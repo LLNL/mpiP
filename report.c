@@ -444,7 +444,7 @@ mpiPi_profile_print (FILE * fp)
                          av[i]->id,
                          j,
                          fileLenMax+4,
-                         sizeof(void*)*2,
+                         (int)sizeof(void*)*2,
                          av[i]->pc[j], 
                          funcLenMax,
                          av[i]->functname[j],
