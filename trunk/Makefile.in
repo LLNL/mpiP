@@ -24,8 +24,11 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	pc_lookup.c \
 	report.c \
-	pcontrol.c
+	pcontrol.c \
+	get_fortran_arg.f
+
 OBJS = $(SRCS:.c=.o)
+OBJS := $(OBJS:.f=.o)
 
 
 ${TARGET}: ${OBJS} TAGS
