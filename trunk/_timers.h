@@ -19,6 +19,7 @@
 #define USECS 1000000
 #define NSECS 1000000000
 
+#include <unistd.h>
 #include <sys/time.h>
 typedef double mpiP_TIMER;
 
@@ -30,6 +31,9 @@ typedef double mpiP_TIMER;
 
 #elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
 #include "timers/crayx1_hw.h"
+
+#elif (defined(Linux) && ! defined(USE_GETTIMEOFDAY) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
+#include "timers/linux_posix.h"
 
 #else
 /* gettimeofday returns microseconds */
