@@ -33,7 +33,7 @@ ${TARGET}: ${OBJS} TAGS
 ${FORTRAN_TARGET}: remake_util ${OBJS} TAGS
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
-	rm util.o
+	rm -f util.o
 
 .PHONY: remake_util
 
