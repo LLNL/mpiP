@@ -24,8 +24,10 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	pc_lookup.c \
 	report.c \
+        mpiPdemangle.c \
 	pcontrol.c
 OBJS = $(SRCS:.c=.o)
+
 
 ${TARGET}: ${OBJS} TAGS
 	${AR} ruv $@ ${OBJS}
@@ -54,9 +56,6 @@ clean::
 	$(MAKE) -C testing clean
 
 include $(srcdir)/Rules.mak
-
-pc_lookup.o: pc_lookup.c
-	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
 
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py --f77symbol $(F77_SYMBOLS) $^
