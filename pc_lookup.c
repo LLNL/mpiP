@@ -174,16 +174,6 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   char buf[128];
   assert (i_addr_hex);
 
-#if 0
-#ifdef AIX
-#ifdef __64BIT__
-  /*  AIX 64-bit apps load .text section at 0x100000000  */
-  i_addr_hex = (void*)((unsigned long)i_addr_hex & 0xfffffffeffffffff);
-  i_addr_hex = (void*)((unsigned long)i_addr_hex + 0x10000000);
-#endif
-#endif
-#endif
-
   if ( abfd == NULL )
     return 1;
 
@@ -198,6 +188,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
   if (!found)
     {
+      mpiPi_msg_debug("returning not found in find_src_loc\n");
       return 1;
     }
   else
@@ -247,7 +238,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 }
 
 
-open_bfd_executable (char *filename)
+void open_bfd_executable (char *filename)
 {
   char *target = NULL;
   char **matching = NULL;
@@ -257,7 +248,7 @@ open_bfd_executable (char *filename)
   if (filename == NULL)
   {
     mpiPi_msg_warn("Executable filename is NULL!\n  If this is a Fortran application, you may be using the incorrect mpiP library.\n");
-    return 1;  /*  failure  */
+    return;
   }
 
   bfd_init ();
@@ -299,7 +290,7 @@ open_bfd_executable (char *filename)
     }
 }
 
-close_bfd_executable ()
+void close_bfd_executable ()
 {
   assert (abfd);
   bfd_close (abfd);
