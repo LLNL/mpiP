@@ -22,6 +22,7 @@
 #define mpiTi_GETUSECS(timeaddr) ((*(timeaddr))/1000)
 #define mpiTi_GETTIMEDIFF(end,start) (((*(hrtime_t*)(end))-(*(hrtime_t*)(start)))/1000)
 
+#define mpiPi_TIMER_NAME "gethrtime"
 #endif
 
 /* eof */
