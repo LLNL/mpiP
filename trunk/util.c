@@ -151,7 +151,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "ngf:b:s:k:t:o")) != EOF);)
+      for (; ((c = getopt (ac, av, "ngf:b:s:k:t:oe")) != EOF);)
 	{
 	  switch (c) {
 	    case 'f':
@@ -269,11 +269,14 @@ mpiPi_getenv ()
               mpiPi.baseNames = 1;
               break;
 	      
+	    case 'e':
+	      mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
+              break;
+	      
 	    case 'a':
 	    case 'b':
 	    case 'c':
 	    case 'd':
-	    case 'e':
 	    case 'h':
 	    case 'i':
 	    case 'j':
