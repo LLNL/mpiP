@@ -50,6 +50,8 @@ typedef struct _callsite_stats
   double cumulativeTimeSquared;
   double maxDur;
   double minDur;
+  double maxDataSent;
+  double minDataSent;
   double cumulativeDataSent;
   void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
   char *filename[MPIP_CALLSITE_STACK_DEPTH_MAX];
@@ -127,6 +129,7 @@ typedef struct _mpiPi_t
   mpiPi_task_info_t *global_task_info;
   double global_app_time;
   double global_mpi_time;
+  double global_mpi_size;
 
   int tableSize;
   h_t *task_callsite_stats;
