@@ -140,7 +140,7 @@ mpiPi_init (char *appName)
   mpiPi.tableSize = 256;
   mpiPi.stackDepth = 1;
   mpiPi.reportPrintThreshold = 0.0;
-
+  mpiPi.baseNames = 0;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =

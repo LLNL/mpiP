@@ -30,6 +30,7 @@ static char *rcsid =
 static int argc=0;
 static char **argv=0;
 
+
 char *
 GetBaseAppName (char *rawName)
 {
@@ -128,6 +129,7 @@ mpiPi_getenv ()
 
   ep = getenv ("MPIP");
   mpiPi.envStr = (ep?strdup (ep):0);
+  optind = 1;  /* reset to avoid conflicts if getopt already called */
   if (ep != NULL)
     {
       int c;
@@ -149,10 +151,9 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "gf:b:s:k:t:o")) != EOF);)
+      for (; ((c = getopt (ac, av, "ngf:b:s:k:t:o")) != EOF);)
 	{
-	  switch (c)
-	    {
+	  switch (c) {
 	    case 'f':
 	      mpiPi.outputDir = optarg;
 	      if (mpiPi.rank == 0)
@@ -263,6 +264,10 @@ mpiPi_getenv ()
 		    mpiPi.enabledCount = 0;
 	      }
 	      break;
+              
+	    case 'n':
+              mpiPi.baseNames = 1;
+              break;
 	      
 	    case 'a':
 	    case 'b':
@@ -274,7 +279,6 @@ mpiPi_getenv ()
 	    case 'j':
 	    case 'l':
 	    case 'm':
-	    case 'n':
 	    case 'p':
 	    case 'q':
 	    case 'r':
@@ -294,6 +298,7 @@ mpiPi_getenv ()
     }
   if (mpiPi.rank == 0)
     mpiPi_msg ("\n");
+  optind = 1;  /* reset to avoid conflicts if getopt called again */
 }
 
 

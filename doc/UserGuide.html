@@ -1,902 +1,715 @@
-<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en"><html><head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="LLNLRandR" content="Jeffrey Vetter, UCRL-CODE-2002-020, Version 2">
-   <meta name="keywords" content="Lightweight, Scalable MPI Profiling"><title>mpiP: Lightweight, Scalable MPI Profiling</title>
-
-   <style>
-A {property:value;text-decoration:none}
-</style><!-- saved from url=(0030)file:/g/g0/chcham/mpip.html --></head><body bgcolor="#ffffff">
-
-<dl><center>
-<h1>
-mpiP: Lightweight, Scalable MPI Profiling</h1></center></dl>
-
-<font face="verdana,arial,helvetica,sans-serif,times" color="black" size="-2"><b><a href="http://www.llnl.gov/disclaimer.html">Privacy &amp; Legal Notice</a></b></font>
-
-
-<center>Version 2.5
-<br>18 August 2003
-<p><font size="+2">Jeffrey Vetter
-<br><a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a></font></p>
-<p><font size="+2">Chris Chambreau
-<br><a href="mailto:chcham@llnl.gov">chcham@llnl.gov</a></font></p></center>
-
-<h1>
-Contents</h1>
-
+<html><head><style type="text/css">
+<!--
+body,p,h1,h2,h3,th,td,ol,ul,li {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #000000;
+}
+.privacyfoter {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+.commandline {
+	font-family: "Courier New", Courier, mono;
+}
+-->
+</style></head><body><p><a href="http://www.llnl.gov/disclaimer.html" class="privacyfoter">Privacy &amp; Legal Notice</a></p>
+<h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI Profiling</a></h1>
+<p align="center">Version 2.5 <br>
+18 August 2003 <br>
+<br>
+Jeffrey Vetter <br>
+<a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a><br>
+<br>
+Chris Chambreau <br>
+<a href="mailto:chcham@llnl.gov">chcham@llnl.gov</a></p>
+<hr width="100%">
+<h2>Contents</h2>
 <ul>
-<li>
-<a href="#Introduction">Introduction</a></li>
-
-<li>
-<a href="#Downloading">Downloading</a></li>
-
-<li>
-<a href="#Contributing">Contributing</a></li>
-
-<li>
-<a href="#New Features">New Features</a></li>
-
-<li>
-<a href="#Using">User Guide (summary)</a></li>
-
-<li>
-<a href="#Supported">Supported Platforms</a></li>
-
-<li>
-<a href="#Building">Building mpiP</a></li>
-
-<li>
-<a href="#Linking Examples">Linking Examples</a></li>
-
-<li>
-<a href="#Runtime Configuration">Runtime Configuration</a></li>
-
-<li>
-<a href="#mpiP Output">mpiP Output</a></li>
-
-<li>
-<a href="#Controlling Scope">Controlling mpiP profiling scope</a></li>
-
-<li>
-<a href="#Caveats">Caveats</a></li>
-
-<li>
-<a href="#Profiled Routines">List of Profiled Routines</a></li>
-
-<li>
-<a href="#Message Size Routines">List of Routine with collected sent message size information</a></li>
-
+<li><a href="#Introduction">Introduction</a><ul>
+<li><a href="#Downloading">Downloading</a></li>
+<li><a href="#Contributing">Contributing</a></li>
+<li><a href="#New_Features">New Features</a></li></ul></li>
+<li><a href="#Using">Using mpiP (summary)</a><ul>
+<li><a href="#Supported">Supported Platforms</a></li>
 </ul>
-
-<h1>
-
-<hr width="100%"><a name="Introduction"></a>Introduction</h1>
-mpiP is a lightweight profiling library for MPI applications. Because it
-only collects statistical information about MPI functions, mpiP generates
-considerably less overhead and much less data than tracing tools. All the
-information captured by mpiP is task-local. It only uses communication
-at the end of the application experiment to merge results from all of the
-tasks into one output file.
-<p>We have tested mpiP on a variety of C/C++/Fortran applications from
-2 to 1536 tasks. Please send your comments, questions, and ideas for enhancements
-to <a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a>.
-
-</p><p>To learn more about performance analysis with mpiP, see Vetter,
-J.S. and M.O. McCracken, "<a href="http://www.llnl.gov/CASC/people/vetter/vetter_pubs.html">Statistical Scalability Analysis of Communication
-Operations in Distributed Applications</a>," Proc. ACM SIGPLAN Symp. on Principles
-and Practice of Parallel Programming (PPOPP), 2001.
-</p>
-<p>The most up-to-date version of this document can be found at <a href="http://www.llnl.gov/casc/mpip/">http://www.llnl.gov/casc/mpip/</a>.</p>
-
-<h1>
-<a name="Downloading"></a>Downloading</h1>
-To download mpiP, follow this <a href="file:/g/g0/chcham/mpip.htmldownload/">link</a>.
-<h1>
-<a name="Contributing"></a>Contributing</h1>
-We are constantly improving mpiP. Bug fixes and ports to new platforms
-are always welcome.
-<p>Many thanks to the following contributors:
-</p><ul>
-<li>
-Michael McCracken (UCSD).</li>
-<li>
-Curt Janssen (Sandia National Laboratory).</li>
-<li>
-Mike Campbell (UIUC).</li>
+</li>
+<li><a href="#Building">Building mpiP</a><ul>
+<li><a href="#Linking_Examples">Linking Examples</a></li>
 </ul>
-
-<h1><a name="New Features"></a>New Features with v2.5</h1>
-<p>Release v2.5 corrects some outstanding issues and provides the following
-new features:
+</li>
+<li><a href="#Runtime_Configuration">Run-time Configuration</a></li>
+<li><a href="#mpiP_Output">mpiP Output</a></li>
+<li><a href="#Controlling_Scope">Controlling mpiP Profiling Scope</a></li>
+<li><a href="#Caveats">Caveats</a></li>
+<li><a href="#Profiled_Routines">List of Profiled Routines</a></li>
+<li><a href="#Message_Size_Routines">List of Routine With Collected Sent Message 
+Size Information</a></li>
+</ul>
+<hr width="75%">
+<h2><a name="Introduction"></a>Introduction</h2>
+<p>mpiP is a lightweight profiling library for MPI applications. Because it only 
+collects statistical information about MPI functions, mpiP generates considerably 
+less overhead and much less data than tracing tools. All the information captured 
+by mpiP is task-local. It only uses communication at the end of the application 
+experiment to merge results from all of the tasks into one output file.
+</p><p> We have tested mpiP on a variety of C/C++/Fortran applications from 2 to 1536 
+tasks. Please send your comments, questions, and ideas for enhancements to <a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a>.
+</p><p> To learn more about performance analysis with mpiP, see Vetter, J.S. and M.O. 
+McCracken, "<a href="http://www.llnl.gov/CASC/people/vetter/vetter_pubs.html">Statistical 
+Scalability Analysis of Communication Operations in Distributed Applications</a>," 
+Proc. ACM SIGPLAN Symp. on Principles and Practice of Parallel Programming (PPOPP), 
+2001.
+</p><h3><a name="Downloading">Downloading</a></h3>
+<p>You may download the current version of mpiP from <a href="http://www.llnl.gov/CASC/mpip/download/">http://www.llnl.gov/CASC/mpip/download/</a></p>
+<h3><a name="Contributing">Contributing</a></h3>
+<p>We are constantly improving mpiP. Bug fixes and ports to new platforms are 
+always welcome. Many thanks to the following contributors:</p>
+<ul>
+<li>Michael McCracken (UCSD)</li>
+<li>Curt Janssen (Sandia National Laboratories)</li>
+<li>Mike Campbell (UIUC)</li>
+</ul>
+<h3><a name="New_Features">New Features with v2.5</a></h3>
+<p>Release v2.5 corrects some outstanding issues and provides the following new 
+features:</p>
 <ul>
 <li>Message Size Reporting</li>
 <li>C++ name demangling</li>
 <li>Long function and file name support</li>
 </ul>
-</p>
-
-<h1>
-<hr width="100%"><a name="Using"></a>Using mpiP</h1>
-Using mpiP is very simple. Because it gathers MPI information through the
-MPI profiling layer, mpiP is a link-time library. That is, you don't have
-to recompile your application to use mpiP. Note that you might have to
-recompile to include the '-g' option. This is important if you want mpiP
-to decode the PC to a source code filename and line number automatically.
-mpiP will work without '-g', but mileage may vary.
-<p>To compile a simple program on LLNL AIX, you need to add the following
-libraries to your compile/link line:
-</p><p><tt>   -L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl</tt>
-</p><p>For example, the new mpiP link line becomes
-</p><p>  $ <tt>mpcc -g -O mpi-foo.c -o mpi-foo.exe -L${mpiP_root}/lib
--lmpiP -lbfd -liberty -lintl</tt>
-</p><p>from
-</p><p>  $ <tt>mpcc -O mpi-foo.c -o mpi-foo.exe</tt>
-</p>
-
-
-<p>Make sure the mpiP library appears before the MPI library on your link
-line. The three libraries (-lbfd -liberty -lintl) provide support for decoding
-the symbol information; they are part of GNU binutils.
-</p><p>Run your application. You can verify that mpiP is working by identifying
-the header and trailer in standard out...
-</p><p><tt>   0:mpiP:</tt>
-<br><tt>   0:mpiP: mpiP V2.5 (Build Aug 28 2001/11:55:57)</tt>
-<br><tt>   0:mpiP: Direct questions and errors to Jeffrey Vetter
-&lt;vetter3@llnl.gov&gt;</tt>
-<br><tt>   0:mpiP:</tt>
-<br><tt>   0:mpiP:</tt>
-<br><tt>   0:mpiP: found 21557 symbols in file [./9-test-mpip-time.exe]</tt>
-<br><tt>   0:mpiP:</tt>
-<br><tt>   0:mpiP: Storing mpiP output in [./9-test-mpip-time.exe.4.37266.mpiP].</tt>
-<br><tt>   0:mpiP:</tt>
-</p><p>By default, the output file is written to the current directory of the
-application. mpiP files are always much smaller than trace files, so writing
-them to this directory is safe.
-</p>
-
-<h1><a name="Supported"></a>Supported Platforms</h1>
-<p>The 2.5 release of mpiP supports Linux, Tru64, and AIX.  Please contact 
-us with bug reports or questions regarding these platforms.  Note that mpiP 
-will not work with MPICH 1.1 nor with the IBM signal-based MPI library 
-(libmpi.a, as opposed to the thread-based implementation libmpi_r.a).  The following table indicates platforms where mpiP was 
-succesfully run and any requirements for that platform. </p>
-<table border="2" align="center" cellpadding="5" width="90%">
-  <tbody>
-    <tr>
-      <td>Platform</td>
-      <td>OS</td>
-      <td>Compiler</td>
-      <td>MPI</td>
-      <td>binutils</td>
-      <td>Requirements</td>
-    </tr>
-    <tr>
-      <td>IBM Power-3/4</td>
-      <td>AIX 5.1</td>
-      <td>VA C 5.0 / VA Fortran 7.1</td>
-      <td>PE 3.2</td>
-      <td>post-7/22/03 snapshot</td>
-      <td>Newer compiler versions require -bnoobjreorder linker flag.  Also, 
-      binutils snapshot after July 22nd 2003 corrects storage class messages.</td>
-    </tr>
-    <tr>
-      <td>IA32-Linux</td>
-      <td>2.4.18 Kernel</td>
-      <td>gcc 2.96, Intel 6.0</td>
-      <td>Quadrics MPI 1.24-8, MPICH 1.2</td>
-      <td>2.14</td>
-      <td>binutils 2.14</td>
-    </tr>
-    <tr>
-      <td>Alpha EV67</td>
-      <td>Tru64 5.1</td>
-      <td>Compaq C 6.4 / Fortran 5.5</td>
-      <td>Quadrics RMS 2.5</td>
-      <td>2.14</td>
-      <td>binutils 2.14</td>
-    </tr>
-  </tbody>
-</table>
-
-<h1><a name="Building"></a>Building mpiP</h1>
-<p>Currently, mpiP requires a compatible GNU <a href="http://sources.redhat.com/binutils">binutils</a> installation.
-The binutils include and lib directories must be specified with the
---with-include and --with-ldflags configure flags.  It is very
-likely that the compilers will need to be indentified, as well, with the
---with-cc, --with-cxx, and --with-f77 flags.  After running configure
-with the appropriate arguments, "make" will build the appropriate
-libraries in the mpiP directory.</p>
-
-<h1><a name="Linking Examples">Example Link Commands for LLNL Machines</a></h1>
-<table border="2" align="center" width="90%" cellpadding="5">
-  <tbody>
-    <tr>
-      <td>OS</td>
-      <td>Compiler</td>
-      <td>Language</td>
-      <td>Example Link Command</td>
-    </tr>
-    <tr>
-      <td rowspan="3">AIX</td>
-      <td rowspan="3">Visual Age</td>
-      <td>C</td>
-      <td>mpxlc -g -bnoobjreorder 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl</td>
-    </tr>
-    <tr>
-      <td>C++</td>
-      <td>mpCC_r -g -bnoobjreorder 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib -lmpiPdmg -lbfd -liberty -lintl</td>
-    </tr>
-    <tr>
-      <td>Fortran</td>
-      <td>mpxlf -g -bnoobjreorder sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl</td>
-    </tr>
-    <tr>
-      <td rowspan="6">Linux</td>
-      <td rowspan="3">Intel</td>
-      <td>C</td>
-      <td>mpiicc -g 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl</td>
-    </tr>
-    <tr>
-      <td>C++</td>
-      <td>mpiicc -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib -lmpiPdmg -lbfd -liberty -lintl </td>
-    </tr>
-    <tr>
-      <td>Fortran</td>
-      <td>mpiifc -g  sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib -lmpiPifc -lbfd -liberty -lintl</td>
-    </tr>
-    <tr>
-      <td rowspan="3">GNU</td>
-      <td>C</td>
-      <td>mpicc -g 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl</td>
-    </tr>
-    </tr>
-      <td>C++</td>
-      <td>mpiCC -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib -lmpiPdmg -lbfd -liberty -lintl  </td>
-    </tr>
-    <tr>
-      <td>Fortran</td>
-      <td>mpif77 -g sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib -lmpiPg77 -lbfd -liberty -lintl</td>
-    <tr>
-    <tr>
-      <td rowspan="3">Tru64</td>
-      <td rowspan="3">Compaq</td>
-      <td>C</td>
-      <td>cc
--g -I/usr/lib/mpi/include 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib
--lmpiP -lbfd -liberty -lintl -lmpi -lpmpi -lexc </td>
-    </tr>
-    <tr>
-      <td>C++</td>
-      <td>cxx -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib -lmpiPdmg -lbfd -liberty -lintl -lmpi -lpmpi -lexc -lmld
-    <tr>
-      <td>Fortran</td>
-      <td>f77 -g -I/usr/lib/mpi/include
-sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty
--lintl -lmpi -lpmpi -lexc</td>
-    </tr>
-  </tbody>
-</table>
-
-<h3>Note:</h3>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Using">Using mpiP</a></h2>
+<p>Using mpiP is very simple. Because it gathers MPI information through the MPI 
+profiling layer, mpiP is a link-time library. That is, you don't have to recompile 
+your application to use mpiP. Note that you might have to recompile to include 
+the '-g' option. This is important if you want mpiP to decode the PC to a source 
+code filename and line number automatically. mpiP will work without <span class="commandline">-g</span>, 
+but mileage may vary.</p>
+<p> To compile a simple program on LLNL AIX, you need to add the following libraries 
+to your compile/link line:</p>
+<blockquote>
+<p><span class="commandline">-L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl</span></p>
+</blockquote>
+<p>For example, the new mpiP link line becomes</p>
+<blockquote>
+<p class="commandline">$ mpcc -g -O mpi-foo.c -o mpi-foo.exe -L${mpiP_root}/lib
+-lmpiP -lbfd -liberty -lintl</p>
+</blockquote>
+<p>from</p>
+<blockquote>
+<p class="commandline">$ mpcc -O mpi-foo.c -o mpi-foo.exe</p>
+</blockquote>
+<p> Make sure the mpiP library appears before the MPI library on your link line. 
+The three libraries (<span class="commandline">-lbfd -liberty -lintl</span>) provide 
+support for decoding the symbol information; they are part of GNU binutils.</p>
+<p> Run your application. You can verify that mpiP is working by identifying the 
+header and trailer in standard out.</p>
+<blockquote>
+<p class="commandline">0:mpiP:<br>
+0:mpiP: mpiP V2.5 (Build Aug 28 2001/11:55:57)<br>
+0:mpiP: Direct questions and errors to Jeffrey Vetter &lt;vetter3@llnl.gov&gt;<br>
+0:mpiP:<br>
+0:mpiP:<br>
+0:mpiP: found 21557 symbols in file [./9-test-mpip-time.exe]<br>
+0:mpiP:<br>
+0:mpiP: Storing mpiP output in [./9-test-mpip-time.exe.4.37266.mpiP].<br>
+0:mpiP:</p>
+</blockquote>
+<p> By default, the output file is written to the current directory of the application. 
+mpiP files are always much smaller than trace files, so writing them to this directory 
+is safe.</p>
+<h3><a name="Supported">Supported Platforms</a></h3>
+<p>The 2.5 release of mpiP supports Linux, Tru64, and AIX. Please contact us with 
+bug reports or questions regarding these platforms. Note that mpiP will not work 
+with MPICH 1.1 nor with the IBM signal-based MPI library (libmpi.a, as opposed 
+to the thread-based implementation libmpi_r.a). The following table indicates 
+platforms where mpiP was succesfully run and any requirements for that platform.</p>
+<table width="100%" border="1" cellspacing="0" cellpadding="3">
+<tbody><tr> 
+<th>Platform</th>
+<th>OS</th>
+<th>Compiler</th>
+<th>MPI</th>
+<th>binutils</th>
+<th>Requirements</th>
+</tr>
+<tr> 
+<td>IBM Power-3/4</td>
+<td>AIX 5.1</td>
+<td>VA C 5.0/<br>
+VA Fortran 7.1</td>
+<td>PE 3.2</td>
+<td>post-7/22/03 snapshot</td>
+<td>Newer compiler versions require <span class="commandline">-bnoobjreorder</span> 
+linker flag. Also, binutils snapshot after July 22, 2003 corrects storage class 
+messages.</td>
+</tr>
+<tr> 
+<td>IA32-Linux</td>
+<td>2.4.18 Kernel</td>
+<td>gcc 2.96,<br>
+Intel 6.0</td>
+<td>Quadrics MPI 1.24-8, MPICH 1.2 2.14</td>
+<td>2.14</td>
+<td>&nbsp;</td>
+</tr>
+<tr> 
+<td>Alpha EV67</td>
+<td>Tru64 5.1</td>
+<td>Compaq C 6.4/<br>
+Fortran 5.5</td>
+<td>Quadrics RMS 2.5 2.14</td>
+<td>2.14</td>
+<td>&nbsp;</td>
+</tr>
+</tbody></table>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Building">Building mpiP</a></h2>
+<p>Currently, mpiP requires a compatible GNU <a href="http://sources.redhat.com/binutils">binutils</a> 
+installation. The binutils include and lib directories must be specified with 
+the <span class="commandline">--with-include</span> and <span class="commandline">--with-ldflags</span> 
+configure flags. It is very likely that the compilers will need to be indentified 
+as well, with the <span class="commandline">--with-cc</span>, <span class="commandline">--with-cxx</span>, 
+and <span class="commandline">--with-f77</span> flags. After running configure 
+with the appropriate arguments, "make" will build the appropriate libraries 
+in the mpiP directory. </p>
+<h3><a name="Linking_Examples">Example Link Commands for LLNL Machines</a></h3>
+<table width="100%" border="1" cellspacing="0" cellpadding="3">
+<tbody><tr> 
+<th>OS</th>
+<th>Compiler</th>
+<th>Language</th>
+<th>Example Link Command</th>
+</tr>
+<tr> 
+<td rowspan="3" align="center">AIX</td>
+<td rowspan="3" align="center">Visual Age</td>
+<td>C</td>
+<td class="commandline">mpxlc -g -bnoobjreorder 1-hot-potato.c -o 1-hot-potato.exe
+-L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>C++</td>
+<td class="commandline">mpCC_r -g -bnoobjreorder 4-demangle.C -o 4-demangle.exe
+-L/usr/local/tools/mpiP/lib -lmpiPdmg -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>Fortran</td>
+<td class="commandline">mpxlf -g -bnoobjreorder sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
+-lmpiP -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td rowspan="6" align="center">Linux</td>
+<td rowspan="3" align="center">Intel</td>
+<td>C</td>
+<td class="commandline">mpiicc -g 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib
+-lmpiP -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>C++</td>
+<td class="commandline">mpiicc -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib
+-lmpiPdmg -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>Fortran</td>
+<td class="commandline">mpiifc -g sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
+-lmpiPifc -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td rowspan="3" align="center">GNU</td>
+<td>C</td>
+<td class="commandline">mpicc -g 1-hot-potato.c -o 1-hot-potato.exe -L/usr/local/tools/mpiP/lib
+-lmpiP -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>C++</td>
+<td class="commandline">mpiCC -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib
+-lmpiPdmg -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td>Fortran</td>
+<td class="commandline">mpif77 -g sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
+-lmpiPg77 -lbfd -liberty -lintl</td>
+</tr>
+<tr> 
+<td rowspan="3" align="center">Tru64</td>
+<td rowspan="3" align="center">Compaq</td>
+<td>C</td>
+<td class="commandline">cc -g -I/usr/lib/mpi/include 1-hot-potato.c -o 1-hot-potato.exe
+-L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lmpi -lpmpi -lexc</td>
+</tr>
+<tr> 
+<td>C++</td>
+<td class="commandline">cxx -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib
+-lmpiPdmg -lbfd -liberty -lintl -lmpi -lpmpi -lexc -lmld</td>
+</tr>
+<tr> 
+<td>Fortran</td>
+<td class="commandline">f77 -g -I/usr/lib/mpi/include sweep-ops.f -o sweep-ops.exe
+-L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lmpi -lpmpi -lexc</td>
+</tr>
+</tbody></table>
+<p><b>Note</b>:</p>
 <ul>
-<li>On Linux, the mpiP Fortran libraries have unique names: libmpiPifc.a for the Intel compiler
-and libmpiPg77.a for the GNU compiler.</li>
-<li>Demangling support is implemented in the library libmpiPdmg.a.  This
-library will be built if "--enable-demangling=[GNU|IBM|Compaq]" is provided
-to the configure script.  Use GNU for the Intel compiler.
-</li>
-<li>On Tru64, the exception library flag (-lexc) must be added to the link command.</li>
-<li>Source lookup for callsites may fail with certain versions of binutils.
-If you are running into trouble, you may want to download a recent
-snapshot from ftp://sources.redhat.com/pub/binutils/snapshots.
-</li>
+<li>On Linux, the mpiP Fortran libraries have unique names: libmpiPifc.a for the 
+Intel compiler and libmpiPg77.a for the GNU compiler. </li>
+<li>Demangling support is implemented in the library libmpiPdmg.a. This library 
+will be built if <span class="commandline">--enable-demangling=[GNU|IBM|Compaq]</span> 
+is provided to the configure script. Use GNU for the Intel compiler. </li>
+<li>On Tru64, the exception library flag (<span class="commandline">-lexc</span>) 
+must be added to the link command. </li>
+<li>Source lookup for callsites may fail with certain versions of binutils. If 
+you are running into trouble, you may want to download a recent snapshot from 
+<a href="ftp://sources.redhat.com/pub/binutils/snapshots">ftp://sources.redhat.com/pub/binutils/snapshots</a>.</li>
 </ul>
-
-<h1>
-<a name="Runtime Configuration">Runtime Configuration of mpiP</a></h1>
-mpiP has several configurable parameters that a user can set via an environment
-variable: MPIP. The setting for MPIP looks like command-line parameters:
-"-t 10 -k 2". Currently, mpiP has several configurable parameters.
-<br>
-<center><br><table border="1">
-<caption>
-<center></center></caption><tbody>
-</tbody>
-
-
-<tbody><tr>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Runtime_Configuration">Run-time Configuration of mpiP</a></h2>
+<p>mpiP has several configurable parameters that a user can set via the environment 
+variable MPIP. The setting for MPIP looks like command-line parameters: "-t 
+10 -k 2". Currently, mpiP has several configurable parameters.</p>
+<table width="90%" border="1" cellspacing="0" cellpadding="3">
+<tbody><tr> 
 <th>Option</th>
-
 <th>Description</th>
-
 <th>Default</th>
 </tr>
-
-<tr>
-<td><tt>-g</tt></td>
-
-<td>Enable mpiP debug mode.</td>
-
-<td>disabled</td>
+<tr> 
+<td class="commandline">-g</td>
+<td>Enable mpiP debug mode. </td>
+<td align="center">disabled</td>
 </tr>
-
-<tr>
-<td><tt>-s n</tt></td>
-
+<tr> 
+<td class="commandline">-s n</td>
 <td>Set hash table size to &lt;n&gt;.</td>
-
-<td>256</td>
+<td align="center">256</td>
 </tr>
-
-<tr>
-<td><tt>-f dir</tt></td>
-
+<tr> 
+<td class="commandline">-f dir</td>
 <td>Record output file in directory &lt;dir&gt;.</td>
-
-<td>.</td>
+<td align="center">.</td>
 </tr>
-
-<tr>
-<td><tt>-k n</tt></td>
-
+<tr> 
+<td class="commandline">-k n</td>
 <td>Sets callsite stack traceback depth to &lt;n&gt;.</td>
-
-<td>1</td>
+<td align="center">1</td>
 </tr>
-
+<tr> 
+<td class="commandline">-t x</td>
+<td>Set print threshold for report, where &lt;x&gt; is the MPI percentage of time 
+for each callsite.</td>
+<td align="center">0.0</td>
+</tr>
 <tr>
-<td><tt>-t x</tt></td>
-
-<td>Set print threshold for report, where &lt;x&gt; is the MPI percentage
-of time for each callsite.</td>
-
-<td>0.0</td>
+<td class="commandline">-o</td>
+<td>Disable profiling at initialization. Application must enable profiling with
+MPI_Pcontrol().</td>
+<td align="center">&nbsp;</td>
 </tr>
-
 <tr>
-<td><tt>-n</tt></td>
-
-<td>Strip directory names from source code filenames.</td>
-
-<td></td>
-</tr>
-
-<tr>
-<td><tt>-o</tt></td>
-
-<td>Disable profiling at initialization. Application must enable profiling
-with MPI_Pcontrol().</td>
-
-<td></td>
-</tr>
-</tbody></table></center>
-
-<p>For example, to set the callsite stack walking depth to 2 and the report
-print threshold to 10%, you simply need to define the mpiP string in your
-environment:
-</p><p><tt>  $ export MPIP="-t 10.0 -k 2"</tt>
-</p><p>mpiP prints a message at initialization if it successfully finds this
-MPIP variable.
-</p><h1>
-<a name="mpiP Output">mpiP Output</a></h1>
-Here's some sample output from mpiP with an application that has 4 MPI
-calls. I'll break it down by sections below. Here's the experiment setup.
-<i>Note
-that MPIP does not capture information about ALL MPI calls.</i> Local calls,
-such as <tt>MPI_Comm_size</tt>, are omitted from the profiling library
-measurement to reduce perturbation and mpiP output.
-<p>Here's the test code.
-</p><p><tt>  sleeptime = 10;</tt>
-<br><tt>  MPI_Init (&amp;argc, &amp;argv);</tt>
-<br><tt>  MPI_Comm_size (comm, &amp;nprocs);</tt>
-<br><tt>  MPI_Comm_rank (comm, &amp;rank);</tt>
-<br><tt>  MPI_Barrier (comm);</tt>
-<br><tt>  if (rank == 0)</tt>
-<br><tt>    {</tt>
-<br><tt>      sleep (sleeptime);       
-/* slacker! delaying everyone else */</tt>
-<br><tt>    }</tt>
-<br><tt>  MPI_Barrier (comm);</tt>
-<br><tt>  MPI_Finalize ();</tt>
-</p><p>The code was compiled with
-</p><p><tt>  $ mpcc -g -g -DAIX 9-test-mpip-time.c -o 9-test-mpip-time.exe 
-\</tt>
-<br><tt>       -L.. -L/g/g2/vetter/AIX/lib 
--lmpiP -lbfd -liberty -lintl</tt>
-</p><p>Environment variables were set as
-</p><p><tt>  $ export MPIP="-t 10.0"</tt>
-</p><p>The example was executed on snow like this
-</p><p> <tt> $ ./9-test-mpip-time.exe -procs 4 -nodes 1</tt>
-</p><p>This experiment produced an output file
-</p><p><tt>  ./9-test-mpip-time.exe.4.37266.mpiP</tt>
-</p><p>that we can now analyze. Header information provides basic
-<br>information about your performance experiment.
-</p><p><tt>@ mpiP</tt>
-<br><tt>@ Command : ./9-test-mpip-time.exe</tt>
-<br><tt>@ Version                 
-: 2.5</tt>
-<br><tt>@ MPIP Build date         
-: Aug 28 2001, 11:55:57</tt>
-<br><tt>@ Start time              
-: 2001 08 28 12:07:18</tt>
-<br><tt>@ Stop time               
-: 2001 08 28 12:07:28</tt>
-<br><tt>@ MPIP env var
-: -t 10.0</tt>
-<br><tt>@ Collector Rank          
-: 0</tt>
-<br><tt>@ Collector PID           
-: 37266</tt>
-<br><tt>@ Final Output Dir        
-: .</tt>
-<br><tt>@ MPI Task Assignment      : 0 snow06.llnl.gov</tt>
-<br><tt>@ MPI Task Assignment      : 1 snow06.llnl.gov</tt>
-<br><tt>@ MPI Task Assignment      : 2 snow06.llnl.gov</tt>
-<br><tt>@ MPI Task Assignment      : 3 snow06.llnl.gov</tt>
-</p><p>This next section above provides an overview of the application's time
-in MPI. Apptime is the wall-clock time from the end of <tt>MPI_Init</tt>
-until the beginning of <tt>MPI_Finalize</tt>. MPI_Time is the wall-clock
-time for all the MPI calls contained within Apptime. MPI% shows the ratio
-of this MPI_Time to Apptime. The asterisk (*) is the aggregate line for
-the entire application.
-</p><p><tt>---------------------------------------------------------------------------</tt>
-<br><tt>@--- MPI Time (seconds) ---------------------------------------------------</tt>
-<br><tt>---------------------------------------------------------------------------</tt>
-<br><tt>Task    AppTime    MPITime    
-MPI%</tt>
-<br><tt>   0        
-10   0.000243     0.00</tt>
-<br><tt>   1        
-10         10   
-99.92</tt>
-<br><tt>   2        
-10         10   
-99.92</tt>
-<br><tt>   3        
-10         10   
-99.92</tt>
-<br><tt>   *        
-40         30   
-74.94</tt>
-</p><p>The callsite section identifies all the MPI callsites within the application.
-The first number is the callsite ID for this mpiP file. The next column
-shows the type of MPI call (w/o the MPI_ prefix). The name of the function
-that contains this MPI call is next, followed by the filename and line
-number. Finally, the last column shows the PC, or program counter for that
-MPI callsite. Note that the default setting for callsite stack walk depth
-is 1. Other settings will enumerate callsites by the entire stack trace
-rather than the single callsite alone.
-</p>
-<p><tt>---------------------------------------------------------------------------</tt>
-<br><tt>@--- Callsites: 2 ---------------------------------------------------------</tt>
-<br><tt>---------------------------------------------------------------------------</tt>
-<br><tt> ID Lev File           
-Line Parent_Funct         MPI_Call</tt>
-<br><tt>  1   0 9-test-mpip-time.c   47 .main                         
-Barrier</tt>
-<br><tt>  2   0 9-test-mpip-time.c   56 .main                         
-Barrier</tt>
-</p><p>The aggregate time section is a very quick overview of the top twenty
-MPI callsites that consume the most aggregate time in your application.
-Call identifies the type of MPI function. Site provides the callsite ID
-(as listed in the callsite section). Time is the aggregate time for that
-callsite in milliseconds. The final two columns show the ratio of that
-aggregate time to the total application time and to the total MPI time,
-respectively.
-</p><p><tt>---------------------------------------------------------------------------</tt>
-<br><tt>@--- Aggregate Time (top twenty, descending, milliseconds) ----------------</tt>
-<br><tt>---------------------------------------------------------------------------</tt>
-<br><tt>Call                
-Site      Time     App%   
-MPI%</tt>
-<br><tt>Barrier                
-2      3e+04   74.94  100.00</tt>
-<br><tt>Barrier                
-1      0.547    0.00   
-0.00</tt>
-</p>
-<p>The next section is similar to the aggregate time section, although
-it reports on the top 20 callsite for total sent message sizes.  For example:
+<td class="commandline">-n</td>
+<td>Do not truncate full pathname of filename in callsites.</td>
+<td align="center">&nbsp;</td>
+</tr></tbody></table>
+<p>For example, to set the callsite stack walking depth to 2 and the report print 
+threshold to 10%, you simply need to define the mpiP string in your environment:</p>
+<p class="commandline">$ export MPIP="-t 10.0 -k 2"</p>
+<p> mpiP prints a message at initialization if it successfully finds this MPIP 
+variable.</p>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="mpiP_Output">mpiP Output</a></h2>
+<p>Here is some sample output from mpiP with an application that has 4 MPI calls. 
+It is broken down by sections below. Here also is the experiment setup. <b>Note 
+that MPIP does not capture information about ALL MPI calls</b><i>.</i> Local calls, 
+such as <span class="commandline">MPI_Comm_size</span>, are omitted from the profiling 
+library measurement to reduce perturbation and mpiP output.</p>
+<p><b>The test code</b>:</p>
+<pre>  sleeptime = 10; 
+  MPI_Init (&amp;argc, &amp;argv); 
+  MPI_Comm_size (comm, &amp;nprocs); 
+  MPI_Comm_rank (comm, &amp;rank); 
+  MPI_Barrier (comm); 
+  if (rank == 0) 
+    { 
+      sleep (sleeptime);        /* slacker! delaying everyone else */ 
+    } 
+  MPI_Barrier (comm); 
+  MPI_Finalize ();
+</pre>
+<p><b>The code was compiled with</b>:</p>
+<pre>  $ mpcc -g -g -DAIX 9-test-mpip-time.c -o 9-test-mpip-time.exe  \
+       -L.. -L/g/g2/vetter/AIX/lib  -lmpiP -lbfd -liberty -lintl
+</pre>
+<p><b>Environment variables were set as</b>:</p>
+<pre>  $ export MPIP="-t 10.0"</pre>
+<p><b>The example was executed on Snow like this</b>:</p>
+<pre>  $ ./9-test-mpip-time.exe -procs 4 -nodes 1</pre>
+<p><b>This experiment produced an output file that we can now analyze</b>:</p>
+<pre>  ./9-test-mpip-time.exe.4.37266.mpiP</pre>
+<p>Header information provides basic information about your performance experiment.</p>
+<pre>@ mpiP
+@ Command : ./9-test-mpip-time.exe
+@ Version                  : 2.5
+@ MPIP Build date          : Aug 28 2001, 11:55:57
+@ Start time               : 2001 08 28 12:07:18
+@ Stop time                : 2001 08 28 12:07:28
+@ MPIP env var : -t 10.0
+@ Collector Rank           : 0
+@ Collector PID            : 37266
+@ Final Output Dir         : .
+@ MPI Task Assignment      : 0 snow06.llnl.gov
+@ MPI Task Assignment      : 1 snow06.llnl.gov
+@ MPI Task Assignment      : 2 snow06.llnl.gov
+@ MPI Task Assignment      : 3 snow06.llnl.gov</pre>
+<p>This next section provides an overview of the application's time in MPI. Apptime 
+is the wall-clock time from the end of <span class="commandline">MPI_Init</span> 
+until the beginning of <span class="commandline">MPI_Finalize</span>. MPI_Time 
+is the wall-clock time for all the MPI calls contained within Apptime. MPI% shows 
+the ratio of this MPI_Time to Apptime. The asterisk (*) is the aggregate line 
+for the entire application.</p>
+<pre>---------------------------------------------------------------------------
+@--- MPI Time (seconds) ---------------------------------------------------
+---------------------------------------------------------------------------
+Task    AppTime    MPITime    MPI%
+   0         10   0.000243    0.00
+   1         10         10   99.92
+   2         10         10   99.92
+   3         10         10   99.92
+   *         40         30   74.94</pre>
+<p> The callsite section identifies all the MPI callsites within the application. 
+The first number is the callsite ID for this mpiP file. The next column shows 
+the type of MPI call (w/o the MPI_ prefix). The name of the function that contains 
+this MPI call is next, followed by the file name and line number. Finally, the 
+last column shows the PC, or program counter, for that MPI callsite. Note that 
+the default setting for callsite stack walk depth is 1. Other settings will enumerate 
+callsites by the entire stack trace rather than the single callsite alone.</p>
+<pre>---------------------------------------------------------------------------
+@--- Callsites: 2 ---------------------------------------------------------
+---------------------------------------------------------------------------
+ ID Lev File            Line Parent_Funct         MPI_Call
+  1   0 9-test-mpip-time.c   47 .main                          Barrier
+  2   0 9-test-mpip-time.c   56 .main                          Barrier</pre>
+<p>The aggregate time section is a very quick overview of the top twenty MPI 
+callsites that consume the most aggregate time in your application. Call identifies 
+the type of MPI function. Site provides the callsite ID (as listed in the callsite 
+section). Time is the aggregate time for that callsite in milliseconds. The final 
+two columns show the ratio of that aggregate time to the total application time 
+and to the total MPI time, respectively.</p>
+<pre>---------------------------------------------------------------------------
+@--- Aggregate Time (top twenty, descending, milliseconds) ----------------
+---------------------------------------------------------------------------
+Call                 Site      Time     App%     MPI%
+Barrier                 2      3e+04   74.94   100.00 
+Barrier                 1      0.547    0.00     0.00</pre>
+<p>The next section is similar to the aggregate time section, although it reports 
+on the top 20 callsites for total sent message sizes. For example:</p>
 <pre>--------------------------------------------------------------------------- 
 @--- Aggregate Sent Message Size (top twenty, descending, bytes) ---------- 
 --------------------------------------------------------------------------- 
-Call                 Site      Count      Total       Avrg   MPI% 
-Send                    7        320   1.92e+06      6e+03  99.96 
-Bcast                   1         12        336         28   0.02 </pre>
+Call                 Site      Count      Total    Avrg      MPI% 
+Send                    7        320   1.92e+06   6e+03     99.96 
+Bcast                   1         12        336      28      0.02</pre>
+<p>The final sections are the ad nauseum listing of the statistics for each callsite 
+across all tasks, followed by an aggregate line (indicated by an asterisk in the 
+Rank column). The first section is for operation time followed by the section 
+for message sizes.</p>
+<pre>---------------------------------------------------------------------------
+@--- Callsite statistics (all, milliseconds): 8 ---------------------------
+---------------------------------------------------------------------------
+Name              Site Rank  Count      Max     Mean      Min   App%   MPI%
+Barrier              1    0      1    0.107    0.107    0.107   0.00  44.03
+Barrier              1    *      4    0.174    0.137    0.107   0.00   0.00
 
-</p><p>The final sections are the ad nauseum listing of the statistics for each
-callsite across all tasks, followed by an aggregate line (indicated by
-an asterisk in the Rank column).  The first section is for operation time
-followed by the a section for message sizes.
-</p><p><tt>---------------------------------------------------------------------------</tt>
-<br><tt>@--- Callsite statistics (all, milliseconds): 8 ---------------------------</tt>
-<br><tt>---------------------------------------------------------------------------</tt>
-<br><tt>Name             
-Site Rank  Count      Max    
-Mean      Min   App%   MPI%</tt>
-<br><tt>Barrier             
-1    0      1   
-0.107    0.107    0.107   0.00 
-44.03</tt>
-<br><tt>Barrier             
-1    *      4   
-0.174    0.137    0.107   0.00  
-0.00</tt>
-</p><p><tt>Barrier             
-2    0      1   
-0.136    0.136    0.136   0.00 
-55.97</tt>
-<br><tt>Barrier             
-2    1      1   
-1e+04    1e+04    1e+04  99.92 100.00</tt>
-<br><tt>Barrier             
-2    2      1   
-1e+04    1e+04    1e+04  99.92 100.00</tt>
-<br><tt>Barrier             
-2    3      1   
-1e+04    1e+04    1e+04  99.92 100.00</tt>
-<br><tt>Barrier             
-2    *      4   
-1e+04  7.5e+03    0.136  74.94 100.00</tt>
-</p><p>Remember that we configured MPIP to not print lines where MPI% was less
-than 10%. All aggregate lines are printed regardless of the configuration
-settings.
-<br> 
-</p><center><br><table border="1">
-<caption>
-<center></center></caption><tbody>
-</tbody>
-
-
-<tbody><tr>
+Barrier              2    0      1    0.136    0.136    0.136   0.00  55.97
+Barrier              2    1      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    2      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    3      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00</pre>
+<p>Remember that we configured MPIP to not print lines where MPI% was less than 
+10%. All aggregate lines are printed regardless of the configuration settings.</p>
+<table width="70%" border="1" cellspacing="0" cellpadding="3">
+<tbody><tr> 
 <th>Column</th>
-
 <th>Description</th>
 </tr>
-
-<tr>
+<tr> 
 <td>Name</td>
-
 <td>Name of the MPI function at that callsite.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Site</td>
-
 <td>Callsite ID as listed in the callsite section above.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Rank</td>
-
 <td>Task rank in MPI_COMM_WORLD.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Count</td>
-
 <td>Number of times this call was executed.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Max</td>
-
 <td>Maximum wall-clock time for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Mean</td>
-
 <td>Arithmetic mean of the wall-clock time for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Min</td>
-
-<td> Minimum wall-clock time for one call.</td>
+<td>Minimum wall-clock time for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>App%</td>
-
-<td> Ratio of time for this call to the overall application time for
-each task.</td>
+<td>Ratio of time for this call to the overall application time for each task.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>MPI%</td>
-
-<td> Ratio of time for this call to the overall MPI time for each
-task.</td>
+<td>Ratio of time for this call to the overall MPI time for each task.</td>
 </tr>
-</tbody></table></center>
-
-<p>The aggregate result for each call has the same measurement meaning;
-however, the statistics are gathered across all tasks and compared with
-the aggregate application and MPI times.
-</p>
-
-<p>The section for sent message sizes has a similar format.</p>
-<pre>
---------------------------------------------------------------------------- 
+</tbody></table>
+<p> The aggregate result for each call has the same measurement meaning; however, 
+the statistics are gathered across all tasks and compared with the aggregate application 
+and MPI times.</p>
+<p> The section for sent message sizes has a similar format.</p>
+<pre>--------------------------------------------------------------------------- 
 @--- Callsite statistics (all, sent bytes) -------------------------------- 
 --------------------------------------------------------------------------- 
-Name              Site Rank   Count       Max      Mean       Min       Sum 
-Send                 5    0      80      6000      6000      6000   4.8e+05 
-Send                 5    1      80      6000      6000      6000   4.8e+05 
-Send                 5    2      80      6000      6000      6000   4.8e+05 
-Send                 5    3      80      6000      6000      6000   4.8e+05 
-Send                 5    *     320      6000      6000      6000  1.92e+06 
-</pre>
-
-<center><br><table border="1">
-
-<tbody><tr>
+Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Site Rank&nbsp;&nbsp; Count&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Max&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Mean&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Min&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sum 
+Send&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp; 4.8e+05 
+Send&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp; 4.8e+05 
+Send&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp; 4.8e+05 
+Send&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp; 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp; 4.8e+05 
+Send&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;&nbsp; 320&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6000&nbsp; 1.92e+06</pre>
+<table width="70%" border="1" cellspacing="0" cellpadding="3">
+<tbody><tr> 
 <th>Column</th>
-
 <th>Description</th>
 </tr>
-
-<tr>
+<tr> 
 <td>Name</td>
-
 <td>Name of the MPI function at that callsite.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Site</td>
-
 <td>Callsite ID as listed in the callsite section above.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Rank</td>
-
 <td>Task rank in MPI_COMM_WORLD.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Count</td>
-
 <td>Number of times this call was executed.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Max</td>
-
 <td>Maximum sent message size in bytes for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Mean</td>
-
 <td>Arithmetic mean of the sent message sizes in bytes for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Min</td>
-
-<td> Minimum sent message size in bytes for one call.</td>
+<td>Minimum sent message size in bytes for one call.</td>
 </tr>
-
-<tr>
+<tr> 
 <td>Sum</td>
-
-<td> Total of all message sizes for this operation and callsite.</td>
+<td>Total of all message sizes for this operation and callsite.</td>
 </tr>
-</tbody></table></center>
-
-
-<h1>
-<a name="Controlling Scope">Controlling the Scope of MPIP Profiling in your Application</a></h1>
-In MPIP, you can limit the scope of profiling measurements to specific
-regions of your code using the <tt>MPI_Pcontrol(int level)</tt> subroutine.
-A value of zero disables MPIP profiling while any nonzero value enables
-profiling. To disable profiling initially at MPI_Init, use the -o configuration
-option. MPIP will only record information about MPI commands encountered
-between activation and deactivation. There is no limit to the number to
-times that an application can activate profiling during execution.
-<p>For example, in your application you can capture the MPI activity for
-timestep 5 only using Pcontrol. Remeber to set the MPIP environment variable
-to include '-o' when using this feature.
-</p><p><tt>for(i=1; i &lt; 10; i++)</tt>
-<br><tt>{</tt>
-<br><tt>  switch(i)</tt>
-<br><tt>  {</tt>
-<br><tt>    case 5:</tt>
-<br><tt>      MPI_Pcontrol(1);</tt>
-<br><tt>      break;</tt>
-<br><tt>    case 6:</tt>
-<br><tt>      MPI_Pcontrol(0);</tt>
-<br><tt>      break;</tt>
-<br><tt>    default:</tt>
-<br><tt>      break;</tt>
-<br><tt>  }</tt>
-<br><tt>  /* ... compute and communicate for one timestep ... */</tt>
-<br><tt>}</tt>
-</p><h1>
-<a name="Caveats">Caveats</a></h1>
-
+</tbody></table>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Controlling_Scope">Controlling the Scope of mpiP Profiling
+in your Application</a></h2>
+<p>In mpiP, you can limit the scope of profiling measurements to specific regions 
+of your code using the <span class="commandline">MPI_Pcontrol(int level)</span> 
+subroutine. A value of zero disables mpiP profiling, while any nonzero value enables 
+profiling. To disable profiling initially at MPI_Init, use the <span class="commandline">-o</span>
+configuration option. mpiP will only record information about MPI commands encountered 
+between activation and deactivation. There is no limit to the number to times 
+that an application can activate profiling during execution.</p>
+<p> For example, in your application you can capture the MPI activity for timestep 
+5 only using Pcontrol. Remember to set the mpiP environment variable to include 
+<span class="commandline">-o</span> when using this feature.</p>
+<pre>for(i=1; i &lt; 10; i++) 
+{ 
+  switch(i) 
+  { 
+    case 5: 
+      MPI_Pcontrol(1); 
+      break; 
+    case 6: 
+      MPI_Pcontrol(0); 
+      break; 
+    default: 
+      break; 
+  } 
+  /* ... compute and communicate for one timestep ... */ 
+}</pre>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Caveats">Caveats</a></h2>
 <ul>
-<li>
-If mpiP has problems with the source code translation, you might be able
-to decode the program counters on LLNL systems with some of the following
-techniques. You can use instmap, addr2line, or look at the assembler code
-itself.</li>
-
-<li>
-Compiler transformations like loop unrolling can sometimes make one source
-code line appear as many different PCs. You can verify this by looking
-at the assembler. In my experience, both instmap and addr2line do a pretty
-good job of mapping these transformed PCs into a filename and line number.</li>
-
+<li>If mpiP has problems with the source code translation, you might be able to 
+decode the program counters on LLNL systems with some of the following techniques. 
+You can use instmap, addr2line, or look at the assembler code itself.</li>
+<li>Compiler transformations like loop unrolling can sometimes make one source 
+code line appear as many different PCs. You can verify this by looking at the 
+assembler. In my experience, both instmap and addr2line do a pretty good job of 
+mapping these transformed PCs into a file name and line number. 
 <ul>
-<li>
- instmap - an IBM utility</li>
-
-<li>
- addr2line - a gnu tool</li>
-
-<li>
- look at the assembler listing, or with GNU's objdump (-d -S)</li>
-
-<li>
- use Totalview or gdb to translate the PC</li>
+<li>instmap&#8212;an IBM utility</li>
+<li>addr2line&#8212;a gnu tool</li>
+<li>look at the assembler listing, or with GNU's objdump (<span class="commandline">-d 
+-S</span>)</li>
+<li>use Totalview or gdb to translate the PC</li>
 </ul>
-<li>There are known incompatibilities with certain binutils versions
-and recent versions of the IBM compilers.  As of this release, a fix 
-has not been incorporated into binutils, however, using the "-bnoobjreorder" 
+</li><li>There are known incompatibilities with certain binutils versions and recent 
+versions of the IBM compilers. As of this release, a fix has not been incorporated 
+into binutils, however, using the <span class="commandline">-bnoobjreorder</span> 
 option is a valid work-around.</li>
-
-<li>Issues when stack walking optimized applications:
+<li>Issues when stack walking optimized applications: 
 <ul>
-    <li>Applications compiled with gcc may return incorrect parent functions,
-    however, the file and line number information may be correct.</li>
-
-    <li>Applications compiled with the Intel compiler may not be able to
-    identify parent stack frames.</li>
-</ul></li>
-<li>If you are calling MPI functions from within dynamically loaded objects,
-you may need to recompile the library as a shared object.</li>
-
+<li>Applications compiled with gcc may return incorrect parent functions; however, 
+the file and line number information may be correct.</li>
+<li>Applications compiled with the Intel compiler may not be able to identify 
+parent stack frames.</li>
+</ul>
+</li><li>If you are calling MPI functions from within dynamically loaded objects, you 
+may need to recompile the library as a shared object.</li>
 <li>The mpiP library currently will not compile with g++ &gt;= 2.96.</li>
-
 <li>The mpiP library currently will not link with the signal-based IBM mpi library.</li>
 </ul>
-
-<h1>
-<a name="Profiled Routines">MPI Routines Profiled with MPIP</a></h1>
-
-<blockquote><tt>MPI_Allgather</tt>
-<br><tt>MPI_Allgatherv</tt>
-<br><tt>MPI_Allreduce</tt>
-<br><tt>MPI_Alltoall</tt>
-<br><tt>MPI_Alltoallv</tt>
-<br><tt>MPI_Attr_delete</tt>
-<br><tt>MPI_Attr_get</tt>
-<br><tt>MPI_Attr_put</tt>
-<br><tt>MPI_Barrier</tt>
-<br><tt>MPI_Bcast</tt>
-<br><tt>MPI_Bsend</tt>
-<br><tt>MPI_Bsend_init</tt>
-<br><tt>MPI_Buffer_attach</tt>
-<br><tt>MPI_Buffer_detach</tt>
-<br><tt>MPI_Cancel</tt>
-<br><tt>MPI_Cart_coords</tt>
-<br><tt>MPI_Cart_create</tt>
-<br><tt>MPI_Cart_get</tt>
-<br><tt>MPI_Cart_map</tt>
-<br><tt>MPI_Cart_rank</tt>
-<br><tt>MPI_Cart_shift</tt>
-<br><tt>MPI_Cart_sub</tt>
-<br><tt>MPI_Cartdim_get</tt>
-<br><tt>MPI_Comm_create</tt>
-<br><tt>MPI_Comm_dup</tt>
-<br><tt>MPI_Comm_group</tt>
-<br><tt>MPI_Comm_remote_group</tt>
-<br><tt>MPI_Comm_remote_size</tt>
-<br><tt>MPI_Comm_split</tt>
-<br><tt>MPI_Comm_test_inter</tt>
-<br><tt>MPI_Dims_create</tt>
-<br><tt>MPI_Error_class</tt>
-<br><tt>MPI_Gather</tt>
-<br><tt>MPI_Gatherv</tt>
-<br><tt>MPI_Graph_create</tt>
-<br><tt>MPI_Graph_get</tt>
-<br><tt>MPI_Graph_map</tt>
-<br><tt>MPI_Graph_neighbors</tt>
-<br><tt>MPI_Graph_neighbors_count</tt>
-<br><tt>MPI_Graphdims_get</tt>
-<br><tt>MPI_Group_compare</tt>
-<br><tt>MPI_Group_difference</tt>
-<br><tt>MPI_Group_excl</tt>
-<br><tt>MPI_Group_free</tt>
-<br><tt>MPI_Group_incl</tt>
-<br><tt>MPI_Group_intersection</tt>
-<br><tt>MPI_Group_translate_ranks</tt>
-<br><tt>MPI_Group_union</tt>
-<br><tt>MPI_Ibsend</tt>
-<br><tt>MPI_Intercomm_create</tt>
-<br><tt>MPI_Intercomm_merge</tt>
-<br><tt>MPI_Iprobe</tt>
-<br><tt>MPI_Irecv</tt>
-<br><tt>MPI_Irsend</tt>
-<br><tt>MPI_Isend</tt>
-<br><tt>MPI_Issend</tt>
-<br><tt>MPI_Keyval_create</tt>
-<br><tt>MPI_Keyval_free</tt>
-<br><tt>MPI_Pack</tt>
-<br><tt>MPI_Probe</tt>
-<br><tt>MPI_Recv</tt>
-<br><tt>MPI_Recv_init</tt>
-<br><tt>MPI_Reduce</tt>
-<br><tt>MPI_Reduce_scatter</tt>
-<br><tt>MPI_Request_free</tt>
-<br><tt>MPI_Rsend</tt>
-<br><tt>MPI_Rsend_init</tt>
-<br><tt>MPI_Scan</tt>
-<br><tt>MPI_Scatter</tt>
-<br><tt>MPI_Scatterv</tt>
-<br><tt>MPI_Send</tt>
-<br><tt>MPI_Send_init</tt>
-<br><tt>MPI_Sendrecv</tt>
-<br><tt>MPI_Sendrecv_replace</tt>
-<br><tt>MPI_Ssend</tt>
-<br><tt>MPI_Ssend_init</tt>
-<br><tt>MPI_Start</tt>
-<br><tt>MPI_Startall</tt>
-<br><tt>MPI_Test</tt>
-<br><tt>MPI_Testall</tt>
-<br><tt>MPI_Testany</tt>
-<br><tt>MPI_Testsome</tt>
-<br><tt>MPI_Topo_test</tt>
-<br><tt>MPI_Type_commit</tt>
-<br><tt>MPI_Type_free</tt>
-<br><tt>MPI_Type_get_contents</tt>
-<br><tt>MPI_Type_get_envelope</tt>
-<br><tt>MPI_Unpack</tt>
-<br><tt>MPI_Wait</tt>
-<br><tt>MPI_Waitall</tt>
-<br><tt>MPI_Waitany</tt>
-<br><tt>MPI_Waitsome</tt></blockquote>
-
-<br>
-
-<h1>
-<a name="Message Size Routines">MPI Routines for which MPIP gathers sent message size data</a></h1>
-<blockquote><tt>MPI_Allgather</tt>
-<br><tt>MPI_Allgatherv</tt>
-<br><tt>MPI_Allreduce</tt>
-<br><tt>MPI_Alltoall</tt>
-<br><tt>MPI_Bcast</tt>
-<br><tt>MPI_Bsend</tt>
-<br><tt>MPI_Gather</tt>
-<br><tt>MPI_Gatherv</tt>
-<br><tt>MPI_Ibsend</tt>
-<br><tt>MPI_Irsend</tt>
-<br><tt>MPI_Isend</tt>
-<br><tt>MPI_Issend</tt>
-<br><tt>MPI_Reduce</tt>
-<br><tt>MPI_Rsend</tt>
-<br><tt>MPI_Scan</tt>
-<br><tt>MPI_Scatter</tt>
-<br><tt>MPI_Send</tt>
-<br><tt>MPI_Sendrecv</tt>
-<br><tt>MPI_Sendrecv_replace</tt>
-<br><tt>MPI_Ssend</tt>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<blockquote>
+<hr width="75%">
 </blockquote>
-
-<hr><p>
-
-
-For further information contact: <a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a> - Jeffrey Vetter, (925) 424-6284.</p><p>
-
-
-
-Last modified on August 15th, 2003.</p><p>
-
-UCRL-CODE-2002-020, Version 2.      </p><p>
-
-<a href="http://www.llnl.gov/disclaimer.html" target="_blank">LLNL Disclaimers</a><br>
-</p></body></html>
+<h2><a name="Profiled_Routines">MPI Routines Profiled with mpiP</a></h2>
+<p>MPI_Allgather <br>
+MPI_Allgatherv <br>
+MPI_Allreduce <br>
+MPI_Alltoall <br>
+MPI_Alltoallv <br>
+MPI_Attr_delete <br>
+MPI_Attr_get <br>
+MPI_Attr_put <br>
+MPI_Barrier <br>
+MPI_Bcast <br>
+MPI_Bsend <br>
+MPI_Bsend_init <br>
+MPI_Buffer_attach <br>
+MPI_Buffer_detach <br>
+MPI_Cancel <br>
+MPI_Cart_coords <br>
+MPI_Cart_create <br>
+MPI_Cart_get <br>
+MPI_Cart_map <br>
+MPI_Cart_rank <br>
+MPI_Cart_shift <br>
+MPI_Cart_sub <br>
+MPI_Cartdim_get <br>
+MPI_Comm_create <br>
+MPI_Comm_dup <br>
+MPI_Comm_group <br>
+MPI_Comm_remote_group <br>
+MPI_Comm_remote_size <br>
+MPI_Comm_split <br>
+MPI_Comm_test_inter <br>
+MPI_Dims_create <br>
+MPI_Error_class <br>
+MPI_Gather <br>
+MPI_Gatherv <br>
+MPI_Graph_create <br>
+MPI_Graph_get <br>
+MPI_Graph_map <br>
+MPI_Graph_neighbors <br>
+MPI_Graph_neighbors_count <br>
+MPI_Graphdims_get <br>
+MPI_Group_compare <br>
+MPI_Group_difference <br>
+MPI_Group_excl <br>
+MPI_Group_free <br>
+MPI_Group_incl <br>
+MPI_Group_intersection <br>
+MPI_Group_translate_ranks <br>
+MPI_Group_union <br>
+MPI_Ibsend <br>
+MPI_Intercomm_create <br>
+MPI_Intercomm_merge <br>
+MPI_Iprobe <br>
+MPI_Irecv <br>
+MPI_Irsend <br>
+MPI_Isend <br>
+MPI_Issend <br>
+MPI_Keyval_create <br>
+MPI_Keyval_free <br>
+MPI_Pack <br>
+MPI_Probe <br>
+MPI_Recv <br>
+MPI_Recv_init <br>
+MPI_Reduce <br>
+MPI_Reduce_scatter <br>
+MPI_Request_free <br>
+MPI_Rsend <br>
+MPI_Rsend_init <br>
+MPI_Scan <br>
+MPI_Scatter <br>
+MPI_Scatterv <br>
+MPI_Send <br>
+MPI_Send_init <br>
+MPI_Sendrecv <br>
+MPI_Sendrecv_replace <br>
+MPI_Ssend <br>
+MPI_Ssend_init <br>
+MPI_Start <br>
+MPI_Startall <br>
+MPI_Test <br>
+MPI_Testall <br>
+MPI_Testany <br>
+MPI_Testsome <br>
+MPI_Topo_test <br>
+MPI_Type_commit <br>
+MPI_Type_free <br>
+MPI_Type_get_contents <br>
+MPI_Type_get_envelope <br>
+MPI_Unpack <br>
+MPI_Wait <br>
+MPI_Waitall <br>
+MPI_Waitany <br>
+MPI_Waitsome</p>
+<p class="privacyfoter"><a href="#top">Top</a></p>
+<hr width="75%">
+<h2><a name="Message_Size_Routines">MPI Routines For Which mpiP Gathers Sent Message 
+Size Data</a></h2>
+<p>MPI_Allgather<br>
+MPI_Allgatherv<br>
+MPI_Allreduce<br>
+MPI_Alltoall<br>
+MPI_Bcast<br>
+MPI_Bsend<br>
+MPI_Gather<br>
+MPI_Gatherv<br>
+MPI_Ibsend<br>
+MPI_Irsend<br>
+MPI_Isend<br>
+MPI_Issend<br>
+MPI_Reduce<br>
+MPI_Rsend<br>
+MPI_Scan<br>
+MPI_Scatter<br>
+MPI_Send<br>
+MPI_Sendrecv <br>
+MPI_Sendrecv_replace <br>
+MPI_Ssend </p>
+<hr>
+<p>For further information contact Jeffrey Vetter,<a href="mailto:vetter3@llnl.gov">vetter3@llnl.gov</a>, 
+(925) 424-6284.</p>
+<p class="privacyfoter"> Last modified on August 26, 2003.<br>
+UCRL-CODE-2002-020, Version 2.</p>
+</body></html>
