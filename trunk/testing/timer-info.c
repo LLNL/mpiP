@@ -90,6 +90,7 @@ void  getGranAndOH(long iters)
   long idx;
 
   printf("\nGranularity Testing\n");
+  printf("\nUsing timer : %s\n", mpiPi_TIMER_NAME);
   while ( mpiP_gettime() == (start = mpiP_gettime()) )
   {
   	fprintf(stderr, "start is %f\n", start);
