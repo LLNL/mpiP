@@ -48,7 +48,10 @@ _MPI_Init (int *argc, char ***argv, void *pc)
     mpiPi.appFullName = strdup(**argv);
   }
   else
+  {
     mpiPi_init ("Unknown");
+    mpiPi_msg_debug( "argv is NULL\n" );
+  }
 #endif
 
   return rc;

@@ -31,7 +31,9 @@ static char *rcsid =
 #include "mpiPconfig.h"
 
 #ifndef DISABLE_BFD
+#ifndef CEXTRACT
 #include "bfd.h"
+#endif
 static asymbol **syms;
 static bfd_vma pc;
 static const char *filename;
@@ -118,6 +120,9 @@ find_address_in_section (abfd, section, data)
 
 #ifdef OSF1
   local_pc = pc | 0x100000000;
+#elif defined(UNICOS_mp)
+  /* use only least significant 32-bits */
+  local_pc = pc & 0xFFFFFFFF;
 #else
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
@@ -144,7 +149,7 @@ find_address_in_section (abfd, section, data)
   if (local_pc >= vma + size)
   {
     mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
-  		     (long) local_pc, vma, vma+size);
+  		     local_pc, vma, vma+size);
     return;
   }
 
@@ -155,11 +160,11 @@ find_address_in_section (abfd, section, data)
   if ( !found )
   {
     mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%x vma=%x-%x\n",
-                     (long) local_pc, vma, vma+size);
+                     local_pc, vma, vma+size);
   }
 
   mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%x vma=%x-%x\n",
-                   (long) local_pc, vma, vma+size);
+                   local_pc, vma, vma+size);
   mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
                    filename, functionname, line);
 }
@@ -298,7 +303,7 @@ void close_bfd_executable ()
   bfd_close (abfd);
 }
 
-#else /* DISABLE_BFD */
+#elif !defined(USE_LIBDWARF)
 
 int
 mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,

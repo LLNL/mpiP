@@ -87,6 +87,19 @@ STACKDEPTH=8
 )
 AC_SUBST(STACKDEPTH)
 
+AC_ARG_ENABLE(dwarf,
+[  --enable-dwarf          Use DWARF library for source lookup.],
+if test x"$enableval" = xyes ; then
+AC_DEFINE(USE_LIBDWARF)
+echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
+enable_bfd=no
+fi ;
+USE_LIBDWARF=yes
+,
+USE_LIBDWARF=no
+)
+AC_SUBST(USE_LIBDWARF)
+
 AC_ARG_ENABLE(bfd,
 [  --disable-bfd           Do not use GNU binutils libbfd for source lookup.],
 AC_DEFINE(DISABLE_BFD)
@@ -103,6 +116,9 @@ PARENT_FRAME_COUNT=1
 if [ `uname -s` == "OSF1" ] ; then
   PARENT_FRAME_COUNT=2
 fi
+if [ `uname -s | cut -c1-6` == "UNICOS" ] ; then
+  PARENT_FRAME_COUNT=3
+fi
 )
 
 AC_ARG_ENABLE(mpi-io,
@@ -114,13 +130,6 @@ DISABLE_MPI_IO=no
 )
 AC_SUBST(DISABLE_MPI_IO)
 
-AC_ARG_WITH(gettimeofday,
-[  --with-gettimeofday     Use gettimeofday for timing.],
-AC_DEFINE(USE_GETTIMEOFDAY)
-echo Using gettimeofday for timing.
-,
-)
-
 AC_ARG_ENABLE(getarg,
 [  --enable-getarg         Use getarg to get fortran command line args.],
 AC_DEFINE(USE_GETARG)
@@ -131,6 +140,13 @@ USE_GETARG=false
 )
 AC_SUBST(USE_GETARG)
 
+AC_ARG_WITH(gettimeofday,
+[  --with-gettimeofday     Use gettimeofday for timing.],
+AC_DEFINE(USE_GETTIMEOFDAY)
+echo Using gettimeofday for timing.
+,
+)
+
 AC_ARG_ENABLE(check-time,
 [  --enable-check-time     Enable AIX check for negative time values.],
 AC_DEFINE(MPIP_CHECK_TIME)
@@ -138,6 +154,7 @@ echo AIX negative time value checking has been enabled
 ,
 )
 
+AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC cmpic++ c++ g++ CC cxx icc, mpiCC)
@@ -149,9 +166,12 @@ AC_CHECK_LIB(intl,dcgettext__)
 AC_CHECK_LIB(iberty,objalloc_create)
 AC_CHECK_LIB(m,sqrt)
 AC_CHECK_LIB(mpio,MPI_File_open)
+
+if test -z "$DISABLE_BFD" ; then
 AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr,,,))
 AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h" 
 )
+fi
 if test -z "$DISABLE_LIBUNWIND" ; then
 AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind" PARENT_FRAME_COUNT=2)
 fi
@@ -247,4 +267,4 @@ AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST_FILE(HAVE_MPI_IO)
 
-AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt )
+AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt])

@@ -346,7 +346,9 @@ mpiPi_profile_print (FILE * fp)
     for (i = 0; i < ac; i++)
       {
 	mpiPi.global_task_info[av[i]->rank].mpi_time += av[i]->cumulativeTime;
+	assert( mpiPi.global_task_info[av[i]->rank].mpi_time >= 0 );
 	mpiPi.global_mpi_time += av[i]->cumulativeTime;
+	assert( mpiPi.global_mpi_time >= 0 );
 	mpiPi.global_mpi_size += av[i]->cumulativeDataSent;
 	mpiPi.global_mpi_io += av[i]->cumulativeIO;
 	mpiPi_msg_debug ("filename ptr: 0x%x functname ptr: 0x%x\n", av[i]->filename[0], av[i]->functname[0]);

@@ -466,6 +466,9 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
   int i;
   extern int mpiPi_debug;
 
+  assert( ac != NULL );
+  assert( av != NULL );
+
 #if defined(AIX)
   {
     /*  Works for C/C++ and Fortran  */
@@ -474,7 +477,7 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = p_xargc;
     argv = p_xargv;
   }
-#elif defined(Intel_Fortran) && !defined(USE_GETARG)
+#elif defined(Intel_Fortran) && !defined(Linux) && !defined(USE_GETARG)
   {
     extern int xargc;
     extern char **xargv;
@@ -514,27 +517,44 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 {
   int i;
 
-#if defined(USE_GETARG) && defined(Intel_Fortran)
+  assert( ac != NULL );
+  assert( av != NULL );
+
+#if defined(USE_GETARG) && (defined(Intel_Fortran) || defined(Cray_Fortran))
 
 #define EXECUTABLE_LEN 2048
 {
   char buf[EXECUTABLE_LEN];
   int len, mpiPi_argc;
-  extern void mpipi_get_fortran_argc(int*);
-  extern void mpipi_get_fortran_arg(int, int, char*, int*);
+  extern void F77_MPIPI_GET_FORTRAN_ARGC(int*);
 
-  mpipi_get_fortran_argc(&mpiPi_argc);
+  F77_MPIPI_GET_FORTRAN_ARGC(&mpiPi_argc);
   *ac = mpiPi_argc;
-  mpiPi_msg_debug("ac is %d\n", *ac);
+/*  mpiPi_msg_debug("ac is %d\n", *ac); */
 
   for ( i = 0; i <= mpiPi_argc; i++ )
   {
-    mpipi_get_fortran_arg(i,EXECUTABLE_LEN,buf,&len);
+    int buf_len = EXECUTABLE_LEN;
+
+#if defined(Intel_Fortran)
+    extern void F77_MPIPI_GET_FORTRAN_ARG(int, int, char*, int*);
+    F77_MPIPI_GET_FORTRAN_ARG(i,EXECUTABLE_LEN,buf,&len);
+#elif defined(Cray_Fortran)
+    /* As far as I can tell from the Cray C and C++ Reference Manual,
+     * parameter passing to Cray Fortran subroutines is always by
+     * reference, so we need to pass pointers for all arguments even
+     * if they are input-only parameters.
+     */
+    extern void F77_MPIPI_GET_FORTRAN_ARG(int*, int*, char*, int*);
+    F77_MPIPI_GET_FORTRAN_ARG( &i, &buf_len, buf, &len);
+#endif
+
     buf[len<EXECUTABLE_LEN ? len : EXECUTABLE_LEN-1] = 0;
     av[i] = strdup(buf);
   }
 }
-#else
+
+#else   /* USE_GETARG */
   *ac = argc;
 
   for (i = 0; (i < *ac) && (i < av_len); i++)

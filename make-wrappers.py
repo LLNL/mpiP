@@ -893,8 +893,13 @@ def GenerateSymbolDefs():
     cwd = os.getcwd()
     os.chdir(cwd)
     sname = cwd + "/symbols.h"
+
+    symflist = copy.deepcopy(flist)
+    symflist.append('mpipi_get_fortran_argc')
+    symflist.append('mpipi_get_fortran_arg')
+
     g = open(sname, "w")
-    for funct in flist:
+    for funct in symflist:
         if f77symbol == 'symbol':
             f77funct = string.lower(funct)
         elif f77symbol == 'symbol_':
