@@ -19,6 +19,8 @@
     mpiP_open_executable and prior to mpiP_close_executable.
 */
 
+#include "mpiPi.h"
+
 #ifndef __CEXTRACT__
 #if __STDC__
 

@@ -67,7 +67,15 @@ int mpiP_open_executable(char* filename)
   if ( access(filename, R_OK|F_OK) != 0 )
   	return -1;
 
+#ifndef DISABLE_BFD
+
   open_bfd_executable(filename);
+
+#elif defined(USE_LIBDWARF)
+
+  open_dwarf_executable(filename);
+
+#endif
 
   return 0;
 }
@@ -112,7 +120,11 @@ int mpiP_open_executable(char* filename)
 
 void mpiP_close_executable()
 {
-  close_bfd_executable();
+#ifndef DISABLE_BFD
+  close_bfd_executable ();
+#elif defined(USE_LIBDWARF)
+  close_dwarf_executable();
+#endif
 }
 
 mpiP_TIMER mpiP_gettime()
