@@ -240,7 +240,7 @@ extern int MPI_Waitsome ( int incount, MPI_Request *array_of_requests, int *outc
 extern void mpi_waitsome_ ( int * incount, MPI_Request *array_of_requests, int *outcount, int *array_of_indices, MPI_Status *array_of_statuses, int *ierr );
 extern int MPI_Init ( int *argc, char ***argv );
 extern void mpi_init_ ( int *ierr );
-extern int _MPI_Finalize ( void *pc );
+extern int _MPI_Finalize ( );
 extern int MPI_Finalize ( void );
 extern void mpi_finalize_ ( int *ierr );
 
