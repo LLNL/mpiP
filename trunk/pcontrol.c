@@ -21,7 +21,7 @@ static char *rcsid = "$Header$";
 
 static int mpiPi_MPI_Pcontrol(const int flag)
 {
-  double dur;
+  mpiP_TIMER dur;
   mpiPi_msg_debug("MPI_Pcontrol encountered: flag = %d\n", flag);
 
   if(flag == 0)
@@ -48,7 +48,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       mpiPi_GETTIME (&mpiPi.startTime);
     }
 
-    return MPI_SUCCESS;
+  return MPI_SUCCESS;
 }
 
 int MPI_Pcontrol(const int flag,... )

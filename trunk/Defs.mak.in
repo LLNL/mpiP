@@ -11,9 +11,12 @@ AR	= ar
 RANLIB	= @RANLIB@
 PYTHON  = python
 
-LIBS        = @LIBS@
-LDFLAGS     = @LDFLAGS@
-F77_SYMBOLS = @F77_SYMBOLS@
+LIBS          = @LIBS@
+LDFLAGS       = @LDFLAGS@
+F77_SYMBOLS   = @F77_SYMBOLS@
+BINUTILS_DIR  = @BINUTILS_DIR@
+BIN_TYPE_FLAG = @BIN_TYPE_FLAG@
+
 
 ifneq ( $(srcdir), "." )
 CPPFLAGS   += -I.
@@ -52,26 +55,36 @@ endif
 
 TARGET	 = libmpiP.a
 MPIPLIB  = mpiP
-FORTRAN_FLAG = @FORTRAN_FLAG@
+MPIPFLIB = mpiP
+
+ifneq ($(OS),Linux)
 FORTRAN_TARGET = @FORTRAN_TARGET@
-MPIPFLIB = @MPIPFLIB@
-F77_VENDOR = @F77_VENDOR@
+MPIPFLIB       = @MPIPFLIB@
+FORTRAN_FLAG   = @FORTRAN_FLAG@
+F77_VENDOR     = @F77_VENDOR@
+endif
 
 DEMANGLE_TARGET =
 DO_DEMANGLE = @DO_DEMANGLE@
 MPIPCXXLIB  = mpiP
-ifneq ($(DO_DEMANGLE),false)
+
+ifeq ($(DO_DEMANGLE),GNU)
+  CPPFLAGS += -DDEMANGLE_$(DO_DEMANGLE)
+endif
+ifeq ($(DO_DEMANGLE),IBM)
   DEMANGLE_FLAG = -DDEMANGLE_$(DO_DEMANGLE)
   DEMANGLE_TARGET = libmpiPdmg.a
   MPIPCXXLIB = mpiPdmg
-ifeq ($(DO_DEMANGLE),IBM)
   CPPFLAGS := -I/usr/include $(CPPFLAGS)
 endif
 ifeq ($(DO_DEMANGLE),Compaq)
+  DEMANGLE_FLAG = -DDEMANGLE_$(DO_DEMANGLE)
+  DEMANGLE_TARGET = libmpiPdmg.a
+  MPIPCXXLIB = mpiPdmg
   CPPFLAGS := -I/usr/include $(CPPFLAGS)
   CXXLIBS += -lmld
 endif
-endif
+
 
 CFLAGS	+= ${OPT}
 CPPFLAGS+= -D${OS}

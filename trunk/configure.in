@@ -11,6 +11,10 @@ AC_CONFIG_AUX_DIR(bin)
 
 AC_CANONICAL_SYSTEM
 
+CPPFLAGS=
+LDFLAGS=
+PARENT_FRAME_COUNT=1
+
 AC_ARG_WITH(cc,
 [  --with-cc               Gives the name of the C compiler to use.],
 CC=$withval
@@ -45,6 +49,26 @@ LIBS=$withval
 echo Using extra libraries: $withval
 )
 
+AC_ARG_WITH(binutils-dir,
+[  --with-binutils-dir     Base directory of binutils installation.],
+BINUTILS_DIR=$withval
+LDFLAGS="${LDFLAGS} -L${BINUTILS_DIR}/lib"
+CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+echo Using binutils-dir: $withval
+,
+BINUTILS_DIR=unknown
+)
+AC_SUBST(BINUTILS_DIR)
+
+AC_ARG_WITH(bin-type-flag,
+[  --with-bin-type-flag    Binary format for AIX ar operations.],
+BIN_TYPE_FLAG=$withval
+echo Using bin-type-flag: $withval
+,
+BIN_TYPE_FLAG=
+)
+AC_SUBST(BIN_TYPE_FLAG)
+
 AC_ARG_ENABLE(demangling,
 [  --enable-demangling     Specify GNU, IBM, or Compaq demangling support.],
 DO_DEMANGLE=$enableval
@@ -74,7 +98,11 @@ AC_ARG_ENABLE(libunwind,
 [  --disable-libunwind     Do not use libunwind to generate stack traces.],
 DISABLE_LIBUNWIND=yes
 echo Use of libunwind has been disabled
+PARENT_FRAME_COUNT=1
 ,
+if [ `uname -s` == "OSF1" ] ; then
+  PARENT_FRAME_COUNT=2
+fi
 )
 
 AC_ARG_ENABLE(mpi-io,
@@ -125,8 +153,9 @@ AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr,,,))
 AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h" 
 )
 if test -z "$DISABLE_LIBUNWIND" ; then
-AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
+AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind" PARENT_FRAME_COUNT=2)
 fi
+AC_SUBST(PARENT_FRAME_COUNT)
 if test "$DISABLE_MPI_IO" = no ; then
 AC_CHECK_FUNC(MPI_File_open, AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt, 
 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
@@ -144,7 +173,7 @@ if test -n "$F77" -a "$F77" != no ; then
   echo "      subroutine f_fun()" > ffunc.f
   echo "      return" >> ffunc.f
   echo "      end" >> ffunc.f
-  $F77 -c ffunc.f 1>/dev/null 2>/dev/null
+  $F77 $FFLAGS -c ffunc.f 1>/dev/null 2>/dev/null
   echo "main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     AC_MSG_RESULT(same as C)

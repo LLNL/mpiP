@@ -8,7 +8,7 @@
    Center for Applied Scientific Computing, LLNL
    31 Jul 2001
 
-   hash.c -- generic hash table
+   mpiP-hash.c -- generic hash table
 
  */
 
@@ -22,7 +22,7 @@ static char *rcsid =
 #include <unistd.h>
 #include <strings.h>
 
-#include "hash.h"
+#include "mpiP-hash.h"
 
 #define Abort(str) {printf("HASH: ABORTING (%s:%d): %s\n",__FILE__,__LINE__,str); exit(-1);}
 
