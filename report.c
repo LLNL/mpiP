@@ -370,9 +370,16 @@ mpiPi_profile_print (FILE * fp)
 	     "MPI%");
     for (i = 0; i < mpiPi.size; i++)
       {
-	double ratio =
-	  (100.0 * mpiPi.global_task_info[i].mpi_time / 1e6) /
-	  (mpiPi.global_task_info[i].app_time);
+	double ratio;
+
+        if ( mpiPi.global_task_info[i].app_time > 0 )
+          {
+            ratio = (100.0 * mpiPi.global_task_info[i].mpi_time / 1e6) /
+              mpiPi.global_task_info[i].app_time;
+          }
+        else
+          ratio = 0;
+        
 	fprintf (fp, mpiP_Report_Formats[MPIP_MPI_TIME_FMT][mpiPi.reportFormat], i,
 		 mpiPi.global_task_info[i].app_time,
 		 mpiPi.global_task_info[i].mpi_time / 1e6, ratio);
@@ -380,7 +387,9 @@ mpiPi_profile_print (FILE * fp)
     fprintf (fp, mpiP_Report_Formats[MPIP_MPI_TIME_SUMMARY_FMT][mpiPi.reportFormat],
 	     mpiPi.global_app_time,
 	     mpiPi.global_mpi_time / 1e6,
-	     (100.0 * mpiPi.global_mpi_time / 1e6) / mpiPi.global_app_time);
+	     mpiPi.global_task_info[i].app_time > 0 ? 
+             (100.0 * mpiPi.global_mpi_time / 1e6) / mpiPi.global_app_time :
+             0);
   }
 
   /* -- dump the source code locations */
@@ -501,8 +510,7 @@ mpiPi_profile_print (FILE * fp)
           fprintf (fp, mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT][mpiPi.reportFormat],
                    &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), av[i]->csid,
                    av[i]->cumulativeTime / 1000.0,
-                   100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time *
-                                                    1e6),
+                   mpiPi.global_app_time > 0 ? 100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time * 1e6):0,
                    mpiPi.global_mpi_time > 0 ? 100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time : 0);
         }
       }
@@ -654,9 +662,8 @@ mpiPi_profile_print (FILE * fp)
 	       sMax / 1000.0,
 	       sCumulative / (sCount * 1000.0),
 	       sMin / 1000.0,
-	       100.0 * sCumulative /
-	       (mpiPi.global_app_time * 1e6),
-	       100.0 * sCumulative / mpiPi.global_mpi_time);
+	       mpiPi.global_app_time > 0 ? 100.0 * sCumulative / (mpiPi.global_app_time * 1e6) : 0,
+	       mpiPi.global_mpi_time > 0 ? 100.0 * sCumulative / mpiPi.global_mpi_time : 0);
     }
 
     free (av);
