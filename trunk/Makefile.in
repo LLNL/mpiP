@@ -9,9 +9,9 @@ include Defs.mak
 
 TARGET	= libmpiP.a
 
-default: ${TARGET} ${FORTRAN_TARGET}
+default: ${TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
-all: ${TARGET} ${FORTRAN_TARGET} test
+all: ${TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -24,7 +24,6 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	pc_lookup.c \
 	report.c \
-        mpiPdemangle.c \
 	pcontrol.c
 OBJS = $(SRCS:.c=.o)
 
@@ -38,12 +37,23 @@ ${FORTRAN_TARGET}: remake_util ${OBJS} TAGS
 	${RANLIB} $@
 	rm -f util.o
 
-.PHONY: remake_util
+${DEMANGLE_TARGET}: remake_lookup ${OBJS} TAGS
+	${AR} ruv $@ ${OBJS}
+	${RANLIB} $@
+	rm -f pc_lookup.o
+
+.PHONY: remake_util remake_lookup
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
 remake_util:
 	rm util.o
 	$(MAKE) util.o CPPFLAGS='${CPPFLAGS}'
+
+remake_lookup: CPPFLAGS += ${DEMANGLE_FLAG}
+remake_lookup:
+	rm pc_lookup.o
+	$(MAKE) pc_lookup.o CPPFLAGS='${CPPFLAGS}'
+	$(MAKE) util.o 
 
 TAGS: ${SRCS}
 	etags $^
