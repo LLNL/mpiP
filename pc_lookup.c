@@ -23,18 +23,14 @@ static char *rcsid =
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpiPconfig.h"
 
 #include "bfd.h"
 #if 0
 #include "bucomm.h"
 #endif
 
-#ifdef HAVE_DEMANGLE_H
-#include "demangle.h"
-#else
-extern char *cplus_demangle (const char *mangled, int options);
-#endif
+#include "mpiPdemangle.h"
+#include "mpiPi.h"
 
 static asymbol **syms;
 static bfd_vma pc;
@@ -55,7 +51,6 @@ typedef boolean bfd_boolean;
 
 static bfd_boolean found;
 static bfd_boolean with_functions = 0;	/* -f, show function names.  */
-static bfd_boolean do_demangle = 0;	/* -C, demangle names.  */
 static bfd_boolean base_names = 1;	/* -s, strip directory names.  */
 
 
@@ -159,17 +154,16 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	{
 	  *o_funct_str = strdup ("[unknown]");
 	}
-      else if (!do_demangle)
+      else if (!mpiPi_do_demangle)
 	{
 	  *o_funct_str = strdup (functionname);
 	}
       else
 	{
 	  char *res = NULL;
-#if 0
-	  /* jsv - need to figure out how to integrate demangling */
-	  res = cplus_demangle (functionname, DMGL_ANSI | DMGL_PARAMS);
-#endif
+
+          res = mpiPdemangle(functionname);
+
 	  if (res == NULL)
 	    {
 	      *o_funct_str = strdup (functionname);
@@ -178,6 +172,8 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	    {
 	      *o_funct_str = res;
 	    }
+
+          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname, o_funct_str);
 	}
 
       /* set the filename and line no */
@@ -206,15 +202,30 @@ open_bfd_executable (char *filename)
   long storage;
   long symcount;
 
+  if (filename == NULL)
+  {
+    mpiPi_abort("Executable filename is NULL!\n  If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+  }
+
   bfd_init ();
   /* set_default_bfd_target (); */
+  mpiPi_msg_debug ("opening filename %s\n", filename);
   abfd = bfd_openr (filename, target);
   if (abfd == NULL)
     mpiPi_abort ("could not open filename %s", filename);
   if (bfd_check_format (abfd, bfd_archive))
     mpiPi_abort ("can not get addresses from archive");
   if (!bfd_check_format_matches (abfd, bfd_object, &matching))
+  {
+    char *curr_match;
+    if (matching != NULL)
+    {
+      for ( curr_match = matching[0]; curr_match != NULL; curr_match++ )
+        mpiPi_msg_debug ("found matching type %s\n", curr_match);
+      free(matching); 
+    }
     mpiPi_abort ("matching failed");
+  }
   
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
     mpiPi_abort ("No symbols in the executable\n");

@@ -55,6 +55,7 @@ AC_CHECK_HEADERS(demangle.h)
 AC_CHECK_LIB(intl,dcgettext__)
 AC_CHECK_LIB(iberty,objalloc_create)
 AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr))
+AC_CHECK_FILE(/usr/ibmcxx/include/demangle.h, CPPFLAGS="-I/usr/ibmcxx/include $CPPFLAGS")
 
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
 AC_MSG_CHECKING(fortran symbols)
