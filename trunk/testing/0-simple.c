@@ -9,6 +9,7 @@ static char *rcsid =
 #endif
 
 #include <stdio.h>
+#include <unistd.h>
 #include "mpi.h"
 
 main (int argc, char **argv)

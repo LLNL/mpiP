@@ -50,8 +50,6 @@ typedef boolean bfd_boolean;
 #endif
 
 static bfd_boolean found;
-static bfd_boolean with_functions = 0;	/* -f, show function names.  */
-static bfd_boolean base_names = 1;	/* -s, strip directory names.  */
 
 
 #ifdef DEMANGLE_IBM
@@ -220,11 +218,13 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	      *o_funct_str = res;
 	    }
 
-          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname, o_funct_str);
+#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
+          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname, *o_funct_str);
+#endif
 	}
 
       /* set the filename and line no */
-      if (base_names && filename != NULL)
+      if (mpiPi.baseNames == 0 && filename != NULL)
 	{
 	  char *h;
 	  h = strrchr (filename, '/');

@@ -11,9 +11,9 @@
 int main(int argc, char** argv)
 {
   MESS_TYPE *sendbuf;
-  void *recvbuf;
+  void *recvbuf, *buf;
   int packsize, typesize, testcount;
-  int dest, rank, maxactive, wsize;
+  int dest, rank, maxactive, wsize, bsize;
   MPI_Status status;
   MPI_Request request;
 
@@ -55,10 +55,9 @@ int main(int argc, char** argv)
 
   if ( rank == 0 )
     fprintf(stderr, "Bsend\n");
+
   if ( rank % 2 )
   {
-    void *buf;
-    int bsize;
     bsize = packsize + MPI_BSEND_OVERHEAD; 
     buf = malloc(bsize);
     MPI_Buffer_attach(buf, bsize);
@@ -73,19 +72,21 @@ int main(int argc, char** argv)
              &status);
     MPI_Barrier(MPI_COMM_WORLD);
   }
+
   testcount += MESS_BASE_COUNT;
 
   if ( rank == 0 )
     fprintf(stderr, "Ibsend\n");
+
   if ( rank % 2 )
   {
-    void *buf;
-    int bsize;
     bsize = packsize + MPI_BSEND_OVERHEAD; 
     buf = malloc(bsize);
     MPI_Buffer_attach(buf, bsize);
+
     MPI_Ibsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
     MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Wait(&request, &status);
     MPI_Buffer_detach(buf, &bsize);
     free(buf);
   }
@@ -95,6 +96,7 @@ int main(int argc, char** argv)
              &status);
     MPI_Barrier(MPI_COMM_WORLD);
   }
+
   testcount += MESS_BASE_COUNT;
 
   if ( rank == 0 )
