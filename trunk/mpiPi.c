@@ -158,6 +158,7 @@ mpiPi_init (char *appName)
       mpiPi_msg ("\n");
     }
 
+  mpiPi_msg_debug ("appName is %s\n", appName);
   mpiPi_msg_debug ("successful init on %d, %s\n", mpiPi.rank, mpiPi.hostname);
 
   if(mpiPi.enabled)
