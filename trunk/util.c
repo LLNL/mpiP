@@ -25,6 +25,11 @@ static char *rcsid =
 #include <excpt.h>
 #endif
 
+#ifdef HAVE_LIBUNWIND
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+#endif
+
 #include "mpiPi.h"
 
 static int argc=0;
@@ -50,6 +55,58 @@ GetBaseAppName (char *rawName)
     }
 }
 
+#ifdef HAVE_LIBUNWIND
+
+void
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+{
+  int i, valid_cursor;
+  unw_context_t uc;
+  unw_cursor_t cursor;
+  unw_word_t pc;
+
+  if ( unw_getcontext(&uc) != 0 )
+  {
+    mpiPi_msg_debug("Failed unw_getcontext!\n");
+    return;
+  }
+
+  if ( unw_init_local(&cursor, &uc) != UNW_ESUCCESS )
+  {
+    mpiPi_msg_debug ("Failed to initialize libunwind cursor with unw_init_local\n");
+  }
+  else
+  {
+    if ( unw_step(&cursor) < 1 || unw_step(&cursor) < 1 )
+    {
+      mpiPi_msg_debug ("unw_step failed to step into mpiPi caller frame.\n");
+    }
+
+    for (i = 0, valid_cursor = 1; i < max_back; i++)
+    {
+      if ( valid_cursor && unw_step(&cursor) > 0 )
+      {
+        if ( unw_get_reg(&cursor, UNW_REG_IP, &pc) != UNW_ESUCCESS )
+        {
+          pc_array[i] = NULL;
+          mpiPi_msg_debug("unw_get_reg failed.\n");
+        }
+        else
+        {
+          pc_array[i] = (void*)pc;
+        }
+      }
+      else
+      {
+        pc_array[i] = NULL;
+        mpiPi_msg_debug("unw_step failed.\n");
+        valid_cursor = 0;
+      }
+    }
+  }
+}
+
+#else  /* not LIBUNWIND */
 
 #ifdef OSF1
 
@@ -91,6 +148,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   /* start w/ the parent frame, not ours (we know who's calling) */
   fp = ParentFP(jb);
+
   for (i = 0; i < max_back; i++)
     {
       if (fp != NULL)
@@ -117,7 +175,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
     }
 }
 #endif
-
+#endif
 
 void
 mpiPi_getenv ()
