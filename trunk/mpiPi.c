@@ -245,8 +245,8 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
       else
 	{
 	  mpiPi_msg_warn ("Unsuccessful BFD lookup for [0x%x]\n", (long) pc);
-	  csp->filename = "[unknown]";
-	  csp->functname = ".[unknown]";
+	  csp->filename = strdup("[unknown]");
+	  csp->functname = strdup("[unknown]");
 	  csp->line = 0;
 	}
       h_insert (callsite_pc_cache, csp);
@@ -347,6 +347,16 @@ mpiPi_query_src (callsite_stats_t * p)
       key.filename[i] = p->filename[i];
       key.functname[i] = p->functname[i];
       key.line[i] = p->lineno[i];
+
+      /*  Do not bother recording frames above main  */
+      if ( p->functname[i] != NULL && 
+           ( strcmp(p->functname[i], "MAIN__") == 0 || 
+             strcmp(p->functname[i], "main") == 0   ||
+             strcmp(p->functname[i], ".main") == 0 ) )
+        {
+          p->pc[i+1] = NULL;
+          break;
+        }
     }
 
   /* lookup/generate an ID based on the callstack, not just the callsite pc */
