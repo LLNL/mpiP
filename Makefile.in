@@ -32,6 +32,15 @@ SRCS =	diag_msgs.c \
 	pcontrol.c \
 	mpiP-API.c
 
+API_SRCS =	diag_msgs_api.c \
+	mpiP-hash.c \
+	glob.c \
+	mpiPi.c \
+	util.c \
+	lookup.c \
+	pc_lookup.c \
+	mpiP-API.c
+
 USE_GETARG   = @USE_GETARG@
 USE_LIBDWARF = @USE_LIBDWARF@
 
@@ -43,6 +52,8 @@ endif
 
 OBJS  = $(SRCS:.c=.o)
 FOBJS = $(OBJS)
+
+API_OBJS = $(API_SRCS:.c=.o)
 
 ifeq ($(USE_GETARG),true)
 ifeq ($(F77_VENDOR),Cray)
@@ -94,6 +105,10 @@ ${SHARED_C_TARGET}: CFLAGS += -fpic
 ${SHARED_C_TARGET}: cleanobjs ${OBJS}
 	${CC} -shared -o $@ ${OBJS}
 endif
+
+libmpiP-API.a: ${API_OBJS} 
+	${AR} ruv $@ ${API_OBJS}
+	${RANLIB} $@
 
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
