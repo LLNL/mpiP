@@ -65,7 +65,16 @@ C_TARGET = libmpiP.a
 MPIPLIB  = mpiP
 MPIPFLIB = mpiP
 
+USE_GETARG = @USE_GETARG@
+BUILD_FLIB=false
+ifeq ($(USE_GETARG),true)
+  BUILD_FLIB=true
+endif
 ifneq ($(OS),Linux)
+  BUILD_FLIB=true
+endif
+
+ifeq ($(BUILD_FLIB),true)
 FORTRAN_TARGET = @FORTRAN_TARGET@
 MPIPFLIB       = @MPIPFLIB@
 FORTRAN_FLAG   = @FORTRAN_FLAG@
