@@ -306,6 +306,7 @@ mpiPi_profile_print (FILE * fp)
     print_intro_line (fp, "Stop time", "%s", nowstr);
   }
 
+  print_intro_line (fp, "Timer Used", "%s", mpiPi_TIMER_NAME);
   print_intro_line (fp, "MPIP env var", "%s",
 		    mpiPi.envStr == NULL ? "[null]" : mpiPi.envStr);
   print_intro_line (fp, "Collector Rank", "%d", mpiPi.collectorRank);
