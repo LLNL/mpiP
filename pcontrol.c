@@ -34,6 +34,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
       mpiPi.cumulativeTime += dur;
       assert( mpiPi.cumulativeTime >= 0 );
+      mpiPi.enabled = 0;
     }
   else if (flag == 2)
     {
