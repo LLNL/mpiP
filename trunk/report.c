@@ -437,8 +437,8 @@ mpiPi_profile_print (FILE * fp)
 		       &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
 		       av[i - 1]->csid, "*", sCount, sMax / 1000.0,
 		       sCumulative / (sCount * 1000.0), sMin / 1000.0,
-		       100.0 * sCumulative / (mpiPi.global_app_time * 1e6),
-		       100.0 * sCumulative / mpiPi.global_mpi_time);
+		       mpiPi.global_app_time > 0 ? 100.0 * sCumulative / (mpiPi.global_app_time * 1e6) : 0,
+		       mpiPi.global_mpi_time > 0 ? 100.0 * sCumulative / mpiPi.global_mpi_time : 0);
 	      fprintf (fp, "\n");
 	      sCount = 0;
 	      sMax = 0;
