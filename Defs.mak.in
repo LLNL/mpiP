@@ -39,6 +39,19 @@ ifeq ($(OS),Linux)
   endif
 endif
 
+ifneq (,$(findstring xlf, $(FC)))
+    CPPFLAGS += -DAIX
+endif
+ifneq (,$(findstring f77, $(FC)))
+    CPPFLAGS += -DGNU_Fortran
+    TARGET = libmpiPf77.a
+endif
+ifneq (,$(findstring ifc, $(FC)))
+    CPPFLAGS += -DIntel_Fortran
+    TARGET = libmpiPifc.a
+endif
+
+
 CFLAGS	+= ${OPT}
 CPPFLAGS+= -D${OS}
 LFLAGS	+=
