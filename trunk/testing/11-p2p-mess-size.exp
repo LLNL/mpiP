@@ -1,0 +1,15 @@
+
+##  Test-specific information
+#
+set test_title "11-p2p-mess-size-exe: check all supported operations for accurate size"
+set test "11-p2p-mess-size.exe"
+set procs 2
+set source_check_file "testing/11-p2p-mess-size.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
