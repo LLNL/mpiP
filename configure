@@ -273,6 +273,7 @@ PACKAGE_VERSION='2.7'
 PACKAGE_STRING='mpiP 2.7'
 PACKAGE_BUGREPORT='mpip-help@llnl.gov'
 
+ac_default_prefix=
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -1427,6 +1428,8 @@ test -n "$target_alias" &&
 CPPFLAGS=
 LDFLAGS=
 PARENT_FRAME_COUNT=1
+=.
+cross_compiling=yes
 
 
 # Check whether --with-cc or --without-cc was given.
@@ -1570,10 +1573,10 @@ echo Use of libunwind has been disabled
 PARENT_FRAME_COUNT=1
 
 else
-  if  `uname -s` == "OSF1"  ; then
+  if test `uname -s` == "OSF1"  ; then
   PARENT_FRAME_COUNT=2
 fi
-if  `uname -s | cut -c1-6` == "UNICOS"  ; then
+if test "`uname -s | cut -c1-6`" == "UNICOS"  ; then
   PARENT_FRAME_COUNT=3
 fi
 

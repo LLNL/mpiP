@@ -250,6 +250,9 @@ calc_COV (double* data, int dataSize)
   var  = 0.0;
   std  = 0.0;
   
+  if ( dataSize <= 1 )
+    return 0;
+
   for ( idx = 0; idx < dataSize; idx++ )
     tot += data[idx];
   
@@ -258,7 +261,7 @@ calc_COV (double* data, int dataSize)
   for ( idx = 0; idx < dataSize; idx++ )
     var += (data[idx] - avrg)*(data[idx] - avrg);
 
-  if ( dataSize > 1 )
+  if ( avrg > 0 && dataSize > 1 )
   {
     var /= dataSize - 1;
     std = sqrt(var);
