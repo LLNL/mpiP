@@ -20,6 +20,7 @@ static char *rcsid = "$Header$";
 
 static int mpiPi_MPI_Pcontrol(const int flag)
 {
+  double dur;
   mpiPi_msg_debug("MPI_Pcontrol encountered: flag = %d\n", flag);
 
   if(flag == 0)
@@ -27,9 +28,10 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       if(! mpiPi.enabled)
 	mpiPi_msg_warn("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
       
-      mpiPi.enabled = 0;
-      mpiPi.endTime = PMPI_Wtime();
-      mpiPi.cumulativeTime += mpiPi.endTime - mpiPi.startTime;
+      mpiPi_GETTIME (&mpiPi.timer, &mpiPi.endTime);
+      dur = (mpiPi_GETTIMEDIFF (&mpiPi.timer, &mpiPi.endTime, &mpiPi.startTime)/1000000.0);
+      printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
+      mpiPi.cumulativeTime += dur;
     }
   else
     {
@@ -38,7 +40,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
 
       mpiPi.enabled = 1;
       mpiPi.enabledCount++;
-      mpiPi.startTime = PMPI_Wtime ();
+      mpiPi_GETTIME (&mpiPi.timer, &mpiPi.startTime);
     }
 
     return MPI_SUCCESS;

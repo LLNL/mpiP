@@ -141,6 +141,7 @@ mpiPi_init (char *appName)
   mpiPi.stackDepth = 1;
   mpiPi.reportPrintThreshold = 0.0;
   mpiPi.baseNames = 0;
+  mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -164,7 +165,7 @@ mpiPi_init (char *appName)
 
   if(mpiPi.enabled)
     {
-      mpiPi.startTime = PMPI_Wtime ();
+      mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.startTime);
     }
 
 #if 0
@@ -663,8 +664,6 @@ mpiPi_collect_basics ()
   double app_time = mpiPi.cumulativeTime;
 
   mpiPi_msg_debug ("Collect Basics\n");
-  mpiPi_msg_debug ("mpiPi.app_time at task %d: %g (%g - %g)\n",
-		   mpiPi.rank, app_time, mpiPi.endTime, mpiPi.startTime);
 
   /* 
    * -- sweep across all tasks, collecting task information about them 
@@ -733,11 +732,13 @@ mpiPi_collect_basics ()
 void
 mpiPi_finalize ()
 {
-  mpiPi.endTime = PMPI_Wtime ();
+  double dur;
+  mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.endTime);
 
   if(mpiPi.enabled)
     {
-      mpiPi.cumulativeTime += mpiPi.endTime - mpiPi.startTime;
+      dur = (mpiPi_GETTIMEDIFF (&mpiPi.apptimer, &mpiPi.endTime, &mpiPi.startTime)/1000000.0);
+      mpiPi.cumulativeTime += dur;
     }
 
   if (time (&mpiPi.stop_timeofday) == (time_t) - 1)
