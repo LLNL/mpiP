@@ -26,7 +26,7 @@ SRCS =	diag_msgs.c \
 	report.c \
 	pcontrol.c
 
-ifeq ($(FORTRAN_VENDOR), Intel)
+ifeq ($(F77_VENDOR), Intel)
   SRCS += get_fortran_arg.f
 endif
 
