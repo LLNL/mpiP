@@ -226,7 +226,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
 	  mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
-			   (long) pc, *filename, *lineno, *functname);
+			   pc, *filename, *lineno, *functname);
 
 	  if ( strcmp(*filename, "??") == 0 )
             *filename = "[unknown]";
@@ -237,7 +237,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	}
       else
 	{
-	  mpiPi_msg_warn ("Unsuccessful Source lookup for [0x%x]\n", (long) pc);
+	  mpiPi_msg_warn ("Unsuccessful Source lookup for [0x%x]\n", pc);
 	  csp->filename = strdup("[unknown]");
 	  csp->functname = strdup("[unknown]");
 	  csp->line = 0;
@@ -453,9 +453,14 @@ mpiPi_mergeResults ()
 
 #ifndef DISABLE_BFD
       if ( mpiPi.av[0] != NULL )
-        open_bfd_executable (mpiPi.appFullName);
-     else
-        mpiPi_msg_debug ("mpiPi.appFullName is NULL.\n");
+      {
+        open_bfd_executable (mpiPi.av[0]);
+      }
+#elif defined(USE_LIBDWARF)
+      if( mpiPi.av[0] != NULL )
+      {
+        open_dwarf_executable( mpiPi.av[0] );
+      }
 #endif
 
       /* convert data to src line; merge, if nec */
@@ -524,7 +529,9 @@ mpiPi_mergeResults ()
 	    {
 	      csp->count += p->count;
 	      csp->cumulativeTime += p->cumulativeTime;
+	      assert( csp->cumulativeTime >= 0 );
 	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
+	      assert( csp->cumulativeTimeSquared >= 0 );
 	      csp->maxDur = max (csp->maxDur, p->maxDur);
 	      csp->minDur = min (csp->minDur, p->minDur);
               csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
@@ -580,7 +587,9 @@ mpiPi_mergeResults ()
 	    {
 	      csp->count += p->count;
 	      csp->cumulativeTime += p->cumulativeTime;
+	      assert( csp->cumulativeTime >= 0 );
 	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
+	      assert( csp->cumulativeTimeSquared >= 0 );
 	      csp->maxDur = max (csp->maxDur, p->maxDur);
 	      csp->minDur = min (csp->minDur, p->minDur);
               csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
@@ -604,7 +613,14 @@ mpiPi_mergeResults ()
 #ifndef DISABLE_BFD
       /* clean up */
       if ( mpiPi.av[0] != NULL )
+      {
         close_bfd_executable ();
+      }
+#elif defined(USE_LIBDWARF)
+      if( mpiPi.av[0] != NULL )
+      {
+        close_dwarf_executable();
+      }
 #endif
     }
 
@@ -764,6 +780,7 @@ mpiPi_generateReport ()
     {
       dur = (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime)/1000000.0);
       mpiPi.cumulativeTime += dur;
+      assert( mpiPi.cumulativeTime >= 0 );
     }
 
   if (time (&mpiPi.stop_timeofday) == (time_t) - 1)
@@ -804,6 +821,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 /*  fprintf(stderr, "received sendSize of %f\n", sendSize); */
 
   assert (mpiPi.task_callsite_stats != NULL);
+  assert (dur >= 0);
 
 
   key.op = op;
@@ -834,7 +852,9 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   /* ASSUME: csp cannot be deleted from list */
   csp->count++;
   csp->cumulativeTime += dur;
+  assert( csp->cumulativeTime >= 0 );
   csp->cumulativeTimeSquared += (dur * dur);
+  assert( csp->cumulativeTimeSquared >= 0 );
   csp->maxDur = max (csp->maxDur, dur);
   csp->minDur = min (csp->minDur, dur);
   csp->cumulativeDataSent += sendSize;

@@ -3,15 +3,19 @@
 # $Header$
 
 srcdir=@srcdir@
+PREFIX=@prefix@
+LIBDESTDIR=${PREFIX}/lib
+INCDESTDIR=${PREFIX}/include
+DOCDESTDIR=${PREFIX}/doc
 VPATH = $(srcdir)
 
 include Defs.mak
 
 MPIP_TARGET	= libmpiP.a
 
-default: ${MPIP_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
+default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
-all: ${MPIP_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
+all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -28,32 +32,50 @@ SRCS =	diag_msgs.c \
 	mpiP-API.c
 
 USE_GETARG = @USE_GETARG@
+USE_LIBDWARF    = @USE_LIBDWARF@
+
+ifeq ($(USE_LIBDWARF),yes)
+    SRCS += pc_lookup_dwarf.c
+endif
 
 OBJS = $(SRCS:.c=.o)
 FOBJS = $(OBJS)
 
 ifeq ($(USE_GETARG),true)
-  FOBJS += get_fortran_arg.o
+
+ifeq ($(F77_VENDOR),Cray)
+
+    FOBJS += get_fortran_arg_pxf.o
+
+clean::
+	rm -f get_fortran_arg_pfx.o
+
+else
+    FOBJS   += get_fortran_arg.o
+
 clean::
 	rm -f get_fortran_arg.o
+
+endif
+
 endif
 
 
-${MPIP_TARGET}: ${OBJS} TAGS
+${C_TARGET}: ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 
-${FORTRAN_TARGET}: remake_util ${FOBJS} TAGS
+${FORTRAN_TARGET}: remake_util ${FOBJS} 
 	${AR} ruv $@ ${FOBJS}
 	${RANLIB} $@
 	rm -f util.o
 
-${DEMANGLE_TARGET}: remake_lookup ${OBJS} TAGS
+${DEMANGLE_TARGET}: remake_lookup ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 	rm -f pc_lookup.o
 
-.PHONY: remake_util remake_lookup
+.PHONY: remake_util remake_lookup install all
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
 remake_util:
@@ -107,8 +129,16 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 
 ${OBJS}: mpiPi_def.h
 
+install: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
+	mkdir -p ${LIBDESTDIR} ${INCDESTDIR} ${DOCDESTDIR}
+	${INSTALL} ${C_TARGET} ${LIBDESTDIR}/${C_TARGET}
+	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${LIBDESTDIR}/${DEMANGLE_TARGET} ; fi
+	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${LIBDESTDIR}/${FORTRAN_TARGET} ; fi
+	${INSTALL} mpiP-API.h timers/*h ${INCDESTDIR}
+	${INSTALL} doc/*txt doc/*html doc/README ${DOCDESTDIR}
+
 proto:
-	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed '/find_address/d' > mpiPi_proto.h
+	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed -e '/find_address/d' -e '/Dwarf/d' > mpiPi_proto.h
 
 clean::
 	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
@@ -121,7 +151,7 @@ lint: ${SRCS}
 	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP*
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h
 
 include Check.mak
 

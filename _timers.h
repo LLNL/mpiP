@@ -26,7 +26,10 @@ typedef double mpiP_TIMER;
 #include "timers/sunos_local.h"
 
 #elif (defined(AIX) && ! defined(USE_GETTIMEOFDAY))
-#include "aix_local.h"
+#include "timers/aix_local.h"
+
+#elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
+#include "timers/crayx1_hw.h"
 
 #else
 /* gettimeofday returns microseconds */

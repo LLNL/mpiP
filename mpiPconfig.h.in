@@ -8,6 +8,9 @@
 /* Define if getarg in enabled. */
 #undef USE_GETARG
 
+/* Define if using libdwarf for source lookup */
+#undef USE_LIBDWARF
+
 /* Define if not using binutils libbfd */
 #undef DISABLE_BFD
 

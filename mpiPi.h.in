@@ -26,7 +26,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifndef CEXTRACT
 #include <mpi.h>
+#endif
 
 #include "mpiP-hash.h"
 
@@ -180,6 +182,7 @@ extern int mpiPi_debug;
 extern int mpiPi_do_demangle;
 
 
+#if !defined(UNICOS_mp)
 
 #if defined(AIX)
 #if defined(__64BIT__)
@@ -214,6 +217,56 @@ extern int mpiPi_do_demangle;
 #define NextFP(fp) (0)
 #endif
 #define GetPPC(jb) FramePC(ParentFP(jb))
+
+#else /* defined(UNICOS_mp) */
+
+#include <intrinsics.h>
+#include <stdint.h>
+
+/*
+ * Cray X1
+ * Stacks grow downward in the address space.
+ */
+
+
+/*
+ * Unlike some of the other platforms, we do not use setjmp to obtain
+ * the frame pointer of the current function.  Instead, we use the
+ * Cray intrinsic function _read_fp() to get the frame pointer of the 
+ * current function.
+ */
+#define GetFP()    ((void*)(_read_fp()))
+
+
+/* 
+ * Given a frame pointer for a callee, the caller's frame pointer is at the 
+ * callee's frame pointer address.
+ */
+#define NextFP(fp)      ((void*)((void**)fp)[0])
+
+
+/*
+ * Given a frame pointer for a callee, the return address to the caller
+ * is two elements in the callee's frame.
+
+ * TODO try masking off the high 32-bits
+ */
+#define FramePC(fp)     ((void*)(((uint64_t)(((void**)fp)[-2])) & 0xFFFFFFFF))
+
+
+
+/*
+ * Currently GetPPC is only used in the MPI_Init/MPI_Finalize functions
+ * in special_wrappers.c.  On other platforms, they extract the 
+ * parent PC from the setjmp jmp_buf, and can do it at any time after
+ * the setjmp call.  On the X1, we're a bit more sensitive for when
+ * we sample the FP.  If GetPPC is used somplace else, be careful that
+ * it is returning the PC that you expect it is.
+ */
+#define GetPPC(jb)      (FramePC(NextFP(GetFP())))
+
+#endif /* defined(UNICOS_mp) */
+
 
 #define min(x,y) ((x<y)?(x):(y))
 #define max(x,y) ((x>y)?(x):(y))
