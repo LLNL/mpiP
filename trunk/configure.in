@@ -49,6 +49,7 @@ AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r gcc cc ifc, gcc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r c++ g++ CC cxx ifc, c++)
 AC_CHECK_PROGS(F77, mpxlf_r xlf_r g77 pgf77 fort, g77)
+AC_CHECK_PROGS(LAUNCH, poe prun mpirun, mpirun)
 
 AC_CHECK_HEADERS(demangle.h)
 AC_CHECK_LIB(intl,dcgettext__)
@@ -94,4 +95,4 @@ fi
 AC_SUBST(F77_SYMBOLS)
 AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
 
-AC_OUTPUT(Defs.mak Makefile testing/Makefile)
+AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak)
