@@ -96,6 +96,13 @@ USE_GETARG=false
 )
 AC_SUBST(USE_GETARG)
 
+AC_ARG_ENABLE(check-time,
+[  --enable-check-time     Enable AIX check for negative time values.],
+AC_DEFINE(MPIP_CHECK_TIME)
+echo AIX negative time value checking has been enabled
+,
+)
+
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC cmpic++ c++ g++ CC cxx icc, mpiCC)
