@@ -33,7 +33,6 @@ Contents
      List of Routines With Collected Sent Message Size Information
 
      List of I/O Routines
-
             ____________________________________________________
 
 Introduction
@@ -231,11 +230,16 @@ Building mpiP
    application  name  identification support. This option will be removed
    in the next release.
 
-  Example Application Link Commands for LLNL Machines
+  Example LLNL Application Link Commands
 
-   LLNL  Linux  users  (MCR/Pengra/ALC/Thunder) can now use the srun-mpip
-   wrapper  script  to  use mpiP without re-linking their application. An
-   example script for mpirun is provided in the mpiP bin directory.
+   LLNL  users  can  now  use  the  srun-mpip, poe-mpip, and poe-mpip-cxx
+   wrapper  scripts to use mpiP without re-linking their application. AIX
+   executables  would  still  need  to  be linked with -bnoobjreorder for
+   successful    runtime   address   lookup.   Additionally,   all   LLNL
+   installations  contain  the  appropriate  binutils objects in the mpiP
+   library, so the -lbfd, -liberty, and -lintl flags are not required. An
+   example  runtime  script  for  mpirun  is  provided  in  the  mpiP bin
+   directory.
 
    OS Compiler Language Example Link Command
    AIX Visual Age C mpxlc -g -bnoobjreorder 1-hot-potato.c -o
@@ -273,10 +277,9 @@ Building mpiP
    -lpmpi -lexc
 
    Note:
-     * On  the LLNL ia64-Linux machine Thunder, /usr/lib/libunwind.a must
-       be  added  to  the link line so that the non-Intel library is used
-       for  stack  unwinding. It may also be necessary to add "-ldl" when
-       linking on this system.
+     * On  BG/L  machines,  the script mpip-insert-src can be used from a
+       login  node  to  translate  addresses in the mpiP report to source
+       information.
      * On  Tru64, the exception library flag (-lexc) must be added to the
        link command.
      * Source  lookup  for  callsites  may  fail with certain versions of
@@ -328,6 +331,7 @@ mpiP Output
    output.
 
    The test code:
+
   sleeptime = 10;
   MPI_Init (&argc, &argv);
   MPI_Comm_size (comm, &nprocs);
