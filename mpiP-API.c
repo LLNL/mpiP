@@ -68,8 +68,6 @@ mpiP_find_src_loc(void *i_addr_hex, char **o_file_str, int *o_lineno,
 
 int mpiP_open_executable(char* filename)
 {
-  int len = 0;
-
   if ( mpiP_api_init == 0 )
     mpiP_init_api();
 
