@@ -645,7 +645,7 @@ def CreateWrapper(funct, olist):
                   + "mpiPi.rank, "
                   + "call_stack, "
                   + "dur, "
-                  + "0"
+                  + "(double)0"
                   + ");\n" \
 		  + "return rc;\n" )
 

@@ -52,4 +52,6 @@ MPIINC	= -I/usr/lpp/ppe.poe/include
 lint: ${SRCS}
 	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
+distclean: clean
+	rm -f Makefile Defs.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c
 ##### EOF
