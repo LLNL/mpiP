@@ -516,6 +516,8 @@ mpiPi_mergeResults ()
 	      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
 	      newp->maxDur = p->maxDur;
 	      newp->minDur = p->minDur;
+	      newp->maxDataSent = p->maxDataSent;
+	      newp->minDataSent = p->minDataSent;
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
@@ -529,7 +531,9 @@ mpiPi_mergeResults ()
 	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
 	      csp->maxDur = max (csp->maxDur, p->maxDur);
 	      csp->minDur = min (csp->minDur, p->minDur);
-	      csp->cumulativeDataSent += p->cumulativeDataSent;
+              csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
+              csp->minDataSent = min (csp->minDataSent, p->minDataSent);
+              csp->cumulativeDataSent += p->cumulativeDataSent;
 	    }
 
 	  /* agg. Don't use rank */
@@ -555,6 +559,8 @@ mpiPi_mergeResults ()
 	      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
 	      newp->maxDur = p->maxDur;
 	      newp->minDur = p->minDur;
+	      newp->maxDataSent = p->maxDataSent;
+	      newp->minDataSent = p->minDataSent;
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
@@ -568,6 +574,8 @@ mpiPi_mergeResults ()
 	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
 	      csp->maxDur = max (csp->maxDur, p->maxDur);
 	      csp->minDur = min (csp->minDur, p->minDur);
+              csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
+              csp->minDataSent = min (csp->minDataSent, p->minDataSent);
 	      csp->cumulativeDataSent += p->cumulativeDataSent;
 	    }
 
@@ -759,6 +767,8 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   if(!mpiPi.enabled)
     return;
 
+/*  fprintf(stderr, "received sendSize of %f\n", sendSize); */
+
   assert (mpiPi.task_callsite_stats != NULL);
 
   key.op = op;
@@ -782,6 +792,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 	}
       csp->cookie = MPIP_CALLSITE_STATS_COOKIE;
       csp->minDur = DBL_MAX;
+      csp->minDataSent = DBL_MAX;
       h_insert (mpiPi.task_callsite_stats, csp);
     }
   /* ASSUME: csp cannot be deleted from list */
@@ -791,6 +802,9 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   csp->maxDur = max (csp->maxDur, dur);
   csp->minDur = min (csp->minDur, dur);
   csp->cumulativeDataSent += sendSize;
+
+  csp->maxDataSent = max (csp->maxDataSent, sendSize);
+  csp->minDataSent = min (csp->minDataSent, sendSize);
   return;
 }
 
