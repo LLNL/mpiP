@@ -32,10 +32,18 @@ typedef double mpiP_TIMER;
 #elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
 #include "timers/crayx1_hw.h"
 
-#elif (defined(Linux) && ! defined(USE_GETTIMEOFDAY) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
+#elif (defined(Linux) && defined(USE_CLOCK_GETTIME) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
 #include "timers/linux_posix.h"
 
+#elif defined(USE_WTIME)
+#define mpiPi_TIMER double
+#define mpiPi_TIME double
+#define mpiPi_TIMER_NAME "PMPI_Wtime"
+#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()/USECS))
+#define mpiPi_GETUSECS(timeaddr) (*(timeaddr))
+#define mpiPi_GETTIMEDIFF(end,start) ((end)-(start))
 #else
+
 /* gettimeofday returns microseconds */
 #define mpiPi_TIMER double
 #define mpiPi_TIME struct timeval
