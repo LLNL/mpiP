@@ -1,8 +1,9 @@
+   Privacy & Legal Notice
 
                  mpiP: Lightweight, Scalable MPI Profiling
 
                                 Version 2.8
-                              18 January 2005
+                              25 January 2005
                                Jeffrey Vetter
                              vetterjs@ornl.gov
                               Chris Chambreau
@@ -68,7 +69,8 @@ Introduction
   Contributing
 
    We are constantly improving mpiP. Bug fixes and ports to new platforms
-   are always welcome. Many thanks to the following contributors:
+   are   always  welcome.  Many  thanks  to  the  following  contributors
+   (chronological order):
      * Michael McCracken (UCSD)
      * Curt Janssen (Sandia National Laboratories)
      * Mike Campbell (UIUC)
@@ -173,13 +175,28 @@ Using mpiP
    information.
    2.4.22 Kernel gcc 3.3.1 mpich2-1.0
    IBM Power3/4 AIX 5.1
-   AIX 5.2 VA C 6.0/
+   AIX 5.2 VA C 6.0
    VA Fortran 8.1 PE 3.2
    PE  4.1  2.15 Binutils currently requires that applications are linked
    with  the  -bnoobjreorder  linker  flag.  Other  mods are required for
    64-bit builds of binutils.
-   Alpha EV67 Tru64 5.1b Compaq C 6.4/
+   Alpha EV67 Tru64 5.1b Compaq C 6.4
    Fortran 5.5 Quadrics RMS 2.5 2.14 2.15
+   Cray X1 UNICOS/mp 2.4.39 Cray Standard C 5.2.0.5, Cray Fortran 5.2.0.5
+   Cray  Message  Passing Toolkit (MPT) 2.3.0.5 from Cray Message Passing
+   Toolkit (MPT) 2.3.0.5 Requires libelf/libdwarf.
+   Example    configure    flags:    --disable-libunwind   --enable-dwarf
+   --disable-demangle    --enable-getarg    --with-cc=cc    --with-cxx=CC
+   --with-f77=ftn
+   Python  on  an  alternative system may be needed to "make wrappers.c",
+   due to missing socket module.
+   SGI  Altix  3700  Linux  (kernel version 2.4.21-sgi303r2) from SGI gcc
+   3.4.3  (Intel  compilers  as  well)  SGI  Message  Passing Toolkit for
+   release    1.10.1   (sgi-mpt-1.10.1-sgi303r1)   2.14.90.0.4-35sgi303r1
+   configure may require --with-libs="-lmpi" to find MPI-I/O routines.
+   Cray  XD1 Linux (2.4.21_H_01_01 kernel, provided by Cray) gcc-3.2.2-54
+   (Cray,    from    /usr/bin),    also    PGI   mpich-1.2.5-p20   (Cray)
+   binutils-2.12.90.0.15-74 (Cray)
 
             ____________________________________________________
 
@@ -224,13 +241,11 @@ Building mpiP
    the default platform timer.
    --enable-check-time   Enable  AIX  check  for  negative  time  values.
    Activate IBM timing debugging code.
-   --enable-getarg  Use getarg to get fortran command line args. This was
-   used  with  the  Intel  8.0  compiler in order to identify the name of
-   Fortran  applications.  This  should  no  longer  be  needed given new
-   application  name  identification support. This option will be removed
-   in the next release.
+   --enable-getarg  Use  getarg to get Fortran command line args. This is
+   used  on  UNICOS  to  provide  access  to the command line for Fortran
+   apllications.
 
-  Example LLNL Application Link Commands
+  Example Application Link Commands
 
    LLNL  users  can  now  use  the  srun-mpip, poe-mpip, and poe-mpip-cxx
    wrapper  scripts to use mpiP without re-linking their application. AIX
@@ -275,6 +290,12 @@ Building mpiP
    Fortran  f77  -g  -I/usr/lib/mpi/include  sweep-ops.f -o sweep-ops.exe
    -L/usr/local/tools/mpiP/lib  -lmpiP  -lbfd  -liberty  -lintl -lm -lmpi
    -lpmpi -lexc
+   Cray  X1  Cray  C/C++/Fortran  Link with -lmpiP -lbfd -liberty -ldwarf
+   -lelf
+   SGI  Altix  GNU or Intel C/C++/Fortran Link with -lmpiP -lunwind -lbfd
+   -liberty
+   Cray XD1 GNU or PGI C/C++/Fortran Link with
+   [path_to_mpiP_install]/libmpiP.a -lbfd -liberty [mpich_libs]
 
    Note:
      * On  BG/L  machines,  the script mpip-insert-src can be used from a
@@ -331,7 +352,6 @@ mpiP Output
    output.
 
    The test code:
-
   sleeptime = 10;
   MPI_Init (&argc, &argv);
   MPI_Comm_size (comm, &nprocs);
@@ -359,7 +379,6 @@ mpiP Output
 
    Header  information  provides basic information about your performance
    experiment.
-
 @ mpiP
 @ Command : /g/g0/chcham/mpiP/devo/testing/./9-test-mpip-time.exe
 @ Version                  : 2.8.0
@@ -382,7 +401,6 @@ mpiP Output
    MPI  calls  contained  within  Apptime.  MPI%  shows the ratio of this
    MPI_Time  to  Apptime.  The asterisk (*) is the aggregate line for the
    entire application.
-
 ---------------------------------------------------------------------------
 @--- MPI Time (seconds) ---------------------------------------------------
 ---------------------------------------------------------------------------
@@ -402,7 +420,6 @@ Task    AppTime    MPITime    MPI%
    setting  for  callsite  stack  walk  depth  is  1. Other settings will
    enumerate  callsites  by the entire stack trace rather than the single
    callsite alone.
-
 ---------------------------------------------------------------------------
 @--- Callsites: 2 ---------------------------------------------------------
 ---------------------------------------------------------------------------
@@ -421,7 +438,6 @@ Task    AppTime    MPITime    MPI%
    presenting  the  coefficient  of  variation  as  calculated  from  the
    individual  process  times.  A  larger  value indicates more variation
    between the process times.
-
 ---------------------------------------------------------------------------
 @--- Aggregate Time (top twenty, descending, milliseconds) ----------------
 ---------------------------------------------------------------------------
@@ -432,7 +448,6 @@ Barrier                 1      0.405    0.00    0.00    0.59
    The next section is similar to the aggregate time section, although it
    reports  on  the  top  20  callsites for total sent message sizes. For
    example:
-
 ---------------------------------------------------------------------------
 @--- Aggregate Sent Message Size (top twenty, descending, bytes) ----------
 ---------------------------------------------------------------------------
@@ -444,7 +459,6 @@ Bcast                   1         12        336      28      0.02
    each  callsite  across  all  tasks,  followed  by  an  aggregate  line
    (indicated  by  an  asterisk in the Rank column). The first section is
    for operation time followed by the section for message sizes.
-
 ---------------------------------------------------------------------------
 @--- Callsite Time statistics (all, milliseconds): 8 ----------------------
 ---------------------------------------------------------------------------
@@ -480,7 +494,6 @@ Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00
    with the aggregate application and MPI times.
 
    The section for sent message sizes has a similar format:
-
 ---------------------------------------------------------------------------
 @--- Callsite Message Sent statistics (all, sent bytes) -------------------
 ---------------------------------------------------------------------------
@@ -503,7 +516,6 @@ Send                 5    *     320      6000      6000      6000   1.92e+06
 
    The  format  of  MPI  I/O  report  section is very similar to the sent
    message sizes section:
-
 ---------------------------------------------------------------------------
 @--- Callsite I/O statistics (all, I/O bytes) -----------------------------
 ---------------------------------------------------------------------------
@@ -533,7 +545,6 @@ Controlling the Scope of mpiP Profiling in your Application
    For  example, in your application you can capture the MPI activity for
    timestep  5  only using Pcontrol. Remember to set the mpiP environment
    variable to include -o when using this feature.
-
 for(i=1; i < 10; i++)
 {
   switch(i)
@@ -758,5 +769,5 @@ MPI Routines For Which mpiP Gathers I/O Data
 
    For further information please send mail to mpip-help@llnl.gov.
 
-   Last modified on January 18th, 2005.
+   Last modified on January 25th, 2005.
    UCRL-CODE-2002-020, Version 2.
