@@ -15,3 +15,9 @@
 
 	* Fixes + message size support, C++ name demangling,
 	  and long file/function name support.
+
+2004-06-25  Chris Chambreau  <chcham@llnl.gov>
+
+	* v2.7 release includes broader platform support, greater 
+	  flexibility for feature configuration, MPI I/O reporting, 
+	  and arbitrary report generation.
