@@ -54,8 +54,7 @@ static bfd_boolean with_functions = 0;	/* -f, show function names.  */
 static bfd_boolean base_names = 1;	/* -s, strip directory names.  */
 
 
-#ifdef DO_DEMANGLE
-#ifdef AIX 
+#ifdef DEMANGLE_IBM
 
 #include <demangle.h>
 #include <string.h>
@@ -74,7 +73,22 @@ char* mpiPdemangle(const char* mangledSym)
     return NULL;
 }
 
-#else
+#elif DEMANGLE_Compaq
+
+#include <demangle.h>
+#include <string.h>
+
+char* mpiPdemangle(const char* mangledSym)
+{
+  char out[1024];
+
+  MLD_demangle_string(mangledSym, out, 1024, MLD_SHOW_INFO | MLD_SHOW_DEMANGLED_NAME);
+
+  return strdup(out);
+}
+
+
+#elif DEMANGLE_GNU
 
 #ifdef HAVE_DEMANGLE_H
 #include "demangle.h"
@@ -88,7 +102,6 @@ char* mpiPdemangle(const char* mangledSym)
 }
 
 #endif
-#endif  /* DO_DEMANGLE */
 
 
 void
@@ -195,7 +208,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	{
 	  char *res = NULL;
 
-#ifdef DO_DEMANGLE
+#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
           res = mpiPdemangle(functionname);
 #endif
 	  if (res == NULL)
