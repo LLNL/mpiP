@@ -59,8 +59,8 @@ F77_IS_GNU = @F77_IS_GNU@
 
 ifeq ($(F77_IS_GNU),true)
   FORTRAN_FLAG = -DGNU_Fortran
-  FORTRAN_TARGET = libmpiPf77.a
-  MPIPFLIB = mpiPf77
+  FORTRAN_TARGET = libmpiPg77.a
+  MPIPFLIB = mpiPg77
 endif
 
 ifneq (,$(findstring ifc, $(FC)))
