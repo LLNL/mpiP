@@ -8,19 +8,25 @@ set procs 2
 case "$launch" in {
     { "prun" } { 
         set pre_args "-p$pool"
-    	set post_args ""
-	set pre_procs "-n$procs"
-	set post_procs ""
-	}
+        set post_args ""
+        set pre_procs "-n$procs"
+        set post_procs ""
+    }
+    { "mpirun" } { 
+        set pre_args "-np"
+        set pre_procs $procs
+        set post_args ""
+        set post_procs ""
+    }
     { "poe" } { 
         set env(MP_PROCS) $procs
         set env(MP_NODES) 1
         set env(MP_RMPOOL) $rmpool
-    	set pre_args ""
-    	set post_args ""
-	set pre_procs ""
-	set post_procs ""
-	}
+        set pre_args ""
+        set post_args ""
+        set pre_procs ""
+        set post_procs ""
+    }
 }
 
 set timeout 30

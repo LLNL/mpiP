@@ -26,25 +26,31 @@ proc runTest { } {
   case "$launch" in {
       { "prun" } { 
         set pre_args "-p$pool"
-  	set pre_procs "-n$procs"
+        set pre_procs "-n$procs"
         send_user "$launch $pre_args $pre_procs $test_targ \n"
         spawn -noecho $launch $pre_args $pre_procs $test_targ 
-  	}
+      }
+      { "mpirun" } { 
+        set pre_args "-np"
+        set pre_procs $procs
+        send_user "$launch $pre_args $pre_procs $test_targ \n"
+        spawn -noecho $launch $pre_args $pre_procs $test_targ 
+      }
       { "poe" } { 
         set env(MP_PROCS) "$procs"
-#        send_user "set MP_PROCS to $procs=$env(MP_PROCS)"
+#       send_user "set MP_PROCS to $procs=$env(MP_PROCS)"
         set env(MP_NODES) 1
         set env(MP_RMPOOL) $rmpool
         send_user "$launch $test_targ \n"
         spawn -noecho $launch $test_targ 
-  	}
+      }
   }
   
   set expect_out(1,string) ""
   expect { 
      -re "mpiP: Storing mpiP output in .\./(.*\.mpiP)\](.*)"   { 
-        close 
         wait 
+        close 
         }
      timeout { fail "$test timed out" }
      eof     { fail "$test failed" }
