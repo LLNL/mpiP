@@ -29,8 +29,8 @@ static char *rcsid =
 #include "bucomm.h"
 #endif
 
-#include "mpiPdemangle.h"
 #include "mpiPi.h"
+#include "mpiPconfig.h"
 
 static asymbol **syms;
 static bfd_vma pc;
@@ -52,6 +52,43 @@ typedef boolean bfd_boolean;
 static bfd_boolean found;
 static bfd_boolean with_functions = 0;	/* -f, show function names.  */
 static bfd_boolean base_names = 1;	/* -s, strip directory names.  */
+
+
+#ifdef DO_DEMANGLE
+#ifdef AIX 
+
+#include <demangle.h>
+#include <string.h>
+
+char* mpiPdemangle(const char* mangledSym)
+{
+  Name *ret;
+  char *rest;
+  unsigned long opts = 0x1;
+
+  ret = demangle((char*)mangledSym, &rest, opts);
+
+  if ( ret != NULL )
+    return strdup(text(ret));
+  else
+    return NULL;
+}
+
+#else
+
+#ifdef HAVE_DEMANGLE_H
+#include "demangle.h"
+#else
+extern char *cplus_demangle (const char *mangled, int options);
+#endif
+
+char* mpiPdemangle(const char* mangledSym)
+{
+  return cplus_demangle (mangledSym, DMGL_ANSI | DMGL_PARAMS);
+}
+
+#endif
+#endif  /* DO_DEMANGLE */
 
 
 void
@@ -154,16 +191,13 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	{
 	  *o_funct_str = strdup ("[unknown]");
 	}
-      else if (!mpiPi_do_demangle)
-	{
-	  *o_funct_str = strdup (functionname);
-	}
       else
 	{
 	  char *res = NULL;
 
+#ifdef DO_DEMANGLE
           res = mpiPdemangle(functionname);
-
+#endif
 	  if (res == NULL)
 	    {
 	      *o_funct_str = strdup (functionname);

@@ -45,6 +45,15 @@ LIBS=$withval
 echo Using extra libraries: $withval
 )
 
+AC_ARG_ENABLE(demangling,
+[  --enable-demangling     Builds additional library with demangling support.],
+DO_DEMANGLE=true
+echo demangling enabled
+,
+DO_DEMANGLE=false
+)
+AC_SUBST(DO_DEMANGLE)
+
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc gcc cc icc, mpicc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC c++ g++ CC cxx icc, mpiCC)
@@ -55,7 +64,7 @@ AC_CHECK_HEADERS(demangle.h)
 AC_CHECK_LIB(intl,dcgettext__)
 AC_CHECK_LIB(iberty,objalloc_create)
 AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr))
-AC_CHECK_FILE(/usr/ibmcxx/include/demangle.h, CPPFLAGS="-I/usr/ibmcxx/include $CPPFLAGS")
+AC_CHECK_FILE(/usr/include/demangle.h, CPPFLAGS="-I/usr/include $CPPFLAGS")
 
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
 AC_MSG_CHECKING(fortran symbols)

@@ -281,7 +281,7 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
 #define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
-      if ( csp_1->filename[i] != NULL )
+      if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
       {
       if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
 	{

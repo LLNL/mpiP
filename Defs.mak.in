@@ -68,6 +68,13 @@ ifneq (,$(findstring ifc, $(FC)))
     MPIPFLIB = mpiPifc
 endif
 
+DEMANGLE_TARGET =
+DO_DEMANGLE = @DO_DEMANGLE@
+ifeq ($(DO_DEMANGLE),true)
+  DEMANGLE_FLAG = -DDO_DEMANGLE
+  DEMANGLE_TARGET = libmpiPdmg.a
+  MPIPCXXLIB = mpiPdmg
+endif
 
 CFLAGS	+= ${OPT}
 CPPFLAGS+= -D${OS}
