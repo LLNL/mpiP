@@ -420,7 +420,7 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 {
   int i;
 
-#if defined(USE_GETARG) 
+#if defined(USE_GETARG) && defined(Intel_Fortran)
 
 #define EXECUTABLE_LEN 2048
 {
