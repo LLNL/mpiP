@@ -39,18 +39,27 @@ void mpiP_init_api()
   mpiPi.stderr_ = stderr;
   mpiP_api_init = 1;
   mpiPi.toolname = "mpiP-API";
+  mpiPi.inAPIrtb = 0;
 }
 
 
 int mpiP_record_traceback(void* pc_array[], int max_stack)
 {
   jmp_buf jb;
+  int retval;
 
   if ( mpiP_api_init == 0 )
     mpiP_init_api();
 
   setjmp(jb);
-  return mpiPi_RecordTraceBack(jb, pc_array, max_stack, 1);
+
+  mpiPi.inAPIrtb = 1;   /*  Used to correctly identify caller FP  */
+
+  retval = mpiPi_RecordTraceBack(jb, pc_array, max_stack);
+
+  mpiPi.inAPIrtb = 0;
+
+  return retval;
 }
 
 extern int

@@ -143,6 +143,7 @@ mpiPi_init (char *appName)
   mpiPi.baseNames = 0;
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
   mpiPi.calcCOV = 1;
+  mpiPi.inAPIrtb = 0;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
