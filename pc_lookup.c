@@ -36,6 +36,10 @@ static char *rcsid =
 extern char *cplus_demangle (const char *mangled, int options);
 #endif
 
+#define boolean int
+#define false 0
+#define true (!false)
+
 static asymbol **syms;
 static bfd_vma pc;
 static const char *filename;
@@ -184,7 +188,7 @@ open_bfd_executable (char *filename)
   /* set_default_bfd_target (); */
   abfd = bfd_openr (filename, target);
   if (abfd == NULL)
-    mpiPi_abort ("could not open filename");
+    mpiPi_abort ("could not open filename %s", filename);
   if (bfd_check_format (abfd, bfd_archive))
     mpiPi_abort ("can not get addresses from archive");
   if (!bfd_check_format_matches (abfd, bfd_object, &matching))
