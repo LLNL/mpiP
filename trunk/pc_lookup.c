@@ -172,9 +172,9 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	      char **o_funct_str)
 {
   char buf[128];
-  assert (abfd);
   assert (i_addr_hex);
 
+#if 0
 #ifdef AIX
 #ifdef __64BIT__
   /*  AIX 64-bit apps load .text section at 0x100000000  */
@@ -182,6 +182,10 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   i_addr_hex = (void*)((unsigned long)i_addr_hex + 0x10000000);
 #endif
 #endif
+#endif
+
+  if ( abfd == NULL )
+    return 1;
 
   sprintf (buf, "0x%lx", (unsigned long) i_addr_hex);
   pc = bfd_scan_vma (buf, NULL, 16);
@@ -252,7 +256,8 @@ open_bfd_executable (char *filename)
 
   if (filename == NULL)
   {
-    mpiPi_abort("Executable filename is NULL!\n  If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+    mpiPi_msg_warn("Executable filename is NULL!\n  If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+    return 1;  /*  failure  */
   }
 
   bfd_init ();
