@@ -224,6 +224,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	(callsite_pc_cache_entry_t *)
 	malloc (sizeof (callsite_pc_cache_entry_t));
       csp->pc = pc;
+#ifndef DISABLE_BFD
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
 	  mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
@@ -243,6 +244,11 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	  csp->functname = strdup("[unknown]");
 	  csp->line = 0;
 	}
+#else /* ! DISABLE_BFD */
+      csp->filename = strdup("[unknown]");
+      csp->functname = strdup("[unknown]");
+      csp->line = 0;
+#endif
       h_insert (callsite_pc_cache, csp);
     }
 
