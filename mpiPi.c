@@ -157,7 +157,7 @@ mpiPi_init (char *appName)
 		 mpiPi_vminor, mpiPi_vdate, mpiPi_vtime);
       mpiPi_msg
 
-	("Direct questions and errors to Jeffrey Vetter <vetter3@llnl.gov>\n");
+	("Direct questions and errors to mpip-help@llnl.gov>\n");
       mpiPi_msg ("\n");
     }
 
