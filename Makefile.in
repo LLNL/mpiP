@@ -3,12 +3,13 @@
 # $Header$
 
 srcdir=@srcdir@
-PREFIX=@prefix@
-LIBDESTDIR=${PREFIX}/lib
-INCDESTDIR=${PREFIX}/include
-DOCDESTDIR=${PREFIX}/doc
-SLIBDESTDIR=${PREFIX}/slib
-VPATH = $(srcdir)
+prefix=@prefix@
+libdir=${prefix}/lib
+includedir=@includedir@
+docdir=${prefix}/doc
+slibdir=${prefix}/slib
+bindir=${prefix}/bin
+VPATH = ${srcdir}
 
 include Defs.mak
 
@@ -84,8 +85,8 @@ SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
 shared: ${SHARED_C_TARGET}
 install::
 	if [ -x ${SHARED_C_TARGET} ] ; then \
-	  mkdir -p ${SLIBDESTDIR} ; \
-	  ${INSTALL} ${SHARED_C_TARGET} ${SLIBDESTDIR} ; \
+	  mkdir -p ${slibdir} ; \
+	  ${INSTALL} ${SHARED_C_TARGET} ${slibdir} ; \
 	fi
 
 ${SHARED_C_TARGET}: CFLAGS += -fpic
@@ -149,12 +150,13 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 ${OBJS}: mpiPi_def.h
 
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
-	mkdir -p ${LIBDESTDIR} ${INCDESTDIR} ${DOCDESTDIR}
-	${INSTALL} ${C_TARGET} ${LIBDESTDIR}/${C_TARGET}
-	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${LIBDESTDIR}/${DEMANGLE_TARGET} ; fi
-	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${LIBDESTDIR}/${FORTRAN_TARGET} ; fi
-	${INSTALL} mpiP-API.h timers/*h ${INCDESTDIR}
-	${INSTALL} doc/*txt doc/*html doc/README ${DOCDESTDIR}
+	mkdir -p ${libdir} ${includedir} ${docdir} ${bindir}
+	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
+	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
+	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${libdir}/${FORTRAN_TARGET} ; fi
+	${INSTALL} mpiP-API.h timers/*h ${includedir}
+	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
+	${INSTALL} bin/*mpip* ${bindir}
 
 merged-install: add_binutils_objs add_libunwind_objs install
 
