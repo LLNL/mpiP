@@ -22,7 +22,6 @@ import pdb
 
 cnt = 0
 fdict = {}
-gParamDict = {}
 lastFunction = "NULL"
 verbose = 0
 baseID = 1000
@@ -198,7 +197,6 @@ def SpecialParamRecord(funct,param):
 def ParamDictUpdate(fname):
     global flist
     global fdict
-    global gParamDict
     global messParamDict
     global ioParamDict
     for p in fdict[fname].paramList:
@@ -255,17 +253,6 @@ def ParamDictUpdate(fname):
             elif paramMessType == 2:
                 fdict[fname].ioTypePname = pname
             
-	if gParamDict.has_key(pname):
-	    ## compare type info
-	    prev = gParamDict[pname]
-	    if (prev.basetype != basetype) \
-	       or (prev.pointerLevel != pointerLevel) \
-	       or (prev.arrayLevel != arrayLevel):
-		print "Warning: ", fname,"/",pname, " conflicts with previous definition."
-	else:
-	    ## add it
-	    gParamDict[pname] = VarDesc(pname, basetype, pointerLevel,arrayLevel)
-
 	if (fdict[fname].paramDict[pname].pointerLevel == 0) \
 	   and (fdict[fname].paramDict[pname].arrayLevel == 0) \
 	   and (fdict[fname].paramDict[pname].basetype != "void"):
@@ -451,7 +438,6 @@ def CreateOptStruct(funct,olist):
 def GenerateStructureFile():
     global flist
     global fdict
-    global gParamDict
     print "-----*----- Generating structure files"
     cwd = os.getcwd()
     os.chdir(cwd)
@@ -526,7 +512,6 @@ def CreatePrintStmt(funct,olist):
 def GeneratePrintStmtsFile():
     global flist
     global fdict
-    global gParamDict
 
     print "-----*----- Generating the event print statments"
     cwd = os.getcwd()
@@ -566,7 +551,6 @@ def GeneratePrintStmtsFile():
 def GenerateLookup():
     global flist
     global fdict
-    global gParamDict
 
     print "-----*----- Generating the lookup table"
     cwd = os.getcwd()
@@ -609,7 +593,6 @@ def GenerateLookup():
 ###
 def CreateWrapper(funct, olist):
     global fdict
-    global gParamDict
 
     if fdict[funct].nowrapper:
 	return
@@ -951,7 +934,6 @@ def CreateWrapper(funct, olist):
 def GenerateWrappers():
     global flist
     global fdict
-    global gParamDict
 
     print "-----*----- Generating profiling wrappers"
     cwd = os.getcwd()
@@ -1013,8 +995,8 @@ def main():
     opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate'])
 
     print "MPI Wrapper Generator ($Revision$)"
-    print "opts=",opts
-    print "pargs=",pargs
+    #print "opts=",opts
+    #print "pargs=",pargs
 
     f77symbol = 'symbol'
     doOpaqueXlate = False
