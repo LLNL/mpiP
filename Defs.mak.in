@@ -54,25 +54,10 @@ endif
 
 TARGET	 = libmpiP.a
 MPIPLIB  = mpiP
-MPIPFLIB = mpiP
-
-#  On Linux, GNU and Intel Fortran compilers require a separate
-#  library, due to unique argc/argv symbols.
-
-FORTRAN_TARGET =
-F77_IS_GNU = @F77_IS_GNU@
-
-ifeq ($(F77_IS_GNU),true)
-  FORTRAN_FLAG = -DGNU_Fortran
-  FORTRAN_TARGET = libmpiPg77.a
-  MPIPFLIB = mpiPg77
-endif
-
-ifneq (,$(findstring ifc, $(FC)))
-    FORTRAN_FLAG   = -DIntel_Fortran
-    FORTRAN_TARGET = libmpiPifc.a
-    MPIPFLIB = mpiPifc
-endif
+FORTRAN_FLAG = @FORTRAN_FLAG@
+FORTRAN_TARGET = @FORTRAN_TARGET@
+MPIPFLIB = @MPIPFLIB@
+F77_VENDOR = @F77_VENDOR@
 
 DEMANGLE_TARGET =
 DO_DEMANGLE = @DO_DEMANGLE@
