@@ -8,7 +8,6 @@ VPATH = $(srcdir)
 include ../Defs.mak
 
 CFLAGS	+= -I..
-FFLAGS  += -g 
 LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
