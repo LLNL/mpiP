@@ -290,7 +290,7 @@ mpiPi_profile_print (FILE * fp)
               }
             else
               {
-                fprintf (fp, "%3d %3d %-15s %4d %-30s %s\n",
+                fprintf (fp, "%3d %3d %-15.15s %4d %-25s %s\n",
                          av[i]->id,
                          j,
                          av[i]->filename[j], av[i]->line[j], 
