@@ -21,6 +21,7 @@ static char *rcsid =
 #include <setjmp.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #ifdef OSF1
 #include <excpt.h>
