@@ -19,7 +19,7 @@ extern int mpiPi_query_pc (void *pc, char **filename, char **functname,
 extern int callsite_src_id_cache_comparator (const void *p1, const void *p2);
 extern int callsite_src_id_cache_hashkey (const void *p1);
 extern int mpiPi_query_src (callsite_stats_t * p);
-extern void mpiPi_mergeResults (void);
+extern int mpiPi_mergeResults (void);
 extern void mpiPi_publishResults (void);
 extern void mpiPi_collect_basics (void);
 extern void mpiPi_finalize (void);
@@ -52,7 +52,7 @@ extern int callsite_src_id_cache_comparator (
   );
 extern int callsite_src_id_cache_hashkey ( /* const void *p1 */ );
 extern int mpiPi_query_src ( /* callsite_stats_t * p */ );
-extern void mpiPi_mergeResults ( /* void */ );
+extern int mpiPi_mergeResults ( /* void */ );
 extern void mpiPi_publishResults ( /* void */ );
 extern void mpiPi_collect_basics ( /* void */ );
 extern void mpiPi_finalize ( /* void */ );
