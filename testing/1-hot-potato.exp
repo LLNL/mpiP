@@ -1,0 +1,17 @@
+
+##  Test-specific information
+#
+
+set test_title "1-hot-potato-exe: simple C Test with MPI"
+set test "1-hot-potato.exe"
+set test_targ "./testing/$test"
+set procs 2
+set source_check_file "testing/1-hot-potato.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+

@@ -1,0 +1,16 @@
+
+##  Test-specific information
+#
+set test_title "3-stacktrace-exe: simple C Test with MPI"
+set test "3-stacktrace.exe"
+set procs 2
+set env(MPIP) "-k 3"
+set source_check_file "testing/3-stacktrace.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+

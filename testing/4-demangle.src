@@ -1,0 +1,1 @@
+  checkOutput "0 4-demangle.C      12 comm::\.?doBarriers\\(int\\)   +Barrier" "Source check:"

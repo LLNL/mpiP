@@ -1,0 +1,15 @@
+
+##  Test-specific information
+#
+set test_title "4-demangle-exe: demangling test with mpiPdmg lib"
+set test "4-demangle.exe"
+set procs 1
+set source_check_file "testing/4-demangle.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
