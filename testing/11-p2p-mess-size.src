@@ -13,7 +13,7 @@ proc checkMessOutput { text type count avrg } {
   checkOutput "$text +\[0-9\]+ +$count +$currTot +$currAvrg" "Message size check:"
 }
 
-foreach op { Bsend Ibsend Irsend Isend Issendr Rsend Send Ssend } {
+foreach op { Bsend Ibsend Irsend Isend Issend Rsend Send Ssend } {
   checkMessOutput $op "Message size check:" 1 $currAvrg
   set currAvrg [ expr $currAvrg + $baseSize ]
 }

@@ -64,7 +64,7 @@ int main(int argc, char** argv)
     MPI_Buffer_attach(buf, bsize);
     MPI_Bsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Buffer_detach(buf);
+    MPI_Buffer_detach(buf, &bsize);
     free(buf);
   }
   else
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     MPI_Buffer_attach(buf, bsize);
     MPI_Ibsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Buffer_detach(buf);
+    MPI_Buffer_detach(buf, &bsize);
     free(buf);
   }
   else
