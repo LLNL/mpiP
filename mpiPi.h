@@ -158,7 +158,7 @@ extern int mpiPi_debug;
 #elif defined(Linux) && defined(IA32)
 /* jb[3] = FP, FP[2] = PC */
 #define ParentFP(jb) ((void*) jb[0].__jmpbuf[3])
-#define FramePC(fp) ((void*)(((void**)fp)[2]))
+#define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
 #if 0
 #define ParentFP(jb) ((void*) jb[0].__jmpbuf[JB_SP])

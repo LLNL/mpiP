@@ -22,6 +22,8 @@ static char *rcsid =
 #include <stdio.h>
 #include "mpiPi.h"
 
+static int argc=0;
+static char **argv=0;
 
 char *
 GetBaseAppName (char *rawName)
@@ -247,8 +249,6 @@ mpiPi_getenv ()
 void
 mpiPi_copy_args (int *ac, char **av, int av_len)
 {
-  int argc=0;
-  char **argv=0;
   int i;
   extern int mpiPi_debug;
 
@@ -259,10 +259,25 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = p_xargc;
     argv = p_xargv;
   }
-#endif
+#elif defined(Intel_Fortran)
+  {
+    extern int xargc;
+    extern char **xargv;
+    argc = xargc;
+    argv = xargv;
+  }
+#elif defined(GNU_Fortran)
+  {
+    extern int f__xargc;
+    extern char **f__xargv;
+    argc = f__xargc;
+    argv = f__xargv;
+  }
+#endif  
 
    mpiPi_copy_given_args(ac, av, av_len, argc, argv);
 }
+
 
 void
 mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
