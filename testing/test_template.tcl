@@ -1,5 +1,4 @@
 set test_targ "./testing/$test"
-set timeout 10
 global expect_out
 
 
@@ -7,12 +6,13 @@ proc checkOutput { text type } {
   global outFile
   global test
 #  send_user "in checkOutput for $text\n"
+  set timeout 1
   spawn cat $outFile
   expect { 
      -re $text {
         send_user "found $type $text\n"
-        close
-        wait 
+#        wait 
+#        close
         }
      timeout { fail "$test timed out\n" }
      eof     { fail "$test $type $text\n" }
@@ -23,8 +23,9 @@ proc checkOutput { text type } {
 proc runTest { } {
   global launch pool rmpool procs test_targ test expect_out env
 
+  set timeout 20
   case "$launch" in {
-      { "prun" } { 
+      { "prun" | "srun" } { 
         set pre_args "-p$pool"
         set pre_procs "-n$procs"
         send_user "$launch $pre_args $pre_procs $test_targ \n"
@@ -49,8 +50,8 @@ proc runTest { } {
   set expect_out(1,string) ""
   expect { 
      -re "mpiP: Storing mpiP output in .\./(.*\.mpiP)\](.*)"   { 
-        wait 
-        close 
+#       wait 
+#       close 
         }
      timeout { fail "$test timed out" }
      eof     { fail "$test failed" }
