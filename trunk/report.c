@@ -555,6 +555,7 @@ mpiPi_profile_print (FILE * fp)
   }
 
 
+#ifdef HAVE_MPI_IO
   {
     int ac;
     callsite_stats_t **av;
@@ -590,6 +591,7 @@ mpiPi_profile_print (FILE * fp)
       free (av);
     }
   }
+#endif
 
   {
     int ac;
@@ -753,6 +755,7 @@ mpiPi_profile_print (FILE * fp)
     }
   }
 
+#ifdef HAVE_MPI_IO
   /*  Print I/O Section  */
   {
     int ac;
@@ -836,6 +839,7 @@ mpiPi_profile_print (FILE * fp)
       free (av);
     }
   }
+#endif
   print_section_heading (fp, "End of Report");
 
   return 0;
