@@ -357,8 +357,8 @@ mpiPi_getenv ()
 	      mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
               break;
 	      
-	    case 'c':
-              mpiPi.calcCOV = 1;
+	    case 'c':  /* changed to disable COV value */
+              mpiPi.calcCOV = 0;
               break;
 
 	    case 'a':
