@@ -152,8 +152,6 @@ AC_DEFINE(USE_CLOCK_GETTIME)
 USE_CLOCK_GETTIME=true
 echo Using clock_gettime for timing.
 ,
-AC_DEFINE(USE_CLOCK_GETTIME)
-USE_CLOCK_GETTIME=true
 )
 
 AC_ARG_ENABLE(check-time,
