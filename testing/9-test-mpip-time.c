@@ -31,9 +31,13 @@ main (int argc, char **argv)
   char buf[256];
   MPI_Comm comm = MPI_COMM_WORLD;
 
+  /*  Call MPI_Init before checking args for MPICH  */
+  MPI_Init (&argc, &argv);
+
   if (argc > 2)
     {
       printf ("usage: %s <sleep seconds>\n", argv[0]);
+      MPI_Finalize ();
       exit (1);
     }
   if (argc == 2)
@@ -41,7 +45,6 @@ main (int argc, char **argv)
       sleeptime = atoi (argv[1]);
     }
 
-  MPI_Init (&argc, &argv);
   MPI_Comm_size (comm, &nprocs);
   MPI_Comm_rank (comm, &rank);
   MPI_Barrier (comm);
