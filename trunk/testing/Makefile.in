@@ -10,6 +10,7 @@ include ../Defs.mak
 CFLAGS	+= 
 LDFLAGS	+= -L..
 LIBS	:= -lmpiP $(LIBS)
+FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 
 CSRCS =	0-simple.c \
 	1-hot-potato.c \
@@ -34,7 +35,7 @@ all: ${EXES}
 	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 .f.exe:
-	${FC} ${FFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
+	${FC} ${FFLAGS} $< -o $@ ${LDFLAGS} ${FLIBS}
 
 clean::
 	rm -f ${EXES} *.mpiP
