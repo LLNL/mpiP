@@ -67,9 +67,6 @@ int MPI_Comm_create ( MPI_Comm comm, MPI_Group group, MPI_Comm *comm_out )
 int MPI_Comm_dup ( MPI_Comm comm, MPI_Comm *comm_out )
 
 int MPI_Comm_free ( MPI_Comm *commp )
-directives
-	nowrapper
-directives
 
 @int MPI_Comm_get_name ( MPI_Comm comm, char *namep, int *reslen )
 
