@@ -20,7 +20,7 @@
 #define mpiPi_TIMER_INIT(timer_addr) {*(timer_addr) = 0;}
 #define mpiPi_TIME timebasestruct_t
 #define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIME));}
-#define mpiPi_GETTIME(timer,timeaddr) {read_real_time(timeaddr,TIMEBASE_SZ);}
+#define mpiPi_GETTIME(timeaddr) {read_real_time(timeaddr,TIMEBASE_SZ);}
 
 extern void mpiPi_msg_warn (char *fmt, ...);
 
@@ -78,8 +78,8 @@ _aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
   return delta_usecs;
 }
 
-#define mpiPi_GETTIMEDIFF(timer,end,start) _aix_cnvt_read_real_time_diff(end,start)
-#define mpiPi_PRINTTIMEDIFF(timer,end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(timer,end,start));}
+#define mpiPi_GETTIMEDIFF(end,start) _aix_cnvt_read_real_time_diff(end,start)
+#define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
 
 #endif
 
