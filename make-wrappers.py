@@ -71,6 +71,26 @@ messParamDict = {
     ( "MPI_Ssend", "datatype"):2
     }
 
+ioParamDict = {
+
+    ( "MPI_File_read", "count"):1,
+    ( "MPI_File_read", "datatype"):2,
+    ( "MPI_File_read_all", "count"):1,
+    ( "MPI_File_read_all", "datatype"):2,
+    ( "MPI_File_read_at", "count"):1,
+    ( "MPI_File_read_at", "datatype"):2,
+    ( "MPI_File_write", "count"):1,
+    ( "MPI_File_write", "datatype"):2,
+    ( "MPI_File_write_all", "count"):1,
+    ( "MPI_File_write_all", "datatype"):2,
+    ( "MPI_File_write_at", "count"):1,
+    ( "MPI_File_write_at", "datatype"):2
+    }
+
+noDefineList = [
+    "MPI_Pcontrol"
+    ]
+
 class VarDesc:
     def __init__ (self,name, basetype, pointerLevel, arrayLevel):
 	"initialize a new variable description structure"
@@ -92,7 +112,6 @@ class fdecl:
 	self.wrapperPreList = []
 	self.wrapperPostList = []
 	self.nowrapper = 0
-	self.define = 1
 	self.paramConciseList = []
 	self.extrafields = {}
 	self.extrafieldsList = []
@@ -100,14 +119,14 @@ class fdecl:
         self.sendTypePname = ""
         self.recvCountPname = ""
         self.recvTypePname = ""
+        self.ioCountPname = ""
+        self.ioTypePname = ""
         
 
 def ProcessDirectiveLine(lastFunction, line):
     tokens = string.split(line)
     if tokens[0] == "nowrapper":
 	fdict[lastFunction].nowrapper = 1
-    elif tokens[0] == "nodefine":
-	fdict[lastFunction].define = 0
     elif tokens[0] == "extrafield":
 	fdict[lastFunction].extrafieldsList.append(tokens[2])
 	fdict[lastFunction].extrafields[tokens[2]] = tokens[1]
@@ -175,6 +194,7 @@ def ParamDictUpdate(fname):
     global fdict
     global gParamDict
     global messParamDict
+    global ioParamDict
     for p in fdict[fname].paramList:
 	## check for pointers, arrays
 	pname = "NULL"
@@ -220,6 +240,14 @@ def ParamDictUpdate(fname):
                 fdict[fname].recvCountPname = pname
             elif paramMessType == 4:
                 fdict[fname].recvTypePname = pname                
+            
+        #  Identify and assign io size parameters
+        if ioParamDict.has_key((fname,pname)):
+            paramMessType = ioParamDict[(fname,pname)]
+            if paramMessType == 1:
+                fdict[fname].ioCountPname = pname
+            elif paramMessType == 2:
+                fdict[fname].ioTypePname = pname
             
 	if gParamDict.has_key(pname):
 	    ## compare type info
@@ -290,7 +318,8 @@ def ReadInputFile(f):
 	    paramList = map(string.strip,string.split(paramstr,","))
 	    #    print cnt, "-->", name,  paramList
 	    fdict[name] = fdecl(name, fcounter, retype, paramList,line)
-	    fcounter = fcounter + 1
+	    if name not in noDefineList:
+	      fcounter = fcounter + 1
 	    ParamDictUpdate(name)
 	    lastFunction = name
 	    if verbose:
@@ -431,7 +460,7 @@ def GenerateStructureFile():
     olist.append("\n")
 
     for funct in flist:
-      if fdict[funct].define:
+      if funct not in noDefineList:
 	olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
 
     olist.append("\n")
@@ -551,7 +580,7 @@ def GenerateLookup():
 
     counter = 0
     for funct in flist:
-        if fdict[funct].define:
+        if funct not in noDefineList:
 	  if counter < len(flist) \
 	    and counter > 0 :
 	    olist.append(",\n")
@@ -608,7 +637,7 @@ def CreateWrapper(funct, olist):
     olist.append(")")
     # start wrapper code
     olist.append("{")
-    olist.append( "int rc, enabledState; double dur; int tsize; double messSize = 0.;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
+    olist.append( "int rc, enabledState; double dur; int tsize; double messSize = 0.; double ioSize = 0.; \nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
 
     olist.append("\nif (mpiPi.enabled) {\n")
     if fdict[funct].wrapperPreList:
@@ -723,13 +752,20 @@ def CreateWrapper(funct, olist):
                       + "messSize = (double)(tsize * *"
                       +  fdict[funct].sendCountPname + ");\n")
                   
+    if fdict[funct].ioCountPname != "":
+        olist.append( "\n" 
+                      + "PMPI_Type_size(*" + fdict[funct].ioTypePname + ", " 
+                      + "&tsize);\n" 
+                      + "ioSize = (double)(tsize * *"
+                      +  fdict[funct].ioCountPname + ");\n")
     
     olist.append( "\n" \
 		  + "mpiPi_update_callsite_stats(" + "mpiPi_" + funct + ", " \
                   + "mpiPi.rank, "
                   + "call_stack, "
                   + "dur, "
-                  + "(double)messSize"
+                  + "(double)messSize,"
+                  + "(double)ioSize"
                   + ");\n" )
 
     # end of enabled check
