@@ -35,4 +35,7 @@
 /* Distinguish available BFD calls between 2.15 and 2.15.96 */
 #undef HAVE_BFD_GET_SECTION_SIZE
 
+/* Address bug in Quadrics MPI Opaque Object translation */
+#undef HAVE_MPIR_TOPOINTER
+
 #endif /* _CONFIG_H */
