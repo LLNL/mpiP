@@ -273,9 +273,12 @@ mpiPi_getenv ()
 	      mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
               break;
 	      
+	    case 'c':
+              mpiPi.calcCOV = 1;
+              break;
+
 	    case 'a':
 	    case 'b':
-	    case 'c':
 	    case 'd':
 	    case 'h':
 	    case 'i':
