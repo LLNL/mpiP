@@ -169,6 +169,7 @@ typedef struct _mpiPi_t
   int baseNames;
   MPIP_REPORT_FORMAT_TYPE reportFormat;
   int calcCOV;
+  int inAPIrtb;
 }
 mpiPi_t;
 
@@ -184,37 +185,36 @@ extern int mpiPi_debug;
 extern int mpiPi_do_demangle;
 
 
-#if !defined(UNICOS_mp)
+#if !defined(UNICOS_mp) 
 
+/*  AIX  */
 #if defined(AIX)
-#if defined(__64BIT__)
+
+#if defined(__64BIT__)  /*  64-bit AIX  */
 #define ParentFP(jb) ((void *) *(long *) jb[5])
-#define CurrentPC(jb) ((void *) *(long *) jb[4])
-#else
+#else  /*  32-bit AIX  */
 #define ParentFP(jb) ((void *) *(long *) jb[3])
-#define CurrentPC(jb) ((void *) *(long *) jb[2])
 #endif
+
+/*  For both 32-bit and 64-bit AIX  */
 #define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *)))) 
 #define NextFP(fp) ((void *) *(long *) fp)
+
+/*  IA32 Linux  */
 #elif defined(Linux) && defined(IA32)
-/* jb[3] = FP, FP[2] = PC */
 #define ParentFP(jb) ((void*) jb[0].__jmpbuf[3])
-#define CurrentPC(jb) ((void*) jb[0].__jmpbuf[5])
 #define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
-#if 0
-#define ParentFP(jb) ((void*) jb[0].__jmpbuf[JB_SP])
-#define FramePC(fp) ((void*)(((void**)fp)[1]))
-#define NextFP(fp) ((void*)((void**)fp)[0])
-#endif
-/* Jim Brandt put here to support X86_64 arch */
+
+/*  X86_64 Linux  */
 #elif defined(Linux) && defined(X86_64)
 #define ParentFP(jb) ((void*) jb[0].__jmpbuf[1])
 #define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
-#else
+
+/*  undefined  */
+#else  
 #define ParentFP(jb) (0)
-#define CurrentPC(jb) (0)
 #define FramePC(fp) (0)
 #define NextFP(fp) (0)
 #endif
