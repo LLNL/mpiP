@@ -145,6 +145,11 @@ clean::
 
 include $(srcdir)/Rules.mak
 
+ENABLE_FORTRAN_XLATE = @ENABLE_FORTRAN_XLATE@
+ifeq ($(ENABLE_FORTRAN_XLATE), yes)
+  MAKE_WRAPPERS_ARGS += --xlate
+endif
+
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --f77symbol $(F77_SYMBOLS) $^
 
