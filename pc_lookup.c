@@ -175,7 +175,10 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   assert (i_addr_hex);
 
   if ( abfd == NULL )
+  {
+    mpiPi_msg_debug("find_src_loc returning failure as abfd == NULL\n");
     return 1;
+  }
 
   sprintf (buf, "0x%lx", (unsigned long) i_addr_hex);
   pc = bfd_scan_vma (buf, NULL, 16);
