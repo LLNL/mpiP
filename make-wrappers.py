@@ -644,7 +644,7 @@ def CreateWrapper(funct, olist):
 	olist.extend(fdict[funct].wrapperPreList)
 
     # capture timer
-    olist.append("mpiPi_GETTIME (&mpiPi.timer, &start);\n" )
+    olist.append("mpiPi_GETTIME (&start);\n" )
 
     # capture HW counters
 #    olist.append("if(mpiTi.hwc_enabled){ \n" \
@@ -678,8 +678,8 @@ def CreateWrapper(funct, olist):
     olist.append("mpiPi.enabled = enabledState;\n")
     olist.append("if (mpiPi.enabled) {\n")
     olist.append("\n" \
-		 + "mpiPi_GETTIME (&mpiPi.timer, &end);\n" \
-		 + "dur = mpiPi_GETTIMEDIFF (&mpiPi.timer, &end, &start);\n" \
+		 + "mpiPi_GETTIME (&end);\n" \
+		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" \
 #		 + "{\n" \
 #		 + " mpiTi_event_t e;\n" \
 #		 + "e.op = mpiTi_"+funct+";\n" \
