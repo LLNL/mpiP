@@ -2,11 +2,14 @@
 # Copyright (C) 2001 Jeffrey Vetter vetter3@llnl.gov
 # $Header$
 
+srcdir=.
+
+
 include ../Defs.mak
 
 CFLAGS	+= -g
-LFLAGS	+= -L.. -L${HOME}/AIX/lib
-LIBS	+= -lmpiP -lbfd -liberty -lintl
+LDFLAGS	+= -L..
+LIBS	:= -lmpiP $(LIBS)
 
 CSRCS =	0-simple.c \
 	1-hot-potato.c \
@@ -25,17 +28,17 @@ all: ${EXES}
 
 .SUFFIXES: .exe
 .c.exe:
-	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LFLAGS} ${LIBS}
+	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 .C.exe:
-	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LFLAGS} ${LIBS}
+	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 .f.exe:
-	${FC} ${FFLAGS} $< -o $@ ${LFLAGS} ${LIBS}
+	${FC} ${FFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 clean::
 	rm -f ${EXES} *.mpiP
 
-include ../Rules.mak
+include $(srcdir)/../Rules.mak
 
 ##### EOF
