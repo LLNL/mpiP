@@ -9,8 +9,9 @@ include Defs.mak
 
 TARGET	= libmpiP.a
 
-all: ${TARGET} ${FORTRAN_TARGET}
-	$(MAKE) -C testing 
+default: ${TARGET} ${FORTRAN_TARGET}
+
+all: ${TARGET} ${FORTRAN_TARGET} test
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -45,6 +46,9 @@ remake_util:
 TAGS: ${SRCS}
 	etags $^
 
+test:
+	$(MAKE) -C testing
+
 clean::
 	rm -f TAGS tags
 	$(MAKE) -C testing clean
@@ -70,4 +74,5 @@ distclean: clean
 	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP*
 
 include Check.mak
+
 ##### EOF
