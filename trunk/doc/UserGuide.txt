@@ -310,6 +310,11 @@ Contact us if you'd like more information.
     Applications compiled with the Intel compiler may not be able to 
     identify parent stack frames.
 
+- If you are calling MPI functions from within dynamically loaded objects,
+you may need to recompile the library as a shared object.
+
+- The mpiP library currently will not compile with g++ >= 2.96.
+
 - C++ name demangling for function names has not been totally
 implemented. Stay tuned.
 
