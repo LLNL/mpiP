@@ -142,7 +142,7 @@ mpiPi_init (char *appName)
   mpiPi.reportPrintThreshold = 0.0;
   mpiPi.baseNames = 0;
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
-  mpiPi.calcCOV = 0;
+  mpiPi.calcCOV = 1;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
