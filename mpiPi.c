@@ -239,7 +239,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
       csp->pc = pc;
       if (find_src_loc (pc, filename, lineno, functname) == 0)
 	{
-	  mpiPi_msg_debug ("Successful BFD lookup for [0x%x]: %s, %d, %s\n",
+	  mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
 			   (long) pc, *filename, *lineno, *functname);
 
 	  if ( strcmp(*filename, "??") == 0 )
@@ -251,7 +251,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	}
       else
 	{
-	  mpiPi_msg_warn ("Unsuccessful BFD lookup for [0x%x]\n", (long) pc);
+	  mpiPi_msg_warn ("Unsuccessful Source lookup for [0x%x]\n", (long) pc);
 	  csp->filename = strdup("[unknown]");
 	  csp->functname = strdup("[unknown]");
 	  csp->line = 0;
@@ -465,7 +465,9 @@ mpiPi_mergeResults ()
     {
       int i;
 
+#ifndef DISABLE_BFD
       open_bfd_executable (mpiPi.av[0]);
+#endif
 
       /* convert data to src line; merge, if nec */
       mpiPi.global_callsite_stats = h_open (mpiPi.tableSize,
@@ -598,8 +600,10 @@ mpiPi_mergeResults ()
 			   p->filename[0], p->lineno[0], p->functname[0]);
 	}
 
+#ifndef DISABLE_BFD
       /* clean up */
       close_bfd_executable ();
+#endif
     }
 
   return 1;
