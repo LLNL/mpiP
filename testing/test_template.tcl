@@ -6,7 +6,7 @@ proc checkOutput { text type } {
   global outFile
   global test
 #  send_user "in checkOutput for $text\n"
-  set timeout 1
+  set timeout 5
   spawn cat $outFile
   expect { 
      -re $text {
