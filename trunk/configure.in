@@ -147,6 +147,11 @@ if test "$G77" = yes ; then
   FORTRAN_FLAG=-DGNU_Fortran
   FORTRAN_TARGET=libmpiPg77.a
   MPIPFLIB=mpiPg77
+elif $F77 -v 2>&1 | grep -e g77 1> /dev/null 2> /dev/null ; then
+  F77_VENDOR=GNU
+  FORTRAN_FLAG=-DGNU_Fortran
+  FORTRAN_TARGET=libmpiPg77.a
+  MPIPFLIB=mpiPg77
 elif $F77 -V 2>&1 | grep -e Intel 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Intel
   FORTRAN_FLAG=-DIntel_Fortran
