@@ -466,7 +466,8 @@ mpiPi_mergeResults ()
       int i;
 
 #ifndef DISABLE_BFD
-      open_bfd_executable (mpiPi.av[0]);
+      if ( mpiPi.av[0] != NULL )
+        open_bfd_executable (mpiPi.av[0]);
 #endif
 
       /* convert data to src line; merge, if nec */
@@ -493,7 +494,7 @@ mpiPi_mergeResults ()
 	  callsite_stats_t *csp = NULL;
 
 	  /* lookup file/line */
-	  mpiPi_query_src (p);	/* sets the file/line in p */
+          mpiPi_query_src (p);	/* sets the file/line in p */
 
 	  /* If exists, accumulate, otherwise insert. This is
 	     specifically for optimizations that have multiple PCs for
@@ -602,7 +603,8 @@ mpiPi_mergeResults ()
 
 #ifndef DISABLE_BFD
       /* clean up */
-      close_bfd_executable ();
+      if ( mpiPi.av[0] != NULL )
+        close_bfd_executable ();
 #endif
     }
 

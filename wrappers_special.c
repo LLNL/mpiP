@@ -30,10 +30,6 @@ _MPI_Init (int *argc, char ***argv, void *pc)
   int rc = 0;
   int enabledStatus;
 
-/*    assert (pc != NULL); */
-  assert (argc != NULL);
-  assert (argv != NULL);
-
   enabledStatus = mpiPi.enabled;
   mpiPi.enabled = 0;
 
@@ -41,7 +37,10 @@ _MPI_Init (int *argc, char ***argv, void *pc)
 
   mpiPi.enabled = enabledStatus;
 
-  mpiPi_init (GetBaseAppName (**argv));
+  if ( argv != NULL )
+    mpiPi_init (GetBaseAppName (**argv));
+  else
+    mpiPi_init ("Unknown");
 
   return rc;
 }
@@ -56,7 +55,10 @@ MPI_Init (int *argc, char ***argv)
 
   rc = _MPI_Init (argc, argv, GetPPC (jbuf));
 
-  mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
+  if ( argc != NULL && argv != NULL )
+    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
+  else
+    mpiPi.ac = 0;
 
   return rc;
 }
