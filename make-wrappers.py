@@ -927,7 +927,6 @@ def CreateWrapper(funct, olist):
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
         if ( xlateVarName.count("array") > 0 ):
-            olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
             olist.append("{\n  int i; \n")
             olist.append("  for (i = 0; i < *count; i++) { \n")
             olist.append("    " + xlateVarName + "[i] = " + xlateType + "_c2f(c_" + xlateVarName + "[i]);\n")
