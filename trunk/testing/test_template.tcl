@@ -59,6 +59,7 @@ proc runTest { } {
      }
 
 #  send_user "$expect_out(buffer)"
+   sleep 1
 }
 
 
