@@ -725,7 +725,7 @@ mpiPi_collect_basics ()
     MPI_Status status;
     mpiPi_task_info_t mti;
     int blockcounts[5] = { 1, 1, MPIPI_HOSTNAME_LEN_MAX };
-    MPI_Datatype types[5] = { MPI_INTEGER, MPI_DOUBLE, MPI_CHAR };
+    MPI_Datatype types[5] = { MPI_INT, MPI_DOUBLE, MPI_CHAR };
     MPI_Aint displs[5];
     MPI_Datatype mti_type;
 
