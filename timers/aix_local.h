@@ -16,7 +16,7 @@
 #define _AIX_LOCAL_H
 
 /* read_real_time returns nanoseconds */
-#define mpiPi_TIMER int
+#define mpiPi_TIMER double
 #define mpiPi_TIMER_INIT(timer_addr) {*(timer_addr) = 0;}
 #define mpiPi_TIME timebasestruct_t
 #define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIME));}
@@ -90,6 +90,7 @@ _aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
 
 #define mpiPi_GETTIMEDIFF(end,start) _aix_cnvt_read_real_time_diff(end,start)
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
+#define mpiPi_TIMER_NAME "read_real_time"
 
 #endif
 
