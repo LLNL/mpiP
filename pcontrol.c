@@ -40,6 +40,8 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       mpiPi.enabledCount++;
       mpiPi.startTime = PMPI_Wtime ();
     }
+
+    return MPI_SUCCESS;
 }
 
 int MPI_Pcontrol(const int flag,... )
