@@ -287,7 +287,7 @@ mpiPi_profile_print (FILE * fp)
       fprintf (fp, "%s ", mpiPi.av[i]);
     }
   fprintf (fp, "\n");
-  print_intro_line (fp, "Version", "%d.%d", mpiPi_vmajor, mpiPi_vminor);
+  print_intro_line (fp, "Version", "%d.%d.%d", mpiPi_vmajor, mpiPi_vminor, mpiPi_vpatch);
   print_intro_line (fp, "MPIP Build date", "%s, %s", mpiPi_vdate,
 		    mpiPi_vtime);
   {
