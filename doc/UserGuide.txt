@@ -6,7 +6,7 @@
 
 			     Version 2.4
 
-			     5 May, 2003
+			     16 May, 2003
 				   
 
 
@@ -77,17 +77,18 @@ Note:
 
     * On Linux, the mpiP Fortran libraries have unique names: libmpiPifc.a for
         the Intel compiler and libmpiPg77.a for the GNU compiler.
-    * With the GNU compiler, the -ggdb flag may be required for address to
-        source translation.
     * On Tru64, the exception library flag (-lexc) must be added to the link
         command.
+    * Source lookup for callsites may fail with certain versions of binutils.
+        If you are running into trouble, you may want to download a recent
+	snapshot from ftp://sources.redhat.com/pub/binutils/snapshots.
 
 
 MPIP CONFIGURATION
 ------------------
 
 mpiP has several configurable parameters that a user can set via an
-enviroment variable: MPIP. The setting for MPIP looks like
+environment variable: MPIP. The setting for MPIP looks like
 command-line parameters: "-t 10 -k 2".
 
 Currently, mpiP has several configurable parameters.
@@ -296,11 +297,20 @@ and line number.
 	look at the assembler listing, or with GNU's objdump (-d -S)
 	use Totalview or gdb to translate the PC
 
-- The source code translation fails on IBM AIX Fortran compilers with
-a version number prior to 7.0. (Most 1LLNL AIX Fortran compilers have
-been upgraded to 7.1).
+- There are known incompatibilities with certain binutils versions 
+and the IBM Fortran compilers.  As of this release, a fix for 
+compiler versions 7.1 and 8.1 has not been incorporated into binutils.  
+Contact us if you'd like more information.
 
-- C++ name demangeling for function names has not been totally
+- Issues when stack walking optimized applications: 
+
+    Applications compiled with gcc may return incorrect parent functions,
+    however, the file and line number information may be correct.
+
+    Applications compiled with the Intel compiler may not be able to 
+    identify parent stack frames.
+
+- C++ name demangling for function names has not been totally
 implemented. Stay tuned.
 
 
