@@ -75,7 +75,7 @@ ${DEMANGLE_TARGET}: remake_lookup ${OBJS}
 	${RANLIB} $@
 	rm -f pc_lookup.o
 
-.PHONY: remake_util remake_lookup install all
+.PHONY: remake_util remake_lookup install all proto merged-install
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
 remake_util:
@@ -136,6 +136,8 @@ install: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${LIBDESTDIR}/${FORTRAN_TARGET} ; fi
 	${INSTALL} mpiP-API.h timers/*h ${INCDESTDIR}
 	${INSTALL} doc/*txt doc/*html doc/README ${DOCDESTDIR}
+
+merged-install: add_binutils_objs add_libunwind_objs install
 
 proto:
 	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed -e '/find_address/d' -e '/Dwarf/d' > mpiPi_proto.h
