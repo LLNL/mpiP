@@ -440,21 +440,30 @@ char* getProcExeLink()
   pid = getpid();
   sprintf(file, "/proc/%d/exe", pid);
   inbuf = malloc(insize);
+  if ( inbuf == NULL )
+  {
+    mpiPi_abort("unable to allocate space for full executable path.\n");
+  }
 
   exelen = readlink(file, inbuf, 256);
-  if ( exelen != ENOENT )
+  if ( exelen == -1 )
+  {
+    if ( errno != ENOENT )
     {
-      while ( exelen == ENAMETOOLONG )
-        {
-          insize += 256;
-          inbuf = realloc(inbuf, insize);
-          exelen = readlink(file,inbuf,insize);
-        }
+      while ( exelen == -1 && errno == ENAMETOOLONG )
+      {
+        insize += 256;
+        inbuf = realloc(inbuf, insize);
+        exelen = readlink(file,inbuf,insize);
+      }
       inbuf[exelen] = 0;
       return inbuf;
     }
+    else
+      free(inbuf);
+  }
   else
-    free(inbuf);
+    return inbuf;
 
   return NULL;
 }
