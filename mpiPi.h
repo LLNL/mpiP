@@ -141,6 +141,7 @@ typedef struct _mpiPi_t
 
   int stackDepth;
   double reportPrintThreshold;
+  int baseNames;
 }
 mpiPi_t;
 
