@@ -15,6 +15,9 @@
 #ifndef _AIX_SWCLOCK_H
 #define _AIX_SWCLOCK_H
 
+/*  PLEASE NOTE: as of release 2.7.1, 
+    this functionality is not supported.    */
+
 /* use global switch clock */
 #include <swclock.h>
 
