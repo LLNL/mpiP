@@ -15,7 +15,7 @@ body,p,h1,h2,h3,th,td,ol,ul,li {
 </style><title>mpiP: Lightweight, Scalable MPI Profiling</title></head><body><p><a href="http://www.llnl.gov/disclaimer.html" class="privacyfoter">Privacy &amp; Legal Notice</a></p>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI Profiling</a></h1>
 <p align="center">Version 2.8 <br>
-18 January 2005 <br>
+25 January 2005 <br>
 <br>
 Jeffrey Vetter <br>
 <a href="mailto:vetterjs@ornl.gov">vetterjs@ornl.gov</a><br>
@@ -71,7 +71,7 @@ Proc. ACM SIGPLAN Symp. on Principles and Practice of Parallel Programming (PPOP
 <p>You may download the current version of mpiP from <a href="http://www.llnl.gov/CASC/mpip/download/">http://www.llnl.gov/CASC/mpip/download/</a></p>
 <h3><a name="Contributing">Contributing</a></h3>
 <p>We are constantly improving mpiP. Bug fixes and ports to new platforms are
-always welcome. Many thanks to the following contributors:</p>
+always welcome. Many thanks to the following contributors (chronological order):</p>
 <ul>
 <li>Michael McCracken (UCSD)</li>
 <li>Curt Janssen (Sandia National Laboratories)</li>
@@ -167,14 +167,14 @@ platforms where mpiP was succesfully run and any requirements for that platform.
 <td rowspan="2">Some binutils mods required for Intel 8.0 support.  Please send mail to the help list for more information.</td>
 </tr>
 <tr>
-<td> 2.4.22 Kernel</td>
+<td>2.4.22 Kernel</td>
 <td>gcc 3.3.1</td>
 <td>mpich2-1.0</td>
 </tr>
 <tr>
 <td>IBM Power3/4</td>
 <td>AIX 5.1<br>AIX 5.2</td>
-<td>VA C 6.0/<br>
+<td>VA C 6.0<br>
 VA Fortran 8.1</td>
 <td>PE 3.2<br>PE 4.1</td>
 <td>2.15</td>
@@ -185,11 +185,44 @@ linker flag.  Other mods are required for 64-bit builds of binutils.</td>
 <tr>
 <td>Alpha EV67</td>
 <td>Tru64 5.1b</td>
-<td>Compaq C 6.4/<br>
+<td>Compaq C 6.4<br>
 Fortran 5.5</td>
 <td>Quadrics RMS 2.5 2.14</td>
 <td>2.15</td>
 <td>&nbsp;</td>
+</tr>
+<tr>
+<td>Cray X1</td>
+<td>UNICOS/mp 2.4.39</td>
+<td>Cray Standard C 5.2.0.5, Cray Fortran 5.2.0.5</td>
+<td>Cray Message Passing Toolkit (MPT) 2.3.0.5</td>
+<td>from Cray Message Passing Toolkit (MPT) 2.3.0.5</td>
+<td>Requires libelf/libdwarf.<br>Example configure flags: --disable-libunwind
+           --enable-dwarf
+           --disable-demangle
+           --enable-getarg
+           --with-cc=cc
+           --with-cxx=CC
+          --with-f77=ftn<br>
+		  Python on an alternative system may be needed to "make wrappers.c", due to missing socket module.</td>
+</tr>
+<tr>
+<td>SGI Altix 3700</td>
+<td>Linux (kernel version 2.4.21-sgi303r2) from SGI</td>
+<td>gcc 3.4.3 (Intel compilers as well)</td>
+<td>SGI Message Passing Toolkit for release 1.10.1 (sgi-mpt-1.10.1-sgi303r1)</td>
+<td>2.14.90.0.4-35sgi303r1</td>
+<td>configure may require --with-libs="-lmpi" to find MPI-I/O routines.</td>
+</tr>
+<tr>
+<td>Cray XD1</td>
+<td>Linux (2.4.21_H_01_01 kernel, provided by Cray)</td>
+<td>gcc-3.2.2-54 (Cray, from /usr/bin), also PGI</td>
+<td>mpich-1.2.5-p20 (Cray)</td>
+<td>binutils-2.12.90.0.15-74 (Cray)</td>
+<td></td>
+</tr>
+<tr>
 </tr>
 </tbody></table>
 <p class="privacyfoter"><a href="#top">Top</a></p>
@@ -220,9 +253,9 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <tr><td>--with-gettimeofday</td><td>Use gettimeofday for timing.</td><td>Use the gettimeofday call for timing instead of the default platform timer.</td></tr>
 <tr><td>--with-clock_gettime</td><td>Use clock_gettime for timing.</td><td>Use the clock_gettime high-resolution per-process timer for timing instead of the default platform timer.</td></tr>
 <tr><td>--enable-check-time</td><td>Enable AIX check for negative time values.</td><td>Activate IBM timing debugging code.</td></tr>
-<tr><td>--enable-getarg</td><td>Use getarg to get fortran command line args.</td><td>This was used with the Intel 8.0 compiler in order to identify the name of Fortran applications.  This should no longer be needed given new application name identification support.  This option will be removed in the next release.</td></tr>
+<tr><td>--enable-getarg</td><td>Use getarg to get Fortran command line args.</td><td>This is used on UNICOS to provide access to the command line for Fortran apllications.</td></tr>
 </tbody></table>
-<h3><a name="Linking_Examples">Example LLNL Application Link Commands</a></h3>
+<h3><a name="Linking_Examples">Example Application Link Commands</a></h3>
 <p><b>LLNL users can now use the srun-mpip, poe-mpip, and poe-mpip-cxx wrapper scripts to use mpiP without re-linking their application.  AIX executables would still need to be linked with -bnoobjreorder for successful runtime address lookup.  Additionally, all LLNL installations contain the appropriate binutils objects in the mpiP library, so the -lbfd, -liberty, and -lintl flags are not required.</b>  An example runtime script for mpirun is provided in the mpiP bin directory.
 </p>
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
@@ -314,6 +347,25 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <td>Fortran</td>
 <td class="commandline">f77 -g -I/usr/lib/mpi/include sweep-ops.f -o sweep-ops.exe
 -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lm -lmpi -lpmpi -lexc</td>
+</tr>
+<tr>
+<td>Cray X1</td>
+<td>Cray</td>
+<td>C/C++/Fortran</td>
+<td>Link with <span class="commandline">-lmpiP -lbfd -liberty -ldwarf -lelf</span></td>
+</tr>
+<tr>
+<td>SGI Altix</td>
+<td>GNU or Intel</td>
+<td>C/C++/Fortran</td>
+<td>Link with <span class="commandline">-lmpiP -lunwind -lbfd -liberty</span></td>
+</tr>
+<tr>
+<td>Cray XD1</td>
+<td>GNU or PGI</td>
+<td>C/C++/Fortran</td>
+<td>Link with  <span class="commandline">[path_to_mpiP_install]/libmpiP.a -lbfd
+-liberty [mpich_libs]</span></td>
 </tr>
 </tbody></table>
 <p><b>Note</b>:</p>
@@ -840,6 +892,6 @@ MPI_File_write_at<br>
 </p><p class="privacyfoter"><a href="#top">Top</a></p>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@llnl.gov">mpip-help@llnl.gov</a>.</p>
-<p class="privacyfoter"> Last modified on January 18th, 2005.<br>
+<p class="privacyfoter"> Last modified on January 25th, 2005.<br>
 UCRL-CODE-2002-020, Version 2.</p>
 </body></html>
