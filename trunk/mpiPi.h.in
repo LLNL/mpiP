@@ -224,7 +224,6 @@ extern int mpiPi_do_demangle;
 #define FramePC(fp) (0)
 #define NextFP(fp) (0)
 #endif
-#define GetPPC(jb) FramePC(ParentFP(jb))
 
 #else /* defined(UNICOS_mp) */
 
@@ -261,17 +260,6 @@ extern int mpiPi_do_demangle;
  */
 #define FramePC(fp)     ((void*)(((uint64_t)(((void**)fp)[-2])) & 0xFFFFFFFF))
 
-
-
-/*
- * Currently GetPPC is only used in the MPI_Init/MPI_Finalize functions
- * in special_wrappers.c.  On other platforms, they extract the 
- * parent PC from the setjmp jmp_buf, and can do it at any time after
- * the setjmp call.  On the X1, we're a bit more sensitive for when
- * we sample the FP.  If GetPPC is used somplace else, be careful that
- * it is returning the PC that you expect it is.
- */
-#define GetPPC(jb)      (FramePC(NextFP(GetFP())))
 
 #endif /* defined(UNICOS_mp) */
 
