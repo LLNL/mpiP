@@ -10,7 +10,7 @@ include ../Defs.mak
 CFLAGS	+= 
 FFLAGS  += -g 
 LDFLAGS	+= -L..
-CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS)
+CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 

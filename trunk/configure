@@ -632,7 +632,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-demangling     Builds additional library with demangling support.
+  --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1076,8 +1076,8 @@ fi;
 # Check whether --enable-demangling or --disable-demangling was given.
 if test "${enable_demangling+set}" = set; then
   enableval="$enable_demangling"
-  DO_DEMANGLE=true
-echo demangling enabled
+  DO_DEMANGLE=$enableval
+echo $DO_DEMANGLE demangling enabled
 
 else
   DO_DEMANGLE=false
@@ -2469,28 +2469,7 @@ fi
 
 fi
 
-echo "$as_me:2472: checking for /usr/include/demangle.h" >&5
-echo $ECHO_N "checking for /usr/include/demangle.h... $ECHO_C" >&6
-if test "${ac_cv_file__usr_include_demangle_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  test "$cross_compiling" = yes &&
-  { { echo "$as_me:2478: error: cannot check for file existence when cross compiling" >&5
-echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
-   { (exit 1); exit 1; }; }
-if test -r "/usr/include/demangle.h"; then
-  ac_cv_file__usr_include_demangle_h=yes
-else
-  ac_cv_file__usr_include_demangle_h=no
-fi
-fi
-echo "$as_me:2487: result: $ac_cv_file__usr_include_demangle_h" >&5
-echo "${ECHO_T}$ac_cv_file__usr_include_demangle_h" >&6
-if test $ac_cv_file__usr_include_demangle_h = yes; then
-  CPPFLAGS="-I/usr/include $CPPFLAGS"
-fi
-
-echo "$as_me:2493: checking fortran symbols" >&5
+echo "$as_me:2472: checking fortran symbols" >&5
 echo $ECHO_N "checking fortran symbols... $ECHO_C" >&6
 if test -n "$F77" -a "$F77" != no ; then
   /bin/rm -f ffunc.f flink.c
@@ -2500,40 +2479,40 @@ if test -n "$F77" -a "$F77" != no ; then
   $F77 -c ffunc.f 1>/dev/null 2>/dev/null
   echo "main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2503: result: same as C" >&5
+    echo "$as_me:2482: result: same as C" >&5
 echo "${ECHO_T}same as C" >&6
     F77_SYMBOLS=symbol
   elif $CC -o flink -DFF=f_fun_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2507: result: lowercase with underscore" >&5
+    echo "$as_me:2486: result: lowercase with underscore" >&5
 echo "${ECHO_T}lowercase with underscore" >&6
     F77_SYMBOLS=symbol_
   elif $CC -o flink -DFF=f_fun__ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2511: result: lowercase with 2 underscores" >&5
+    echo "$as_me:2490: result: lowercase with 2 underscores" >&5
 echo "${ECHO_T}lowercase with 2 underscores" >&6
     F77_SYMBOLS=symbol__
   elif $CC -o flink -DFF=F_FUN flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2515: result: uppercase" >&5
+    echo "$as_me:2494: result: uppercase" >&5
 echo "${ECHO_T}uppercase" >&6
     F77_SYMBOLS=SYMBOL
   elif $CC -o flink -DFF=F_FUN_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2519: result: uppercase with underscore" >&5
+    echo "$as_me:2498: result: uppercase with underscore" >&5
 echo "${ECHO_T}uppercase with underscore" >&6
     F77_SYMBOLS=SYMBOL_
   elif $CC -o flink -DFF=F_FUN_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
-    echo "$as_me:2523: result: uppercase with 2 underscores" >&5
+    echo "$as_me:2502: result: uppercase with 2 underscores" >&5
 echo "${ECHO_T}uppercase with 2 underscores" >&6
     F77_SYMBOLS=SYMBOL__
   else
-    echo "$as_me:2527: result: giving up" >&5
+    echo "$as_me:2506: result: giving up" >&5
 echo "${ECHO_T}giving up" >&6
-    { { echo "$as_me:2529: error: could not determine F77 symbol names" >&5
+    { { echo "$as_me:2508: error: could not determine F77 symbol names" >&5
 echo "$as_me: error: could not determine F77 symbol names" >&2;}
    { (exit 1); exit 1; }; }
   fi
   /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
   F77_SYMBOLS=symbol_
-  echo "$as_me:2536: result: guessing lowercase with underscore" >&5
+  echo "$as_me:2515: result: guessing lowercase with underscore" >&5
 echo "${ECHO_T}guessing lowercase with underscore" >&6
 fi
 
@@ -2541,15 +2520,15 @@ cat >>confdefs.h <<EOF
 #define F77_SYMBOLS $F77_SYMBOLS
 EOF
 
-echo "$as_me:2544: checking GNU fortran compiler" >&5
+echo "$as_me:2523: checking GNU fortran compiler" >&5
 echo $ECHO_N "checking GNU fortran compiler... $ECHO_C" >&6
 if $F77 -v 2>&1 | grep -e gcc 1> /dev/null 2> /dev/null ; then
   F77_IS_GNU="true"
 
-  echo "$as_me:2549: result: yes" >&5
+  echo "$as_me:2528: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
-  echo "$as_me:2552: result: no" >&5
+  echo "$as_me:2531: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -2579,7 +2558,7 @@ DEFS=-DHAVE_CONFIG_H
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:2582: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:2561: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -2751,7 +2730,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:2754: error: ambiguous option: $1
+    { { echo "$as_me:2733: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -2770,7 +2749,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:2773: error: unrecognized option: $1
+  -*) { { echo "$as_me:2752: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -2810,7 +2789,7 @@ do
   "testing/Makefile" ) CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
   "Check.mak" ) CONFIG_FILES="$CONFIG_FILES Check.mak" ;;
   "mpiPconfig.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mpiPconfig.h" ;;
-  *) { { echo "$as_me:2813: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:2792: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -3028,7 +3007,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:3031: creating $ac_file" >&5
+    { echo "$as_me:3010: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -3046,7 +3025,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:3049: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:3028: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -3059,7 +3038,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:3062: error: cannot find input file: $f" >&5
+           { { echo "$as_me:3041: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -3119,7 +3098,7 @@ for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
   * )   ac_file_in=$ac_file.in ;;
   esac
 
-  test x"$ac_file" != x- && { echo "$as_me:3122: creating $ac_file" >&5
+  test x"$ac_file" != x- && { echo "$as_me:3101: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
 
   # First look for the input files in the build tree, otherwise in the
@@ -3130,7 +3109,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:3133: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:3112: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -3143,7 +3122,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:3146: error: cannot find input file: $f" >&5
+           { { echo "$as_me:3125: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -3260,7 +3239,7 @@ cat >>$CONFIG_STATUS <<\EOF
   rm -f $tmp/in
   if test x"$ac_file" != x-; then
     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
-      { echo "$as_me:3263: $ac_file is unchanged" >&5
+      { echo "$as_me:3242: $ac_file is unchanged" >&5
 echo "$as_me: $ac_file is unchanged" >&6;}
     else
       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
