@@ -9,8 +9,8 @@ include ../Defs.mak
 
 CFLAGS	+= 
 LDFLAGS	+= -L..
+FLIBS	= -l$(MPIPFLIB) $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
-FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 
 CSRCS =	0-simple.c \
 	1-hot-potato.c \
