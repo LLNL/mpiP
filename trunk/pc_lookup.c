@@ -247,7 +247,8 @@ void open_bfd_executable (char *filename)
 
   if (filename == NULL)
   {
-    mpiPi_msg_warn("Executable filename is NULL!\n  If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+    mpiPi_msg_warn("Executable filename is NULL!\n");
+    mpiPi_msg_warn("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
     return;
   }
 
