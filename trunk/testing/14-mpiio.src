@@ -1,0 +1,34 @@
+
+proc checkIoOutput { text type count tot avrg } {
+  set baseSize [ expr 256 * 8 ]
+  set currAvrg [ format "%.3g" $avrg ]
+  set currTot  [ format "%.3g" $tot ]
+  regsub "\\+" $currAvrg "\\\\+" currAvrg
+  regsub "\\+" $currTot "\\\\+" currTot
+#  send_user "currAvrg = $currAvrg\n"
+#  send_user "currTot  = $currTot\n"
+  checkOutput "$text +\[0-9\]+ +$count +$currTot +$currAvrg" "Message size check:"
+}
+
+proc checkIoCount { text type count } {
+  checkOutput "$text +\[0-9\]+ +\\* +$count" $type
+}
+
+set currAvrg 64
+set currTot  2560
+
+foreach op { File_read File_read_at File_write File_write_at } {
+  checkIoOutput $op "Message size check:" 40 $currTot $currAvrg
+}
+
+set currAvrg 1280
+
+foreach op { File_read_all File_write_all } {
+  checkIoOutput $op "Message size check:" 2 $currTot $currAvrg
+}
+
+foreach op { File_open File_close File_preallocate } {
+  checkIoCount $op "Call count check:" 2 
+}
+
+checkIoCount File_seek "Call count check:" 40

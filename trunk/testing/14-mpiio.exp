@@ -1,0 +1,15 @@
+
+##  Test-specific information
+#
+set test_title "14-mpiio-exe: check supported MPI I/O calls"
+set test "14-mpiio.exe"
+set procs 2
+set source_check_file "testing/14-mpiio.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
