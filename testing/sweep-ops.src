@@ -1,0 +1,10 @@
+
+checkOutput "sweep-ops.f       76 (\.?simsweep3d\.|MAIN..) +Allreduce" "Source check:"
+checkOutput "sweep-ops.f       42 (\.?simsweep3d.|MAIN..) +Bcast" "Source check:"
+checkOutput "sweep-ops.f       54 (\.?simsweep3d.|MAIN..) +Send" "Source check:"
+checkOutput "sweep-ops.f       45 (\.?simsweep3d.|MAIN..) +Bcast" "Source check:"
+checkOutput "sweep-ops.f       50 (\.?simsweep3d.|MAIN..) +Barrier" "Source check:"
+checkOutput "sweep-ops.f       27 (\.?simsweep3d.|MAIN..) +Barrier" "Source check:"
+checkOutput "sweep-ops.f       73 (\.?simsweep3d.|MAIN..) +Allreduce" "Source check:"
+checkOutput "sweep-ops.f       63 (\.?simsweep3d.|MAIN..) +Barrier" "Source check:"
+checkOutput "sweep-ops.f       58 (\.?simsweep3d.|MAIN..) +Recv" "Source check:"

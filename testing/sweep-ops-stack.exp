@@ -1,0 +1,15 @@
+
+set test_title "sweep-ops-stack-exe: Fortran test with stack trace"
+set test "sweep-ops-stack.exe"
+set test_targ "./testing/$test"
+set procs 4
+set source_check_file "testing/sweep-ops-stack.src"
+
+set env(MPIP) "-k 3"
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
