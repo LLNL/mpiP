@@ -24,7 +24,8 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	pc_lookup.c \
 	report.c \
-	pcontrol.c
+	pcontrol.c \
+	mpiP-API.c
 
 USE_GETARG = @USE_GETARG@
 

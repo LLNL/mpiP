@@ -168,7 +168,7 @@ find_address_in_section (abfd, section, data)
 
 
 int
-find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
+mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	      char **o_funct_str)
 {
   char buf[128];
@@ -176,7 +176,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
   if ( abfd == NULL )
   {
-    mpiPi_msg_debug("find_src_loc returning failure as abfd == NULL\n");
+    mpiPi_msg_debug("mpiP_find_src_loc returning failure as abfd == NULL\n");
     return 1;
   }
 
@@ -191,7 +191,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
   if (!found)
     {
-      mpiPi_msg_debug("returning not found in find_src_loc\n");
+      mpiPi_msg_debug("returning not found in mpiP_find_src_loc\n");
       return 1;
     }
   else
@@ -289,8 +289,8 @@ void open_bfd_executable (char *filename)
     mpiPi_abort ("symcount < 0");
   else
     {
-      mpiPi_msg ("\n");
-      mpiPi_msg ("found %d symbols in file [%s]\n", symcount, filename);
+      mpiPi_msg_debug ("\n");
+      mpiPi_msg_debug ("found %d symbols in file [%s]\n", symcount, filename);
     }
 }
 
@@ -303,7 +303,7 @@ void close_bfd_executable ()
 #else /* DISABLE_BFD */
 
 int
-find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
+mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	      char **o_funct_str)
 {
   return 1;  /*  failure  */
