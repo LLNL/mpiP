@@ -7,15 +7,15 @@ VPATH = $(srcdir)
 
 include Defs.mak
 
-TARGET	= libmpiP.a
+MPIP_TARGET	= libmpiP.a
 
-default: ${TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
+default: ${MPIP_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
-all: ${TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
+all: ${MPIP_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
 	@echo All done.
 
 SRCS =	diag_msgs.c \
-	hash.c \
+	mpiP-hash.c \
 	glob.c \
 	wrappers.c \
 	wrappers_special.c \
@@ -39,7 +39,7 @@ clean::
 endif
 
 
-${TARGET}: ${OBJS} TAGS
+${MPIP_TARGET}: ${OBJS} TAGS
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 
@@ -65,6 +65,30 @@ remake_lookup:
 	rm pc_lookup.o
 	$(MAKE) pc_lookup.o CPPFLAGS='${CPPFLAGS}'
 	$(MAKE) util.o 
+
+add_binutils_objs:
+	-mkdir mpip_temp_obj_dir
+	cd mpip_temp_obj_dir; \
+	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libbfd.a ; \
+	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libiberty.a ; \
+	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libintl.a ; \
+	ar -q ${BIN_TYPE_FLAG} ../${MPIP_TARGET} *.o ; \
+	if [ "${FORTRAN_TARGET}" ]; then \
+	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
+	if [ "${DEMANGLE_TARGET}" ]; then \
+	  ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi
+	rm -rf mpip_temp_obj_dir
+
+add_libunwind_objs:
+	-mkdir mpip_temp_obj_dir
+	cd mpip_temp_obj_dir ; \
+	ar -x ${BIN_TYPE_FLAG} /usr/lib/libunwind.a ; \
+	ar -q ${BIN_TYPE_FLAG} ../${MPIP_TARGET} *.o ; \
+	if [ "${FORTRAN_TARGET}" ]; then \
+	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
+	if [ "${DEMANGLE_TARGET}" ]; then \
+	  ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi
+	rm -rf mpip_temp_obj_dir
 
 TAGS: ${SRCS}
 	etags $^

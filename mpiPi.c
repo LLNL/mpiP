@@ -138,7 +138,7 @@ mpiPi_init (char *appName)
   /* set some defaults values */
   mpiPi.collectorRank = 0;
   mpiPi.tableSize = 256;
-  mpiPi.stackDepth = 1;
+  mpiPi.stackDepth = 1;  /* the value 2 includes parent wrapper function */
   mpiPi.reportPrintThreshold = 0.0;
   mpiPi.baseNames = 0;
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
@@ -453,9 +453,9 @@ mpiPi_mergeResults ()
 
 #ifndef DISABLE_BFD
       if ( mpiPi.av[0] != NULL )
-        open_bfd_executable (mpiPi.av[0]);
+        open_bfd_executable (mpiPi.appFullName);
      else
-        mpiPi_msg_debug ("mpiPi.av[0] is NULL.\n");
+        mpiPi_msg_debug ("mpiPi.appFullName is NULL.\n");
 #endif
 
       /* convert data to src line; merge, if nec */
@@ -757,7 +757,7 @@ mpiPi_collect_basics ()
 void
 mpiPi_generateReport ()
 {
-  double dur;
+  mpiP_TIMER dur;
   mpiPi_GETTIME (&mpiPi.endTime);
 
   if(mpiPi.enabled)

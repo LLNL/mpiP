@@ -310,7 +310,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS DO_DEMANGLE STACKDEPTH DISABLE_MPI_IO USE_GETARG RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH DISABLE_MPI_IO USE_GETARG RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP PARENT_FRAME_COUNT F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
 ac_subst_files='HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -865,7 +865,8 @@ Optional Packages:
   --with-include          Specifies include directories (-Idir1 -Idir2).
   --with-ldflags          Specifies ld flags (-L/usr/local/lib).
   --with-libs             Specifies libraries (-llib1 -llib2).
-  --with-binutils-dir     Specifies location of binutils.
+  --with-binutils-dir     Base directory of binutils installation.
+  --with-bin-type-flag    Binary format for AIX ar operations.
   --with-gettimeofday     Use gettimeofday for timing.
 
 Some influential environment variables:
@@ -1422,6 +1423,10 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
+CPPFLAGS=
+LDFLAGS=
+PARENT_FRAME_COUNT=1
+
 
 # Check whether --with-cc or --without-cc was given.
 if test "${with_cc+set}" = set; then
@@ -1450,7 +1455,7 @@ fi;
 # Check whether --with-include or --without-include was given.
 if test "${with_include+set}" = set; then
   withval="$with_include"
-  CPPFLAGS="$CPPFLAGS $withval"
+  CPPFLAGS=$withval
 echo Using extra include directories: $withval
 
 fi;
@@ -1469,7 +1474,7 @@ fi;
 # Check whether --with-libs or --without-libs was given.
 if test "${with_libs+set}" = set; then
   withval="$with_libs"
-  LIBS="$LIBS $withval"
+  LIBS=$withval
 echo Using extra libraries: $withval
 
 fi;
@@ -1478,11 +1483,29 @@ fi;
 # Check whether --with-binutils-dir or --without-binutils-dir was given.
 if test "${with_binutils_dir+set}" = set; then
   withval="$with_binutils_dir"
-  LIBS="$LIBS -L$withval/lib"
-CPPFLAGS="$CPPFLAGS -I$withval/include"
-echo Using binutils location $withval
+  BINUTILS_DIR=$withval
+LDFLAGS="${LDFLAGS} -L${BINUTILS_DIR}/lib"
+CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+echo Using binutils-dir: $withval
+
+else
+  BINUTILS_DIR=unknown
 
 fi;
+
+
+
+# Check whether --with-bin-type-flag or --without-bin-type-flag was given.
+if test "${with_bin_type_flag+set}" = set; then
+  withval="$with_bin_type_flag"
+  BIN_TYPE_FLAG=$withval
+echo Using bin-type-flag: $withval
+
+else
+  BIN_TYPE_FLAG=
+
+fi;
+
 
 # Check whether --enable-demangling or --disable-demangling was given.
 if test "${enable_demangling+set}" = set; then
@@ -1524,6 +1547,12 @@ if test "${enable_libunwind+set}" = set; then
   enableval="$enable_libunwind"
   DISABLE_LIBUNWIND=yes
 echo Use of libunwind has been disabled
+PARENT_FRAME_COUNT=1
+
+else
+  if  `uname -s` == "OSF1"  ; then
+  PARENT_FRAME_COUNT=2
+fi
 
 fi;
 
@@ -4107,11 +4136,12 @@ if test $ac_cv_header_libunwind_h = yes; then
   cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBUNWIND 1
 _ACEOF
- LIBS="$LIBS -lunwind"
+ LIBS="$LIBS -lunwind" PARENT_FRAME_COUNT=2
 fi
 
 
 fi
+
 if test "$DISABLE_MPI_IO" = no ; then
 echo "$as_me:$LINENO: checking for MPI_File_open" >&5
 echo $ECHO_N "checking for MPI_File_open... $ECHO_C" >&6
@@ -4227,7 +4257,7 @@ if test -n "$F77" -a "$F77" != no ; then
   echo "      subroutine f_fun()" > ffunc.f
   echo "      return" >> ffunc.f
   echo "      end" >> ffunc.f
-  $F77 -c ffunc.f 1>/dev/null 2>/dev/null
+  $F77 $FFLAGS -c ffunc.f 1>/dev/null 2>/dev/null
   echo "main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     echo "$as_me:$LINENO: result: same as C" >&5
@@ -4895,6 +4925,8 @@ s,@target_cpu@,$target_cpu,;t t
 s,@target_vendor@,$target_vendor,;t t
 s,@target_os@,$target_os,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
+s,@BINUTILS_DIR@,$BINUTILS_DIR,;t t
+s,@BIN_TYPE_FLAG@,$BIN_TYPE_FLAG,;t t
 s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
 s,@STACKDEPTH@,$STACKDEPTH,;t t
 s,@DISABLE_MPI_IO@,$DISABLE_MPI_IO,;t t
@@ -4912,6 +4944,7 @@ s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
+s,@PARENT_FRAME_COUNT@,$PARENT_FRAME_COUNT,;t t
 s,@F77_SYMBOLS@,$F77_SYMBOLS,;t t
 s,@F77_VENDOR@,$F77_VENDOR,;t t
 s,@MPIPFLIB@,$MPIPFLIB,;t t
