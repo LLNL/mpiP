@@ -98,6 +98,12 @@ find_address_in_section (abfd, section, data)
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
 
+  if ( !found )
+  {
+    mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%x vma=%x-%x\n",
+                     (long) local_pc, vma, vma+size);
+  }
+
   mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%x vma=%x-%x\n",
                    (long) local_pc, vma, vma+size);
   mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
@@ -189,6 +195,7 @@ open_bfd_executable (char *filename)
     mpiPi_abort ("can not get addresses from archive");
   if (!bfd_check_format_matches (abfd, bfd_object, &matching))
     mpiPi_abort ("matching failed");
+  
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
     mpiPi_abort ("No symbols in the executable\n");
   /* TODO: move this to the begining of the process so that the user
