@@ -1,0 +1,38 @@
+set baseSize [ expr 256 * 8 ]
+set currAvrg $baseSize
+
+proc checkMessOutput { text type count avrg } {
+  set baseSize [ expr 256 * 8 ]
+  set currAvrg [ format "%.3g" $avrg ]
+  set currTot  [format "%.3g" [ expr $avrg * $count ] ]
+  regsub "\\+" $currAvrg "\\\\+" currAvrg
+  regsub "\\+" $currTot "\\\\+" currTot
+#  send_user "currAvrg = $currAvrg\n"
+#  send_user "currTot  = $currTot\n"
+  checkOutput "$text +\[0-9\]+ +$count +$currTot +$currAvrg" "Message size check:"
+}
+
+foreach op { Allgather Allgatherv Allreduce Alltoall Bcast Gather Gatherv Reduce Scan Scatter Sendrecv Sendrecv_replace } {
+  checkMessOutput $op "Message size check:" 2 $currAvrg
+  set currAvrg [ expr $currAvrg + $baseSize ]
+}
+
+#checkMessOutput "Allgather" "Message size check:" 2 $currAvrg
+#set currAvrg [ expr $currAvrg + $baseSize ]
+#checkMessOutput "Allgatherv" "Message size check:" 2 $currAvrg
+#set currAvrg [ expr $currAvrg + $baseSize ]
+#checkMessOutput "Allreduce" "Message size check:" 2 $currAvrg
+#set currAvrg [ expr $currAvrg + $baseSize ]
+#checkMessOutput "Alltoall" "Message size check:" 2 $currAvrg
+#
+#checkOutput "Allgather +\[0-9\]+ +2 +4.1e\\+03 +2.05e\\+03" "Message size check:"
+#checkOutput "Allgatherv +\[0-9\]+ +2 +2.87e\\+04   1.43e\\+04" "Message size check:"
+#checkOutput "Allreduce +\[0-9\]+ +2 +1.23e\\+04   6.14e\\+03" "Message size check:"
+#checkOutput "Alltoall +\[0-9\]+ +2 +1.64e\\+04   8.19e\\+03" "Message size check:"
+#checkOutput "Bcast +\[0-9\]+ +2 +2.05e\\+04   1.02e\\+04" "Message size check:"
+#checkOutput "Gather +\[0-9\]+ +2 +2.87e\\+04   1.43e\\+04" "Message size check:"
+#checkOutput "Gatherv +\[0-9\]+ +2 +2.87e\\+04   1.43e\\+04" "Message size check:"
+#checkOutput "Reduce +\[0-9\]+ +2 +5.32e\\+04   2.66e\\+04" "Message size check:"
+#checkOutput "Rsend +\[0-9\]+ +1 +2.87e\\+04   2.87e\\+04" "Message size check:"
+#checkOutput "Scatter +\[0-9\]+ +2 +6.55e\\+04   3.28e\\+04" "Message size check:"
+#checkOutput "Scan +\[0-9\]+ +2 +6.14e\\+04   3.07e\\+04" "Message size check:"
