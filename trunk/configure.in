@@ -4,7 +4,7 @@ dnl These two lines disable the cache.
 define([AC_CACHE_LOAD], )
 define([AC_CACHE_SAVE], )
 
-AC_INIT(mpiP, 2.7, mpip-help@llnl.gov)
+AC_INIT(mpiP, 2.8, mpip-help@llnl.gov)
 AC_PREREQ(2.13)
 AC_CONFIG_HEADER(mpiPconfig.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -13,9 +13,12 @@ AC_CANONICAL_SYSTEM
 
 CPPFLAGS=
 LDFLAGS=
-AC_PREFIX_DEFAULT=.
-PARENT_FRAME_COUNT=1
+AC_PREFIX_DEFAULT(".")
 cross_compiling=yes
+echo
+echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in"
+echo "        the case where test executables would need to be run as a parallel job."
+echo
 
 AC_ARG_WITH(cc,
 [  --with-cc               Gives the name of the C compiler to use.],
@@ -113,11 +116,7 @@ AC_ARG_ENABLE(libunwind,
 [  --disable-libunwind     Do not use libunwind to generate stack traces.],
 DISABLE_LIBUNWIND=yes
 echo Use of libunwind has been disabled
-PARENT_FRAME_COUNT=1
 ,
-if test "`uname -s | cut -c1-6`" == "UNICOS"  ; then
-  PARENT_FRAME_COUNT=3
-fi
 )
 
 AC_ARG_ENABLE(mpi-io,
@@ -172,9 +171,8 @@ AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h"
 )
 fi
 if test -z "$DISABLE_LIBUNWIND" ; then
-AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind" PARENT_FRAME_COUNT=2)
+AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
 fi
-AC_SUBST(PARENT_FRAME_COUNT)
 if test "$DISABLE_MPI_IO" = no ; then
 AC_CHECK_FUNC(MPI_File_open, AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt, 
 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
