@@ -7,11 +7,12 @@ PREFIX=@prefix@
 LIBDESTDIR=${PREFIX}/lib
 INCDESTDIR=${PREFIX}/include
 DOCDESTDIR=${PREFIX}/doc
+SLIBDESTDIR=${PREFIX}/slib
 VPATH = $(srcdir)
 
 include Defs.mak
 
-MPIP_TARGET	= libmpiP.a
+.PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs
 
 default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
@@ -31,18 +32,17 @@ SRCS =	diag_msgs.c \
 	pcontrol.c \
 	mpiP-API.c
 
-USE_GETARG = @USE_GETARG@
-USE_LIBDWARF    = @USE_LIBDWARF@
+USE_GETARG   = @USE_GETARG@
+USE_LIBDWARF = @USE_LIBDWARF@
 
 ifeq ($(USE_LIBDWARF),yes)
     SRCS += pc_lookup_dwarf.c
 endif
 
-OBJS = $(SRCS:.c=.o)
+OBJS  = $(SRCS:.c=.o)
 FOBJS = $(OBJS)
 
 ifeq ($(USE_GETARG),true)
-
 ifeq ($(F77_VENDOR),Cray)
 
     FOBJS += get_fortran_arg_pxf.o
@@ -57,7 +57,6 @@ clean::
 	rm -f get_fortran_arg.o
 
 endif
-
 endif
 
 
@@ -75,18 +74,38 @@ ${DEMANGLE_TARGET}: remake_lookup ${OBJS}
 	${RANLIB} $@
 	rm -f pc_lookup.o
 
-.PHONY: remake_util remake_lookup install all proto merged-install
+
+
+ifeq ($(OS), Linux)
+SHARED_C_TARGET = $(C_TARGET:.a=.so)
+SHARED_FORTRAN_TARGET = $(FORTRAN_TARGET:.a=.so)
+SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
+
+shared: ${SHARED_C_TARGET}
+install::
+	if [ -x ${SHARED_C_TARGET} ] ; then \
+	  mkdir -p ${SLIBDESTDIR} ; \
+	  ${INSTALL} ${SHARED_C_TARGET} ${SLIBDESTDIR} ; \
+	fi
+
+${SHARED_C_TARGET}: CFLAGS += -fpic
+${SHARED_C_TARGET}: cleanobjs ${OBJS}
+	${CC} -shared -o $@ ${OBJS}
+endif
+
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
 remake_util:
-	rm util.o
+	rm -f util.o
 	$(MAKE) util.o CPPFLAGS='${CPPFLAGS}'
 
 remake_lookup: CPPFLAGS += ${DEMANGLE_FLAG}
-remake_lookup:
-	rm pc_lookup.o
+remake_lookup: remove_lookup
 	$(MAKE) pc_lookup.o CPPFLAGS='${CPPFLAGS}'
 	$(MAKE) util.o 
+
+remove_lookup:
+	rm -f pc_lookup.o
 
 add_binutils_objs:
 	-mkdir mpip_temp_obj_dir
@@ -94,7 +113,7 @@ add_binutils_objs:
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libbfd.a ; \
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libiberty.a ; \
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libintl.a ; \
-	ar -q ${BIN_TYPE_FLAG} ../${MPIP_TARGET} *.o ; \
+	ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
 	if [ "${FORTRAN_TARGET}" ]; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
 	if [ "${DEMANGLE_TARGET}" ]; then \
@@ -105,7 +124,7 @@ add_libunwind_objs:
 	-mkdir mpip_temp_obj_dir
 	cd mpip_temp_obj_dir ; \
 	ar -x ${BIN_TYPE_FLAG} /usr/lib/libunwind.a ; \
-	ar -q ${BIN_TYPE_FLAG} ../${MPIP_TARGET} *.o ; \
+	ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
 	if [ "${FORTRAN_TARGET}" ]; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
 	if [ "${DEMANGLE_TARGET}" ]; then \
@@ -129,7 +148,7 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 
 ${OBJS}: mpiPi_def.h
 
-install: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
+install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	mkdir -p ${LIBDESTDIR} ${INCDESTDIR} ${DOCDESTDIR}
 	${INSTALL} ${C_TARGET} ${LIBDESTDIR}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${LIBDESTDIR}/${DEMANGLE_TARGET} ; fi
@@ -147,6 +166,9 @@ clean::
 
 clean::
 	rm -f ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
+
+cleanobjs:
+	rm -f ${FOBJS}
 
 MPIINC	= -I/usr/lpp/ppe.poe/include
 lint: ${SRCS}
