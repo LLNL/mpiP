@@ -54,7 +54,7 @@ _aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
       nsecs += 1000000000;
     }
 
-  delta_usecs = (double)((secs * USECS) + (nsecs / 1000));
+  delta_usecs = ((double)secs * USECS) + (nsecs / 1000);
 
 #if defined(MPIP_CHECK_TIME)
 
@@ -68,6 +68,10 @@ _aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
       mpiPi_msg_warn (" save_start.tb_low is %u\n", save_start.tb_low);
       mpiPi_msg_warn ("  save_end.tb_high is %u\n", save_end.tb_high);
       mpiPi_msg_warn ("   save_end.tb_low is %u\n", save_end.tb_low);
+      mpiPi_msg_warn ("    start->tb_high is %u\n", start->tb_high);
+      mpiPi_msg_warn ("     start->tb_low is %u\n", start->tb_low);
+      mpiPi_msg_warn ("      end->tb_high is %u\n", end->tb_high);
+      mpiPi_msg_warn ("       end->tb_low is %u\n", end->tb_low);
     }
 #endif
 
