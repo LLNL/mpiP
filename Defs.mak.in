@@ -21,8 +21,7 @@ endif
 CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
 
 ifdef FAST
-OPT	+= -O4
-CPPFLAGS+= -DFAST
+OPT	+= -O3
 endif
 
 ifdef NODEBUG

@@ -46,9 +46,9 @@ echo Using extra libraries: $withval
 )
 
 AC_PROG_RANLIB
-AC_CHECK_PROGS(CC, mpcc_r xlc_r gcc cc ifc, gcc)
-AC_CHECK_PROGS(CXX, mpCC_r xlC_r c++ g++ CC cxx ifc, c++)
-AC_CHECK_PROGS(F77, mpxlf_r xlf_r f77 g77 pgf77 fort, g77)
+AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc gcc cc icc, mpicc)
+AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC c++ g++ CC cxx icc, mpiCC)
+AC_CHECK_PROGS(F77, mpxlf_r xlf_r mpif77 f77 g77 pgf77 fort ifc, mpif77)
 AC_CHECK_PROGS(LAUNCH, poe prun mpirun, mpirun)
 
 AC_CHECK_HEADERS(demangle.h)
