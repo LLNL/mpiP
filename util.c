@@ -34,6 +34,10 @@ char *
 GetBaseAppName (char *rawName)
 {
   char *cp;
+
+  if ( rawName == NULL )
+    return strdup("Unknown");
+
   /* delete directorys and make a copy, if nec */
   if ((cp = rindex (rawName, '/')) == NULL)
     {
@@ -56,7 +60,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   PCONTEXT context;
 
   context = (PCONTEXT)jb;
-  pc = context->sc_pc;
+  pc = (void*)context->sc_pc;
 
   for (i = 0; i < max_back; i++)
   {
@@ -65,8 +69,8 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
       unwind(context, 0);
       
       /* record this frame's pc */
-      pc_array[i] = context->sc_pc;
-      pc = context->sc_pc;
+      pc_array[i] = (void*)context->sc_pc;
+      pc = (void*)context->sc_pc;
     }
     else
     {
@@ -291,6 +295,7 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
 
 #if defined(AIX)
   {
+    /*  Works for C/C++ and Fortran  */
     extern int p_xargc;
     extern char **p_xargv;
     argc = p_xargc;
@@ -310,6 +315,14 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = f__xargc;
     argv = f__xargv;
   }
+#elif defined(OSF1)
+  {
+    /*  Works for C/C++ and Fortran  */
+    extern int __Argc;
+    extern char **__Argv;
+    argc = __Argc;
+    argv = __Argv;
+  }
 #endif  
 
    mpiPi_copy_given_args(ac, av, av_len, argc, argv);
@@ -323,6 +336,10 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
   extern int mpiPi_debug;
 
   *ac = argc;
+  if (*ac == 0 && mpiPi_debug)
+    {
+      printf ("argc = 0\n");
+    }
   for (i = 0; (i < *ac) && (i < av_len); i++)
     {
       av[i] = argv[i];
