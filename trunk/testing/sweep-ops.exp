@@ -1,0 +1,15 @@
+
+set test_title "sweep-ops.exe: Fortran test app w/communication"
+set test "sweep-ops.exe"
+set test_targ "./testing/$test"
+set procs 4
+set source_check_file "testing/sweep-ops.src"
+
+set env(MPIP) "-k 1"
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+

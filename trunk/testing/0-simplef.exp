@@ -1,0 +1,39 @@
+
+set test_title "0-simplef.exe: basic Fortran Test"
+set test "0-simplef.exe"
+set test_targ "./testing/$test"
+set procs 2
+
+
+case "$launch" in {
+    { "prun" } { 
+        set pre_args "-p$pool"
+    	set post_args ""
+	set pre_procs "-n$procs"
+	set post_procs ""
+	}
+    { "poe" } { 
+        set env(MP_PROCS) $procs
+        set env(MP_NODES) 1
+        set env(MP_RMPOOL) $rmpool
+    	set pre_args ""
+    	set post_args ""
+	set pre_procs ""
+	set post_procs ""
+	}
+}
+
+set timeout 30
+
+send_user "$launch $pre_args $pre_procs $test_targ $post_args $post_procs\n"
+
+spawn -noecho $launch $pre_args $pre_procs $test_targ $post_args $post_procs
+
+expect { 
+   "Collector found no records to merge."   { pass "$test passed" } 
+   timeout { fail "$test timed out\n\n" }
+   eof     { fail "$test failed\n\n" }
+
+   }
+
+send_user "$expect_out(buffer)\n\n"
