@@ -26,20 +26,24 @@ SRCS =	diag_msgs.c \
 	report.c \
 	pcontrol.c
 
-ifeq ($(F77_VENDOR), Intel)
-  SRCS += get_fortran_arg.f
-endif
+USE_GETARG = @USE_GETARG@
 
 OBJS = $(SRCS:.c=.o)
-OBJS := $(OBJS:.f=.o)
+FOBJS = $(OBJS)
+
+ifeq ($(USE_GETARG),true)
+  FOBJS += get_fortran_arg.o
+clean::
+	rm -f get_fortran_arg.o
+endif
 
 
 ${TARGET}: ${OBJS} TAGS
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 
-${FORTRAN_TARGET}: remake_util ${OBJS} TAGS
-	${AR} ruv $@ ${OBJS}
+${FORTRAN_TARGET}: remake_util ${FOBJS} TAGS
+	${AR} ruv $@ ${FOBJS}
 	${RANLIB} $@
 	rm -f util.o
 
@@ -80,6 +84,9 @@ ${OBJS}: mpiPi_def.h
 
 clean::
 	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
+
+clean::
+	rm -f ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
 MPIINC	= -I/usr/lpp/ppe.poe/include
 lint: ${SRCS}
