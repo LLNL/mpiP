@@ -209,7 +209,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "ngf:b:s:k:t:oe")) != EOF);)
+      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oe")) != EOF);)
 	{
 	  switch (c) {
 	    case 'f':
