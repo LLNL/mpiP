@@ -4,9 +4,9 @@
 			    Jeffrey Vetter
 			  (vetter3@llnl.gov)
 
-			      Version 2
+			     Version 2.4
 
-			   1 September 2001
+			     5 May, 2003
 				   
 
 
@@ -38,16 +38,16 @@ vary.
 To compile a simple program on LLNL AIX, you need to add the following
 libraries to your compile/link line: 
 
-	  -L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl -lm
+	  -L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl 
 
 For example, the new mpiP link line becomes
 
  mpcc -g -O mpi-foo.c -o mpi-foo.exe -L${mpiP_root}/lib -lmpiP \
-  -lbfd -liberty -lintl -lm
+  -lbfd -liberty -lintl 
 
 from 
 
- mpcc -O mpi-foo.c -o mpi-foo.exe -lm
+ mpcc -O mpi-foo.c -o mpi-foo.exe 
 
 Make sure the mpiP library appears before the MPI library on your link
 line. The three libraries (-lbfd -liberty -lintl) provide support for
@@ -69,6 +69,18 @@ identifying the header and trailer in standard out...
 By default, the output file is written to the current directory of the
 application. mpiP files are always much smaller than trace files, so
 writing them to this directory is safe.
+
+The 2.4 release of mpiP adds support for Linux and Tru64. Note that mpiP will
+not work with MPICH 1.1. 
+
+Note:
+
+    * On Linux, the mpiP Fortran libraries have unique names: libmpiPifc.a for
+        the Intel compiler and libmpiPg77.a for the GNU compiler.
+    * With the GNU compiler, the -ggdb flag may be required for address to
+        source translation.
+    * On Tru64, the exception library flag (-lexc) must be added to the link
+        command.
 
 
 MPIP CONFIGURATION
@@ -269,9 +281,9 @@ CAVEATS
 -------
 
 - If mpiP has problems with the source code translation, you might be
-able to decode the program counters on LLNL AIX systems with some of
-the following techniques. You can use instmap, addr2line, or look at
-the assembler code itself.
+able to decode the program counters on LLNL systems with some of
+the following techniques. You can use instmap, addr2line, a debugger 
+such as Totalview or gdb, or look at the assembler code itself.
 
 - Compiler transformations like loop unrolling can sometimes make one
 source code line appear as many different PCs. You can verify this by
@@ -282,7 +294,7 @@ and line number.
 	instmap - an IBM utility
 	addr2line - a gnu tool
 	look at the assembler listing, or with GNU's objdump (-d -S)
-	use Totalview to translate the PC
+	use Totalview or gdb to translate the PC
 
 - The source code translation fails on IBM AIX Fortran compilers with
 a version number prior to 7.0. (Most 1LLNL AIX Fortran compilers have
