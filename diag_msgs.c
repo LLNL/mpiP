@@ -17,20 +17,17 @@ static char *rcsid =
   "$Header$";
 #endif
 
-#include <varargs.h>
+#include <stdarg.h>
 
 #include "mpiPi.h"
 
 
 void
-mpiPi_msg (va_alist)
-     va_dcl
+mpiPi_msg (char *fmt, ...)
 {
   va_list args;
   FILE *fp = mpiPi.stdout_;
-  char *fmt = NULL;
-  va_start (args);
-  fmt = va_arg (args, char *);
+  va_start (args, fmt);
   fprintf (fp, "%s: ", mpiPi.toolname);
   vfprintf (fp, fmt, args);
   va_end (args);
@@ -38,15 +35,12 @@ mpiPi_msg (va_alist)
 }
 
 void
-mpiPi_abort (va_alist)
-     va_dcl
+mpiPi_abort (char *fmt, ...)
 {
   va_list args;
   FILE *fp = mpiPi.stderr_;
-  char *fmt = NULL;
-  va_start (args);
+  va_start (args, fmt);
   fprintf (fp, "\n\n%s: ABORTING: ", mpiPi.toolname);
-  fmt = va_arg (args, char *);
   vfprintf (fp, fmt, args);
   va_end (args);
   fflush (fp);
@@ -54,18 +48,14 @@ mpiPi_abort (va_alist)
 }
 
 void
-mpiPi_msg_debug (va_alist)
-     va_dcl
+mpiPi_msg_debug (char *fmt, ...)
 {
-  va_list args;
-  FILE *fp = mpiPi.stdout_;
-  char *fmt = NULL;
+  va_list args; FILE *fp = mpiPi.stdout_;
 
   if (mpiPi_debug <= 0)
     return;
 
-  va_start (args);
-  fmt = va_arg (args, char *);
+  va_start (args, fmt);
   fprintf (fp, "%s: DBG: ", mpiPi.toolname);
   vfprintf (fp, fmt, args);
   va_end (args);
@@ -73,14 +63,11 @@ mpiPi_msg_debug (va_alist)
 }
 
 void
-mpiPi_msg_warn (va_alist)
-     va_dcl
+mpiPi_msg_warn (char *fmt, ...)
 {
   va_list args;
   FILE *fp = mpiPi.stderr_;
-  char *fmt = NULL;
-  va_start (args);
-  fmt = va_arg (args, char *);
+  va_start (args, fmt);
   fprintf (fp, "%s: WARNING: ", mpiPi.toolname);
   vfprintf (fp, fmt, args);
   va_end (args);

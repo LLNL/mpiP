@@ -44,6 +44,10 @@ ifeq ($(OS),Linux)
   ifeq ($(ARCH),alpha)
     CPPFLAGS += -Dalpha
   endif
+  ifeq ($(ARCH),x86_64)
+    CPPFLAGS += -DX86_64
+  endif
+
 endif
 
 TARGET	 = libmpiP.a

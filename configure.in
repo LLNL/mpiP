@@ -54,6 +54,14 @@ DO_DEMANGLE=false
 )
 AC_SUBST(DO_DEMANGLE)
 
+STACKDEPTH=8
+AC_ARG_ENABLE(stackdepth,
+[  --enable-stackdepth     Specify maximum stacktrace depth (default is 8).],
+STACKDEPTH=$enableval
+echo Maximum stacktrace depth is $STACKDEPTH
+)
+AC_SUBST(STACKDEPTH)
+
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc gcc cc icc, mpicc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC c++ g++ CC cxx icc, mpiCC)
@@ -115,4 +123,4 @@ else
 fi
 
 
-AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak)
+AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h)

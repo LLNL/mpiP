@@ -29,6 +29,50 @@ static char *rcsid =
 
 #define icmp(a,b) (((a)<(b))?(-1):(((a)>(b))?(1):(0)))
 
+static char* mpiP_Report_Formats[8][2] = {
+  { 
+    /*  MPIP_MPI_TIME_FMT  */
+    "%4d %10.3g %10.3g    %5.2lf\n",
+    "%4d %10.3f %10.3f    %5.2lf\n"
+  },
+  { 
+    /*  MPIP_MPI_TIME_SUMMARY_FMT  */
+    "   * %10.3g %10.3g    %5.2lf\n",
+    "   * %10.3f %10.3f    %5.2lf\n"
+  },
+  { 
+    /*  MPIP_AGGREGATE_TIME_FMT  */
+    "%-20s %4d %10.3g  %6.2lf  %6.2lf\n",
+    "%-20s %4d %10.3f  %6.2lf  %6.2lf\n"
+  },
+  { 
+    /*  MPIP_AGGREGATE_MESS_FMT  */
+    "%-20s %4d %10lld %10.3g %10.3g %6.2lf\n",
+    "%-20s %4d %10lld %10.3f %10.3f %6.2lf\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_TIME_SUMMARY_FMT  */
+    "%-17s %4d %4s %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
+    "%-17s %4d %4s %6lld %8.3f %8.3f %8.3f %6.2lf %6.2lf\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_TIME_RANK_FMT  */
+    "%-17s %4d %4d %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
+    "%-17s %4d %4d %6lld %8.3f %8.3f %8.3f %6.2lf %6.2lf\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_MESS_SUMMARY_FMT  */
+    "%-17s %4d %4s %7lld %9.4g %9.4g %9.4g %9.4g\n",
+    "%-17s %4d %4s %7lld %9.4f %9.4f %9.4f %9.4f\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_MESS_RANK_FMT  */
+    "%-17s %4d %4d %7lld %9.4g %9.4g %9.4g %9.4g\n",
+    "%-17s %4d %4d %7lld %9.4f %9.4f %9.4f %9.4f\n"
+  }
+};
+
+
 static void
 print_section_heading (FILE * fp, char *str)
 {
@@ -137,23 +181,16 @@ callsite_sort_by_name_id_rank (const void *a, const void *b)
   return 0;
 }
 
-#include <varargs.h>
+#include <stdarg.h>
 
 /* proto -- print_intro_line(filep, name, "fmt to print value", args for fmt ) */
 static void
-print_intro_line (va_alist)
-     va_dcl
+print_intro_line (FILE *fp, char *name, char *fmt, ...)
 {
   va_list args;
-  FILE *fp = NULL;
-  char *fmt = NULL;
   char *cp = "@";
-  char *name = NULL;
 
-  va_start (args);
-  fp = va_arg (args, FILE *);
-  name = va_arg (args, char *);
-  fmt = va_arg (args, char *);
+  va_start (args, fmt);
 
   fprintf (fp, "%-2s%-25s: ", cp, name);
   vfprintf (fp, fmt, args);
@@ -264,11 +301,11 @@ mpiPi_profile_print (FILE * fp)
 	double ratio =
 	  (100.0 * mpiPi.global_task_info[i].mpi_time / 1e6) /
 	  (mpiPi.global_task_info[i].app_time);
-	fprintf (fp, "%4d %10.3g %10.3g    %5.2lf\n", i,
+	fprintf (fp, mpiP_Report_Formats[MPIP_MPI_TIME_FMT][mpiPi.reportFormat], i,
 		 mpiPi.global_task_info[i].app_time,
 		 mpiPi.global_task_info[i].mpi_time / 1e6, ratio);
       }
-    fprintf (fp, "   * %10.3g %10.3g    %5.2lf\n",
+    fprintf (fp, mpiP_Report_Formats[MPIP_MPI_TIME_SUMMARY_FMT][mpiPi.reportFormat],
 	     mpiPi.global_app_time,
 	     mpiPi.global_mpi_time / 1e6,
 	     (100.0 * mpiPi.global_mpi_time / 1e6) / mpiPi.global_app_time);
@@ -364,7 +401,7 @@ mpiPi_profile_print (FILE * fp)
 
     for (i = 0; (i < 20) && (i < ac); i++)
       {
-	fprintf (fp, "%-20s %4d %10.3g  %6.2lf  %6.2lf\n",
+	fprintf (fp, mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT][mpiPi.reportFormat],
 		 &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), av[i]->csid,
 		 av[i]->cumulativeTime / 1000.0,
 		 100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time *
@@ -395,7 +432,7 @@ mpiPi_profile_print (FILE * fp)
       {
         if ( av[i]->cumulativeDataSent > 0 )
           {
-            fprintf(fp, "%-20s %4d %10lld %10.3g %10.3g %6.2lf\n",
+            fprintf(fp, mpiP_Report_Formats[MPIP_AGGREGATE_MESS_FMT][mpiPi.reportFormat],
                     &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), 
                     av[i]->csid,
                     av[i]->count,
@@ -435,7 +472,7 @@ mpiPi_profile_print (FILE * fp)
 	  if (i != 0 && (av[i]->csid != av[i - 1]->csid))
 	    {
 	      fprintf (fp,
-		       "%-17s %4d %4s %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
+		       mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT][mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
 		       av[i - 1]->csid, "*", sCount, sMax / 1000.0,
 		       sCumulative / (sCount * 1000.0), sMin / 1000.0,
@@ -459,7 +496,7 @@ mpiPi_profile_print (FILE * fp)
 	      >= mpiPi.reportPrintThreshold)
 	    {
 	      fprintf (fp,
-		       "%-17s %4d %4d %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
+		       mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT][mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->rank, av[i]->count,
 		       av[i]->maxDur / 1000.0,
@@ -471,7 +508,7 @@ mpiPi_profile_print (FILE * fp)
 		       mpiPi.global_task_info[av[i]->rank].mpi_time);
 	    }
 	}
-      fprintf (fp, "%-17s %4d %4s %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
+      fprintf (fp, mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT][mpiPi.reportFormat],
 	       &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
 	       av[i - 1]->csid,
 	       "*",
@@ -515,7 +552,7 @@ mpiPi_profile_print (FILE * fp)
 	  if (i != 0 && sCumulative > 0 && (av[i]->csid != av[i - 1]->csid))
 	    {
 	      fprintf (fp,
-		       "%-17s %4d %4s %7lld %9.4g %9.4g %9.4g %9.4g\n",
+		       mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
 		       av[i - 1]->csid, "*", sCount, sMax,
 		       sCumulative / sCount, sMin,
@@ -536,7 +573,7 @@ mpiPi_profile_print (FILE * fp)
               sMin = min (av[i]->minDataSent, sMin);
 
 	      fprintf (fp,
-		       "%-17s %4d %4d %7lld %9.4g %9.4g %9.4g %9.4g\n",
+		       mpiP_Report_Formats[MPIP_CALLSITE_MESS_RANK_FMT][mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->rank, av[i]->count,
 		       av[i]->maxDataSent,
@@ -548,7 +585,7 @@ mpiPi_profile_print (FILE * fp)
       
       if ( sCumulative > 0 )
         {
-          fprintf (fp, "%-17s %4d %4s %7lld %9.4g %9.4g %9.4g %9.4g\n",
+          fprintf (fp, mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.reportFormat],
                    &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
                    av[i - 1]->csid,
                    "*",
