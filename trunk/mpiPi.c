@@ -153,8 +153,8 @@ mpiPi_init (char *appName)
   if (mpiPi.collectorRank == mpiPi.rank)
     {
       mpiPi_msg ("\n");
-      mpiPi_msg ("%s V%d.%d (Build %s/%s)\n", mpiPi.toolname, mpiPi_vmajor,
-		 mpiPi_vminor, mpiPi_vdate, mpiPi_vtime);
+      mpiPi_msg ("%s V%d.%d.%d (Build %s/%s)\n", mpiPi.toolname, mpiPi_vmajor,
+		 mpiPi_vminor, mpiPi_vpatch, mpiPi_vdate, mpiPi_vtime);
       mpiPi_msg
 
 	("Direct questions and errors to mpip-help@llnl.gov>\n");
@@ -454,6 +454,8 @@ mpiPi_mergeResults ()
 #ifndef DISABLE_BFD
       if ( mpiPi.av[0] != NULL )
         open_bfd_executable (mpiPi.av[0]);
+     else
+        mpiPi_msg_debug ("mpiPi.av[0] is NULL.\n");
 #endif
 
       /* convert data to src line; merge, if nec */
@@ -649,14 +651,11 @@ mpiPi_publishResults ()
 	    nowstr[i] = '-';
 	  }
       }
-    if ( printCount == 0 )
-      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.mpiP", mpiPi.outputDir,
-               mpiPi.appName, mpiPi.size, mpiPi.procID);
-    else
-      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
-               mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
 
     printCount++;
+    sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+             mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+
     fp = fopen (mpiPi.oFilename, "w");
   }
   if (fp == NULL)
