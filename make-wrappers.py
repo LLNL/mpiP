@@ -602,8 +602,9 @@ def CreateWrapper(funct, olist):
     olist.append(")")
     # start wrapper code
     olist.append("{")
-    olist.append( "int rc; double dur; int tsize; double messSize = 0.;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
+    olist.append( "int rc, enabledState; double dur; int tsize; double messSize = 0.;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
 
+    olist.append("\nif (mpiPi.enabled) {\n")
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
 
@@ -618,7 +619,12 @@ def CreateWrapper(funct, olist):
     # capture call stack
     olist.append("mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
 
+    # end of enabled check
+    olist.append("}\n\n")
+
     # call PMPI 
+    olist.append("enabledState = mpiPi.enabled;\n")
+    olist.append("mpiPi.enabled = 0;\n")
     olist.append("\nrc = P" + funct + "( " )
 
     for i in fdict[funct].paramConciseList:
@@ -632,8 +638,10 @@ def CreateWrapper(funct, olist):
 	    print "Warning: passing on arg",i,"in",funct
 	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
 	    olist.append(", ")
-    olist.append(");\n")
+    olist.append(");\n\n")
 
+    olist.append("mpiPi.enabled = enabledState;\n")
+    olist.append("if (mpiPi.enabled) {\n")
     olist.append("\n" \
 		 + "mpiPi_GETTIME (&mpiPi.timer, &end);\n" \
 		 + "dur = mpiPi_GETTIMEDIFF (&mpiPi.timer, &end, &start);\n" \
@@ -716,8 +724,12 @@ def CreateWrapper(funct, olist):
                   + "call_stack, "
                   + "dur, "
                   + "(double)messSize"
-                  + ");\n" \
-		  + "return rc;\n" )
+                  + ");\n" )
+
+    # end of enabled check
+    olist.append("}\n\n")
+
+    olist.append("return rc;\n")
 
     olist.append("}" + " /* " + funct + " */\n\n")
 
