@@ -1,4 +1,15 @@
-2005-01-25  Chris Chambreau  <chcham@llnl.gov>
+Mon Feb  7 23:13:40 2005  Chris Chambreau  <chcham@llnl.gov>
+
+  * util.c: Corrected use of readlink and added check/abort for malloc.
+
+  * mpiPi.c: Changed MPI_INTEGER to MPI_INT to avoid problems with MPICH 1.2
+  when f77 support is not configured.
+
+  * Makefile.in: add test to .PHONY
+
+Tue Jan 25 22:47:17 2005  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: More commits for 2.8 release.
 
   * doc/UserGuide.html, doc/UserGuide.txt:
   Include new Platform doc info for X1, XD1, Altix.
@@ -6,12 +17,12 @@
   * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
   Outstanding BG/L issues that have been addressed.
 
-2005-01-12  Chris Chambreau  <chcham@llnl.gov>
+Wed Jan 12 20:42:33 2005  Chris Chambreau  <chcham@llnl.gov>
 
   * doc/UserGuide.html, doc/UserGuide.txt:
   Last minute changes to documentation prior to v2.8 release.
 
-2005-01-11  Chris Chambreau  <chcham@llnl.gov>
+Tue Jan 11 22:26:17 2005  Chris Chambreau  <chcham@llnl.gov>
 
   * ChangeLog: Changes up to 2.8 Release.
 
@@ -27,7 +38,7 @@
 
   * configure.in: clock_gettime suuport and MPICH 2 C++ compile script support
 
-2005-01-06  Chris Chambreau  <chcham@llnl.gov>
+Thu Jan  6 23:33:20 2005  Chris Chambreau  <chcham@llnl.gov>
 
   * mpiP-API.c, util.c: Cleaning with lint.
 
@@ -57,14 +68,14 @@
   * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
   Modifications to support BlueGene/L ppc64 platform.
 
-2004-12-28  Chris Chambreau  <chcham@llnl.gov>
+Tue Dec 28 18:13:37 2004  Chris Chambreau  <chcham@llnl.gov>
 
-  * timers/linux_posix.h, linux_posix.h: admin
+  * timers/linux_posix.h, Attic/linux_posix.h: admin
 
-  * _timers.h, linux_posix.h:
+  * Attic/linux_posix.h, _timers.h:
   Phil Roth additions to support linux/posix clock_gettime initially for Altix.
 
-2004-12-04  Chris Chambreau  <chcham@llnl.gov>
+Sat Dec  4 00:39:59 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * configure: updated.
 
@@ -82,7 +93,7 @@
 
   * bin/config.guess, bin/config.sub: Updated config scripts
 
-2004-12-02  Chris Chambreau  <chcham@llnl.gov>
+Thu Dec  2 19:50:40 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * glob.c: new version numbers
 
@@ -92,7 +103,7 @@
 
   * mpi.io.protos.txt: this should have been added before, but I missed it...
 
-2004-11-05  Chris Chambreau  <chcham@llnl.gov>
+Fri Nov  5 17:48:03 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * configure.in: Modification for correct parent frame count
 
@@ -100,13 +111,14 @@
 
   * testing/Makefile.in: removed fortran api test
 
-  * testing/api-test-f.c, testing/api-test.f: removed api fortran test
+  * testing/Attic/api-test-f.c, testing/Attic/api-test.f:
+  removed api fortran test
 
   * util.c: *** empty log message ***
 
-  * testing/api-test-f.c, testing/api-test.f: minor corrections
+  * testing/Attic/api-test-f.c, testing/Attic/api-test.f: minor corrections
 
-2004-11-04  Chris Chambreau  <chcham@llnl.gov>
+Thu Nov  4 23:36:19 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * mpiPi.h.in: Do not use asserts by default
 
@@ -121,7 +133,7 @@
 
   * testing/timer-info.c: Make use of new TIMER_NAME macro
 
-  * timers/crayx1_local.h: Does not appear to be needed
+  * timers/Attic/crayx1_local.h: Does not appear to be needed
 
   * mpiP-API.c: removed unnecessary version of function mpiP_open_executable
 
@@ -135,12 +147,12 @@
   o  Removed unused cray timer header file
   o  Changed new cray files to conform to new macro format
 
-2004-10-28  Chris Chambreau  <chcham@llnl.gov>
+Thu Oct 28 21:01:26 2004  Chris Chambreau  <chcham@llnl.gov>
 
-  * timers/crayx1_hw.h, timers/crayx1_local.h:
+  * timers/Attic/crayx1_local.h, timers/crayx1_hw.h:
   Missed Phil's cray timer include files...
 
-2004-10-27  Chris Chambreau  <chcham@llnl.gov>
+Wed Oct 27 18:52:48 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * Defs.mak.in, get_fortran_arg.f, util.c:
   Slight modifications to allow forcing use of getargs on linux and
@@ -148,24 +160,24 @@
 
   * Makefile.in: added merged-install target for LLNL site installations.
 
-2004-10-26  Chris Chambreau  <chcham@llnl.gov>
+Tue Oct 26 23:29:56 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
   *** empty log message ***
 
-  * Makefile.in, Rules.mak, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in:
+  * Attic/aix_local.h, Attic/aix_swclock.h, Attic/sunos-timers.h, Makefile.in, Rules.mak, _timers.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, util.c, wrappers_special.c, Defs.mak.in:
   o  Cray X1/UNICOS support
   o  Libdwarf support : note that Intel compilers do not provide full C++ symbols
   o  install target
 
-2004-10-22  Chris Chambreau  <chcham@llnl.gov>
+Fri Oct 22 21:38:59 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in: target for generating prototype file.
 
   * testing/timer-info.c:
   Not so much a test as a utility to report on timer info.
 
-  * testing/api-test-f.c, testing/api-test.c, testing/api-test.f:
+  * testing/Attic/api-test-f.c, testing/Attic/api-test.f, testing/api-test.c:
   New API tests.
 
   * get_fortran_arg.f, mpiPi_proto.h:
@@ -178,7 +190,7 @@
   * testing/12-null-null.src, testing/13-pcontrol-report.c, testing/9-test-mpip-time.c, testing/Makefile.in:
   *** empty log message ***
 
-  * mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in, Makefile.in, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, hash.c, hash.h, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
+  * Attic/sunos-timers.h, mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, util.c, wrappers_special.c, Attic/aix_local.h, Attic/aix_swclock.h, Attic/hash.c, Attic/hash.h, Defs.mak.in, Makefile.in, _timers.h, configure, configure.in, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
   Added mpiP API : provides stack tracing, address lookup and timing functionality
   1)  Added mpiP-API.c and mpiP-API.h.
   2)  Renamed hash files to avoid API conflict with hash.h.
@@ -200,12 +212,12 @@
   Added functionality to get executable name from /proc on Linux. <-- Assumes exec
   utable will not be longer than 4096.
 
-2004-10-21  Chris Chambreau  <chcham@llnl.gov>
+Thu Oct 21 21:05:03 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * _timers.h, configure, configure.in, make-wrappers.py, mpiPconfig.h.in:
   Added timing checking and gettimeday configuration switch.
 
-2004-09-21  Chris Chambreau  <chcham@llnl.gov>
+Tue Sep 21 22:05:16 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in, configure, mpiP-API.c, mpiP-API.h, pc_lookup.c:
   Added support for mpiP functionality API.
@@ -216,7 +228,7 @@
   Removed unnecessary timer argument to TIMER macros that was left over
   from AIX Switch Clock support, which is not being supported.
 
-2004-09-14  Chris Chambreau  <chcham@llnl.gov>
+Tue Sep 14 17:10:26 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * pc_lookup.c: Added debugging info if can't BFD fails due to NULL file.
 
@@ -227,6 +239,6 @@
   * glob.c, mpiPi.c, mpiPi.h.in, report.c:
   Added patch number for release tracking
 
-  * mpi.protos.txt:
+  * Attic/mpi.protos.txt:
   Not necessary to archive, as there is an mpi.protos.txt.in file
 
