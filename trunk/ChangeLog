@@ -5,3 +5,8 @@
 2003-01-03  Chris Chambreau  <chcham@llnl.gov>
 
 	* Correction pertaining to alpha-osf1 port.
+
+2003-05-01  Chris Chambreau  <chcham@llnl.gov>
+
+	* Changes to support x86-Linux/Tru64 and compatible
+	  versions of binutils.
