@@ -85,7 +85,7 @@ void
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 {
   int i;
-  void *fp;
+  void *fp, *lastfp;
   void* pc;
 
   /* start w/ the parent frame, not ours (we know who's calling) */
@@ -105,6 +105,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
             pc_array[i] = NULL;
           
 	  /* update frame ptr */
+          lastfp = fp;
 	  fp = NextFP(fp);
 	}
       else
@@ -148,10 +149,16 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "gf:b:s:k:t:o")) != EOF);)
+      for (; ((c = getopt (ac, av, "Cgf:b:s:k:t:o")) != EOF);)
 	{
 	  switch (c)
 	    {
+	    case 'C':
+              mpiPi_do_demangle = 1;
+	      if (mpiPi.rank == 0)
+		mpiPi_msg ("Enabled mpiP demangling.\n");
+	      break;
+
 	    case 'f':
 	      mpiPi.outputDir = optarg;
 	      if (mpiPi.rank == 0)
@@ -196,7 +203,7 @@ mpiPi_getenv ()
 	      {
 		int defaultStackDepth = mpiPi.stackDepth;
 		mpiPi.stackDepth = atoi (optarg);
-		if (mpiPi.stackDepth < 2)
+		if (mpiPi.stackDepth < 1)
 		  {
 		    if (mpiPi.rank == 0)
 		      mpiPi_msg_warn
@@ -351,7 +358,7 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
     }
   for (i = 0; (i < *ac) && (i < av_len); i++)
     {
-      av[i] = argv[i];
+      av[i] = strdup(argv[i]);
       if (mpiPi_debug)
 	{
 	  printf ("argv[%d] = %s\n", i, av[i]);
