@@ -8,8 +8,8 @@ static char *rcsid =
   "$Header$";
 #endif
 
-#include <stdio.h>
 #include "mpi.h"
+#include <stdio.h>
 #include <unistd.h>
 
 class simplec
