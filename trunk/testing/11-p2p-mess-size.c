@@ -64,6 +64,8 @@ int main(int argc, char** argv)
     MPI_Buffer_attach(buf, bsize);
     MPI_Bsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Buffer_detach(buf);
+    free(buf);
   }
   else
   {
@@ -73,14 +75,59 @@ int main(int argc, char** argv)
   }
   testcount += MESS_BASE_COUNT;
 
-  /*  TODO:  
-      MPI_Ibsend
-      MPI_Irsend
-      MPI_Isend
-      MPI_Issend  */
+  if ( rank == 0 )
+    fprintf(stderr, "Ibsend\n");
+  if ( rank % 2 )
+  {
+    void *buf;
+    int bsize;
+    bsize = packsize + MPI_BSEND_OVERHEAD; 
+    buf = malloc(bsize);
+    MPI_Buffer_attach(buf, bsize);
+    MPI_Ibsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Buffer_detach(buf);
+    free(buf);
+  }
+  else
+  {
+    MPI_Recv(recvbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, 
+             &status);
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
   testcount += MESS_BASE_COUNT;
+
+  if ( rank == 0 )
+    fprintf(stderr, "Irsend\n");
+  if ( rank % 2 )
+  {
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Irsend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
+  }
+  else
+  {
+    MPI_Irecv(recvbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, 
+             &request);
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
   testcount += MESS_BASE_COUNT;
+
+  if ( rank == 0 )
+    fprintf(stderr, "Isend\n");
+  if ( rank % 2 )
+    MPI_Isend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
+  else
+    MPI_Recv(recvbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, 
+             &status);
   testcount += MESS_BASE_COUNT;
+
+  if ( rank == 0 )
+    fprintf(stderr, "Issend\n");
+  if ( rank % 2 )
+    MPI_Issend(sendbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, &request);
+  else
+    MPI_Recv(recvbuf, testcount, MPI_MESS_TYPE, dest, 0, MPI_COMM_WORLD, 
+             &status);
   testcount += MESS_BASE_COUNT;
 
   if ( rank == 0 )
