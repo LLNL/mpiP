@@ -228,15 +228,15 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 #if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
-	  mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
-			   pc, *filename, *lineno, *functname);
-
-	  if ( *filename == NULL || strcmp(*filename, "??") )
+	  if ( *filename == NULL || strcmp(*filename, "??") == 0 )
             *filename = "[unknown]";
           
 	  if ( *functname == NULL )
             *functname = "[unknown]";
           
+    mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
+         pc, *filename, *lineno, *functname);
+
           csp->filename = strdup (*filename);
           csp->functname = strdup (*functname);
           csp->line = *lineno;
