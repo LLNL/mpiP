@@ -153,7 +153,11 @@ extern int mpiPi_debug;
 
 
 #if defined(AIX)
+#if defined(__64BIT__)
+#define ParentFP(jb) ((void *) *(long *) jb[5])
+#else
 #define ParentFP(jb) ((void *) *(long *) jb[3])
+#endif
 #define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *)))) 
 #define NextFP(fp) ((void *) *(long *) fp)
 #elif defined(Linux) && defined(IA32)

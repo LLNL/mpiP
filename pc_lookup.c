@@ -67,7 +67,7 @@ find_address_in_section (abfd, section, data)
 {
   bfd_vma vma;
   bfd_size_type size;
-  long local_pc = pc;
+  bfd_vma local_pc = pc;
 
   assert (abfd);
   if (found)
@@ -89,7 +89,7 @@ find_address_in_section (abfd, section, data)
 
   if (local_pc < vma)
   {
-    mpiPi_msg_debug ("failed bfd_get_section_vma: local_pc=0x%p  vma=0x%p\n",
+    mpiPi_msg_debug ("failed bfd_get_section_vma: local_pc=0x%lx  vma=0x%lx\n",
       local_pc, vma);
     return;
   }
@@ -101,10 +101,11 @@ find_address_in_section (abfd, section, data)
 		   
   if (local_pc >= vma + size)
   {
-    mpiPi_msg_debug ("PC not in section: pc=%x vma=%x-%x\n",
+    mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
   		     (long) local_pc, vma, vma+size);
     return;
   }
+
 
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
@@ -130,9 +131,17 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   assert (abfd);
   assert (i_addr_hex);
 
+#ifdef AIX
+#ifdef __64BIT__
+  /*  AIX 64-bit apps load .text section at 0x100000000  */
+  i_addr_hex = (void*)((unsigned long)i_addr_hex & 0xfffffffeffffffff);
+  i_addr_hex = (void*)((unsigned long)i_addr_hex + 0x10000000);
+#endif
+#endif
 
-  sprintf (buf, "0x%x", (long) i_addr_hex);
+  sprintf (buf, "0x%lx", (unsigned long) i_addr_hex);
   pc = bfd_scan_vma (buf, NULL, 16);
+
   /* jsv hack - trim high bit off of address */
   /*  pc &= !0x10000000; */
   found = FALSE;
@@ -148,7 +157,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       /* determine the function name */
       if (functionname == NULL || *functionname == '\0')
 	{
-	  *o_funct_str = strdup ("??");
+	  *o_funct_str = strdup ("[unknown]");
 	}
       else if (!do_demangle)
 	{
@@ -181,7 +190,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	}
 
       *o_lineno = line;
-      *o_file_str = strdup (filename ? filename : "??");
+      *o_file_str = strdup (filename ? filename : "[unknown]");
 
       mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
 		       *o_funct_str);
