@@ -60,11 +60,14 @@ F77_MPI_INIT (int *ierr)
 {
   int rc = 0;
   jmp_buf jbuf;
+  char **tmp_argv;
+
   setjmp (jbuf);
   mpiPi.toolname = "mpiP";
   mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, 32);
 
-  rc = _MPI_Init (&(mpiPi.ac), (char ***) &(mpiPi.av), GetPPC (jbuf));
+  tmp_argv = mpiPi.av;
+  rc = _MPI_Init (&(mpiPi.ac), (char ***) &tmp_argv, GetPPC (jbuf));
   *ierr = rc;
 
   return;
@@ -79,6 +82,7 @@ _MPI_Finalize (void *pc)
   int rc = 0;
 
   mpiPi_finalize ();
+  mpiPi.enabled = 0;
   mpiPi_msg_debug ("calling PMPI_Finalize\n");
   rc = PMPI_Finalize ();
   mpiPi_msg_debug ("returning from PMPI_Finalize\n");

@@ -626,7 +626,7 @@ mpiPi_collect_basics ()
 
   mpiPi_msg_debug ("Collect Basics\n");
   mpiPi_msg_debug ("mpiPi.app_time at task %d: %g (%g - %g)\n",
-		   mpiPi.rank, app_time);
+		   mpiPi.rank, app_time, mpiPi.endTime, mpiPi.startTime);
 
   /* 
    * -- sweep across all tasks, collecting task information about them 
@@ -696,6 +696,7 @@ void
 mpiPi_finalize ()
 {
   mpiPi.endTime = PMPI_Wtime ();
+
   if(mpiPi.enabled)
     {
       mpiPi.cumulativeTime += mpiPi.endTime - mpiPi.startTime;
