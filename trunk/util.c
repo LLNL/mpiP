@@ -503,9 +503,6 @@ void getProcCmdLine(int* ac, char** av, int max_args)
 void
 mpiPi_copy_args (int *ac, char **av, int av_len)
 {
-  int i;
-  extern int mpiPi_debug;
-
   assert( ac != NULL );
   assert( av != NULL );
 
