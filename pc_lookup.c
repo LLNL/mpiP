@@ -36,10 +36,6 @@ static char *rcsid =
 extern char *cplus_demangle (const char *mangled, int options);
 #endif
 
-#define boolean int
-#define false 0
-#define true (!false)
-
 static asymbol **syms;
 static bfd_vma pc;
 static const char *filename;
