@@ -10,3 +10,8 @@
 
 	* Changes to support x86-Linux/Tru64 and compatible
 	  versions of binutils.
+
+2003-08-14  Chris Chambreau  <chcham@llnl.gov>
+
+	* Fixes + message size support, C++ name demangling,
+	  and long file/function name support.
