@@ -27,6 +27,50 @@ lastFunction = "NULL"
 verbose = 0
 baseID = 1000
 
+messParamDict = {
+
+    ( "MPI_Allgather", "sendcount"):1,
+    ( "MPI_Allgather", "sendtype"):2,
+    ( "MPI_Allgatherv", "sendcount"):1,
+    ( "MPI_Allgatherv", "sendtype"):2,
+    ( "MPI_Allreduce", "count"):1,
+    ( "MPI_Allreduce", "datatype"):2,
+    ( "MPI_Alltoall", "sendcount"):1,
+    ( "MPI_Alltoall", "sendtype"):2,
+    ( "MPI_Bcast", "count"):1,
+    ( "MPI_Bcast", "datatype"):2,
+    ( "MPI_Bsend", "count"):1,
+    ( "MPI_Bsend", "datatype"):2,
+    ( "MPI_Gather", "sendcnt"):1,
+    ( "MPI_Gather", "sendtype"):2,
+    ( "MPI_Gatherv", "sendcnt"):1,
+    ( "MPI_Gatherv", "sendtype"):2,
+    ( "MPI_Ibsend", "count"):1,
+    ( "MPI_Ibsend", "datatype"):2,
+    ( "MPI_Irsend", "count"):1,
+    ( "MPI_Irsend", "datatype"):2,
+    ( "MPI_Isend", "count"):1,
+    ( "MPI_Isend", "datatype"):2,
+    ( "MPI_Issend", "count"):1,
+    ( "MPI_Issend", "datatype"):2,
+    ( "MPI_Reduce", "count"):1,
+    ( "MPI_Reduce", "datatype"):2,
+    ( "MPI_Rsend", "count"):1,
+    ( "MPI_Rsend", "datatype"):2,
+    ( "MPI_Scan", "count"):1,
+    ( "MPI_Scan", "datatype"):2,
+    ( "MPI_Scatter", "sendcnt"):1,
+    ( "MPI_Scatter", "sendtype"):2,
+    ( "MPI_Send", "count"):1,
+    ( "MPI_Send", "datatype"):2,
+    ( "MPI_Sendrecv", "sendcount"):1,
+    ( "MPI_Sendrecv", "sendtype"):2,
+    ( "MPI_Sendrecv_replace", "count"):1,
+    ( "MPI_Sendrecv_replace", "datatype"):2,
+    ( "MPI_Ssend", "count"):1,
+    ( "MPI_Ssend", "datatype"):2
+    }
+
 class VarDesc:
     def __init__ (self,name, basetype, pointerLevel, arrayLevel):
 	"initialize a new variable description structure"
@@ -51,7 +95,11 @@ class fdecl:
 	self.paramConciseList = []
 	self.extrafields = {}
 	self.extrafieldsList = []
-
+        self.sendCountPname = ""
+        self.sendTypePname = ""
+        self.recvCountPname = ""
+        self.recvTypePname = ""
+        
 
 def ProcessDirectiveLine(lastFunction, line):
     tokens = string.split(line)
@@ -123,6 +171,7 @@ def ParamDictUpdate(fname):
     global flist
     global fdict
     global gParamDict
+    global messParamDict
     for p in fdict[fname].paramList:
 	## check for pointers, arrays
 	pname = "NULL"
@@ -156,6 +205,19 @@ def ParamDictUpdate(fname):
 	basetype = string.strip(basetype)
 	fdict[fname].paramDict[pname] = VarDesc(pname,basetype,pointerLevel,arrayLevel)
 	fdict[fname].paramConciseList.append(pname)
+
+        #  Identify and assign message size parameters
+        if messParamDict.has_key((fname,pname)):
+            paramMessType = messParamDict[(fname,pname)]
+            if paramMessType == 1:
+                fdict[fname].sendCountPname = pname
+            elif paramMessType == 2:
+                fdict[fname].sendTypePname = pname
+            elif paramMessType == 3:
+                fdict[fname].recvCountPname = pname
+            elif paramMessType == 4:
+                fdict[fname].recvTypePname = pname                
+            
 	if gParamDict.has_key(pname):
 	    ## compare type info
 	    prev = gParamDict[pname]
@@ -540,7 +602,7 @@ def CreateWrapper(funct, olist):
     olist.append(")")
     # start wrapper code
     olist.append("{")
-    olist.append( "int rc; double dur;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
+    olist.append( "int rc; double dur; int tsize; double messSize = 0.;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
 
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
@@ -639,13 +701,21 @@ def CreateWrapper(funct, olist):
 # 		  + "mpiTi_flush_if_nec();\n" \
 # 		  + "if(mpiTi.hwc_enabled) { mpiThwc_reset(); }\n" \
 # 		  + "return rc;\n" )
-
+    #
+    if fdict[funct].sendCountPname != "":
+        olist.append( "\n" 
+                      + "PMPI_Type_size(*" + fdict[funct].sendTypePname + ", " 
+                      + "&tsize);\n" 
+                      + "messSize = (double)(tsize * *"
+                      +  fdict[funct].sendCountPname + ");\n")
+                  
+    
     olist.append( "\n" \
 		  + "mpiPi_update_callsite_stats(" + "mpiPi_" + funct + ", " \
                   + "mpiPi.rank, "
                   + "call_stack, "
                   + "dur, "
-                  + "(double)0"
+                  + "(double)messSize"
                   + ");\n" \
 		  + "return rc;\n" )
 
