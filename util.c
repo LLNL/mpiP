@@ -25,12 +25,13 @@ static char *rcsid =
 #include <excpt.h>
 #endif
 
+#include "mpiPi.h"
+
 #ifdef HAVE_LIBUNWIND
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #endif
 
-#include "mpiPi.h"
 
 static int argc=0;
 static char **argv=0;
