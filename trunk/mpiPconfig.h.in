@@ -2,8 +2,17 @@
 #ifndef _MPIPCONFIG_H
 #define _MPIPCONFIG_H
 
-/* Define if demangle.h is present.  */
+/* Define if demangle.h is present. */
 #undef HAVE_DEMANGLE_H
+
+/* Define if getarg in enabled. */
+#undef USE_GETARG
+
+/* Define if not using binutils libbfd */
+#undef DISABLE_BFD
+
+/* Define if using libunwind */
+#undef HAVE_LIBUNWIND
 
 #endif /* _CONFIG_H */
 

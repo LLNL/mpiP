@@ -20,7 +20,6 @@ CPPFLAGS   += -I.
 endif
 CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
 
-CPPFLAGS   += @DISABLE_BFD@
 ifdef FAST
 OPT	+= -O3
 endif
