@@ -14,7 +14,7 @@ RUNTESTFLAGS =
 TEST = 	
 # Execute the tests 
 check: site.exp all 
-	$(RUNTEST) $(RUNTESTFLAGS) \
+	DEJAGNU="./lib/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
 	--tool testing --srcdir . $(TEST)
 	
 # Make the local config file
