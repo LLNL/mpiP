@@ -10,7 +10,7 @@ include Defs.mak
 TARGET	= libmpiP.a
 
 all: ${TARGET} ${FORTRAN_TARGET}
-	make -C testing 
+	$(MAKE) -C testing 
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -33,6 +33,7 @@ ${TARGET}: ${OBJS} TAGS
 ${FORTRAN_TARGET}: remake_util ${OBJS} TAGS
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
+	rm util.o
 
 .PHONY: remake_util
 
@@ -46,7 +47,7 @@ TAGS: ${SRCS}
 
 clean::
 	rm -f TAGS tags
-	make -C testing clean
+	$(MAKE) -C testing clean
 
 include $(srcdir)/Rules.mak
 
