@@ -463,8 +463,10 @@ char* getProcExeLink()
       free(inbuf);
   }
   else
+  {
+    inbuf[exelen] = 0;
     return inbuf;
-
+  }
   return NULL;
 }
 
