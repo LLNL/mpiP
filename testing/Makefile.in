@@ -38,13 +38,9 @@ FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
-EXES += api-test-f
 
 all: ${EXES}
 	@echo All done.
-
-api-test-f: api-test-f.o
-	${FC} ${FFLAGS} ${CPPFLAGS} api-test-f.o api-test.f -o $@ ${LDFLAGS} ${FLIBS}
 
 .SUFFIXES: .exe
 .c.exe:
