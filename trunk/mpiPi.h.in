@@ -212,6 +212,12 @@ extern int mpiPi_do_demangle;
 #define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
 
+/*  BG/L Linux  */
+#elif defined(Linux) && defined(ppc64)
+#define ParentFP(jb) NextFP(((void*)jb[0].__jmpbuf[0]))
+#define FramePC(fp) ((void*)(((char**)fp)[1]))
+#define NextFP(fp) ((void*)((char**)fp)[0])
+
 /*  undefined  */
 #else  
 #define ParentFP(jb) (0)
