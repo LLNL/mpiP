@@ -1,14 +1,19 @@
 set test_targ "./testing/$test"
-set timeout 30
+set timeout 10
 global expect_out
 
 
 proc checkOutput { text type } {
   global outFile
   global test
+#  send_user "in checkOutput for $text\n"
   spawn cat $outFile
   expect { 
-     -re $text {send_user "found $type $text\n"}
+     -re $text {
+        send_user "found $type $text\n"
+        close
+        wait 
+        }
      timeout { fail "$test timed out\n" }
      eof     { fail "$test $type $text\n" }
     }
@@ -37,7 +42,10 @@ proc runTest { } {
   
   set expect_out(1,string) ""
   expect { 
-     -re "mpiP: Storing mpiP output in .\./(.*\.mpiP)\](.*)"   { }
+     -re "mpiP: Storing mpiP output in .\./(.*\.mpiP)\](.*)"   { 
+        close 
+        wait 
+        }
      timeout { fail "$test timed out" }
      eof     { fail "$test failed" }
   

@@ -1,0 +1,15 @@
+
+##  Test-specific information
+#
+set test_title "10-coll-mess-size-exe: check all supported operations for accurate size"
+set test "10-coll-mess-size.exe"
+set procs 2
+set source_check_file "testing/10-coll-mess-size.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
