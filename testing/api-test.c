@@ -53,7 +53,7 @@ main(int argc, char* argv[])
 	exit(1);
   }
 
-  fprintf(stderr, "opened bfd file\n");
+  fprintf(stderr, "opened executable file\n");
 
   thisIsTheTopLevelFunction();
   fprintf(stderr, "finished function test\n");
