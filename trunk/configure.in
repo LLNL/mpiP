@@ -13,7 +13,6 @@ AC_CANONICAL_SYSTEM
 
 CPPFLAGS=
 LDFLAGS=
-PARENT_FRAME_COUNT=1
 AC_PREFIX_DEFAULT=.
 cross_compiling=yes
 
@@ -115,9 +114,6 @@ DISABLE_LIBUNWIND=yes
 echo Use of libunwind has been disabled
 PARENT_FRAME_COUNT=1
 ,
-if test `uname -s` == "OSF1"  ; then
-  PARENT_FRAME_COUNT=2
-fi
 if test "`uname -s | cut -c1-6`" == "UNICOS"  ; then
   PARENT_FRAME_COUNT=3
 fi
