@@ -171,6 +171,7 @@ extern mpiPi_t mpiPi;
 
 extern int mpiPi_vmajor;
 extern int mpiPi_vminor;
+extern int mpiPi_vpatch;
 extern char *mpiPi_vdate;
 extern char *mpiPi_vtime;
 
