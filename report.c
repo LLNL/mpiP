@@ -309,7 +309,7 @@ mpiPi_profile_print (FILE * fp)
 		 av[i]->cumulativeTime / 1000.0,
 		 100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time *
 						  1e6),
-		 100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time);
+		 mpiPi.global_mpi_time > 0 ? 100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time : 0);
       }
 
     free (av);
