@@ -148,7 +148,12 @@ AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
 
 dnl ========== Identify F77 ==========
 AC_MSG_CHECKING(fortran compiler)
-if test "$G77" = yes ; then
+if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
+  F77_VENDOR=PGI
+  FORTRAN_FLAG=-DPGI
+  FORTRAN_TARGET=libmpiPpgf.a
+  MPIPFLIB=mpiPpgf
+elif test "$G77" = yes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
   FORTRAN_TARGET=libmpiPg77.a

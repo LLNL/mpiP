@@ -402,6 +402,13 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = __Argc;
     argv = __Argv;
   }
+#elif defined(PGI)
+  {
+    extern int __argc_save;
+    extern char **__argv_save;
+    argc = __argc_save;
+    argv = __argv_save;
+  }
 #endif  
 
    mpiPi_copy_given_args(ac, av, av_len, argc, argv);
@@ -413,7 +420,7 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 {
   int i;
 
-#if defined(USE_GETARG) && defined(Intel_Fortran)
+#if defined(USE_GETARG) 
 
 #define EXECUTABLE_LEN 2048
 {
