@@ -97,6 +97,11 @@ find_address_in_section (abfd, section, data)
 
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
+
+  mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%x vma=%x-%x\n",
+                   (long) local_pc, vma, vma+size);
+  mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
+                   filename, functionname, line);
 }
 
 
