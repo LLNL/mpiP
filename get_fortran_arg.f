@@ -14,7 +14,6 @@
 !
 
        subroutine mpipi_get_fortran_argc(argc_val)
-       !DEC$ attributes C :: mpipi_get_fortran_argc
        !DEC$ attributes REFERENCE :: argc_val
        integer argc_val
 
@@ -24,7 +23,6 @@
 
 
        subroutine mpipi_get_fortran_arg(idx, buf_len, buf, len)
-       !DEC$ attributes C :: mpipi_get_fortran_arg
        !DEC$ attributes VALUE :: idx
        !DEC$ attributes VALUE :: buf_len
        !DEC$ attributes REFERENCE :: buf
