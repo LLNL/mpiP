@@ -39,7 +39,7 @@ void  thisIsTheTopLevelFunction()
   thisIsTheNextLevelFunction();
 }
 
-void run_test()
+void run_test_()
 {
   char* infile;
   mpiP_TIMER start, end;
