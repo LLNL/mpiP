@@ -16,12 +16,13 @@ LIBS	:= -lmpiP $(LIBS)
 CSRCS =	0-simple.c \
 	1-hot-potato.c \
 	2-pcontrol.c \
+	3-stacktrace.c \
 	5-medley.c \
 	6-nonblock.c \
 	7-nonblock-waitall.c \
 	8-test.c \
 	9-test-mpip-time.c 
-FSRCS =	0-simplef.f sweep-ops.f
+FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
 EXES = $(CSRCS:.c=.exe)
 EXES += $(FSRCS:.f=.exe)
 
