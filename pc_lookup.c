@@ -141,11 +141,18 @@ find_address_in_section (abfd, section, data)
     return;
   }
 
+/* The following define addresses binutils modifications between
+ * version 2.15 and 2.15.96
+ */
+#ifdef HAVE_BFD_GET_SECTION_SIZE
+  size = bfd_get_section_size (section);
+#else      
   if ( section->reloc_done )
      size = bfd_get_section_size_after_reloc (section);
   else
      size = bfd_get_section_size_before_reloc (section);
-		   
+#endif
+
   if (local_pc >= vma + size)
   {
     mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
