@@ -2,8 +2,6 @@
 c --- a simple FORTRAN program to test stack traces with
 c ---  the mpi features that sweep3D uses.
 
-c      include mpif.h
-
       subroutine do_bcasts(rarray, rdarray)
       include 'mpif.h'
       integer rarray(100)
@@ -28,6 +26,9 @@ c      include mpif.h
 
       double precision sdarray(100)
       double precision rdarray(100)
+      
+      tag = 30
+
         call mpi_barrier(MPI_COMM_WORLD,ierr)
         print *,'passed barrier.'
   
