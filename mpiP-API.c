@@ -99,6 +99,7 @@ void mpiP_close_executable()
 #endif
 }
 
+/*  Returns current time in usec  */
 mpiP_TIMER mpiP_gettime()
 {
   mpiPi_TIME currtime;
