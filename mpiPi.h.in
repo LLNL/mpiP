@@ -184,6 +184,9 @@ extern char *mpiPi_vtime;
 extern int mpiPi_debug;
 extern int mpiPi_do_demangle;
 
+#ifdef HAVE_MPIR_TOPOINTER
+extern void *MPIR_ToPointer( int idx );
+#endif
 
 #if !defined(UNICOS_mp) 
 
@@ -220,6 +223,9 @@ extern int mpiPi_do_demangle;
 
 /*  undefined  */
 #else  
+#if ! defined(HAVE_LIBUNWIND)
+#warning "No stack trace mechanism defined for this platform."
+#endif
 #define ParentFP(jb) (0)
 #define FramePC(fp) (0)
 #define NextFP(fp) (0)
