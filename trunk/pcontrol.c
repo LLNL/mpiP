@@ -34,7 +34,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
       mpiPi.cumulativeTime += dur;
     }
-  else if (flag == -1)
+  else if (flag == 2)
     {
       mpiPi_generateReport();
     }
