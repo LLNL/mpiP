@@ -18,20 +18,20 @@ static char *rcsid =
   "$Header$";
 #endif
 
+#if defined(DEMANGLE_GNU)
 #include <ansidecl.h>
+#endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "bfd.h"
-#if 0
-#include "bucomm.h"
-#endif
-
 #include "mpiPi.h"
 #include "mpiPconfig.h"
 
+#ifndef DISABLE_BFD
+#include "bfd.h"
 static asymbol **syms;
 static bfd_vma pc;
 static const char *filename;
@@ -44,12 +44,13 @@ static bfd *abfd = NULL;
 #ifdef BFD_TRUE_FALSE
 typedef boolean bfd_boolean;
 #endif
-
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 static bfd_boolean found;
+
+#endif  /* DISABLE_BFD */
+
 
 
 #ifdef DEMANGLE_IBM
@@ -101,6 +102,7 @@ char* mpiPdemangle(const char* mangledSym)
 
 #endif
 
+#ifndef DISABLE_BFD
 
 void
 find_address_in_section (abfd, section, data)
@@ -127,7 +129,6 @@ find_address_in_section (abfd, section, data)
     mpiPi_msg_debug ("failed bfd_get_section_flags\n");
     return;
   }
-
   vma = bfd_get_section_vma (abfd, section);
 
   if (local_pc < vma)
@@ -298,5 +299,16 @@ close_bfd_executable ()
   assert (abfd);
   bfd_close (abfd);
 }
+
+#else /* DISABLE_BFD */
+
+int
+find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
+	      char **o_funct_str)
+{
+  return 1;  /*  failure  */
+}
+
+#endif
 
 /* eof */

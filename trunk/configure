@@ -832,6 +832,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
   --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
+  --disable-bfd           Do not use GNU binutils libbfd for source lookup.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1371,12 +1372,26 @@ else
 fi;
 
 
-STACKDEPTH=8
 # Check whether --enable-stackdepth or --disable-stackdepth was given.
 if test "${enable_stackdepth+set}" = set; then
   enableval="$enable_stackdepth"
   STACKDEPTH=$enableval
 echo Maximum stacktrace depth is $STACKDEPTH
+
+else
+  STACKDEPTH=8
+
+fi;
+
+
+# Check whether --enable-bfd or --disable-bfd was given.
+if test "${enable_bfd+set}" = set; then
+  enableval="$enable_bfd"
+  DISABLE_BFD=-DDISABLE_BFD
+echo Use of libbfd has been disabled
+
+else
+  DISABLE_BFD=
 
 fi;
 
@@ -3784,6 +3799,7 @@ s,@target_os@,$target_os,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
 s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
 s,@STACKDEPTH@,$STACKDEPTH,;t t
+s,@DISABLE_BFD@,$DISABLE_BFD,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@CC@,$CC,;t t
