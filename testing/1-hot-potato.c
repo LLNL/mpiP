@@ -1,4 +1,4 @@
-/* mpi2.c -- hot potato test */
+/* 1-hot-potato.c -- hot potato test */
 
 #ifndef lint
 static char *rcsid =
