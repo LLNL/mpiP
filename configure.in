@@ -130,11 +130,11 @@ DISABLE_MPI_IO=no
 AC_SUBST(DISABLE_MPI_IO)
 
 AC_ARG_ENABLE(fortran-xlate,
-[  --enable-fortran-xlate  Enable translation of Fortran opaque objects.],
-ENABLE_FORTRAN_XLATE=yes
-echo Translation of FORTRAN opaque objects has been enabled.
-,
+[  --disable-fortran-xlate Disable translation of Fortran opaque objects.],
 ENABLE_FORTRAN_XLATE=no
+echo Translation of FORTRAN opaque objects has been disabled.
+,
+ENABLE_FORTRAN_XLATE=yes
 )
 AC_SUBST(ENABLE_FORTRAN_XLATE)
 
@@ -170,6 +170,7 @@ echo AIX negative time value checking has been enabled
 ,
 )
 
+
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
@@ -201,7 +202,7 @@ if test "$DISABLE_MPI_IO" = no ; then
 AC_CHECK_FUNC(MPI_File_open,
               AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt,
 	      AC_CHECK_LIB(mpio,MPI_File_open, 
-                AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS}-lmpio",
+                AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio",
                 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
                 HAVE_MPI_IO=/dev/null)
 )
@@ -212,6 +213,7 @@ fi
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
 
 AC_MSG_CHECKING(fortran symbols)
+
 if test -n "$F77" -a "$F77" != no ; then
   /bin/rm -f ffunc.f flink.c
   echo "      subroutine f_fun()" > ffunc.f
