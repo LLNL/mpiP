@@ -1,0 +1,20 @@
+
+set baseSize [ expr 256 * 8 ]
+set currAvrg $baseSize
+
+proc checkMessOutput { text type count avrg } {
+  set baseSize [ expr 256 * 8 ]
+  set currAvrg [ format "%.3g" $avrg ]
+  set currTot  [ format "%.3g" $avrg ]
+  regsub "\\+" $currAvrg "\\\\+" currAvrg
+  regsub "\\+" $currTot "\\\\+" currTot
+#  send_user "currAvrg = $currAvrg\n"
+#  send_user "currTot  = $currTot\n"
+  checkOutput "$text +\[0-9\]+ +$count +$currTot +$currAvrg" "Message size check:"
+}
+
+foreach op { Bsend Ibsend Irsend Isend Issendr Rsend Send Ssend } {
+  checkMessOutput $op "Message size check:" 1 $currAvrg
+  set currAvrg [ expr $currAvrg + $baseSize ]
+}
+
