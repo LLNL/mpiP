@@ -373,7 +373,7 @@ mpiPi_query_src (callsite_stats_t * p)
 }
 
 
-void
+int
 mpiPi_mergeResults ()
 {
   int ac;
@@ -390,7 +390,7 @@ mpiPi_mergeResults ()
     {
       mpiPi_msg_warn
 	("Collector found no records to merge. Omitting report.\n");
-      return;
+      return 0;
     }
 
   /* gather global data at collector */
@@ -556,6 +556,8 @@ mpiPi_mergeResults ()
       /* clean up */
       close_bfd_executable ();
     }
+
+  return 1;
 }
 
 void
@@ -715,8 +717,8 @@ mpiPi_finalize ()
 
   /* collect results and publish */
   mpiPi_collect_basics ();
-  mpiPi_mergeResults ();
-  mpiPi_publishResults ();
+  if ( mpiPi_mergeResults () )
+    mpiPi_publishResults ();
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
