@@ -1,0 +1,6 @@
+
+proc foo_exit {} {}
+proc foo_version {} {}
+set pool pdebug
+set rmpool 0
+
