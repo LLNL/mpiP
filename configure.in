@@ -81,10 +81,10 @@ DISABLE_UNWIND=
 )
 
 AC_PROG_RANLIB
-AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc gcc cc icc, mpicc)
-AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC c++ g++ CC cxx icc, mpiCC)
-AC_CHECK_PROGS(F77, mpxlf_r xlf_r mpif77 f77 g77 pgf77 fort ifc, mpif77)
-AC_CHECK_PROGS(LAUNCH, poe prun mpirun, mpirun)
+AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
+AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC cmpic++ c++ g++ CC cxx icc, mpiCC)
+AC_CHECK_PROGS(F77, mpxlf_r xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc, mpif77)
+AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
 
 AC_CHECK_HEADER(demangle.h, AC_DEFINE(HAVE_DEMANGLE_H))
 AC_CHECK_LIB(intl,dcgettext__)
