@@ -15,6 +15,7 @@ FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 
 CSRCS =	0-simple.c \
+	0-simple-c++.C \
 	1-hot-potato.c \
 	2-pcontrol.c \
 	3-stacktrace.c \
@@ -23,7 +24,8 @@ CSRCS =	0-simple.c \
 	6-nonblock.c \
 	7-nonblock-waitall.c \
 	8-test.c \
-	9-test-mpip-time.c 
+	9-test-mpip-time.c \
+	10-mess-size.c
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
