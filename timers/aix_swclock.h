@@ -38,6 +38,7 @@ mpiTi_timer_t;
 #define mpiTi_GETTIMEDIFF(timer,end_addr,start_addr) (((*(end_addr))-(*(start_addr)))/((timer)->incr/1000000))
 #define mpiTi_PRINTTIMEDIFF(timer,end_addr,start_addr) {printf("Time diff is %lld usecs.\n",mpiTi_GETTIMEDIFF(timer,end_addr,start_addr));}
 
+#define mpiPi_TIMER_NAME "swclockRead"
 #endif
 
 /* eof */
