@@ -48,6 +48,12 @@ echo Using ld flags: $withval
 )
 AC_SUBST(LDFLAGS)
 
+AC_SUBST(CFLAGS)
+if test -z ${FFLAGS} ; then
+  FFLAGS=${CFLAGS}
+fi
+AC_SUBST(FFLAGS)
+
 AC_ARG_WITH(libs,
 [  --with-libs             Specifies libraries (-llib1 -llib2).],
 LIBS=$withval

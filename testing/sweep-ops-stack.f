@@ -72,6 +72,7 @@ c ---  the mpi features that sweep3D uses.
      &     MPI_MAX,MPI_COMM_WORLD,ierr)
         print *,'allreduce double p placed ', rdarray(1), 
      &    ' in rarray(1)'
+        print *,'before runtest return.'
       return
       end
 
