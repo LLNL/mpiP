@@ -132,7 +132,6 @@ typedef struct _mpiPi_t
   char *envStr;
   FILE *stdout_;
   FILE *stderr_;
-  mpiPi_TIMER apptimer;
   mpiPi_TIME startTime;
   mpiPi_TIME endTime;
 

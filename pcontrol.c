@@ -29,8 +29,8 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       if(! mpiPi.enabled)
 	mpiPi_msg_warn("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
       
-      mpiPi_GETTIME (&mpiPi.timer, &mpiPi.endTime);
-      dur = (mpiPi_GETTIMEDIFF (&mpiPi.timer, &mpiPi.endTime, &mpiPi.startTime)/1000000.0);
+      mpiPi_GETTIME (&mpiPi.endTime);
+      dur = (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime)/1000000.0);
       printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
       mpiPi.cumulativeTime += dur;
     }
@@ -45,7 +45,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
 
       mpiPi.enabled = 1;
       mpiPi.enabledCount++;
-      mpiPi_GETTIME (&mpiPi.timer, &mpiPi.startTime);
+      mpiPi_GETTIME (&mpiPi.startTime);
     }
 
     return MPI_SUCCESS;
