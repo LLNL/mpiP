@@ -1,8 +1,9 @@
 c --- a simple FORTRAN program to test linking to mpi.
 
-c      include mpif.h
 
       program simple
+
+      include 'mpif.h'
 
       integer info
       integer rank
