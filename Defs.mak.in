@@ -40,6 +40,7 @@ endif
 ifeq ($(OS),Linux)
   ifeq ($(ARCH),i686)
     CPPFLAGS += -DIA32
+    LIBS += -lm
   endif
   ifeq ($(ARCH),alpha)
     CPPFLAGS += -Dalpha
