@@ -259,13 +259,32 @@ mpiPi_profile_print (FILE * fp)
   {
     int ac;
     callsite_src_id_cache_entry_t **av;
+    int fileLenMax = 15;
+    int funcLenMax = 25;
 
     h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
     sprintf (buf, "Callsites: %d", ac);
     qsort (av, ac, sizeof (void *), callsite_src_id_cache_sort_by_id);
     print_section_heading (fp, buf);
-    fprintf (fp, "%3s %3s %-15s %4s %-25s %-25s\n",
-	     "ID", "Lev", "File/Address", "Line", "Parent_Funct", "MPI_Call");
+
+    /* Find longest file and function names for formatting */
+    for (i = 0; i < ac; i++)
+      {
+	int j, currlen;
+	for (j = 0;
+	     (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL);
+	     j++)
+	  {
+            currlen = strlen(av[i]->filename[j]);
+            fileLenMax = currlen > fileLenMax ? currlen : fileLenMax;
+            currlen = strlen(av[i]->functname[j]);
+            funcLenMax = currlen > funcLenMax ? currlen : funcLenMax;
+          }
+      }
+
+    fprintf (fp, "%3s %3s %-*s %4s %-*s %-25s\n",
+	     "ID", "Lev", fileLenMax, "File/Address", "Line", funcLenMax, 
+             "Parent_Funct", "MPI_Call");
 
     for (i = 0; i < ac; i++)
       {
@@ -290,10 +309,12 @@ mpiPi_profile_print (FILE * fp)
               }
             else
               {
-                fprintf (fp, "%3d %3d %-15.15s %4d %-25s %s\n",
+                fprintf (fp, "%3d %3d %-*s %4d %-*s %s\n",
                          av[i]->id,
                          j,
+                         fileLenMax,
                          av[i]->filename[j], av[i]->line[j], 
+                         funcLenMax,
                          av[i]->functname[j],
                          (j ==
                           0) ? &(mpiPi.lookup[av[i]->op -
