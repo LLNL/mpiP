@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH USE_LIBDWARF DISABLE_MPI_IO USE_GETARG INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH USE_LIBDWARF DISABLE_MPI_IO ENABLE_FORTRAN_XLATE USE_GETARG INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
 ac_subst_files='HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -855,6 +855,7 @@ Optional Features:
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-mpi-io        Disable MPI-I/O reporting.
+  --disable-fortran-xlate Disable translation of Fortran opaque objects.
   --enable-getarg         Use getarg to get fortran command line args.
   --enable-check-time     Enable AIX check for negative time values.
 
@@ -1492,7 +1493,7 @@ fi;
 if test "${with_binutils_dir+set}" = set; then
   withval="$with_binutils_dir"
   BINUTILS_DIR=$withval
-LDFLAGS="${LDFLAGS} -L${BINUTILS_DIR}/lib"
+LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
 CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
 echo Using binutils-dir: $withval
 
@@ -1590,6 +1591,18 @@ else
 fi;
 
 
+# Check whether --enable-fortran-xlate or --disable-fortran-xlate was given.
+if test "${enable_fortran_xlate+set}" = set; then
+  enableval="$enable_fortran_xlate"
+  ENABLE_FORTRAN_XLATE=no
+echo Translation of FORTRAN opaque objects has been disabled.
+
+else
+  ENABLE_FORTRAN_XLATE=yes
+
+fi;
+
+
 # Check whether --enable-getarg or --disable-getarg was given.
 if test "${enable_getarg+set}" = set; then
   enableval="$enable_getarg"
@@ -1641,6 +1654,7 @@ _ACEOF
 echo AIX negative time value checking has been enabled
 
 fi;
+
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -3966,7 +3980,74 @@ _ACEOF
 
 fi
 
+  echo "$as_me:$LINENO: checking whether bfd_get_section_size is declared" >&5
+echo $ECHO_N "checking whether bfd_get_section_size is declared... $ECHO_C" >&6
+if test "${ac_cv_have_decl_bfd_get_section_size+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include "bfd.h"
+
+
+int
+main ()
+{
+#ifndef bfd_get_section_size
+  char *p = (char *) bfd_get_section_size;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_have_decl_bfd_get_section_size=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_have_decl_bfd_get_section_size=no
 fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_have_decl_bfd_get_section_size" >&5
+echo "${ECHO_T}$ac_cv_have_decl_bfd_get_section_size" >&6
+if test $ac_cv_have_decl_bfd_get_section_size = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_BFD_GET_SECTION_SIZE 1
+_ACEOF
+
+fi
+
+
+fi
+
 
 
 echo "$as_me:$LINENO: checking for bfd_boolean" >&5
@@ -4425,7 +4506,7 @@ if test $ac_cv_lib_mpio_MPI_File_open = yes; then
   cat >>confdefs.h <<\_ACEOF
 #define HAVE_MPI_IO 1
 _ACEOF
- HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS}-lmpio"
+ HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio"
 else
   echo "$as_me:$LINENO: result: MPI I/O symbols not found.  MPI I/O reporting deactivated." >&5
 echo "${ECHO_T}MPI I/O symbols not found.  MPI I/O reporting deactivated." >&6
@@ -4442,6 +4523,7 @@ fi
 
 echo "$as_me:$LINENO: checking fortran symbols" >&5
 echo $ECHO_N "checking fortran symbols... $ECHO_C" >&6
+
 if test -n "$F77" -a "$F77" != no ; then
   /bin/rm -f ffunc.f flink.c
   echo "      subroutine f_fun()" > ffunc.f
@@ -5122,6 +5204,7 @@ s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
 s,@STACKDEPTH@,$STACKDEPTH,;t t
 s,@USE_LIBDWARF@,$USE_LIBDWARF,;t t
 s,@DISABLE_MPI_IO@,$DISABLE_MPI_IO,;t t
+s,@ENABLE_FORTRAN_XLATE@,$ENABLE_FORTRAN_XLATE,;t t
 s,@USE_GETARG@,$USE_GETARG,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
