@@ -99,7 +99,6 @@ ifeq ($(DO_DEMANGLE),Compaq)
 endif
 
 
-CFLAGS	+= ${OPT}
 ifneq ($(ARCH),ppc64)
   CPPFLAGS+= -D${OS}
 endif
