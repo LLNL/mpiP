@@ -75,10 +75,10 @@ ifneq ($(DO_DEMANGLE),false)
   DEMANGLE_TARGET = libmpiPdmg.a
   MPIPCXXLIB = mpiPdmg
 ifeq ($(DO_DEMANGLE),IBM)
-  CPPFLAGS := "-I/usr/include" $(CPPFLAGS)
+  CPPFLAGS := -I/usr/include $(CPPFLAGS)
 endif
 ifeq ($(DO_DEMANGLE),Compaq)
-  CPPFLAGS := "-I/usr/include" $(CPPFLAGS)
+  CPPFLAGS := -I/usr/include $(CPPFLAGS)
   CXXLIBS += -lmld
 endif
 endif

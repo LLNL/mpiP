@@ -11,11 +11,11 @@ RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
 	
 # The flags to pass to runtest
 RUNTESTFLAGS =
-	
+TEST = 	
 # Execute the tests 
 check: site.exp all 
 	$(RUNTEST) $(RUNTESTFLAGS) \
-	--tool testing --srcdir .
+	--tool testing --srcdir . $(TEST)
 	
 # Make the local config file
 site.exp: ./config.status Makefile
