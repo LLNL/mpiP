@@ -38,8 +38,8 @@ spawn -noecho $launch $pre_args $pre_procs $test_targ $post_args $post_procs
 expect { 
    "Collector found no records to merge."   { 
      pass "$test passed" 
-     close
-     wait
+#     close
+#     wait
      } 
    timeout { fail "$test timed out\n\n" }
    eof     { fail "$test failed\n\n" }
