@@ -360,7 +360,8 @@ mpiPi_profile_print (FILE * fp)
 	  sMax = max (av[i]->maxDur, sMax);
 	  sMin = min (av[i]->minDur, sMin);
 
-	  if ((100.0 * av[i]->cumulativeTime /
+	  if (mpiPi.global_task_info[av[i]->rank].mpi_time != 0 &&
+              (100.0 * av[i]->cumulativeTime /
 	       mpiPi.global_task_info[av[i]->rank].mpi_time)
 	      >= mpiPi.reportPrintThreshold)
 	    {
