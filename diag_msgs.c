@@ -21,6 +21,7 @@ static char *rcsid =
 
 #include "mpiPi.h"
 
+#if ! defined(ppc64)
 
 void
 mpiPi_msg (char *fmt, ...)
@@ -74,4 +75,34 @@ mpiPi_msg_warn (char *fmt, ...)
   fflush (fp);
 }
 
+#else  /* defined(ppc64)  as of 1/5/05 get SIGBUS fault with these funcs */
+
+void
+mpiPi_msg (char *fmt, ...)
+{
+  return;
+}
+
+void
+mpiPi_abort (char *fmt, ...)
+{
+  return;
+}
+
+void
+mpiPi_msg_debug (char *fmt, ...)
+{
+  return;
+}
+
+void
+mpiPi_msg_warn (char *fmt, ...)
+{
+  return;
+}
+
+#endif
+
 /* eof */
+
+
