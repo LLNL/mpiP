@@ -41,12 +41,23 @@ static bfd_vma pc;
 static const char *filename;
 static const char *functionname;
 static unsigned int line;
-static boolean found;
 static bfd *abfd = NULL;
 
-static boolean with_functions = 0;	/* -f, show function names.  */
-static boolean do_demangle = 0;	/* -C, demangle names.  */
-static boolean base_names = 1;	/* -s, strip directory names.  */
+/*  BFD boolean and bfd_boolean types have changed through versions.
+    It looks like bfd_boolean will be preferred.                     */
+#ifdef BFD_TRUE_FALSE
+typedef boolean bfd_boolean;
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+static bfd_boolean found;
+static bfd_boolean with_functions = 0;	/* -f, show function names.  */
+static bfd_boolean do_demangle = 0;	/* -C, demangle names.  */
+static bfd_boolean base_names = 1;	/* -s, strip directory names.  */
+
 
 void
 find_address_in_section (abfd, section, data)
@@ -124,7 +135,7 @@ find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   pc = bfd_scan_vma (buf, NULL, 16);
   /* jsv hack - trim high bit off of address */
   /*  pc &= !0x10000000; */
-  found = false;
+  found = FALSE;
 
   bfd_map_over_sections (abfd, find_address_in_section, (PTR) NULL);
 
