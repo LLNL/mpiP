@@ -834,23 +834,6 @@ def CreateWrapper(funct, olist):
     xlateCount = 0
     #  Input types to translate
     xlateTargetTypes = [ "MPI_Comm", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
-    #  Values that need to be translated before returning
-    xlateExitInfo = {}
-    xlateExitInfo["MPI_Cart_create"] = xlateEntry("Comm", "comm_cart")
-    xlateExitInfo["MPI_Cart_sub"] = xlateEntry("Comm", "comm_new")
-    xlateExitInfo["MPI_Cart_sub"] = xlateEntry("Comm", "comm_new")
-    xlateExitInfo["MPI_Comm_create"] = xlateEntry("Comm", "comm_out")
-    xlateExitInfo["MPI_Comm_remote_group"] = xlateEntry("Group", "group")
-    xlateExitInfo["MPI_Comm_split"] = xlateEntry("Comm", "comm_out")
-    xlateExitInfo["MPI_Graph_create"] = xlateEntry("Comm", "comm_graph")
-    xlateExitInfo["MPI_Group_incl"] = xlateEntry("Group", "group_out")
-    xlateExitInfo["MPI_Group_intersection"] = xlateEntry("Group", "group_out")
-    xlateExitInfo["MPI_Group_range_include"] = xlateEntry("Group", "newgroup")
-    xlateExitInfo["MPI_Group_range_exclude"] = xlateEntry("Group", "newgroup")
-    xlateExitInfo["MPI_Group_union"] = xlateEntry("Group", "group_out")
-    xlateExitInfo["MPI_Intercomm_create"] = xlateEntry("Comm", "comm_out")
-    xlateExitInfo["MPI_Intercomm_merge"] = xlateEntry("Comm", "comm_out")
-    xlateExitInfo["MPI_Op_create"] = xlateEntry("Op", "op")
         
     freelist = []
     
@@ -902,16 +885,15 @@ def CreateWrapper(funct, olist):
     for i in range(len(xlateVarNames)) :
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
-        if ( not (funct in xlateExitInfo and xlateVarName == xlateExitInfo[funct].varName) ) :        
-            if ( xlateVarName.count("array") > 0 ):
-                olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
-                olist.append("{\n  int i; \n")
-                olist.append("  for (i = 0; i < *count; i++) { \n")
-                olist.append("    c_" + xlateVarName + "[i] = " + xlateType + "_f2c(" + xlateVarName + "[i]);\n")
-                olist.append("  }\n}\n")
-                freelist.append("c_"+xlateVarName);
-            else:
-                olist.append("c_" + xlateVarName + " = " + xlateType + "_f2c(*" + xlateVarName + ");\n")
+        if ( xlateVarName.count("array") > 0 ):
+            olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
+            olist.append("{\n  int i; \n")
+            olist.append("  for (i = 0; i < *count; i++) { \n")
+            olist.append("    c_" + xlateVarName + "[i] = " + xlateType + "_f2c(" + xlateVarName + "[i]);\n")
+            olist.append("  }\n}\n")
+            freelist.append("c_"+xlateVarName);
+        else:
+            olist.append("c_" + xlateVarName + " = " + xlateType + "_f2c(*" + xlateVarName + ");\n")
             
     olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
     
@@ -929,7 +911,7 @@ def CreateWrapper(funct, olist):
         if (fdict[funct].paramDict[i].pointerLevel == 0) \
            and (fdict[funct].paramDict[i].arrayLevel == 0) \
            and (fdict[funct].paramDict[i].basetype != "void"):
-            olist.append("  " + argname)
+            olist.append(argname)
         elif (fdict[funct].paramDict[i].pointerLevel > 0):
             olist.append(argname)
         else:
@@ -939,13 +921,28 @@ def CreateWrapper(funct, olist):
 
     olist.append(" );\n\n")
     olist.append("*ierr = rc;\n")
-    
-    #  Generate post-call translation code if necessary and free any allocated memory
-    if ( doOpaqueXlate is True ) :
-        if ( funct in xlateExitInfo ) :
-            olist.append("*" + xlateExitInfo[funct].varName + " = MPI_" + xlateExitInfo[funct].mpiType + "_c2f(c_" + xlateExitInfo[funct].varName + ");\n")
-        for freeSym in freelist:
-            olist.append("free("+freeSym+");\n")
+
+    #  Generate post-call translation code if necessary
+    for i in range(len(xlateVarNames)) :
+        xlateVarName = xlateVarNames[i]
+        xlateType = xlateTypes[i]
+        if ( xlateVarName.count("array") > 0 ):
+            olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
+            olist.append("{\n  int i; \n")
+            olist.append("  for (i = 0; i < *count; i++) { \n")
+            olist.append("    " + xlateVarName + "[i] = " + xlateType + "_c2f(c_" + xlateVarName + "[i]);\n")
+            olist.append("  }\n}\n")
+        else:
+            olist.append("*" + xlateVarName + " = " + xlateType + "_c2f(c_" + xlateVarName + ");\n")
+    for freeSym in freelist:
+        olist.append("free("+freeSym+");\n")
+                
+#    #  Generate post-call translation code if necessary and free any allocated memory
+#    if ( doOpaqueXlate is True ) :
+#        if ( funct in xlateExitInfo ) :
+#            olist.append("*" + xlateExitInfo[funct].varName + " = MPI_" + xlateExitInfo[funct].mpiType + "_c2f(c_" + xlateExitInfo[funct].varName + ");\n")
+#        for freeSym in freelist:
+#            olist.append("free("+freeSym+");\n")
 
     olist.append("return;\n" + "}" + " /* " + string.lower(funct) + " */\n")
 
