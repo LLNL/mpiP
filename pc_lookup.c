@@ -92,6 +92,8 @@ char* mpiPdemangle(const char* mangledSym)
 #ifdef HAVE_DEMANGLE_H
 #include "demangle.h"
 #else
+#define DMGL_PARAMS    (1 << 0)
+#define DMGL_ANSI      (1 << 1)
 extern char *cplus_demangle (const char *mangled, int options);
 #endif
 
