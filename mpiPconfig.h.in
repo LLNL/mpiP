@@ -14,6 +14,9 @@
 /* Define if using libunwind */
 #undef HAVE_LIBUNWIND
 
+/* Define if MPI I/O function are present */
+#undef HAVE_MPI_IO
+
 #endif /* _CONFIG_H */
 
 /* 

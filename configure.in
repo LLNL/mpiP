@@ -99,6 +99,10 @@ AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr,,,-lintl -liberty))
 if test -z "$DISABLE_LIBUNWIND" ; then
 AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
 fi
+AC_CHECK_FUNC(MPI_File_open, AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt, 
+AC_MSG_RESULT("MPI I/O symbols not found.  MPI I/O reporting deactivated.")
+HAVE_MPI_IO=/dev/null
+)
 
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
 AC_MSG_CHECKING(fortran symbols)
@@ -174,5 +178,6 @@ AC_SUBST(F77_VENDOR,$F77_VENDOR)
 AC_SUBST(MPIPFLIB,$MPIPFLIB)
 AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
+AC_SUBST_FILE(HAVE_MPI_IO)
 
-AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h)
+AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt)
