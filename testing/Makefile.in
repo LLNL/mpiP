@@ -20,7 +20,7 @@ CSRCS =	0-simple.c \
 	7-nonblock-waitall.c \
 	8-test.c \
 	9-test-mpip-time.c 
-FSRCS =	0-simplef.f 
+FSRCS =	0-simplef.f sweep-ops.f
 EXES = $(CSRCS:.c=.exe)
 EXES += $(FSRCS:.f=.exe)
 
@@ -38,7 +38,7 @@ all: ${EXES}
 	${FC} ${FFLAGS} $< -o $@ ${LDFLAGS} ${FLIBS}
 
 clean::
-	rm -f ${EXES} *.mpiP
+	rm -f ${EXES} *.mpiP *.o
 
 include $(srcdir)/../Rules.mak
 
