@@ -29,6 +29,9 @@
 /* Define to force use of gettimeofday for timing */
 #undef USE_GETTIMEOFDAY
 
+/* Define to use clock_gettime for timing */
+#undef USE_CLOCK_GETTIME
+
 #endif /* _CONFIG_H */
 
 /* 
