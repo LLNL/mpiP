@@ -444,7 +444,7 @@ void getProcCmdLine(int* ac, char** av, int max_args)
       if ( fread(inbuf, 1, MPIP_MAX_ARG_STRING_SIZE, infile) > 0 )
       {
         arg_ptr = inbuf;
-	while ( *arg_ptr != NULL )
+	while ( *arg_ptr != 0 )
 	{
           av[i] = strdup(arg_ptr);
 	  arg_ptr += strlen(av[i]) + 1;
