@@ -107,7 +107,9 @@ endif
 
 
 CFLAGS	+= ${OPT}
-CPPFLAGS+= -D${OS}
+ifneq ($(ARCH),ppc64)
+  CPPFLAGS+= -D${OS}
+endif
 LFLAGS	+=
 LIBS	+=
 
