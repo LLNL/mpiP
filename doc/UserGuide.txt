@@ -1,0 +1,294 @@
+
+	      mpiP: Lightweight, scalable MPI profiling
+
+			    Jeffrey Vetter
+			  (vetter3@llnl.gov)
+
+			      Version 2
+
+			   1 September 2001
+				   
+
+
+INTRODUCTION
+------------
+
+mpiP is a lightweight profiling library for MPI applications. Because
+it only collects statistical information about MPI functions, mpiP
+generates considerably less overhead and much less data than tracing
+tools. All the information captured by mpiP is task-local. It only
+uses communication at the end of the application run to merge results
+from all of the tasks into one output file.
+
+This is BETA software. However, we have tested mpiP on a variety of
+C/C++/Fortran applications from 2 to 1536 tasks. Please send all your
+comments, questions, and ideas for enhancements to vetter@llnl.gov.
+
+USING MPIP
+----------
+
+Using mpiP is very simple. Because it gathers MPI information through
+the MPI profiling layer, mpiP is a link-time library. That is, you
+don't have to recompile your application to use mpiP. Note that you
+might have to recompile to include the '-g' option. This is important
+if you want mpiP to decode the PC to a source code filename and line
+number automatically. mpiP will work without '-g', but mileage may
+vary.
+
+To compile a simple program on LLNL AIX, you need to add the following
+libraries to your compile/link line: 
+
+	  -L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl -lm
+
+For example, the new mpiP link line becomes
+
+ mpcc -g -O mpi-foo.c -o mpi-foo.exe -L${mpiP_root}/lib -lmpiP \
+  -lbfd -liberty -lintl -lm
+
+from 
+
+ mpcc -O mpi-foo.c -o mpi-foo.exe -lm
+
+Make sure the mpiP library appears before the MPI library on your link
+line. The three libraries (-lbfd -liberty -lintl) provide support for
+decoding the symbol information; they are part of GNU binutils.
+
+Run your application. You can verify that mpiP is working by
+identifying the header and trailer in standard out...
+
+   0:mpiP: 
+   0:mpiP: mpiP V2.3 (Build Aug 28 2001/11:55:57)
+   0:mpiP: Direct questions and errors to Jeffrey Vetter <vetter@llnl.gov>
+   0:mpiP: 
+   0:mpiP: 
+   0:mpiP: found 21557 symbols in file [./9-test-mpip-time.exe]
+   0:mpiP: 
+   0:mpiP: Storing mpiP output in [./9-test-mpip-time.exe.4.37266.mpiP].
+   0:mpiP: 
+
+By default, the output file is written to the current directory of the
+application. mpiP files are always much smaller than trace files, so
+writing them to this directory is safe.
+
+
+MPIP CONFIGURATION
+------------------
+
+mpiP has several configurable parameters that a user can set via an
+enviroment variable: MPIP. The setting for MPIP looks like
+command-line parameters: "-t 10 -k 2".
+
+Currently, mpiP has several configurable parameters.
+
+  -g	   enables MPIP debug mode (default=disabled)
+
+  -s n	   sets hash table size to <n> (default=256)
+
+  -f dir   records output file in <dir> (default=.)
+
+  -k n	   sets callsite stack walking depth to <n> (default=1)
+
+  -t x	   sets report print threshold to <x>, where <x> is the 
+	   MPI percentage of time for a callsite (default=0.0)
+
+  -o	   disabled MPIP at MPI_Init. Use with Pcontrol to limit
+	   MPIP analysis to specific code regions.
+
+For example, to set the callsite stack walking depth to 2 and the
+report print threshold to 10%, you simply need to define the MPIP
+string in your environment:
+
+    export MPIP="-t 10.0 -k 2"
+
+mpiP prints a message at initialization if it successfully finds this
+MPIP variable.
+
+
+ANALYZING MPIP OUTPUT
+--------------------
+
+Here's some sample output from mpiP with an application that has 4 MPI
+calls. I'll break it down by sections below. Here's the experiment setup.
+
+Note that MPIP does not capture information about ALL MPI calls. Local
+calls, such as MPI_Comm_size, are omitted from the profiling library
+measurement to reduce perturbation and mpiP output.
+
+Here's the test code.
+
+  sleeptime = 10;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (comm, &nprocs);
+  MPI_Comm_rank (comm, &rank);
+  MPI_Barrier (comm);
+  switch (rank)
+    {
+    case 0:
+      sleep (sleeptime);        /* slacker! holding everyone else up */
+      break;
+    default:
+      break;
+    }
+  MPI_Barrier (comm);
+  MPI_Finalize ();
+
+The code was compiled with
+
+  mpcc -g -g -DAIX 9-test-mpip-time.c -o 9-test-mpip-time.exe  \
+       -L.. -L/g/g2/vetter/AIX/lib  -lmpiP -lbfd -liberty -lintl
+
+Environment variables were set as
+
+  export MPIP="-t 10.0"
+
+The example was executed on snow like this
+
+  snow01 testing - ./9-test-mpip-time.exe -procs 4 -nodes 1
+
+This experiment produced an output file
+
+  ./9-test-mpip-time.exe.4.37266.mpiP
+
+that we can now analyze. Header information provides basic
+information about your performance experiment.
+
+@ mpiP
+@ Command : ./9-test-mpip-time.exe 
+@ Version                  : 2.3
+@ MPIP Build date          : Aug 28 2001, 11:55:57
+@ Start time               : 2001 08 28 12:07:18
+@ Stop time                : 2001 08 28 12:07:28
+@ MPIP env var             : -t 10.0
+@ Collector Rank           : 0
+@ Collector PID            : 37266
+@ Final Output Dir         : .
+@ MPI Task Assignment      : 0 snow06.llnl.gov
+@ MPI Task Assignment      : 1 snow06.llnl.gov
+@ MPI Task Assignment      : 2 snow06.llnl.gov
+@ MPI Task Assignment      : 3 snow06.llnl.gov
+
+This next section above provides an overview of the application's time
+in MPI. Apptime is the wall-clock time from the end of MPI_Init until
+the beginning of MPI_Finalize. MPI_Time is the wall-clock time for all
+the MPI calls contained within Apptime. MPI% shows the ratio of this
+MPI_Time to Apptime. The asterisk (*) is the aggregate line for the
+entire application.
+
+---------------------------------------------------------------------------
+@--- MPI Time (seconds) ---------------------------------------------------
+---------------------------------------------------------------------------
+Task    AppTime    MPITime     MPI%
+   0         10   0.000243     0.00
+   1         10         10    99.92
+   2         10         10    99.92
+   3         10         10    99.92
+   *         40         30    74.94
+
+The callsite section identifies all the MPI callsites within the
+application. The first number is the callsite ID for this mpiP
+file. The next column shows the type of MPI call (w/o the MPI_
+prefix). The name of the function that contains this MPI call is next,
+followed by the filename and line number. Finally, the last column
+shows the PC, or program counter for that MPI callsite. Note that the
+default setting for callsite stack walk depth is 1. Other settings
+will enumerate callsites by the entire stack trace rather than the
+single callsite alone.
+
+---------------------------------------------------------------------------
+@--- Callsites: 2 ---------------------------------------------------------
+---------------------------------------------------------------------------
+ ID Lev File            Line Parent_Funct         MPI_Call            
+  1   0 9-test-mpip-time.c   47 .main                          Barrier
+  2   0 9-test-mpip-time.c   56 .main                          Barrier
+
+The aggregate time section is a very quick overview of the top twenty
+MPI callsites that consume the most aggregate time in your
+application. Call identifies the type of MPI function. Site provides
+the callsite ID (as listed in the callsite section). Time is the
+aggregate time for that callsite in milliseconds. The final two
+columns show the ratio of that aggregate time to the total application
+time and to the total MPI time, respectively.
+
+---------------------------------------------------------------------------
+@--- Aggregate Time (top twenty, descending, milliseconds) ----------------
+---------------------------------------------------------------------------
+Call                 Site      Time     App%    MPI%
+Barrier                 2      3e+04   74.94  100.00
+Barrier                 1      0.547    0.00    0.00
+
+The final section is the ad nauseum listing of the statistics for each
+callsite across all tasks, followed by an aggregate line (indicated by
+an asterisk in the Rank column).
+
+---------------------------------------------------------------------------
+@--- Callsite statistics (all, milliseconds): 8 ---------------------------
+---------------------------------------------------------------------------
+Name              Site Rank  Count      Max     Mean      Min   App%   MPI%
+Barrier              1    0      1    0.107    0.107    0.107   0.00  44.03
+Barrier              1    *      4    0.174    0.137    0.107   0.00   0.00
+
+Barrier              2    0      1    0.136    0.136    0.136   0.00  55.97
+Barrier              2    1      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    2      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    3      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00
+
+
+Remember that we configured MPIP to not print lines where MPI% was
+less than 10%. All aggregate lines are printed regardless of the
+configuration settings.
+
+Column	Description
+
+Name	Name of the MPI function at that callsite.
+
+Site	Callsite ID as listed in the callsite section above.
+
+Rank	Task rank in MPI_COMM_WORLD.
+
+Count	Number of times this call was executed.
+
+Max	Maximum wall-clock time for one call.
+
+Mean	Arithmetic mean of the wall-clock time for one call. 
+
+Min	Minimum wall-clock time for one call.
+
+App%	Ratio of time for this call to the overall application time for 
+	each task.
+
+MPI%	Ratio of time for this call to the overall MPI time for each 
+	task.
+
+The aggregate result for each call has the same measurement meaning;
+however, the statistics are gathered across all tasks and compared
+with the aggregate application and MPI times.
+
+
+CAVEATS
+-------
+
+- If mpiP has problems with the source code translation, you might be
+able to decode the program counters on LLNL AIX systems with some of
+the following techniques. You can use instmap, addr2line, or look at
+the assembler code itself.
+
+- Compiler transformations like loop unrolling can sometimes make one
+source code line appear as many different PCs. You can verify this by
+looking at the assembler. In my experience, both instmap and addr2line
+do a pretty good job of mapping these transformed PCs into a filename
+and line number.
+
+	instmap - an IBM utility
+	addr2line - a gnu tool
+	look at the assembler listing, or with GNU's objdump (-d -S)
+	use Totalview to translate the PC
+
+- The source code translation fails on IBM AIX Fortran compilers with
+a version number prior to 7.0. (Most 1LLNL AIX Fortran compilers have
+been upgraded to 7.1).
+
+- C++ name demangeling for function names has not been totally
+implemented. Stay tuned.
+
+
