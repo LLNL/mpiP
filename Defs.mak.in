@@ -47,18 +47,31 @@ ifeq ($(OS),Linux)
   endif
 endif
 
+TARGET	 = libmpiP.a
+MPIPLIB  = mpiP
+MPIPFLIB = mpiP
+
+FORTRAN_TARGET =
+
+ifeq (f77, $(FC))
+#  Compaq Fortran
+else 
+    ifneq (,$(findstring f77, $(FC)))
+      FORTRAN_FLAG = -DGNU_Fortran
+      FORTRAN_TARGET = libmpiPf77.a
+      MPIPFLIB = mpiPf77
+    endif
+endif
+
+ifneq (,$(findstring ifc, $(FC)))
+    FORTRAN_FLAG   = -DIntel_Fortran
+    FORTRAN_TARGET = libmpiPifc.a
+    MPIPFLIB = mpiPifc
+endif
+
 ifneq (,$(findstring xlf, $(FC)))
     CPPFLAGS += -DAIX
 endif
-ifneq (,$(findstring f77, $(FC)))
-    CPPFLAGS += -DGNU_Fortran
-    TARGET = libmpiPf77.a
-endif
-ifneq (,$(findstring ifc, $(FC)))
-    CPPFLAGS += -DIntel_Fortran
-    TARGET = libmpiPifc.a
-endif
-
 
 CFLAGS	+= ${OPT}
 CPPFLAGS+= -D${OS}
