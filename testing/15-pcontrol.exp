@@ -1,0 +1,16 @@
+
+##  Test-specific information
+#
+set test_title "15-pcontrol.exe : test profiling activation/deactivation control"
+set test "15-pcontrol.exe"
+set procs 2
+set env(MPIP) "-o"
+set source_check_file "testing/15-pcontrol.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
