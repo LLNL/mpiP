@@ -26,7 +26,8 @@ CSRCS =	0-simple.c \
 	8-test.c \
 	9-test-mpip-time.c \
 	10-coll-mess-size.c \
-	11-p2p-mess-size.c
+	11-p2p-mess-size.c \
+	12-null-null.c
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
 TEXES = $(CSRCS:.c=.exe)

@@ -1,0 +1,17 @@
+
+##  Test-specific information
+#
+
+set test_title "12-null-null-exe: test for NULL MPI_Init args"
+set test "12-null-null.exe"
+set test_targ "./testing/$test"
+set procs 2
+set source_check_file "testing/12-null-null.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
