@@ -4,7 +4,7 @@ dnl These two lines disable the cache.
 define([AC_CACHE_LOAD], )
 define([AC_CACHE_SAVE], )
 
-AC_INIT(mpiP, 2.6, mpip-help@llnl.gov)
+AC_INIT(mpiP, 2.7, mpip-help@llnl.gov)
 AC_PREREQ(2.13)
 AC_CONFIG_HEADER(mpiPconfig.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -85,6 +85,13 @@ echo Profiling of MPI I/O has been disabled.
 DISABLE_MPI_IO=no
 )
 AC_SUBST(DISABLE_MPI_IO)
+
+AC_ARG_WITH(gettimeofday,
+[  --with-gettimeofday     Use gettimeofday for timing.],
+AC_DEFINE(USE_GETTIMEOFDAY)
+echo Using gettimeofday for timing.
+,
+)
 
 AC_ARG_ENABLE(getarg,
 [  --enable-getarg         Use getarg to get fortran command line args.],
