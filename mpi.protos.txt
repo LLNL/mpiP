@@ -124,6 +124,7 @@ directives
 	nowrapper
 directives
 
+
 @@@  MPI I/O Routines
 int MPI_File_close (MPI_File *fh)
 
@@ -146,6 +147,7 @@ int MPI_File_write (MPI_File fh, void *buf, int count, MPI_Datatype datatype, MP
 int MPI_File_write_all (MPI_File fh, void *buf, int count, MPI_Datatype datatype, MPI_Status *status)
 
 int MPI_File_write_at (MPI_File fh, MPI_Offset offset, void *buf, int count, MPI_Datatype datatype, MPI_Status *status)
+
 
 int MPI_Finalize ( void )
 directives

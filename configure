@@ -310,7 +310,7 @@ ac_includes_default="\
 #endif"
 
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS DO_DEMANGLE STACKDEPTH RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
-ac_subst_files=''
+ac_subst_files='HAVE_MPI_IO'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3807,6 +3807,90 @@ fi
 
 
 fi
+echo "$as_me:$LINENO: checking for MPI_File_open" >&5
+echo $ECHO_N "checking for MPI_File_open... $ECHO_C" >&6
+if test "${ac_cv_func_MPI_File_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char MPI_File_open (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char MPI_File_open ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_MPI_File_open) || defined (__stub___MPI_File_open)
+choke me
+#else
+char (*f) () = MPI_File_open;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != MPI_File_open;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_MPI_File_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_MPI_File_open=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_MPI_File_open" >&5
+echo "${ECHO_T}$ac_cv_func_MPI_File_open" >&6
+if test $ac_cv_func_MPI_File_open = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI_IO 1
+_ACEOF
+ HAVE_MPI_IO=mpi.io.protos.txt
+else
+  echo "$as_me:$LINENO: result: \"MPI I/O symbols not found.  MPI I/O reporting deactivated.\"" >&5
+echo "${ECHO_T}\"MPI I/O symbols not found.  MPI I/O reporting deactivated.\"" >&6
+HAVE_MPI_IO=/dev/null
+
+fi
+
 
 echo "$as_me:$LINENO: checking fortran symbols" >&5
 echo $ECHO_N "checking fortran symbols... $ECHO_C" >&6
@@ -3901,7 +3985,8 @@ FORTRAN_FLAG=$FORTRAN_FLAG
 FORTRAN_TARGET=$FORTRAN_TARGET
 
 
-                                                  ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h"
+
+                                                            ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt"
 
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -4377,6 +4462,7 @@ do
   "testing/Makefile" ) CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
   "Check.mak" ) CONFIG_FILES="$CONFIG_FILES Check.mak" ;;
   "mpiPi.h" ) CONFIG_FILES="$CONFIG_FILES mpiPi.h" ;;
+  "mpi.protos.txt" ) CONFIG_FILES="$CONFIG_FILES mpi.protos.txt" ;;
   "mpiPconfig.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mpiPconfig.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -4497,6 +4583,8 @@ s,@FORTRAN_FLAG@,$FORTRAN_FLAG,;t t
 s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
+/@HAVE_MPI_IO@/r $HAVE_MPI_IO
+s,@HAVE_MPI_IO@,,;t t
 CEOF
 
 _ACEOF
