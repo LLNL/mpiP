@@ -11,8 +11,8 @@
       CALL MPI_COMM_RANK( MPI_COMM_WORLD, rank, ierr )
       CALL MPI_COMM_SIZE( MPI_COMM_WORLD, wsize, ierr )
 
-      starg = modulo( rank+1, wsize )
-      rtarg = modulo( rank+wsize-1, wsize )
+      starg = mod( rank+1, wsize )
+      rtarg = mod( rank+wsize-1, wsize )
 
       print *, 'rank ', rank, ' has starget ', starg
       print *, 'rank ', rank, ' has rtarget ', rtarg
