@@ -380,7 +380,7 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = p_xargc;
     argv = p_xargv;
   }
-#elif defined(Intel_Fortran)
+#elif defined(Intel_Fortran) && !defined(USE_GETARG)
   {
     extern int xargc;
     extern char **xargv;
@@ -412,25 +412,34 @@ void
 mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 {
   int i;
-  extern int mpiPi_debug;
 
+#if defined(USE_GETARG) && defined(Intel_Fortran)
+
+#define EXECUTABLE_LEN 2048
+{
+  char buf[EXECUTABLE_LEN];
+  int len, mpiPi_argc;
+  extern void mpipi_get_fortran_argc(int*);
+  extern void mpipi_get_fortran_arg(int, int, char*, int*);
+
+  mpipi_get_fortran_argc(&mpiPi_argc);
+  *ac = mpiPi_argc;
+  mpiPi_msg_debug("ac is %d\n", *ac);
+
+  for ( i = 0; i <= mpiPi_argc; i++ )
+  {
+    mpipi_get_fortran_arg(i,EXECUTABLE_LEN,buf,&len);
+    buf[len<EXECUTABLE_LEN ? len : EXECUTABLE_LEN-1] = 0;
+    av[i] = strdup(buf);
+  }
+}
+#else
   *ac = argc;
-  if (*ac == 0 && mpiPi_debug)
-    {
-      printf ("argc = 0\n");
-    }
+
   for (i = 0; (i < *ac) && (i < av_len); i++)
-    {
       av[i] = strdup(argv[i]);
-      if (mpiPi_debug)
-	{
-	  printf ("argv[%d] = %s\n", i, av[i]);
-	}
-    }
+#endif
 }
 
 /* eof */
 
-
-
-/* eof */
