@@ -19,6 +19,7 @@ static char *rcsid =
 
 #include <string.h>
 #include <float.h>
+#include <unistd.h>
 #include "mpiPi.h"
 
 static int
@@ -675,9 +676,13 @@ mpiPi_publishResults ()
 	  }
       }
 
-    printCount++;
-    sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
-             mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+    do
+    {
+      printCount++;
+      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+               mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+    }
+    while ( access ( mpiPi.oFilename, F_OK ) == 0 ) ;
 
     fp = fopen (mpiPi.oFilename, "w");
   }
