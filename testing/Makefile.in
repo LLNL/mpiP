@@ -35,7 +35,7 @@ CSRCS =	0-simple.c \
 	timer-info.c
 
 
-FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
+FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
