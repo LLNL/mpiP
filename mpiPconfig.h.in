@@ -20,6 +20,9 @@
 /* Define if bfd_boolean not defined */
 #undef BFD_TRUE_FALSE
 
+/* Define to activate check for negative time values */
+#undef MPIP_CHECK_TIME
+
 #endif /* _CONFIG_H */
 
 /* 
