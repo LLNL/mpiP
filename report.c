@@ -316,11 +316,13 @@ mpiPi_profile_print (FILE * fp)
                  (strcmp(av[i]->filename[j], "[unknown]") == 0 ||
                   strcmp(av[i]->functname[j], "[unknown]") == 0) )
               {
-                fprintf (fp, "%3d %3d 0x%-18.*lx %-25s %s\n",
+                fprintf (fp, "%3d %3d 0x%-*.*lx %-*s %s\n",
                          av[i]->id,
                          j,
+                         fileLenMax+3,
                          sizeof(void*)*2,
                          av[i]->pc[j], 
+                         funcLenMax,
                          av[i]->functname[j],
                          (j ==
                           0) ? &(mpiPi.lookup[av[i]->op -
