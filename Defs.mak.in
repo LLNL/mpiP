@@ -70,10 +70,17 @@ endif
 
 DEMANGLE_TARGET =
 DO_DEMANGLE = @DO_DEMANGLE@
-ifeq ($(DO_DEMANGLE),true)
-  DEMANGLE_FLAG = -DDO_DEMANGLE
+ifneq ($(DO_DEMANGLE),false)
+  DEMANGLE_FLAG = -DDEMANGLE_$(DO_DEMANGLE)
   DEMANGLE_TARGET = libmpiPdmg.a
   MPIPCXXLIB = mpiPdmg
+ifeq ($(DO_DEMANGLE),IBM)
+  CPPFLAGS := "-I/usr/include" $(CPPFLAGS)
+endif
+ifeq ($(DO_DEMANGLE),Compaq)
+  CPPFLAGS := "-I/usr/include" $(CPPFLAGS)
+  CXXLIBS += -lmld
+endif
 endif
 
 CFLAGS	+= ${OPT}
