@@ -77,12 +77,24 @@ echo Use of libunwind has been disabled
 ,
 )
 
+AC_ARG_ENABLE(mpi-io,
+[  --disable-mpi-io        Disable MPI-I/O reporting.],
+DISABLE_MPI_IO=yes
+echo Profiling of MPI I/O has been disabled.
+,
+DISABLE_MPI_IO=no
+)
+AC_SUBST(DISABLE_MPI_IO)
+
 AC_ARG_ENABLE(getarg,
 [  --enable-getarg         Use getarg to get fortran command line args.],
 AC_DEFINE(USE_GETARG)
 echo Use of getarg has been enabled
+USE_GETARG=true
 ,
+USE_GETARG=false
 )
+AC_SUBST(USE_GETARG)
 
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
@@ -101,12 +113,17 @@ AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h"
 if test -z "$DISABLE_LIBUNWIND" ; then
 AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
 fi
+if test "$DISABLE_MPI_IO" = no ; then
 AC_CHECK_FUNC(MPI_File_open, AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt, 
 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
 HAVE_MPI_IO=/dev/null
 )
+else
+  HAVE_MPI_IO=/dev/null
+fi
 
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
+
 AC_MSG_CHECKING(fortran symbols)
 if test -n "$F77" -a "$F77" != no ; then
   /bin/rm -f ffunc.f flink.c
@@ -150,9 +167,9 @@ dnl ========== Identify F77 ==========
 AC_MSG_CHECKING(fortran compiler)
 if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=PGI
+  MPIPFLIB=mpiPpgf
   FORTRAN_FLAG=-DPGI
   FORTRAN_TARGET=libmpiPpgf.a
-  MPIPFLIB=mpiPpgf
 elif test "$G77" = yes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
@@ -187,4 +204,4 @@ AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST_FILE(HAVE_MPI_IO)
 
-AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt)
+AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt )
