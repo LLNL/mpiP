@@ -6,7 +6,7 @@ set procs 2
 
 
 case "$launch" in {
-    { "prun" } { 
+    { "prun" | "srun" } { 
         set pre_args "-p$pool"
         set post_args ""
         set pre_procs "-n2"
