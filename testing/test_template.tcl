@@ -20,6 +20,24 @@ proc checkOutput { text type } {
 }
 
 
+proc checkAbsent { text type } {
+  global outFile
+  global test
+#  send_user "in checkOutput for $text\n"
+  set timeout 5
+  spawn cat $outFile
+  expect { 
+     -re $text {
+        fail "$test $type $text\n"
+#        wait 
+#        close
+        }
+     timeout { fail "$test timed out\n" }
+     eof     { send_user "no    $type $text\n" }
+    }
+}
+
+
 proc runTest { } {
   global launch pool rmpool procs test_targ test expect_out env
 
