@@ -1,1 +1,3 @@
-  checkOutput "0 4-demangle.C      12 comm::\.?doBarriers\\(int\\)   +Barrier" "Source check:"
+  checkOutput "0 4-demangle.C      14 comm::\.?comm\\(int \\*, char \\*\\*\\*\\) +Barrier" "Source check:"
+  checkOutput "0 4-demangle.C      28 comm::\.?doBarriers\\(int, int\\)  +Barrier" "Source check:"
+  checkOutput "0 4-demangle.C      20 comm::~\.?comm\\(void\\) +Barrier" "Source check:"
