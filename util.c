@@ -20,6 +20,7 @@ static char *rcsid =
 #include <string.h>
 #include <setjmp.h>
 #include <stdio.h>
+#include <errno.h>
 
 #ifdef OSF1
 #include <excpt.h>
@@ -58,10 +59,10 @@ GetBaseAppName (char *rawName)
 
 #ifdef HAVE_LIBUNWIND
 
-void
-mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back, int parent_frame_start)
 {
-  int i, valid_cursor;
+  int i, valid_cursor, frame_count = 0;
   unw_context_t uc;
   unw_cursor_t cursor;
   unw_word_t pc;
@@ -69,7 +70,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   if ( unw_getcontext(&uc) != 0 )
   {
     mpiPi_msg_debug("Failed unw_getcontext!\n");
-    return;
+    return frame_count;
   }
 
   if ( unw_init_local(&cursor, &uc) != UNW_ESUCCESS )
@@ -78,15 +79,17 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   }
   else
   {
-    if ( unw_step(&cursor) < 1 || unw_step(&cursor) < 1 )
+    for (i = 0; i < parent_frame_start; i++)
     {
-      mpiPi_msg_debug ("unw_step failed to step into mpiPi caller frame.\n");
+      if ( unw_step(&cursor) )
+        mpiPi_msg_debug ("unw_step failed to step into mpiPi caller frame.\n");
     }
 
     for (i = 0, valid_cursor = 1; i < max_back; i++)
     {
       if ( valid_cursor && unw_step(&cursor) > 0 )
       {
+        frame_count++;
         if ( unw_get_reg(&cursor, UNW_REG_IP, &pc) != UNW_ESUCCESS )
         {
           pc_array[i] = NULL;
@@ -94,7 +97,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
         }
         else
         {
-          pc_array[i] = (void*)pc;
+          pc_array[i] = (void*)((char*)pc - 1);
         }
       }
       else
@@ -105,21 +108,28 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
       }
     }
   }
+  return frame_count;
 }
 
 #else  /* not LIBUNWIND */
 
 #ifdef OSF1
 
-void
-mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back, int parent_frame_start)
 {
-  int i;
+  int i, frame_count = 0;
   void *pc;
   PCONTEXT context;
 
   context = (PCONTEXT)jb;
   pc = (void*)context->sc_pc;
+
+  for (i = 1; i < parent_frame_start; i++)
+  {
+    if ( pc != NULL )
+      unwind(context, 0);
+  }
 
   for (i = 0; i < max_back; i++)
   {
@@ -130,25 +140,36 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
       /* record this frame's pc and calculate the previous instruction  */
       pc_array[i] = (void*)context->sc_pc - (void*)0x4; 
       pc = (void*)context->sc_pc;
+      frame_count++;
     }
     else
     {
       pc_array[i] = NULL;
     }
   }
+  return frame_count;
 }
 
 #else  /* not OSF1 */
 
-void
-mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back, int parent_frame_start)
 {
-  int i;
+  int i, frame_count = 0;
   void *fp, *lastfp;
   void* pc;
 
   /* start w/ the parent frame, not ours (we know who's calling) */
   fp = ParentFP(jb);
+
+  for (i = 1; i < parent_frame_start && fp != NULL; i++)
+    fp = NextFP(fp);
+
+  if ( parent_frame_start == 0 )
+  {
+    pc_array[0] = CurrentPC(jb);
+    frame_count++;
+  }
 
   for (i = 0; i < max_back; i++)
     {
@@ -158,6 +179,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 	  pc = FramePC(fp);
 	  if ( pc != NULL )
 	  {
+	    frame_count++;
             /*  Get previous instruction  */
 	    pc_array[i] = (void*)((char*)pc - 1);
 	  }
@@ -174,6 +196,8 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 	  pc_array[i] = NULL;
 	}
     }
+
+  return frame_count;
 }
 #endif
 #endif
@@ -366,6 +390,75 @@ mpiPi_getenv ()
   optind = 1;  /* reset to avoid conflicts if getopt called again */
 }
 
+
+#ifdef Linux
+char* getProcExeLink()
+{
+  int pid, fh, exelen, insize = 256;
+  char *inbuf = NULL, file[256];
+
+  pid = getpid();
+  sprintf(file, "/proc/%d/exe", pid);
+  inbuf = malloc(insize);
+
+  exelen = readlink(file, inbuf, 256);
+  if ( exelen != ENOENT )
+  {
+    while ( exelen == ENAMETOOLONG )
+    {
+      insize += 256;
+      inbuf = realloc(inbuf, insize);
+      exelen = readlink(file,inbuf,insize);
+    }
+    inbuf[exelen] = 0;
+    return inbuf;
+  }
+  else
+    free(inbuf);
+
+  return NULL;
+}
+
+#define MPIP_MAX_ARG_STRING_SIZE 4096
+void getProcCmdLine(int* ac, char** av, int max_args)
+{
+  int i = 0, pid, exelen, insize = 256;
+  char *inbuf, file[256];
+  FILE* infile;
+  char* arg_ptr;
+  long fsize;
+
+  *ac = 0;
+  *av = NULL;
+
+  pid = getpid();
+  sprintf(file, "/proc/%d/cmdline", pid);
+  infile = fopen(file, "r");
+  
+  if ( infile != NULL )
+  {
+    while ( !feof(infile) )
+    {
+      inbuf = malloc(MPIP_MAX_ARG_STRING_SIZE);
+      if ( fread(inbuf, 1, MPIP_MAX_ARG_STRING_SIZE, infile) > 0 )
+      {
+        arg_ptr = inbuf;
+	while ( *arg_ptr != NULL )
+	{
+          av[i] = strdup(arg_ptr);
+	  arg_ptr += strlen(av[i]) + 1;
+	  i++;
+        }
+      }
+    }
+    *ac = i;
+
+    free(inbuf);
+    fclose(infile);
+  }
+}
+
+#endif
 
 void
 mpiPi_copy_args (int *ac, char **av, int av_len)

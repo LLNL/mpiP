@@ -652,7 +652,7 @@ def CreateWrapper(funct, olist):
 #		 + "}\n" )
 
     # capture call stack
-    olist.append("mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
+    olist.append("mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH,MPIP_PARENT_FRAME_COUNT);\n"  )
 
     # end of enabled check
     olist.append("}\n\n")
@@ -680,7 +680,7 @@ def CreateWrapper(funct, olist):
     olist.append("\n" \
 		 + "mpiPi_GETTIME (&end);\n" \
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" \
-		 + "if ( dur < 0 ) mpiPi_msg_warn(\"Negative time difference : %11.9f\\n\", mpiPi_msg_warn);\n" \
+		 + "if ( dur < 0 ) mpiPi_msg_warn(\"Negative time difference : %11.9f\\n\", dur);\n" \
 #		 + "{\n" \
 #		 + " mpiTi_event_t e;\n" \
 #		 + "e.op = mpiTi_"+funct+";\n" \

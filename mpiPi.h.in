@@ -28,7 +28,7 @@
 
 #include <mpi.h>
 
-#include "hash.h"
+#include "mpiP-hash.h"
 
 #include "mpiPi_def.h"
 #include "mpiPconfig.h"
@@ -36,6 +36,7 @@
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
 #define MPIP_CALLSITE_STACK_DEPTH_MAX @STACKDEPTH@
+#define MPIP_PARENT_FRAME_COUNT @PARENT_FRAME_COUNT@
 
 #define MPIP_CALLSITE_STACK_DEPTH (mpiPi.stackDepth)
 #define MPIP_CALLSITE_STATS_COOKIE 518641
@@ -119,6 +120,7 @@ typedef struct _mpiPi_t
   char *av[32];
   char *toolname;
   char *appName;
+  char *appFullName;
   char oFilename[256];
   MPI_Comm comm;
   int tag;
@@ -182,14 +184,17 @@ extern int mpiPi_do_demangle;
 #if defined(AIX)
 #if defined(__64BIT__)
 #define ParentFP(jb) ((void *) *(long *) jb[5])
+#define CurrentPC(jb) ((void *) *(long *) jb[4])
 #else
 #define ParentFP(jb) ((void *) *(long *) jb[3])
+#define CurrentPC(jb) ((void *) *(long *) jb[2])
 #endif
 #define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *)))) 
 #define NextFP(fp) ((void *) *(long *) fp)
 #elif defined(Linux) && defined(IA32)
 /* jb[3] = FP, FP[2] = PC */
 #define ParentFP(jb) ((void*) jb[0].__jmpbuf[3])
+#define CurrentPC(jb) ((void*) jb[0].__jmpbuf[5])
 #define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
 #if 0
@@ -204,6 +209,7 @@ extern int mpiPi_do_demangle;
 #define NextFP(fp) ((void*)((void**)fp)[0])
 #else
 #define ParentFP(jb) (0)
+#define CurrentPC(jb) (0)
 #define FramePC(fp) (0)
 #define NextFP(fp) (0)
 #endif

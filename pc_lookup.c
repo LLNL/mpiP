@@ -51,8 +51,6 @@ static bfd_boolean found;
 
 #endif  /* DISABLE_BFD */
 
-
-
 #ifdef DEMANGLE_IBM
 
 #include <demangle.h>
