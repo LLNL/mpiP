@@ -92,6 +92,7 @@ class fdecl:
 	self.wrapperPreList = []
 	self.wrapperPostList = []
 	self.nowrapper = 0
+	self.define = 1
 	self.paramConciseList = []
 	self.extrafields = {}
 	self.extrafieldsList = []
@@ -105,6 +106,8 @@ def ProcessDirectiveLine(lastFunction, line):
     tokens = string.split(line)
     if tokens[0] == "nowrapper":
 	fdict[lastFunction].nowrapper = 1
+    elif tokens[0] == "nodefine":
+	fdict[lastFunction].define = 0
     elif tokens[0] == "extrafield":
 	fdict[lastFunction].extrafieldsList.append(tokens[2])
 	fdict[lastFunction].extrafields[tokens[2]] = tokens[1]
@@ -428,6 +431,7 @@ def GenerateStructureFile():
     olist.append("\n")
 
     for funct in flist:
+      if fdict[funct].define:
 	olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
 
     olist.append("\n")
@@ -539,6 +543,7 @@ def GenerateLookup():
 #    olist.append("#include \"mpiTi.h\"\n")
 #    olist.append("#include \"eprint.h\"\n")
     olist.append("#include \"mpiPi.h\"\n")
+    olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
     olist.append("\n")
 
@@ -546,13 +551,14 @@ def GenerateLookup():
 
     counter = 0
     for funct in flist:
-	if counter < len(flist) \
-	   and counter > 0:
+        if fdict[funct].define:
+	  if counter < len(flist) \
+	    and counter > 0 :
 	    olist.append(",\n")
-	olist.append("\t{ mpiPi_" + funct)
-	olist.append(", \"" + funct + "\"")
-	olist.append("}")
-	counter = counter + 1
+	  olist.append("\t{ mpiPi_" + funct)
+	  olist.append(", \"" + funct + "\"")
+	  olist.append("}")
+	  counter = counter + 1
 
     olist.append(",\n\t{0,NULL}};\n")
 
@@ -833,6 +839,7 @@ def GenerateWrappers():
     olist = StandardFileHeader(sname)
     olist.append("#include \"mpiPi.h\"\n")
     olist.append("#include \"symbols.h\"\n")
+    olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
     for funct in flist:
 	CreateWrapper(funct, olist)

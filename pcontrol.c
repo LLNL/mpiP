@@ -17,6 +17,7 @@ static char *rcsid = "$Header$";
 #endif
 
 #include "mpiPi.h"
+#include "symbols.h"
 
 static int mpiPi_MPI_Pcontrol(const int flag)
 {
@@ -32,6 +33,10 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       dur = (mpiPi_GETTIMEDIFF (&mpiPi.timer, &mpiPi.endTime, &mpiPi.startTime)/1000000.0);
       printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
       mpiPi.cumulativeTime += dur;
+    }
+  else if (flag == -1)
+    {
+      mpiPi_generateReport();
     }
   else
     {
@@ -51,7 +56,7 @@ int MPI_Pcontrol(const int flag,... )
   return mpiPi_MPI_Pcontrol(flag);
 }
 
-int mpi_pcontrol(int *flag,... )
+int F77_MPI_PCONTROL(int *flag,... )
 {
   return mpiPi_MPI_Pcontrol(*flag);
 }
