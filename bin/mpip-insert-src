@@ -1,0 +1,116 @@
+#! /usr/bin/perl
+#
+# mpip-insert-src
+#
+# Chris Chambreau LLNL 1/6/05
+#
+# Script for translating mpiP addresses with addr2line
+#
+# 1) Extracts addresses in mpiP report
+# 2) Generates temp file of address output from addr2line
+# 3) Substitutes source file information for addresses in report file
+#
+# Output is sent to stdout
+# addr2line must be available
+#
+#
+
+$temp_file=insert_src.temp;
+
+
+sub print_use
+{
+  print "\nmpip-insert-src : mpip-insert-src [executable] [report file]\n\n";
+  print "Translate mpiP report address information into source info.\n";
+  print "Output is sent to stdout.\n\n";
+  exit -1;
+}
+
+
+if ( $#ARGV ne 1 )
+{
+  print_use();
+}
+
+if ( -f $temp_file )
+{
+  unlink($temp_file);
+}
+
+#
+#  Open pipe to addr2line and open report output file
+#  Read addresses from report file and translate with addr2line
+#
+open INFO, "| addr2line -f -s -e $ARGV[0] > $temp_file"
+  or die "failed to open addr2line pipe";
+
+open REPORT, "$ARGV[1]" or die "failed to open report file $ARGV[1]";
+
+while (<REPORT>)
+{
+  if ( /0x/ )
+  {
+    ($addr) = $_ =~ /(0x\S+)/;
+    push @addrs, $addr;
+    print INFO "$addr\n";
+  }
+}
+
+close INFO;
+
+
+#  Read temp file with source data and populate hash table with info
+open ADDRS, $temp_file;
+$idx = 0;
+while (<ADDRS>)
+{
+   chomp;
+   $func = $_;
+   $_ = <ADDRS>;
+   chomp;
+   ($file, $line) = $_ =~ /(\S+):(\d+)/;
+   $source{$addrs[$idx]}->{file} = $file;
+   $source{$addrs[$idx]}->{line} = $line;
+   $source{$addrs[$idx]}->{func} = $func;
+   $idx++;
+}
+close ADDRS;
+
+
+#
+#  Generate new report output with source information
+#
+seek (REPORT, 0, 0);
+while (<REPORT>)
+{
+  if ( /0x/ )
+  {
+    ($addr) = $_ =~ /(0x\S+)/;
+    ($id, $lev) = $_ =~ /(\d+)\s+(\d+)/;
+    if ( $lev eq 0 )
+    {
+      ($call) = $_ =~ /(\S+)\s*$/;
+    }
+    else
+    {
+      $call = "";
+    }
+    printf ( "%3d%4d %-16s%5d %-24s %-20s\n", $id, $lev,
+             $source{$addr}->{file}, $source{$addr}->{line},
+             $source{$addr}->{func}, $call ) ;
+  }
+  else
+  {
+    print;
+  }
+}
+
+close REPORT;
+
+
+if ( -f $temp_file )
+{
+  unlink($temp_file);
+}
+
+exit 0;
