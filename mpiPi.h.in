@@ -36,6 +36,8 @@
 #include "mpiPconfig.h"
 #include "_timers.h"
 
+#define NDEBUG
+
 #define MPIPI_HOSTNAME_LEN_MAX 128
 #define MPIP_CALLSITE_STACK_DEPTH_MAX @STACKDEPTH@
 #define MPIP_PARENT_FRAME_COUNT @PARENT_FRAME_COUNT@
