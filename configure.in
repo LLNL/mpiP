@@ -129,6 +129,15 @@ DISABLE_MPI_IO=no
 )
 AC_SUBST(DISABLE_MPI_IO)
 
+AC_ARG_ENABLE(fortran-xlate,
+[  --enable-fortran-xlate  Enable translation of Fortran opaque objects.],
+ENABLE_FORTRAN_XLATE=yes
+echo Translation of FORTRAN opaque objects has been enabled.
+,
+ENABLE_FORTRAN_XLATE=no
+)
+AC_SUBST(ENABLE_FORTRAN_XLATE)
+
 AC_ARG_ENABLE(getarg,
 [  --enable-getarg         Use getarg to get fortran command line args.],
 AC_DEFINE(USE_GETARG)
