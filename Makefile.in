@@ -24,8 +24,11 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	pc_lookup.c \
 	report.c \
-	pcontrol.c \
-	get_fortran_arg.f
+	pcontrol.c
+
+ifeq ($(FORTRAN_VENDOR), Intel)
+  SRCS += get_fortran_arg.f
+endif
 
 OBJS = $(SRCS:.c=.o)
 OBJS := $(OBJS:.f=.o)
