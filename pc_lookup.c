@@ -51,7 +51,6 @@ typedef boolean bfd_boolean;
 #endif
 static bfd_boolean found;
 
-#endif  /* DISABLE_BFD */
 
 #ifdef DEMANGLE_IBM
 
@@ -104,7 +103,6 @@ char* mpiPdemangle(const char* mangledSym)
 
 #endif
 
-#ifndef DISABLE_BFD
 
 void
 find_address_in_section (abfd, section, data)
@@ -314,6 +312,6 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   return 1;  /*  failure  */
 }
 
-#endif
+#endif  /* DISABLE_BFD */
 
 /* eof */
