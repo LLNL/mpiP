@@ -10,6 +10,7 @@ include ../Defs.mak
 CFLAGS	+= 
 FFLAGS  += -g 
 LDFLAGS	+= -L..
+CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 
@@ -17,13 +18,15 @@ CSRCS =	0-simple.c \
 	1-hot-potato.c \
 	2-pcontrol.c \
 	3-stacktrace.c \
+	4-demangle.C \
 	5-medley.c \
 	6-nonblock.c \
 	7-nonblock-waitall.c \
 	8-test.c \
 	9-test-mpip-time.c 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
-EXES = $(CSRCS:.c=.exe)
+TEXES = $(CSRCS:.c=.exe)
+EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
 
 all: ${EXES}
@@ -34,7 +37,7 @@ all: ${EXES}
 	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 .C.exe:
-	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
+	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${CXXLIBS}
 
 .f.exe:
 	${FC} ${FFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${FLIBS}

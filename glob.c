@@ -22,7 +22,6 @@ static char *rcsid =
 mpiPi_t mpiPi;
 
 int mpiPi_debug = 0;
-int mpiPi_do_demangle = 0;
 
 int mpiPi_vmajor = 2;
 int mpiPi_vminor = 4;

@@ -149,16 +149,10 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "Cgf:b:s:k:t:o")) != EOF);)
+      for (; ((c = getopt (ac, av, "gf:b:s:k:t:o")) != EOF);)
 	{
 	  switch (c)
 	    {
-	    case 'C':
-              mpiPi_do_demangle = 1;
-	      if (mpiPi.rank == 0)
-		mpiPi_msg ("Enabled mpiP demangling.\n");
-	      break;
-
 	    case 'f':
 	      mpiPi.outputDir = optarg;
 	      if (mpiPi.rank == 0)
