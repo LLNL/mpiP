@@ -89,6 +89,7 @@ AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
 AC_CHECK_HEADER(demangle.h, AC_DEFINE(HAVE_DEMANGLE_H))
 AC_CHECK_LIB(intl,dcgettext__)
 AC_CHECK_LIB(iberty,objalloc_create)
+AC_CHECK_LIB(m,sqrt)
 AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr,,,-lintl -liberty))
 if test -z "$DISABLE_LIBUNWIND" ; then
 AC_CHECK_HEADER(libunwind.h, CPPFLAGS="-DHAVE_LIBUNWIND $CPPFLAGS" LIBS="$LIBS -lunwind")
@@ -134,14 +135,34 @@ AC_SUBST(F77_SYMBOLS)
 AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
 
 
-dnl ========== Check if F77 is GNU ==========
-AC_MSG_CHECKING(GNU fortran compiler)
-if $F77 -v 2>&1 | grep -e gcc 1> /dev/null 2> /dev/null ; then
-  AC_SUBST(F77_IS_GNU,"true")
-  AC_MSG_RESULT(yes)
+dnl ========== Identify F77 ==========
+AC_MSG_CHECKING(fortran compiler)
+if test "$G77" = yes ; then
+  F77_VENDOR=GNU
+  FORTRAN_FLAG=-DGNU_Fortran
+  FORTRAN_TARGET=libmpiPg77.a
+  MPIPFLIB=mpiPg77
+elif $F77 -V 2>&1 | grep -e Intel 1> /dev/null 2> /dev/null ; then
+  F77_VENDOR=Intel
+  FORTRAN_FLAG=-DIntel_Fortran
+  FORTRAN_TARGET=libmpiPifc.a
+  MPIPFLIB=mpiPifc
+elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
+  F77_VENDOR=Compaq
+  MPIPFLIB=mpiP
+  FORTRAN_FLAG=
+  FORTRAN_TARGET=
 else
-  AC_MSG_RESULT(no)
+  F77_VENDOR=Unknown
+  MPIPFLIB=mpiP
+  FORTRAN_FLAG=
+  FORTRAN_TARGET=
 fi
 
+AC_MSG_RESULT($F77_VENDOR)
+AC_SUBST(F77_VENDOR,$F77_VENDOR)
+AC_SUBST(MPIPFLIB,$MPIPFLIB)
+AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
+AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 
 AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak mpiPi.h)
