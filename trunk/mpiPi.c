@@ -166,7 +166,7 @@ mpiPi_init (char *appName)
 
   if(mpiPi.enabled)
     {
-      mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.startTime);
+      mpiPi_GETTIME (&mpiPi.startTime);
     }
 
   return;
@@ -223,7 +223,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	(callsite_pc_cache_entry_t *)
 	malloc (sizeof (callsite_pc_cache_entry_t));
       csp->pc = pc;
-      if (find_src_loc (pc, filename, lineno, functname) == 0)
+      if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
 	  mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
 			   (long) pc, *filename, *lineno, *functname);
@@ -758,11 +758,11 @@ void
 mpiPi_generateReport ()
 {
   double dur;
-  mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.endTime);
+  mpiPi_GETTIME (&mpiPi.endTime);
 
   if(mpiPi.enabled)
     {
-      dur = (mpiPi_GETTIMEDIFF (&mpiPi.apptimer, &mpiPi.endTime, &mpiPi.startTime)/1000000.0);
+      dur = (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime)/1000000.0);
       mpiPi.cumulativeTime += dur;
     }
 
