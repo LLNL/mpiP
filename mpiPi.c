@@ -169,20 +169,6 @@ mpiPi_init (char *appName)
       mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.startTime);
     }
 
-#if 0
-  mpiPi.lookup = &mpiPi_lookup;
-  mpiPi.finalEventCount = 0;
-  mpiPi.monThrHandle = (pthread_t) NULL;
-  pthread_mutex_init (&(mpiPi.flushLock), NULL);
-  mpiPi.eCount = 0;
-  mpiPi.eHighWaterMark = 0;
-  mpiPi.eBufSize = 100000;
-  mpiPi.collector_stats = NULL;
-  mpiPi.task_stats = NULL;
-  mpiPi.MPI_Test_root = q_open ();
-  mpiPi_query_mpi_env ();
-#endif
-
   return;
 }
 
@@ -524,6 +510,9 @@ mpiPi_mergeResults ()
 	      newp->maxDataSent = p->maxDataSent;
 	      newp->minDataSent = p->minDataSent;
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
+	      newp->maxIO = p->maxIO;
+	      newp->minIO = p->minIO;
+	      newp->cumulativeIO = p->cumulativeIO;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
 	      /* insert new record into global */
@@ -539,6 +528,9 @@ mpiPi_mergeResults ()
               csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
               csp->minDataSent = min (csp->minDataSent, p->minDataSent);
               csp->cumulativeDataSent += p->cumulativeDataSent;
+	      csp->maxIO = max (csp->maxIO, p->maxIO);
+	      csp->minIO = min (csp->minIO, p->minIO);
+              csp->cumulativeIO += p->cumulativeIO;
 	    }
 
 	  /* agg. Don't use rank */
@@ -567,6 +559,9 @@ mpiPi_mergeResults ()
 	      newp->maxDataSent = p->maxDataSent;
 	      newp->minDataSent = p->minDataSent;
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
+	      newp->cumulativeIO = p->cumulativeIO;
+	      newp->maxIO = p->maxIO;
+	      newp->minIO = p->minIO;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
 	      if ( mpiPi.calcCOV )
@@ -589,6 +584,9 @@ mpiPi_mergeResults ()
               csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
               csp->minDataSent = min (csp->minDataSent, p->minDataSent);
 	      csp->cumulativeDataSent += p->cumulativeDataSent;
+              csp->maxIO = max (csp->maxIO, p->maxIO);
+              csp->minIO = min (csp->minIO, p->minIO);
+	      csp->cumulativeIO += p->cumulativeIO;
 
 	      if ( mpiPi.calcCOV )
 	      {
@@ -795,7 +793,7 @@ mpiPi_finalize ()
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
-			     double dur, double sendSize)
+			     double dur, double sendSize, double ioSize)
 {
   int i;
   callsite_stats_t *csp = NULL;
@@ -831,6 +829,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
       csp->cookie = MPIP_CALLSITE_STATS_COOKIE;
       csp->minDur = DBL_MAX;
       csp->minDataSent = DBL_MAX;
+      csp->minIO = DBL_MAX;
       h_insert (mpiPi.task_callsite_stats, csp);
     }
   /* ASSUME: csp cannot be deleted from list */
@@ -840,9 +839,14 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   csp->maxDur = max (csp->maxDur, dur);
   csp->minDur = min (csp->minDur, dur);
   csp->cumulativeDataSent += sendSize;
+  csp->cumulativeIO += ioSize;
 
   csp->maxDataSent = max (csp->maxDataSent, sendSize);
   csp->minDataSent = min (csp->minDataSent, sendSize);
+
+  csp->maxIO = max (csp->maxIO, ioSize);
+  csp->minIO = min (csp->minIO, ioSize);
+
   return;
 }
 

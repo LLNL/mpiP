@@ -23,13 +23,14 @@ static char *rcsid =
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 
 #include "mpiPi.h"
 
 #define icmp(a,b) (((a)<(b))?(-1):(((a)>(b))?(1):(0)))
 
-static char* mpiP_Report_Formats[9][2] = {
+static char* mpiP_Report_Formats[][2] = {
   { 
     /*  MPIP_MPI_TIME_FMT  */
     "%4d %10.3g %10.3g    %5.2lf\n",
@@ -56,6 +57,11 @@ static char* mpiP_Report_Formats[9][2] = {
     "%-20s %4d %10lld %10.3f %10.3f %6.2lf\n"
   },
   { 
+    /*  MPIP_AGGREGATE_IO_FMT  */
+    "%-20s %4d %10lld %10.3g %10.3g %6.2lf\n",
+    "%-20s %4d %10lld %10.3f %10.3f %6.2lf\n"
+  },
+  { 
     /*  MPIP_CALLSITE_TIME_SUMMARY_FMT  */
     "%-17s %4d %4s %6lld %8.3g %8.3g %8.3g %6.2lf %6.2lf\n",
     "%-17s %4d %4s %6lld %8.3f %8.3f %8.3f %6.2lf %6.2lf\n"
@@ -72,6 +78,16 @@ static char* mpiP_Report_Formats[9][2] = {
   },
   { 
     /*  MPIP_CALLSITE_MESS_RANK_FMT  */
+    "%-17s %4d %4d %7lld %9.4g %9.4g %9.4g %9.4g\n",
+    "%-17s %4d %4d %7lld %9.4f %9.4f %9.4f %9.4f\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_IO_SUMMARY_FMT  */
+    "%-17s %4d %4s %7lld %9.4g %9.4g %9.4g %9.4g\n",
+    "%-17s %4d %4s %7lld %9.4f %9.4f %9.4f %9.4f\n"
+  },
+  { 
+    /*  MPIP_CALLSITE_IO_RANK_FMT  */
     "%-17s %4d %4d %7lld %9.4g %9.4g %9.4g %9.4g\n",
     "%-17s %4d %4d %7lld %9.4f %9.4f %9.4f %9.4f\n"
   }
@@ -156,6 +172,24 @@ callsite_sort_by_cumulative_size (const void *a, const void *b)
       return 1;
     }
   if ((*a1)->cumulativeDataSent > (*b1)->cumulativeDataSent)
+    {
+      return -1;
+    }
+  return 0;
+}
+
+static int
+callsite_sort_by_cumulative_io (const void *a, const void *b)
+{
+  callsite_stats_t **a1 = (callsite_stats_t **) a;
+  callsite_stats_t **b1 = (callsite_stats_t **) b;
+
+  /* NOTE: want descending sort, so compares are reveresed */
+  if ((*a1)->cumulativeIO < (*b1)->cumulativeIO)
+    {
+      return 1;
+    }
+  if ((*a1)->cumulativeIO > (*b1)->cumulativeIO)
     {
       return -1;
     }
@@ -314,6 +348,8 @@ mpiPi_profile_print (FILE * fp)
 	mpiPi.global_task_info[av[i]->rank].mpi_time += av[i]->cumulativeTime;
 	mpiPi.global_mpi_time += av[i]->cumulativeTime;
 	mpiPi.global_mpi_size += av[i]->cumulativeDataSent;
+	mpiPi.global_mpi_io += av[i]->cumulativeIO;
+	mpiPi_msg_debug ("filename ptr: 0x%x functname ptr: 0x%x\n", av[i]->filename[0], av[i]->functname[0]);
 	mpiPi_msg_debug ("Callsite(%d,%d=[%s,%d,%s],%d) %g Cumulative=%g\n",
 			 av[i]->op,
 			 av[i]->csid,
@@ -478,33 +514,73 @@ mpiPi_profile_print (FILE * fp)
     int ac;
     callsite_stats_t **av;
 
-    h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
+    if ( mpiPi.global_mpi_size > 0 )
+    {
+      h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
 
-    /* -- now that we have all the statistics in a queue, which is
-     * pointers to the data, we can sort it however we need to.
-     */
-    qsort (av, ac, sizeof (void *), callsite_sort_by_cumulative_size);
+      /* -- now that we have all the statistics in a queue, which is
+       * pointers to the data, we can sort it however we need to.
+       */
+      qsort (av, ac, sizeof (void *), callsite_sort_by_cumulative_size);
 
-    print_section_heading (fp,
-			   "Aggregate Sent Message Size (top twenty, descending, bytes)");
-    fprintf (fp, "%-20s %4s %10s %10s %10s %6s\n", "Call", "Site", "Count", 
-             "Total", "Avrg", "MPI%");
+      print_section_heading (fp,
+                             "Aggregate Sent Message Size (top twenty, descending, bytes)");
+      fprintf (fp, "%-20s %4s %10s %10s %10s %6s\n", "Call", "Site", "Count", 
+               "Total", "Avrg", "Sent%");
 
-    for (i = 0; (i < 20) && (i < ac); i++)
+      for (i = 0; (i < 20) && (i < ac); i++)
       {
         if ( av[i]->cumulativeDataSent > 0 )
-          {
-            fprintf(fp, mpiP_Report_Formats[MPIP_AGGREGATE_MESS_FMT][mpiPi.reportFormat],
-                    &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), 
-                    av[i]->csid,
-                    av[i]->count,
-                    av[i]->cumulativeDataSent,
-                    av[i]->cumulativeDataSent/av[i]->count,
-                    av[i]->cumulativeDataSent * 100 / mpiPi.global_mpi_size);
-          }
+        {
+          fprintf(fp, mpiP_Report_Formats[MPIP_AGGREGATE_MESS_FMT][mpiPi.reportFormat],
+                  &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), 
+                  av[i]->csid,
+                  av[i]->count,
+                  av[i]->cumulativeDataSent,
+                  av[i]->cumulativeDataSent/av[i]->count,
+                  av[i]->cumulativeDataSent * 100 / mpiPi.global_mpi_size);
+        }
       }
 
-    free (av);
+      free (av);
+    }
+  }
+
+
+  {
+    int ac;
+    callsite_stats_t **av;
+
+    if ( mpiPi.global_mpi_io > 0 )
+    {
+      h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
+
+      /* -- now that we have all the statistics in a queue, which is
+       * pointers to the data, we can sort it however we need to.
+       */
+      qsort (av, ac, sizeof (void *), callsite_sort_by_cumulative_io);
+
+      print_section_heading (fp,
+                             "Aggregate I/O Size (top twenty, descending, bytes)");
+      fprintf (fp, "%-20s %4s %10s %10s %10s %6s\n", "Call", "Site", "Count", 
+               "Total", "Avrg", "I/O%");
+
+      for (i = 0; (i < 20) && (i < ac); i++)
+      {
+        if ( av[i]->cumulativeIO > 0 )
+        {
+          fprintf(fp, mpiP_Report_Formats[MPIP_AGGREGATE_IO_FMT][mpiPi.reportFormat],
+                  &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), 
+                  av[i]->csid,
+                  av[i]->count,
+                  av[i]->cumulativeIO,
+                  av[i]->cumulativeIO/av[i]->count,
+                  av[i]->cumulativeIO * 100 / mpiPi.global_mpi_io);
+        }
+      }
+
+      free (av);
+    }
   }
 
   {
@@ -518,7 +594,7 @@ mpiPi_profile_print (FILE * fp)
      */
     qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
 
-    sprintf (buf, "Callsite statistics (all, milliseconds): %d", ac);
+    sprintf (buf, "Callsite Time statistics (all, milliseconds): %d", ac);
     print_section_heading (fp, buf);
     fprintf (fp, "%-17s %4s %4s %6s %8s %8s %8s %6s %6s\n", "Name", "Site",
 	     "Rank", "Count", "Max", "Mean", "Min", "App%", "MPI%");
@@ -591,61 +667,68 @@ mpiPi_profile_print (FILE * fp)
     int ac;
     callsite_stats_t **av;
 
-    h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av);
-
-    /* -- now that we have all the statistics in a queue, which is
-     * pointers to the data, we can sort it however we need to.
-     */
-    qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
-
-    sprintf (buf, "Callsite statistics (all, sent bytes)");
-    print_section_heading (fp, buf);
-    fprintf (fp, "%-17s %4s %4s %7s %9s %9s %9s %9s\n", "Name", "Site",
-	     "Rank", "Count", "Max", "Mean", "Min", "Sum");
-
+    if ( mpiPi.global_mpi_size > 0 )
     {
-      long long sCount = 0;
-      double sMin = DBL_MAX;
-      double sMax = 0;
-      double sCumulative = 0;
+      h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av);
 
-      for (i = 0; i < ac; i++)
+      /* -- now that we have all the statistics in a queue, which is
+       * pointers to the data, we can sort it however we need to.
+       */
+      qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
+
+      sprintf (buf, "Callsite Message Sent statistics (all, sent bytes)");
+      print_section_heading (fp, buf);
+      fprintf (fp, "%-17s %4s %4s %7s %9s %9s %9s %9s\n", "Name", "Site",
+               "Rank", "Count", "Max", "Mean", "Min", "Sum");
+
+      {
+        long long sCount = 0;
+        double sMin = DBL_MAX;
+        double sMax = 0;
+        double sCumulative = 0;
+        int lastcsid = 0;
+
+        for (i = 0; i < ac; i++)
 	{
 	  if (i != 0 && sCumulative > 0 && (av[i]->csid != av[i - 1]->csid))
-	    {
-	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.reportFormat],
-		       &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
-		       av[i - 1]->csid, "*", sCount, sMax,
-		       sCumulative / sCount, sMin,
-		       sCumulative);
+          {
+            fprintf (fp,
+                     mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.reportFormat],
+                     &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+                     av[i - 1]->csid, "*", sCount, sMax,
+                     sCumulative / sCount, sMin,
+                     sCumulative);
 
-	      fprintf (fp, "\n");
-	      sCount = 0;
-	      sMax = 0;
-	      sMin = DBL_MAX;
-	      sCumulative = 0;
-	    }
+            sCount = 0;
+            sMax = 0;
+            sMin = DBL_MAX;
+            sCumulative = 0;
+          }
 
 	  if (av[i]->cumulativeDataSent > 0 )
-            {
-              sCount += av[i]->count;
-              sCumulative += av[i]->cumulativeDataSent;
-              sMax = max (av[i]->maxDataSent, sMax);
-              sMin = min (av[i]->minDataSent, sMin);
+          {
+            sCount += av[i]->count;
+            sCumulative += av[i]->cumulativeDataSent;
+            sMax = max (av[i]->maxDataSent, sMax);
+            sMin = min (av[i]->minDataSent, sMin);
 
-	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_CALLSITE_MESS_RANK_FMT][mpiPi.reportFormat],
-		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
-		       av[i]->csid, av[i]->rank, av[i]->count,
-		       av[i]->maxDataSent,
-		       av[i]->cumulativeDataSent / av[i]->count,
-		       av[i]->minDataSent,
-		       av[i]->cumulativeDataSent);
-            }
+            if ( lastcsid != 0 && lastcsid != av[i]->csid )
+              fprintf (fp, "\n");
+
+            fprintf (fp,
+                     mpiP_Report_Formats[MPIP_CALLSITE_MESS_RANK_FMT][mpiPi.reportFormat],
+                     &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
+                     av[i]->csid, av[i]->rank, av[i]->count,
+                     av[i]->maxDataSent,
+                     av[i]->cumulativeDataSent / av[i]->count,
+                     av[i]->minDataSent,
+                     av[i]->cumulativeDataSent);
+
+            lastcsid = av[i]->csid;
+          }
 	}
       
-      if ( sCumulative > 0 )
+        if ( sCumulative > 0 )
         {
           fprintf (fp, mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.reportFormat],
                    &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
@@ -657,11 +740,95 @@ mpiPi_profile_print (FILE * fp)
                    sMin,
                    sCumulative);
         }
-    }
+      }
 
-    free (av);
+      free (av);
+    }
   }
 
+  /*  Print I/O Section  */
+  {
+    int ac;
+    callsite_stats_t **av;
+
+    if ( mpiPi.global_mpi_io > 0 )
+    {
+      h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av);
+
+      /* -- now that we have all the statistics in a queue, which is
+       * pointers to the data, we can sort it however we need to.
+       */
+      qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
+
+      sprintf (buf, "Callsite I/O statistics (all, I/O bytes)");
+      print_section_heading (fp, buf);
+      fprintf (fp, "%-17s %4s %4s %7s %9s %9s %9s %9s\n", "Name", "Site",
+               "Rank", "Count", "Max", "Mean", "Min", "Sum");
+
+      {
+        long long sCount = 0;
+        double sMin = DBL_MAX;
+        double sMax = 0;
+        double sCumulative = 0;
+        int lastcsid = 0;
+
+        for (i = 0; i < ac; i++)
+	{
+	  if (i != 0 && sCumulative > 0 && (av[i]->csid != av[i - 1]->csid))
+          {
+            fprintf (fp,
+                     mpiP_Report_Formats[MPIP_CALLSITE_IO_SUMMARY_FMT][mpiPi.reportFormat],
+                     &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+                     av[i - 1]->csid, "*", sCount, sMax,
+                     sCumulative / sCount, sMin,
+                     sCumulative);
+
+            sCount = 0;
+            sMax = 0;
+            sMin = DBL_MAX;
+            sCumulative = 0;
+          }
+
+	  if (av[i]->cumulativeIO > 0 )
+          {
+            sCount += av[i]->count;
+            sCumulative += av[i]->cumulativeIO;
+            sMax = max (av[i]->maxIO, sMax);
+            sMin = min (av[i]->minIO, sMin);
+
+            if ( lastcsid != 0 && lastcsid != av[i]->csid )
+              fprintf (fp, "\n");
+
+            fprintf (fp,
+                     mpiP_Report_Formats[MPIP_CALLSITE_IO_RANK_FMT][mpiPi.reportFormat],
+                     &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
+                     av[i]->csid, av[i]->rank, av[i]->count,
+                     av[i]->maxIO,
+                     av[i]->cumulativeIO / av[i]->count,
+                     av[i]->minIO,
+                     av[i]->cumulativeIO);
+
+            lastcsid = av[i]->csid;
+          }
+	}
+      
+        if ( sCumulative > 0 )
+        {
+          fprintf (fp, mpiP_Report_Formats[MPIP_CALLSITE_IO_SUMMARY_FMT][mpiPi.reportFormat],
+                   &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+                   av[i - 1]->csid,
+                   "*",
+                   sCount,
+                   sMax,
+                   sCumulative / sCount,
+                   sMin,
+                   sCumulative);
+        }
+      }
+
+      free (av);
+    }
+  }
   print_section_heading (fp, "End of Report");
 
   return 0;

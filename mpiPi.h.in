@@ -31,6 +31,7 @@
 #include "hash.h"
 
 #include "mpiPi_def.h"
+#include "mpiPconfig.h"
 #include "_timers.h"
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
@@ -52,7 +53,10 @@ typedef struct _callsite_stats
   double minDur;
   double maxDataSent;
   double minDataSent;
+  double maxIO;
+  double minIO;
   double cumulativeDataSent;
+  double cumulativeIO;
   double *siteData;
   int siteDataIdx;
   void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
@@ -100,9 +104,10 @@ extern mpiPi_lookup_t mpiPi_lookup[];
 
 enum { MPIP_MPI_TIME_FMT, MPIP_MPI_TIME_SUMMARY_FMT,
        MPIP_AGGREGATE_TIME_FMT, MPIP_AGGREGATE_COV_TIME_FMT,
-       MPIP_AGGREGATE_MESS_FMT,
+       MPIP_AGGREGATE_MESS_FMT, MPIP_AGGREGATE_IO_FMT,
        MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT, 
-       MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT
+       MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
+       MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT
 };
 
 typedef enum { MPIP_REPORT_SCI_FORMAT, MPIP_REPORT_FLT_FORMAT } 
@@ -144,6 +149,7 @@ typedef struct _mpiPi_t
   double global_app_time;
   double global_mpi_time;
   double global_mpi_size;
+  double global_mpi_io;
 
   int tableSize;
   h_t *task_callsite_stats;
