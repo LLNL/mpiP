@@ -13,7 +13,7 @@ VPATH = ${srcdir}
 
 include Defs.mak
 
-.PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs
+.PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs test
 
 default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
 
