@@ -66,6 +66,7 @@ typedef struct callsite_src_id_cache_entry_t
   char *filename[MPIP_CALLSITE_STACK_DEPTH_MAX];
   char *functname[MPIP_CALLSITE_STACK_DEPTH_MAX];
   int line[MPIP_CALLSITE_STACK_DEPTH_MAX];
+  void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
 }
 callsite_src_id_cache_entry_t;
 
@@ -153,7 +154,7 @@ extern int mpiPi_debug;
 
 #if defined(AIX)
 #define ParentFP(jb) ((void *) *(long *) jb[3])
-#define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *))))
+#define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *)))) 
 #define NextFP(fp) ((void *) *(long *) fp)
 #elif defined(Linux) && defined(IA32)
 /* jb[3] = FP, FP[2] = PC */

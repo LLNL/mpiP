@@ -264,8 +264,8 @@ mpiPi_profile_print (FILE * fp)
     sprintf (buf, "Callsites: %d", ac);
     qsort (av, ac, sizeof (void *), callsite_src_id_cache_sort_by_id);
     print_section_heading (fp, buf);
-    fprintf (fp, "%3s %3s %-15s %4s %-20s %-20s\n",
-	     "ID", "Lev", "File", "Line", "Parent_Funct", "MPI_Call");
+    fprintf (fp, "%3s %3s %-15s %4s %-25s %-25s\n",
+	     "ID", "Lev", "File/Address", "Line", "Parent_Funct", "MPI_Call");
 
     for (i = 0; i < ac; i++)
       {
@@ -274,14 +274,32 @@ mpiPi_profile_print (FILE * fp)
 	     (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL);
 	     j++)
 	  {
-	    fprintf (fp, "%3d %3d %-15s %4d %-30s %s\n",
-		     av[i]->id,
-		     j,
-		     av[i]->filename[j], av[i]->line[j], av[i]->functname[j],
-		     (j ==
-		      0) ? &(mpiPi.lookup[av[i]->op -
-					  mpiPi_BASE].name[4]) : "");
-	  }
+            if ( av[i]->line[j] == 0 && 
+                 (strcmp(av[i]->filename[j], "[unknown]") == 0 ||
+                  strcmp(av[i]->functname[j], "[unknown]") == 0) )
+              {
+                fprintf (fp, "%3d %3d 0x%-18.*lx %-25s %s\n",
+                         av[i]->id,
+                         j,
+                         sizeof(void*)*2,
+                         av[i]->pc[j], 
+                         av[i]->functname[j],
+                         (j ==
+                          0) ? &(mpiPi.lookup[av[i]->op -
+                                              mpiPi_BASE].name[4]) : "");
+              }
+            else
+              {
+                fprintf (fp, "%3d %3d %-15s %4d %-30s %s\n",
+                         av[i]->id,
+                         j,
+                         av[i]->filename[j], av[i]->line[j], 
+                         av[i]->functname[j],
+                         (j ==
+                          0) ? &(mpiPi.lookup[av[i]->op -
+                                              mpiPi_BASE].name[4]) : "");
+              }
+          }
       }
     free (av);
   }

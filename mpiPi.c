@@ -47,6 +47,7 @@ mpiPi_callsite_stats_pc_comparator (const void *p1, const void *p2)
 #define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
   express (op);
   express (rank);
+
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
       express (pc[i]);
@@ -238,9 +239,13 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	{
 	  mpiPi_msg_debug ("Successful BFD lookup for [0x%x]: %s, %d, %s\n",
 			   (long) pc, *filename, *lineno, *functname);
-	  csp->filename = strdup (*filename);
-	  csp->functname = strdup (*functname);
-	  csp->line = *lineno;
+
+	  if ( strcmp(*filename, "??") == 0 )
+            *filename = "[unknown]";
+          
+          csp->filename = strdup (*filename);
+          csp->functname = strdup (*functname);
+          csp->line = *lineno;
 	}
       else
 	{
@@ -296,6 +301,8 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
 	  return -1;
 	}
       }
+
+      express(pc[i]);
     }
 #undef express
   return 0;
@@ -340,6 +347,7 @@ mpiPi_query_src (callsite_stats_t * p)
      check that mapping here. If we got unknown, then we assign
      different ids */
   bzero (&key, sizeof (callsite_src_id_cache_entry_t));
+
   for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
     {
       mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
@@ -347,6 +355,7 @@ mpiPi_query_src (callsite_stats_t * p)
       key.filename[i] = p->filename[i];
       key.functname[i] = p->functname[i];
       key.line[i] = p->lineno[i];
+      key.pc[i] = p->pc[i];
 
       /*  Do not bother recording frames above main  */
       if ( p->functname[i] != NULL && 
@@ -367,11 +376,13 @@ mpiPi_query_src (callsite_stats_t * p)
 	(callsite_src_id_cache_entry_t *)
 	malloc (sizeof (callsite_src_id_cache_entry_t));
       bzero (csp, sizeof (callsite_src_id_cache_entry_t));
+
       for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
 	{
 	  csp->filename[i] = strdup (key.filename[i]);
 	  csp->functname[i] = strdup (key.functname[i]);
 	  csp->line[i] = key.line[i];
+          csp->pc[i] = p->pc[i];
 	}
       csp->id = callsite_src_id_counter++;
       csp->op = p->op;
