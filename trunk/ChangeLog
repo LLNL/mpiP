@@ -1,23 +1,222 @@
-2002-02-01  Jeffrey Vetter  <vetter3@llnl.gov>
+2005-01-11  Chris Chambreau  <chcham@llnl.gov>
 
-	* Prepare distribution.
+	* configure: 2.8 release version
 
-2003-01-03  Chris Chambreau  <chcham@llnl.gov>
+	* doc/UserGuide.html, doc/UserGuide.txt: Updated for 2.8 release.
 
-	* Correction pertaining to alpha-osf1 port.
+	* configure.in, mpi.protos.txt.in, mpiPconfig.h.in:
+	Make gettimeofday the default Linux timer, but clock_gettime can be
+	activated with configure switch.
 
-2003-05-01  Chris Chambreau  <chcham@llnl.gov>
+	* testing/0-simple-c++.C: Avoid MPICH2 compile script warning.
 
-	* Changes to support x86-Linux/Tru64 and compatible
-	  versions of binutils.
+	* configure.in:
+	clock_gettime suuport and MPICH 2 C++ compile script support
 
-2003-08-14  Chris Chambreau  <chcham@llnl.gov>
+2005-01-06  Chris Chambreau  <chcham@llnl.gov>
 
-	* Fixes + message size support, C++ name demangling,
-	  and long file/function name support.
+	* mpiP-API.c, util.c: Cleaning with lint.
 
-2004-06-25  Chris Chambreau  <chcham@llnl.gov>
+	* bin/mpip-insert-src, bin/mpirun-mpip, bin/srun-mpip:
+	Scripts for replacing address info in report with addr2line output and
+	example runtime profiling.
 
-	* v2.7 release includes broader platform support, greater 
-	  flexibility for feature configuration, MPI I/O reporting, 
-	  and arbitrary report generation.
+	* Makefile.in:
+	Modifications to install target to account for new scripts in bin.
+
+	* mpiPi.c:
+	Do not overwrite existing report files.  If a report file exists, increment
+	the report count and check until a new filename is generated.
+
+	* configure.in, mpiPi.c, pc_lookup.c:
+	Addressed DISABLE_BFD and MPI-I/O configuration issues.
+
+	* _timers.h:
+	Phil Roth's support for POSIX clock_gettime for Linux/Altix.
+
+	* util.c: Added stdlib.h
+
+	* mpiPi_proto.h, wrappers_special.c:
+	Remove unnecessary PC sampling at Init and Finalize.
+
+	* mpiP-API.c: additional comment
+
+	* Defs.mak.in, diag_msgs.c, mpiPi.h.in:
+	Modifications to support BlueGene/L ppc64 platform.
+
+2004-12-28  Chris Chambreau  <chcham@llnl.gov>
+
+	* timers/linux_posix.h, linux_posix.h: admin
+
+	* _timers.h, linux_posix.h:
+	Phil Roth additions to support linux/posix clock_gettime initially for Altix.
+
+2004-12-04  Chris Chambreau  <chcham@llnl.gov>
+
+	* configure: updated.
+
+	* configure.in, make-wrappers.py, mpiP-API.c, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, util.c:
+	Completely re-wrote code to address the differences of the number of
+	frames to unwind to get to the calling application function from
+	libunwind, Tru64 unwind, UNICOS, as well as MPI vs API calls.
+
+	* testing/test_template.tcl:
+	Added sleep during test loop to keep some tests from failing.
+
+	* pc_lookup.c: Added demangling defines if demangle.h is not available.
+
+	* report.c: Addressed Tru64 compile warning.
+
+	* bin/config.guess, bin/config.sub: Updated config scripts
+
+2004-12-02  Chris Chambreau  <chcham@llnl.gov>
+
+	* glob.c: new version numbers
+
+	* testing/14-mpiio.exp, testing/14-mpiio.src:
+	more MPI-I/O related files that didn't quite make it into the
+	distribution for 2.7 (oops!)
+
+	* mpi.io.protos.txt:
+	this should have been added before, but I missed it...
+
+2004-11-05  Chris Chambreau  <chcham@llnl.gov>
+
+	* configure.in: Modification for correct parent frame count
+
+	* configure, configure.in, report.c: More minor modifications
+
+	* testing/Makefile.in: removed fortran api test
+
+	* testing/api-test-f.c, testing/api-test.f: removed api fortran test
+
+	* util.c: *** empty log message ***
+
+	* testing/api-test-f.c, testing/api-test.f: minor corrections
+
+2004-11-04  Chris Chambreau  <chcham@llnl.gov>
+
+	* mpiPi.h.in: Do not use asserts by default
+
+	* Makefile.in: o  Expanded phony targets
+	o  shared lib build and install targets for Linux
+
+	* configure.in: o  Set default prefix to .
+	o  Use kludge of setting cross_compiling to yes to avoid test execution
+	o  Added test to identify UNICOS OS for frame depth
+
+	* report.c: *** empty log message ***
+
+	* testing/timer-info.c: Make use of new TIMER_NAME macro
+
+	* timers/crayx1_local.h: Does not appear to be needed
+
+	* mpiP-API.c:
+	removed unnecessary version of function mpiP_open_executable
+
+	* mpiPi.c, util.c: Made COV reporting the default
+
+	* _timers.h: *** empty log message ***
+
+	* timers/aix_local.h, timers/aix_swclock.h, timers/crayx1_hw.h, timers/sunos-timers.h:
+	o  Cleaned up gettimeofday types
+	o  Added TIMER_NAME macro
+	o  Removed unused cray timer header file
+	o  Changed new cray files to conform to new macro format
+
+2004-10-28  Chris Chambreau  <chcham@llnl.gov>
+
+	* timers/crayx1_hw.h, timers/crayx1_local.h:
+	Missed Phil's cray timer include files...
+
+2004-10-27  Chris Chambreau  <chcham@llnl.gov>
+
+	* Defs.mak.in, get_fortran_arg.f, util.c:
+	Slight modifications to allow forcing use of getargs on linux and
+	support getargs file compatability with Linux and UNICOS.
+
+	* Makefile.in: added merged-install target for LLNL site installations.
+
+2004-10-26  Chris Chambreau  <chcham@llnl.gov>
+
+	* timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
+	*** empty log message ***
+
+	* Makefile.in, Rules.mak, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in:
+	o  Cray X1/UNICOS support
+	o  Libdwarf support : note that Intel compilers do not provide full C++ symbols
+	o  install target
+
+2004-10-22  Chris Chambreau  <chcham@llnl.gov>
+
+	* Makefile.in: target for generating prototype file.
+
+	* testing/timer-info.c:
+	Not so much a test as a utility to report on timer info.
+
+	* testing/api-test-f.c, testing/api-test.c, testing/api-test.f:
+	New API tests.
+
+	* get_fortran_arg.f, mpiPi_proto.h:
+	This file should no longer be necessary if getting Linux executable
+	name from /proc.
+
+	* timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
+	moved files out of this directory for ease of API use.
+
+	* testing/12-null-null.src, testing/13-pcontrol-report.c, testing/9-test-mpip-time.c, testing/Makefile.in:
+	*** empty log message ***
+
+	* mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in, Makefile.in, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, hash.c, hash.h, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
+	Added mpiP API : provides stack tracing, address lookup and timing functionality
+	1)  Added mpiP-API.c and mpiP-API.h.
+	2)  Renamed hash files to avoid API conflict with hash.h.
+	3)  To make compilation with API easier, moved timers include files to main dir
+	and removed timers dir.
+	4)  Added mpiP_TIMER typedef for API.
+	5)  API required some additional issues, such as PARENT_FRAME_COUNT to help
+	coordinate which stack frames are recorded through the API.
+
+	also other modifications:
+
+	Added binutils-dir flag for easier configuration.
+	Added bin-type-flag to address issues with 32/64 mixed systems.
+	Always call demangling on symbols and remove libmpiPdmg on system where this mak
+	es sense.
+	Added makefile targets to merge binutils and libunwind objects into libmpiP.
+	Added negative time value checking for all time difference calculation in wrappe
+	rs.c.
+	Added functionality to get executable name from /proc on Linux. <-- Assumes exec
+	utable will not be longer than 4096.
+
+2004-10-21  Chris Chambreau  <chcham@llnl.gov>
+
+	* _timers.h, configure, configure.in, make-wrappers.py, mpiPconfig.h.in:
+	Added timing checking and gettimeday configuration switch.
+
+2004-09-21  Chris Chambreau  <chcham@llnl.gov>
+
+	* Makefile.in, configure, mpiP-API.c, mpiP-API.h, pc_lookup.c:
+	Added support for mpiP functionality API.
+
+	* timers/aix_local.h, timers/aix_swclock.h: *** empty log message ***
+
+	* _timers.h, make-wrappers.py, mpiPi.c, mpiPi.h.in, pcontrol.c:
+	Removed unnecessary timer argument to TIMER macros that was left over
+	from AIX Switch Clock support, which is not being supported.
+
+2004-09-14  Chris Chambreau  <chcham@llnl.gov>
+
+	* pc_lookup.c:
+	Added debugging info if can't BFD fails due to NULL file.
+
+	* util.c:
+	Moved mpiPi.h above HAVE_LIBUNWIND pre-processor conditionals so that
+	HAVE_LIBUNWIND is actually set!
+
+	* glob.c, mpiPi.c, mpiPi.h.in, report.c:
+	Added patch number for release tracking
+
+	* mpi.protos.txt:
+	Not necessary to archive, as there is an mpi.protos.txt.in file
+
