@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH USE_LIBDWARF DISABLE_MPI_IO ENABLE_FORTRAN_XLATE USE_GETARG INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH USE_LIBDWARF DISABLE_MPI_IO ENABLE_FORTRAN_XLATE USE_GETARG INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
 ac_subst_files='HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -1477,6 +1477,12 @@ if test "${with_ldflags+set}" = set; then
 echo Using ld flags: $withval
 
 fi;
+
+
+
+if test -z ${FFLAGS} ; then
+  FFLAGS=${CFLAGS}
+fi
 
 
 
@@ -5269,6 +5275,8 @@ s,@target_cpu@,$target_cpu,;t t
 s,@target_vendor@,$target_vendor,;t t
 s,@target_os@,$target_os,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
+s,@CFLAGS@,$CFLAGS,;t t
+s,@FFLAGS@,$FFLAGS,;t t
 s,@BINUTILS_DIR@,$BINUTILS_DIR,;t t
 s,@BIN_TYPE_FLAG@,$BIN_TYPE_FLAG,;t t
 s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
@@ -5286,7 +5294,6 @@ s,@CC@,$CC,;t t
 s,@CXX@,$CXX,;t t
 s,@F77@,$F77,;t t
 s,@LAUNCH@,$LAUNCH,;t t
-s,@CFLAGS@,$CFLAGS,;t t
 s,@CPPFLAGS@,$CPPFLAGS,;t t
 s,@ac_ct_CC@,$ac_ct_CC,;t t
 s,@EXEEXT@,$EXEEXT,;t t

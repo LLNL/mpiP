@@ -11,6 +11,9 @@ AR	= ar
 RANLIB	= @RANLIB@
 PYTHON  = python
 
+CFLAGS = @CFLAGS@
+FFLAGS = @FFLAGS@
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
@@ -26,16 +29,6 @@ ifneq ( $(srcdir), "." )
 CPPFLAGS   += -I.
 endif
 CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
-
-ifdef FAST
-OPT	+= -O3
-endif
-
-ifdef NODEBUG
-OPT	+= 
-else
-OPT	+= -g
-endif
 
 OS	= $(shell uname)
 ARCH    = $(shell uname -m)
