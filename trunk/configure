@@ -870,6 +870,7 @@ Optional Packages:
   --with-binutils-dir     Base directory of binutils installation.
   --with-bin-type-flag    Binary format for AIX ar operations.
   --with-gettimeofday     Use gettimeofday for timing.
+  --with-clock_gettime    Use clock_gettime for timing.
 
 Some influential environment variables:
   CC          C compiler command
@@ -1565,6 +1566,7 @@ if test "${enable_bfd+set}" = set; then
 _ACEOF
 
 echo Use of libbfd has been disabled
+DISABLE_BFD=yes
 
 fi;
 
@@ -1613,6 +1615,19 @@ if test "${with_gettimeofday+set}" = set; then
 _ACEOF
 
 echo Using gettimeofday for timing.
+
+fi;
+
+
+# Check whether --with-clock_gettime or --without-clock_gettime was given.
+if test "${with_clock_gettime+set}" = set; then
+  withval="$with_clock_gettime"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_CLOCK_GETTIME 1
+_ACEOF
+
+USE_CLOCK_GETTIME=true
+echo Using clock_gettime for timing.
 
 fi;
 
@@ -1827,7 +1842,7 @@ fi
 done
 test -n "$CC" || CC="mpicc"
 
-for ac_prog in mpCC_r xlC_r mpiCC cmpic++ c++ g++ CC cxx icc
+for ac_prog in mpCC_r xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2882,6 +2897,82 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+
+echo "$as_me:$LINENO: checking for sqrt in -lm" >&5
+echo $ECHO_N "checking for sqrt in -lm... $ECHO_C" >&6
+if test "${ac_cv_lib_m_sqrt+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char sqrt ();
+int
+main ()
+{
+sqrt ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_m_sqrt=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_m_sqrt=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_m_sqrt" >&5
+echo "${ECHO_T}$ac_cv_lib_m_sqrt" >&6
+if test $ac_cv_lib_m_sqrt = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBM 1
+_ACEOF
+
+  LIBS="-lm $LIBS"
+
+fi
+
+
+if test -z "$DISABLE_BFD" ; then
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3663,156 +3754,6 @@ _ACEOF
 
 fi
 
-
-echo "$as_me:$LINENO: checking for sqrt in -lm" >&5
-echo $ECHO_N "checking for sqrt in -lm... $ECHO_C" >&6
-if test "${ac_cv_lib_m_sqrt+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lm  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char sqrt ();
-int
-main ()
-{
-sqrt ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_m_sqrt=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_m_sqrt=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_m_sqrt" >&5
-echo "${ECHO_T}$ac_cv_lib_m_sqrt" >&6
-if test $ac_cv_lib_m_sqrt = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBM 1
-_ACEOF
-
-  LIBS="-lm $LIBS"
-
-fi
-
-
-echo "$as_me:$LINENO: checking for MPI_File_open in -lmpio" >&5
-echo $ECHO_N "checking for MPI_File_open in -lmpio... $ECHO_C" >&6
-if test "${ac_cv_lib_mpio_MPI_File_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmpio  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char MPI_File_open ();
-int
-main ()
-{
-MPI_File_open ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_mpio_MPI_File_open=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_mpio_MPI_File_open=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_mpio_MPI_File_open" >&5
-echo "${ECHO_T}$ac_cv_lib_mpio_MPI_File_open" >&6
-if test $ac_cv_lib_mpio_MPI_File_open = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBMPIO 1
-_ACEOF
-
-  LIBS="-lmpio $LIBS"
-
-fi
-
-
-if test -z "$DISABLE_BFD" ; then
 if test "${ac_cv_header_bfd_h+set}" = set; then
   echo "$as_me:$LINENO: checking for bfd.h" >&5
 echo $ECHO_N "checking for bfd.h... $ECHO_C" >&6
@@ -4096,6 +4037,82 @@ _ACEOF
 fi
 
 fi
+if test "$USE_CLOCK_GETTIME" = "true"; then
+
+echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
+echo $ECHO_N "checking for clock_gettime in -lrt... $ECHO_C" >&6
+if test "${ac_cv_lib_rt_clock_gettime+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lrt  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char clock_gettime ();
+int
+main ()
+{
+clock_gettime ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_rt_clock_gettime=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_rt_clock_gettime=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_rt_clock_gettime" >&5
+echo "${ECHO_T}$ac_cv_lib_rt_clock_gettime" >&6
+if test $ac_cv_lib_rt_clock_gettime = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBRT 1
+_ACEOF
+
+  LIBS="-lrt $LIBS"
+
+fi
+
+fi
 if test -z "$DISABLE_LIBUNWIND" ; then
 if test "${ac_cv_header_libunwind_h+set}" = set; then
   echo "$as_me:$LINENO: checking for libunwind.h" >&5
@@ -4340,9 +4357,81 @@ if test $ac_cv_func_MPI_File_open = yes; then
 _ACEOF
  HAVE_MPI_IO=mpi.io.protos.txt
 else
+  echo "$as_me:$LINENO: checking for MPI_File_open in -lmpio" >&5
+echo $ECHO_N "checking for MPI_File_open in -lmpio... $ECHO_C" >&6
+if test "${ac_cv_lib_mpio_MPI_File_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpio  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char MPI_File_open ();
+int
+main ()
+{
+MPI_File_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_mpio_MPI_File_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_mpio_MPI_File_open=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_mpio_MPI_File_open" >&5
+echo "${ECHO_T}$ac_cv_lib_mpio_MPI_File_open" >&6
+if test $ac_cv_lib_mpio_MPI_File_open = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPI_IO 1
+_ACEOF
+ HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS}-lmpio"
+else
   echo "$as_me:$LINENO: result: MPI I/O symbols not found.  MPI I/O reporting deactivated." >&5
 echo "${ECHO_T}MPI I/O symbols not found.  MPI I/O reporting deactivated." >&6
-HAVE_MPI_IO=/dev/null
+                HAVE_MPI_IO=/dev/null
+fi
+
 
 fi
 
