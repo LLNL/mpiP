@@ -149,6 +149,7 @@ extern char *mpiPi_vdate;
 extern char *mpiPi_vtime;
 
 extern int mpiPi_debug;
+extern int mpiPi_do_demangle;
 
 
 
