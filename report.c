@@ -397,7 +397,7 @@ mpiPi_profile_print (FILE * fp)
     int ac;
     callsite_src_id_cache_entry_t **av;
     int fileLenMax = 15;
-    int funcLenMax = 25;
+    int funcLenMax = 24;
 
     h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
     sprintf (buf, "Callsites: %d", ac);
@@ -419,7 +419,7 @@ mpiPi_profile_print (FILE * fp)
           }
       }
 
-    fprintf (fp, "%3s %3s %-*s %4s %-*s %-25s\n",
+    fprintf (fp, "%3s %3s %-*s %5s %-*s %s\n",
 	     "ID", "Lev", fileLenMax, "File/Address", "Line", funcLenMax, 
              "Parent_Funct", "MPI_Call");
 
@@ -437,7 +437,7 @@ mpiPi_profile_print (FILE * fp)
                 fprintf (fp, "%3d %3d 0x%-*.*lx %-*s %s\n",
                          av[i]->id,
                          j,
-                         fileLenMax+3,
+                         fileLenMax+4,
                          sizeof(void*)*2,
                          av[i]->pc[j], 
                          funcLenMax,
@@ -448,7 +448,7 @@ mpiPi_profile_print (FILE * fp)
               }
             else
               {
-                fprintf (fp, "%3d %3d %-*s %4d %-*s %s\n",
+                fprintf (fp, "%3d %3d %-*s %5d %-*s %s\n",
                          av[i]->id,
                          j,
                          fileLenMax,
