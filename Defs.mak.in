@@ -51,16 +51,16 @@ TARGET	 = libmpiP.a
 MPIPLIB  = mpiP
 MPIPFLIB = mpiP
 
-FORTRAN_TARGET =
+#  On Linux, GNU and Intel Fortran compilers require a separate
+#  library, due to unique argc/argv symbols.
 
-ifeq (f77, $(FC))
-#  Compaq Fortran
-else 
-    ifneq (,$(findstring f77, $(FC)))
-      FORTRAN_FLAG = -DGNU_Fortran
-      FORTRAN_TARGET = libmpiPf77.a
-      MPIPFLIB = mpiPf77
-    endif
+FORTRAN_TARGET =
+F77_IS_GNU = @F77_IS_GNU@
+
+ifeq ($(F77_IS_GNU),true)
+  FORTRAN_FLAG = -DGNU_Fortran
+  FORTRAN_TARGET = libmpiPf77.a
+  MPIPFLIB = mpiPf77
 endif
 
 ifneq (,$(findstring ifc, $(FC)))
@@ -69,9 +69,6 @@ ifneq (,$(findstring ifc, $(FC)))
     MPIPFLIB = mpiPifc
 endif
 
-ifneq (,$(findstring xlf, $(FC)))
-    CPPFLAGS += -DAIX
-endif
 
 CFLAGS	+= ${OPT}
 CPPFLAGS+= -D${OS}

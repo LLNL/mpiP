@@ -48,7 +48,7 @@ echo Using extra libraries: $withval
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r gcc cc ifc, gcc)
 AC_CHECK_PROGS(CXX, mpCC_r xlC_r c++ g++ CC cxx ifc, c++)
-AC_CHECK_PROGS(F77, mpxlf_r xlf_r g77 pgf77 fort, g77)
+AC_CHECK_PROGS(F77, mpxlf_r xlf_r f77 g77 pgf77 fort, g77)
 AC_CHECK_PROGS(LAUNCH, poe prun mpirun, mpirun)
 
 AC_CHECK_HEADERS(demangle.h)
@@ -94,5 +94,16 @@ else
 fi
 AC_SUBST(F77_SYMBOLS)
 AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
+
+
+dnl ========== Check if F77 is GNU ==========
+AC_MSG_CHECKING(GNU fortran compiler)
+if $F77 -v 2>&1 | grep -e gcc 1> /dev/null 2> /dev/null ; then
+  AC_SUBST(F77_IS_GNU,"true")
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
 
 AC_OUTPUT(Defs.mak Makefile testing/Makefile Check.mak)
