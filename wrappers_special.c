@@ -28,12 +28,18 @@ static int
 _MPI_Init (int *argc, char ***argv, void *pc)
 {
   int rc = 0;
+  int enabledStatus;
 
 /*    assert (pc != NULL); */
   assert (argc != NULL);
   assert (argv != NULL);
 
+  enabledStatus = mpiPi.enabled;
+  mpiPi.enabled = 0;
+
   rc = PMPI_Init (argc, argv);
+
+  mpiPi.enabled = enabledStatus;
 
   mpiPi_init (GetBaseAppName (**argv));
 
