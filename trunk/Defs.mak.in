@@ -13,8 +13,12 @@ PYTHON  = python
 
 LIBS        = @LIBS@
 LDFLAGS     = @LDFLAGS@
-CPPFLAGS    = -I$(srcdir) -I. @CPPFLAGS@
 F77_SYMBOLS = @F77_SYMBOLS@
+
+ifneq ( $(srcdir), "." )
+CPPFLAGS   += -I.
+endif
+CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
 
 ifdef FAST
 OPT	+= -O4
@@ -29,6 +33,10 @@ endif
 
 OS	+= $(shell uname)
 ARCH    = $(shell uname -m)
+
+ifeq ($(OS),OSF1)
+  LIBS += -lexc
+endif
 
 ifeq ($(OS),Linux)
   ifeq ($(ARCH),i686)
