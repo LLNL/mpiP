@@ -8,7 +8,7 @@
    Lawrence Livermore National Lab, Center for Applied Scientific Computing
    04 Oct 2000
 
-   mpiTi_timers.h -- timer macros
+   _timers.h -- timer macros
 
 */
 
@@ -33,13 +33,14 @@ typedef double mpiP_TIMER;
 
 #else
 /* gettimeofday returns microseconds */
-#define mpiPi_TIMER int
+#define mpiPi_TIMER double
 #define mpiPi_TIME struct timeval
+#define mpiPi_TIMER_NAME "gettimeofday"
 #define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIMER));}
 #define mpiPi_GETTIME(timeaddr) gettimeofday(timeaddr,NULL)
-#define mpiPi_GETUSECS(timeaddr) ((mpiP_TIMER)(((mpiP_TIMER)(timeaddr)->tv_sec*USECS)+(timeaddr)->tv_usec))
+#define mpiPi_GETUSECS(timeaddr) (((mpiPi_TIMER)(timeaddr)->tv_sec)*USECS+((mpiPi_TIMER)(timeaddr)->tv_usec))
 #define mpiPi_PRINTTIME(taddr) printf("Time is %ld sec and %ld usec.\n", (taddr)->tv_sec, (taddr)->tv_usec)
-#define mpiPi_GETTIMEDIFF(end,start) ((mpiP_TIMER)(((end)->tv_sec*USECS)+(end)->tv_usec)-(((start)->tv_sec*USECS)+(start)->tv_usec))
+#define mpiPi_GETTIMEDIFF(end,start) ((mpiP_TIMER)((((mpiPi_TIMER)(end)->tv_sec)*USECS)+(end)->tv_usec)-((((mpiPi_TIMER)(start)->tv_sec)*USECS)+(start)->tv_usec))
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
 
 #endif
