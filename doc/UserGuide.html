@@ -222,8 +222,8 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <tr><td>--enable-check-time</td><td>Enable AIX check for negative time values.</td><td>Activate IBM timing debugging code.</td></tr>
 <tr><td>--enable-getarg</td><td>Use getarg to get fortran command line args.</td><td>This was used with the Intel 8.0 compiler in order to identify the name of Fortran applications.  This should no longer be needed given new application name identification support.  This option will be removed in the next release.</td></tr>
 </tbody></table>
-<h3><a name="Linking_Examples">Example Application Link Commands for LLNL Machines</a></h3>
-<p><b>LLNL Linux users (MCR/Pengra/ALC/Thunder) can now use the srun-mpip wrapper script to use mpiP without re-linking their application.</b>  An example script for mpirun is provided in the mpiP bin directory.
+<h3><a name="Linking_Examples">Example LLNL Application Link Commands</a></h3>
+<p><b>LLNL users can now use the srun-mpip, poe-mpip, and poe-mpip-cxx wrapper scripts to use mpiP without re-linking their application.  AIX executables would still need to be linked with -bnoobjreorder for successful runtime address lookup.  Additionally, all LLNL installations contain the appropriate binutils objects in the mpiP library, so the -lbfd, -liberty, and -lintl flags are not required.</b>  An example runtime script for mpirun is provided in the mpiP bin directory.
 </p>
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
 <tbody><tr>
@@ -318,10 +318,8 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 </tbody></table>
 <p><b>Note</b>:</p>
 <ul>
-<li>On the LLNL ia64-Linux machine Thunder, /usr/lib/libunwind.a must be added to
-the link line so that the non-Intel library is used for stack
-unwinding. It may also be necessary to add "-ldl" when linking on this
-system.</li>
+<li>On BG/L machines, the script mpip-insert-src can be used from a login node to translate addresses
+in the mpiP report to source information.</li>
 <li>On Tru64, the exception library flag (<span class="commandline">-lexc</span>)
 must be added to the link command. </li>
 <li>Source lookup for callsites may fail with certain versions of binutils. If
