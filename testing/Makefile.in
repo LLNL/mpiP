@@ -7,7 +7,7 @@ VPATH = $(srcdir)
 
 include ../Defs.mak
 
-CFLAGS	+= -g
+CFLAGS	+= 
 LDFLAGS	+= -L..
 LIBS	:= -lmpiP $(LIBS)
 
