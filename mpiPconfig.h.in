@@ -17,6 +17,9 @@
 /* Define if MPI I/O function are present */
 #undef HAVE_MPI_IO
 
+/* Define if bfd_boolean not defined */
+#undef BFD_TRUE_FALSE
+
 #endif /* _CONFIG_H */
 
 /* 
