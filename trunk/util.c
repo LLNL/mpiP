@@ -68,8 +68,8 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
     {
       unwind(context, 0);
       
-      /* record this frame's pc */
-      pc_array[i] = (void*)context->sc_pc;
+      /* record this frame's pc and calculate the previous instruction  */
+      pc_array[i] = (void*)context->sc_pc - (void*)0x4; 
       pc = (void*)context->sc_pc;
     }
     else
@@ -86,6 +86,8 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 {
   int i;
   void *fp;
+  void* pc;
+
   /* start w/ the parent frame, not ours (we know who's calling) */
   fp = ParentFP(jb);
   for (i = 0; i < max_back; i++)
@@ -93,8 +95,15 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
       if (fp != NULL)
 	{
 	  /* record this frame's pc */
-	  pc_array[i] = FramePC(fp);
-
+	  pc = FramePC(fp);
+	  if ( pc != NULL )
+	  {
+            /*  Get previous instruction  */
+	    pc_array[i] = (void*)((char*)pc - 1);
+	  }
+          else
+            pc_array[i] = NULL;
+          
 	  /* update frame ptr */
 	  fp = NextFP(fp);
 	}
