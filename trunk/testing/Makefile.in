@@ -7,7 +7,7 @@ VPATH = $(srcdir)
 
 include ../Defs.mak
 
-CFLAGS	+= 
+CFLAGS	+= -I..
 FFLAGS  += -g 
 LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
@@ -29,16 +29,22 @@ CSRCS =	0-simple.c \
 	11-p2p-mess-size.c \
 	12-null-null.c \
 	13-pcontrol-report.c \
-	14-mpiio.c
+	14-mpiio.c \
+	api-test.c \
+	timer-info.c
 
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
+EXES += api-test-f
 
 all: ${EXES}
 	@echo All done.
+
+api-test-f: api-test-f.o
+	${FC} ${FFLAGS} ${CPPFLAGS} api-test-f.o api-test.f -o $@ ${LDFLAGS} ${FLIBS}
 
 .SUFFIXES: .exe
 .c.exe:
