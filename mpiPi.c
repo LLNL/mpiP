@@ -142,6 +142,7 @@ mpiPi_init (char *appName)
   mpiPi.reportPrintThreshold = 0.0;
   mpiPi.baseNames = 0;
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
+  mpiPi.calcCOV = 0;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -522,7 +523,7 @@ mpiPi_mergeResults ()
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
-	      /* inerst new record into global */
+	      /* insert new record into global */
 	      h_insert (mpiPi.global_callsite_stats, newp);
 	    }
 	  else
@@ -565,7 +566,14 @@ mpiPi_mergeResults ()
 	      newp->cumulativeDataSent = p->cumulativeDataSent;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
-	      /* inerst new record into global */
+	      if ( mpiPi.calcCOV )
+	      {
+                newp->siteData = (double*)malloc(mpiPi.size*sizeof(double));
+                newp->siteData[0] = p->cumulativeTime;
+                newp->siteDataIdx = 1;
+	      }
+
+	      /* insert new record into global */
 	      h_insert (mpiPi.global_callsite_stats_agg, newp);
 	    }
 	  else
@@ -578,6 +586,12 @@ mpiPi_mergeResults ()
               csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
               csp->minDataSent = min (csp->minDataSent, p->minDataSent);
 	      csp->cumulativeDataSent += p->cumulativeDataSent;
+
+	      if ( mpiPi.calcCOV )
+	      {
+                csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
+                csp->siteDataIdx++;
+	      }
 	    }
 
 	  mpiPi_msg_debug ("%d: %d %d=[%s,%d,%s]\n", i, p->op, p->csid,

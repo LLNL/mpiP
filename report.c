@@ -29,7 +29,7 @@ static char *rcsid =
 
 #define icmp(a,b) (((a)<(b))?(-1):(((a)>(b))?(1):(0)))
 
-static char* mpiP_Report_Formats[8][2] = {
+static char* mpiP_Report_Formats[9][2] = {
   { 
     /*  MPIP_MPI_TIME_FMT  */
     "%4d %10.3g %10.3g    %5.2lf\n",
@@ -44,6 +44,11 @@ static char* mpiP_Report_Formats[8][2] = {
     /*  MPIP_AGGREGATE_TIME_FMT  */
     "%-20s %4d %10.3g  %6.2lf  %6.2lf\n",
     "%-20s %4d %10.3f  %6.2lf  %6.2lf\n"
+  },
+  { 
+    /*  MPIP_AGGREGATE_COV_TIME_FMT  */
+    "%-20s %4d %10.3g  %6.2lf  %6.2lf  %6.2lf\n",
+    "%-20s %4d %10.3f  %6.2lf  %6.2lf  %6.2lf\n",
   },
   { 
     /*  MPIP_AGGREGATE_MESS_FMT  */
@@ -198,6 +203,37 @@ print_intro_line (FILE *fp, char *name, char *fmt, ...)
 
   va_end (args);
 }
+
+
+double 
+calc_COV (double* data, int dataSize)
+{
+  int idx;
+  double tot, avrg, var, std;
+
+  tot  = 0.0;
+  avrg = 0.0;
+  var  = 0.0;
+  std  = 0.0;
+  
+  for ( idx = 0; idx < dataSize; idx++ )
+    tot += data[idx];
+  
+  avrg = tot/dataSize;
+
+  for ( idx = 0; idx < dataSize; idx++ )
+    var += (data[idx] - avrg)*(data[idx] - avrg);
+
+  if ( dataSize > 1 )
+  {
+    var /= dataSize - 1;
+    std = sqrt(var);
+    return std/avrg;
+  }
+  else
+    return 0;
+}
+
 
 int
 mpiPi_profile_print (FILE * fp)
@@ -386,6 +422,7 @@ mpiPi_profile_print (FILE * fp)
   {
     int ac;
     callsite_stats_t **av;
+    double timeCOV;
 
     h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
 
@@ -396,17 +433,42 @@ mpiPi_profile_print (FILE * fp)
 
     print_section_heading (fp,
 			   "Aggregate Time (top twenty, descending, milliseconds)");
-    fprintf (fp, "%-20s %4s %12s%6s  %6s\n", "Call", "Site", "Time  ",
-	     "App%", "MPI%");
+
+    if ( mpiPi.calcCOV )
+    {
+      fprintf (fp, "%-20s %4s %12s%6s  %6s  %6s\n", "Call", "Site", "Time  ",
+	       "App%", "MPI%", "COV");
+    }
+    else
+    {
+      fprintf (fp, "%-20s %4s %12s%6s  %6s\n", "Call", "Site", "Time  ",
+	       "App%", "MPI%");
+    }
 
     for (i = 0; (i < 20) && (i < ac); i++)
       {
-	fprintf (fp, mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT][mpiPi.reportFormat],
-		 &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), av[i]->csid,
-		 av[i]->cumulativeTime / 1000.0,
-		 100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time *
-						  1e6),
-		 mpiPi.global_mpi_time > 0 ? 100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time : 0);
+        if ( mpiPi.calcCOV )
+        {
+          timeCOV = calc_COV(av[i]->siteData, av[i]->siteDataIdx);
+          free(av[i]->siteData);
+
+  	  fprintf (fp, mpiP_Report_Formats[MPIP_AGGREGATE_COV_TIME_FMT][mpiPi.reportFormat],
+	  	   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), av[i]->csid,
+		   av[i]->cumulativeTime / 1000.0,
+		   100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time * 1e6),
+		   mpiPi.global_mpi_time > 0 ? 
+                   (100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time) : 0,
+                   timeCOV);
+	}
+	else
+	{
+          fprintf (fp, mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT][mpiPi.reportFormat],
+                   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]), av[i]->csid,
+                   av[i]->cumulativeTime / 1000.0,
+                   100.0 * av[i]->cumulativeTime / (mpiPi.global_app_time *
+                                                    1e6),
+                   mpiPi.global_mpi_time > 0 ? 100.0 * av[i]->cumulativeTime / mpiPi.global_mpi_time : 0);
+        }
       }
 
     free (av);

@@ -53,6 +53,8 @@ typedef struct _callsite_stats
   double maxDataSent;
   double minDataSent;
   double cumulativeDataSent;
+  double *siteData;
+  int siteDataIdx;
   void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
   char *filename[MPIP_CALLSITE_STACK_DEPTH_MAX];
   char *functname[MPIP_CALLSITE_STACK_DEPTH_MAX];
@@ -97,13 +99,14 @@ mpiPi_lookup_t;
 extern mpiPi_lookup_t mpiPi_lookup[];
 
 enum { MPIP_MPI_TIME_FMT, MPIP_MPI_TIME_SUMMARY_FMT,
-       MPIP_AGGREGATE_TIME_FMT, MPIP_AGGREGATE_MESS_FMT,
+       MPIP_AGGREGATE_TIME_FMT, MPIP_AGGREGATE_COV_TIME_FMT,
+       MPIP_AGGREGATE_MESS_FMT,
        MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT, 
        MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT
 };
 
 typedef enum { MPIP_REPORT_SCI_FORMAT, MPIP_REPORT_FLT_FORMAT } 
-MPIP_REPORT_FORMAT_TYPE;
+  MPIP_REPORT_FORMAT_TYPE;
 
 typedef struct _mpiPi_t
 {
@@ -154,6 +157,7 @@ typedef struct _mpiPi_t
   double reportPrintThreshold;
   int baseNames;
   MPIP_REPORT_FORMAT_TYPE reportFormat;
+  int calcCOV;
 }
 mpiPi_t;
 
