@@ -618,6 +618,7 @@ mpiPi_publishResults ()
   callsite_stats_t **av;
   int i;
   FILE *fp;
+  static int printCount = 0;
 
   if (mpiPi.collectorRank != mpiPi.rank)
     {
@@ -650,8 +651,14 @@ mpiPi_publishResults ()
 	    nowstr[i] = '-';
 	  }
       }
-    sprintf (mpiPi.oFilename, "%s/%s.%d.%d.mpiP", mpiPi.outputDir,
-	     mpiPi.appName, mpiPi.size, mpiPi.procID);
+    if ( printCount == 0 )
+      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.mpiP", mpiPi.outputDir,
+               mpiPi.appName, mpiPi.size, mpiPi.procID);
+    else
+      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+               mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+
+    printCount++;
     fp = fopen (mpiPi.oFilename, "w");
   }
   if (fp == NULL)
@@ -749,8 +756,9 @@ mpiPi_collect_basics ()
   return;
 }
 
+
 void
-mpiPi_finalize ()
+mpiPi_generateReport ()
 {
   double dur;
   mpiPi_GETTIME (&mpiPi.apptimer, &mpiPi.endTime);
@@ -770,12 +778,20 @@ mpiPi_finalize ()
   mpiPi_collect_basics ();
   if ( mpiPi_mergeResults () )
     mpiPi_publishResults ();
+}
+
+
+void
+mpiPi_finalize ()
+{
+  mpiPi_generateReport();
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
 
   return;
 }
+
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
@@ -791,6 +807,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 /*  fprintf(stderr, "received sendSize of %f\n", sendSize); */
 
   assert (mpiPi.task_callsite_stats != NULL);
+
 
   key.op = op;
   key.rank = rank;
