@@ -16,6 +16,7 @@ c      include mpif.h
      &     MPI_COMM_WORLD,ierr)
         print *,'after double precision broadcast I see ',
      &     rdarray(1),' in my array.'
+      return
       end
 
       subroutine runtest(rank, size)
@@ -70,6 +71,7 @@ c      include mpif.h
      &     MPI_MAX,MPI_COMM_WORLD,ierr)
         print *,'allreduce double p placed ', rdarray(1), 
      &    ' in rarray(1)'
+      return
       end
 
 
