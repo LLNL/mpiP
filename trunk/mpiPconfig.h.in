@@ -1,0 +1,15 @@
+
+#ifndef _MPIPCONFIG_H
+#define _MPIPCONFIG_H
+
+/* Define if demangle.h is present.  */
+#undef HAVE_DEMANGLE_H
+
+#endif /* _CONFIG_H */
+
+/* 
+ * Local Variables:
+ * mode: c
+ * End:
+ */
+

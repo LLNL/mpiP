@@ -1,0 +1,97 @@
+dnl Process this file with autoconf to produce a configure script.
+
+dnl These two lines disable the cache.
+define([AC_CACHE_LOAD], )
+define([AC_CACHE_SAVE], )
+
+AC_INIT(mpiPi.h)
+AC_PREREQ(2.13)
+AC_CONFIG_HEADER(mpiPconfig.h)
+AC_CONFIG_AUX_DIR(bin)
+
+AC_CANONICAL_SYSTEM
+
+AC_ARG_WITH(cc,
+[  --with-cc               Gives the name of the C compiler to use.],
+CC=$withval
+)
+
+AC_ARG_WITH(cxx,
+[  --with-cxx              Gives the name of the C++ compiler to use.],
+CXX=$withval
+)
+
+AC_ARG_WITH(f77,
+[  --with-f77              Gives the name of the FORTRAN 77 compiler to use.],
+F77=$withval
+)
+
+AC_ARG_WITH(include,
+[  --with-include          Specifies include directories (-Idir1 -Idir2).],
+CPPFLAGS=$withval
+echo Using extra include directories: $withval
+)
+
+AC_ARG_WITH(ldflags,
+[  --with-ldflags          Specifies ld flags (-L/usr/local/lib).],
+LDFLAGS=$withval
+echo Using ld flags: $withval
+)
+AC_SUBST(LDFLAGS)
+
+AC_ARG_WITH(libs,
+[  --with-libs             Specifies libraries (-llib1 -llib2).],
+LIBS=$withval
+echo Using extra libraries: $withval
+)
+
+AC_PROG_RANLIB
+AC_CHECK_PROGS(CC, mpcc_r xlc_r gcc cc ifc, gcc)
+AC_CHECK_PROGS(CXX, mpCC_r xlC_r c++ g++ CC cxx ifc, c++)
+AC_CHECK_PROGS(F77, mpxlf_r xlf_r g77 pgf77 fort, g77)
+
+AC_CHECK_HEADERS(demangle.h)
+AC_CHECK_LIB(intl,dcgettext__)
+AC_CHECK_LIB(iberty,objalloc_create)
+AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr))
+
+dnl ========== Find out how FORTRAN symbol names appear in C ==========
+AC_MSG_CHECKING(fortran symbols)
+if test -n "$F77" -a "$F77" != no ; then
+  /bin/rm -f ffunc.f flink.c
+  echo "      subroutine f_fun()" > ffunc.f
+  echo "      return" >> ffunc.f
+  echo "      end" >> ffunc.f
+  $F77 -c ffunc.f 1>/dev/null 2>/dev/null
+  echo "main(){ FF(); return 0; }" > flink.c
+  if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(same as C)
+    F77_SYMBOLS=symbol
+  elif $CC -o flink -DFF=f_fun_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(lowercase with underscore)
+    F77_SYMBOLS=symbol_
+  elif $CC -o flink -DFF=f_fun__ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(lowercase with 2 underscores)
+    F77_SYMBOLS=symbol__
+  elif $CC -o flink -DFF=F_FUN flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(uppercase)
+    F77_SYMBOLS=SYMBOL
+  elif $CC -o flink -DFF=F_FUN_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(uppercase with underscore)
+    F77_SYMBOLS=SYMBOL_
+  elif $CC -o flink -DFF=F_FUN_ flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
+    AC_MSG_RESULT(uppercase with 2 underscores)
+    F77_SYMBOLS=SYMBOL__
+  else
+    AC_MSG_RESULT(giving up)
+    AC_MSG_ERROR(could not determine F77 symbol names)
+  fi
+  /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
+else
+  F77_SYMBOLS=symbol_
+  AC_MSG_RESULT(guessing lowercase with underscore)
+fi
+AC_SUBST(F77_SYMBOLS)
+AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
+
+AC_OUTPUT(Defs.mak Makefile testing/Makefile)

@@ -1,0 +1,47 @@
+# Makefile for MPIP	-*-Makefile-*-
+# Copyright (C) 2001 Jeffrey Vetter vetter3@llnl.gov
+# $Header$
+
+SHELL	= /bin/sh
+MAKE	= make
+CC	= @CC@
+CXX	= @CXX@
+FC	= @F77@
+AR	= ar
+RANLIB	= @RANLIB@
+PYTHON  = python
+
+LIBS        = @LIBS@
+LDFLAGS     = @LDFLAGS@
+CPPFLAGS    = -I$(srcdir) -I. @CPPFLAGS@
+F77_SYMBOLS = @F77_SYMBOLS@
+
+ifdef FAST
+OPT	+= -O4
+CPPFLAGS+= -DFAST
+endif
+
+ifdef NODEBUG
+OPT	+= 
+else
+OPT	+= -g
+endif
+
+OS	+= $(shell uname)
+ARCH    = $(shell uname -m)
+
+ifeq ($(OS),Linux)
+  ifeq ($(ARCH),i686)
+    CPPFLAGS += -DIA32
+  endif
+  ifeq ($(ARCH),alpha)
+    CPPFLAGS += -Dalpha
+  endif
+endif
+
+CFLAGS	+= ${OPT}
+CPPFLAGS+= -D${OS}
+LFLAGS	+=
+LIBS	+=
+
+##### EOF

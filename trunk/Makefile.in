@@ -1,0 +1,55 @@
+# Makefile for MPIP	-*-Makefile-*-
+# Copyright (C) 2001 Jeffrey Vetter vetter3@llnl.gov
+# $Header$
+
+srcdir=@srcdir@
+VPATH = $(srcdir)
+
+include Defs.mak
+
+TARGET	= libmpiP.a
+
+all: ${TARGET}
+	@echo All done.
+
+SRCS =	diag_msgs.c \
+	hash.c \
+	glob.c \
+	wrappers.c \
+	wrappers_special.c \
+	mpiPi.c \
+	util.c \
+	lookup.c \
+	pc_lookup.c \
+	report.c \
+	pcontrol.c
+OBJS = $(SRCS:.c=.o)
+
+${TARGET}: ${OBJS} TAGS
+	${AR} ruv $@ ${OBJS}
+	${RANLIB} $@
+
+TAGS: ${SRCS}
+	etags $^
+
+clean::
+	rm -f TAGS tags
+
+include $(srcdir)/Rules.mak
+
+pc_lookup.o: pc_lookup.c
+	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
+
+wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
+	$(PYTHON) $(srcdir)/make-wrappers.py --f77symbol $(F77_SYMBOLS) $^
+
+${OBJS}: mpiPi_def.h
+
+clean::
+	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
+
+MPIINC	= -I/usr/lpp/ppe.poe/include
+lint: ${SRCS}
+	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
+
+##### EOF
