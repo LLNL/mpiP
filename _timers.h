@@ -24,7 +24,7 @@
 #if (defined(SunOS))
 #include "timers/sunos_local.h"
 
-#elif (defined(AIX))
+#elif (defined(AIX) && ! defined(USE_GETTIMEOFDAY))
 #include "timers/aix_local.h"
 
 #else

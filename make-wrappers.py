@@ -680,6 +680,7 @@ def CreateWrapper(funct, olist):
     olist.append("\n" \
 		 + "mpiPi_GETTIME (&end);\n" \
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" \
+		 + "if ( dur < 0 ) mpiPi_msg_warn(\"Negative time difference : %11.9f\\n\", mpiPi_msg_warn);\n" \
 #		 + "{\n" \
 #		 + " mpiTi_event_t e;\n" \
 #		 + "e.op = mpiTi_"+funct+";\n" \

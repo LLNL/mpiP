@@ -23,6 +23,9 @@
 /* Define to activate check for negative time values */
 #undef MPIP_CHECK_TIME
 
+/* Define to force use of gettimeofday for timing */
+#undef USE_GETTIMEOFDAY
+
 #endif /* _CONFIG_H */
 
 /* 
