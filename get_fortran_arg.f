@@ -8,10 +8,10 @@
 !   Integrated Computing and Communications, LLNL
 !   23 Jun 2004
 !
+!   $Header$
+!
 !   get_fortran_arg.f -- access fortran command line arguments
 !
-       character*(128) rcsid
-       data rcsid /'$Header$'/
 
        subroutine mpipi_get_fortran_argc(argc_val)
        !DEC$ attributes C :: mpipi_get_fortran_argc
