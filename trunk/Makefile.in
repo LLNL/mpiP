@@ -107,6 +107,9 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 
 ${OBJS}: mpiPi_def.h
 
+proto:
+	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed '/find_address/d' > mpiPi_proto.h
+
 clean::
 	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
 
