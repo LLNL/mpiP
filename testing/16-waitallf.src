@@ -1,0 +1,3 @@
+checkOutput "0 16-waitallf.f.* +20 \.?(waitallf.|main|MAIN..)" "Source check:"
+checkOutput "0 16-waitallf.f.* +23 \.?(waitallf.|main|MAIN..)" "Source check:"
+checkOutput "0 16-waitallf.f.* +26 \.?(waitallf.|main|MAIN..)" "Source check:"
