@@ -168,7 +168,7 @@ endif
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --f77symbol $(F77_SYMBOLS) $^
 
-${OBJS}: mpiPi_def.h
+${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h
 
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	mkdir -p ${libdir} ${includedir} ${docdir} ${bindir}
