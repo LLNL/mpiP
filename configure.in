@@ -146,6 +146,16 @@ echo Using gettimeofday for timing.
 ,
 )
 
+AC_ARG_WITH(clock_gettime,
+[  --with-clock_gettime    Use clock_gettime for timing.],
+AC_DEFINE(USE_CLOCK_GETTIME)
+USE_CLOCK_GETTIME=true
+echo Using clock_gettime for timing.
+,
+AC_DEFINE(USE_CLOCK_GETTIME)
+USE_CLOCK_GETTIME=true
+)
+
 AC_ARG_ENABLE(check-time,
 [  --enable-check-time     Enable AIX check for negative time values.],
 AC_DEFINE(MPIP_CHECK_TIME)
@@ -156,7 +166,7 @@ echo AIX negative time value checking has been enabled
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
-AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC cmpic++ c++ g++ CC cxx icc, mpiCC)
+AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpiCC)
 AC_CHECK_PROGS(F77, mpxlf_r xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc, mpif77)
 AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
 
@@ -169,6 +179,9 @@ AC_CHECK_LIB(iberty,objalloc_create)
 AC_CHECK_HEADER(bfd.h,AC_CHECK_LIB(bfd,bfd_openr,,,))
 AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h" 
 )
+fi
+if test "$USE_CLOCK_GETTIME" = "true"; then
+  AC_CHECK_LIB(rt,clock_gettime)
 fi
 if test -z "$DISABLE_LIBUNWIND" ; then
 AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
