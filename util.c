@@ -20,6 +20,11 @@ static char *rcsid =
 #include <string.h>
 #include <setjmp.h>
 #include <stdio.h>
+
+#ifdef OSF1
+#include <excpt.h>
+#endif
+
 #include "mpiPi.h"
 
 static int argc=0;
@@ -40,6 +45,37 @@ GetBaseAppName (char *rawName)
     }
 }
 
+
+#ifdef OSF1
+
+void
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+{
+  int i;
+  void *pc;
+  PCONTEXT context;
+
+  context = (PCONTEXT)jb;
+  pc = context->sc_pc;
+
+  for (i = 0; i < max_back; i++)
+  {
+    if ( pc != NULL )
+    {
+      unwind(context, 0);
+      
+      /* record this frame's pc */
+      pc_array[i] = context->sc_pc;
+      pc = context->sc_pc;
+    }
+    else
+    {
+      pc_array[i] = NULL;
+    }
+  }
+}
+
+#else  /* not OSF1 */
 
 void
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
@@ -65,6 +101,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 	}
     }
 }
+#endif
 
 
 void

@@ -61,17 +61,40 @@ find_address_in_section (abfd, section, data)
   assert (abfd);
   if (found)
     return;
+
+#ifdef OSF1
+  local_pc = pc | 0x100000000;
+#else
   local_pc = pc /*& (~0x10000000) */ ;
+#endif
+
   if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
+  {
+    mpiPi_msg_debug ("failed bfd_get_section_flags\n");
     return;
+  }
+
   vma = bfd_get_section_vma (abfd, section);
+
   if (local_pc < vma)
+  {
+    mpiPi_msg_debug ("failed bfd_get_section_vma: local_pc=0x%p  vma=0x%p\n",
+      local_pc, vma);
     return;
-  size = bfd_get_section_size_before_reloc (section);
-  mpiPi_msg_debug ("find_address_in_section: pc=%x vma=%x size=%d\n",
-		   (long) local_pc, vma, size);
+  }
+
+  if ( section->reloc_done )
+     size = bfd_get_section_size_after_reloc (section);
+  else
+     size = bfd_get_section_size_before_reloc (section);
+		   
   if (local_pc >= vma + size)
+  {
+    mpiPi_msg_debug ("PC not in section: pc=%x vma=%x-%x\n",
+  		     (long) local_pc, vma, vma+size);
     return;
+  }
+
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
 }
