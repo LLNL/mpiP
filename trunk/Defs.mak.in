@@ -57,10 +57,15 @@ ifeq ($(OS),Linux)
   endif
   ifeq ($(ARCH),x86_64)
     CPPFLAGS += -DX86_64
+    MAKE_WRAPPERS_ARGS += --xlate
   endif
   ifeq ($(ARCH),ppc64)
     CPPFLAGS += -Dppc64
   endif
+  ifeq ($(ARCH),ia64)
+    MAKE_WRAPPERS_ARGS += --xlate
+  endif
+
 
 endif
 

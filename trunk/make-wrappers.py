@@ -121,6 +121,12 @@ class fdecl:
         self.recvTypePname = ""
         self.ioCountPname = ""
         self.ioTypePname = ""
+
+class xlateEntry:
+    def __init__ (self,mpiType,varName):
+        "initialize a new Fortran translation structure"
+        self.mpiType = mpiType
+        self.varName = varName
         
 
 def ProcessDirectiveLine(lastFunction, line):
@@ -820,44 +826,127 @@ def CreateWrapper(funct, olist):
 
     ##### funct decl
     olist.append("\n\nextern void " + "F77_" + string.upper(funct) + "(" )
+    
+    ###  Type translation information
+    xlateVarName = ""
+    xlateVarNames = []
+    xlateTypes = []
+    xlateCount = 0
+    #  Input types to translate
+    xlateTargetTypes = [ "MPI_Comm", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
+    #  Values that need to be translated before returning
+    xlateExitInfo = {}
+    xlateExitInfo["MPI_Cart_create"] = xlateEntry("Comm", "comm_cart")
+    xlateExitInfo["MPI_Cart_sub"] = xlateEntry("Comm", "comm_new")
+    xlateExitInfo["MPI_Cart_sub"] = xlateEntry("Comm", "comm_new")
+    xlateExitInfo["MPI_Comm_create"] = xlateEntry("Comm", "comm_out")
+    xlateExitInfo["MPI_Comm_remote_group"] = xlateEntry("Group", "group")
+    xlateExitInfo["MPI_Comm_split"] = xlateEntry("Comm", "comm_out")
+    xlateExitInfo["MPI_Graph_create"] = xlateEntry("Comm", "comm_graph")
+    xlateExitInfo["MPI_Group_incl"] = xlateEntry("Group", "group_out")
+    xlateExitInfo["MPI_Group_intersection"] = xlateEntry("Group", "group_out")
+    xlateExitInfo["MPI_Group_range_include"] = xlateEntry("Group", "newgroup")
+    xlateExitInfo["MPI_Group_range_exclude"] = xlateEntry("Group", "newgroup")
+    xlateExitInfo["MPI_Group_union"] = xlateEntry("Group", "group_out")
+    xlateExitInfo["MPI_Intercomm_create"] = xlateEntry("Comm", "comm_out")
+    xlateExitInfo["MPI_Intercomm_merge"] = xlateEntry("Comm", "comm_out")
+    xlateExitInfo["MPI_Op_create"] = xlateEntry("Op", "op")
+        
+    freelist = []
+    
     for i in fdict[funct].paramConciseList:
-	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append(fdict[funct].paramDict[i].basetype + " * " + i)
-	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-	    olist.append(fdict[funct].paramDict[i].basetype)
-	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
-		olist.append(" *")
-	    olist.append(i)
-	else:
-	    pass
-	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-	    olist.append(", ")
+        # In the case where MPI_Fint and MPI_Request are not the same size,
+        #   we want to use MPI conversion functions.
+        # The most obvious problem we have encountered is for MPI_Request objects,
+        #   but Communicators, Group, Win, Info, Op are also possibily problems.
+        # There are two cases:
+        #   1) A single argument needs to be translated.
+        #   2) An array of objects needs to be allocated and translated.
+        #      This only appears necessary for Request and Datatype
+        if ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype in xlateTargetTypes ) :
+            currBasetype = "MPI_Fint"
+            xlateTypes.append(fdict[funct].paramDict[i].basetype)
+            xlateVarNames.append(i)
+            #  Try to identify whether array or single value
+            if ( xlateVarNames[xlateCount].count("array") > 0 ):
+                decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + ";\n";
+            else:
+                decl += xlateTypes[xlateCount] + " c_" + xlateVarNames[xlateCount] + ";\n";
+            xlateCount += 1
+        else:
+    		currBasetype = fdict[funct].paramDict[i].basetype
+    	if (fdict[funct].paramDict[i].pointerLevel == 0) \
+    	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
+    	   and (fdict[funct].paramDict[i].basetype != "void"):
+    	    olist.append(currBasetype + " * " + i)
+    	elif (fdict[funct].paramDict[i].pointerLevel > 0):
+    	    olist.append(currBasetype)
+    	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
+    		olist.append(" *")
+    	    olist.append(i)
+    	else:
+    	    pass
+    	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+    	    olist.append(", ")
     olist.append(" , int *ierr)")
     olist.append("{")
     olist.append(decl)
-
+    olist.append("\n")
+    
     if fdict[funct].wrapperPreList:
-	olist.extend(fdict[funct].wrapperPreList)
+	    olist.extend(fdict[funct].wrapperPreList)
 
-    olist.append("setjmp (jbuf);\n")
-
+    olist.append("setjmp (jbuf);\n\n")
+    
+    #  Generate pre-call translation code if necessary
+    for i in range(len(xlateVarNames)) :
+        xlateVarName = xlateVarNames[i]
+        xlateType = xlateTypes[i]
+        if ( not (funct in xlateExitInfo and xlateVarName == xlateExitInfo[funct].varName) ) :        
+            if ( xlateVarName.count("array") > 0 ):
+                olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
+                olist.append("{\n  int i; \n")
+                olist.append("  for (i = 0; i < *count; i++) { \n")
+                olist.append("    c_" + xlateVarName + "[i] = " + xlateType + "_f2c(" + xlateVarName + "[i]);\n")
+                olist.append("  }\n}\n")
+                freelist.append("c_"+xlateVarName);
+            else:
+                olist.append("c_" + xlateVarName + " = " + xlateType + "_f2c(*" + xlateVarName + ");\n")
+            
     olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
+    
+    argname = ""
     for i in fdict[funct].paramConciseList:
-	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append("  " + i)
-	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-	    olist.append(i)
-	else:
-	    pass
-	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-	    olist.append(", ")
+        #  Replace argument with the translated variable
+        if ( i in xlateVarNames ):
+            xlateVarName = i
+            if ( xlateVarName.count("array") > 0 ):
+                argname = "c_" + xlateVarName;
+            else:
+                argname = "&c_" + xlateVarName;
+        else:
+            argname = i
+        if (fdict[funct].paramDict[i].pointerLevel == 0) \
+           and (fdict[funct].paramDict[i].arrayLevel == 0) \
+           and (fdict[funct].paramDict[i].basetype != "void"):
+            olist.append("  " + argname)
+        elif (fdict[funct].paramDict[i].pointerLevel > 0):
+            olist.append(argname)
+        else:
+            pass
+        if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+            olist.append(", ")
 
-    olist.append(" );\n\n" )
+    olist.append(" );\n\n")
     olist.append("*ierr = rc;\n")
+    
+    #  Generate post-call translation code if necessary and free any allocated memory
+    if ( doOpaqueXlate is True ) :
+        if ( funct in xlateExitInfo ) :
+            olist.append("*" + xlateExitInfo[funct].varName + " = MPI_" + xlateExitInfo[funct].mpiType + "_c2f(c_" + xlateExitInfo[funct].varName + ");\n")
+        for freeSym in freelist:
+            olist.append("free("+freeSym+");\n")
+
     olist.append("return;\n" + "}" + " /* " + string.lower(funct) + " */\n")
 
     print "   Wrapped " + funct
@@ -922,18 +1011,24 @@ def GenerateSymbolDefs():
 def main():
     global fdict
     global flist
-    global f77symbol;
+    global f77symbol
+    global doOpaqueXlate
 
-    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol='])
+    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate'])
 
     print "MPI Wrapper Generator ($Revision$)"
     print "opts=",opts
     print "pargs=",pargs
 
     f77symbol = 'symbol'
+    doOpaqueXlate = False
+    
     for o, a in opts:
         if o == '--f77symbol':
             f77symbol = a
+        if o == '--xlate':
+            doOpaqueXlate = True
+            
 
     ##### Load the input file
     if len(pargs) < 1:
