@@ -20,6 +20,7 @@ CPPFLAGS   += -I.
 endif
 CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
 
+CPPFLAGS   += @DISABLE_BFD@
 ifdef FAST
 OPT	+= -O3
 endif
@@ -75,6 +76,7 @@ endif
 
 DEMANGLE_TARGET =
 DO_DEMANGLE = @DO_DEMANGLE@
+MPIPCXXLIB  = mpiP
 ifneq ($(DO_DEMANGLE),false)
   DEMANGLE_FLAG = -DDEMANGLE_$(DO_DEMANGLE)
   DEMANGLE_TARGET = libmpiPdmg.a
