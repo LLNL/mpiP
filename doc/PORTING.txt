@@ -1,0 +1,42 @@
+
+		    Porting Instructions for MPIP
+
+			    Jeffrey Vetter
+
+			    8 October 2002
+
+
+
+Most of MPIP is C code, so it ports relatively easy to new
+platforms. It does however require access to certain libraries and
+header files during compilation. Also, there are a few architecture
+specific modules, but they are localized.
+
+
+Libraries:
+
+- MPI
+- GNU BFD (part of binutils)
+
+Executables:
+
+- GNU make
+- Python - any recent version (>1.5) of Python should work
+
+MPIP uses the MPI_Wtime timer to gather timing information, so timer
+access is portable.
+
+MPIP walks the stack to gather the stack frames for MPI calls. THIS IS
+ARCHITECTURE DEPENDENT. This portion of the port takes investgative
+work. The macros (in file mpiPi.h)
+
+      ParentFP
+      FramePC
+      NextFP
+
+must be completed for your architecture. The easiest way to do this is
+to use a debugger to interrogate the stack of a simple application and
+calculate the offsets for the PC and stack frame pointer.
+
+
+- eof -
