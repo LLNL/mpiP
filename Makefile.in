@@ -10,6 +10,7 @@ include Defs.mak
 TARGET	= libmpiP.a
 
 all: ${TARGET} ${FORTRAN_TARGET}
+	make -C testing 
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -65,6 +66,7 @@ lint: ${SRCS}
 	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
-	rm -f Makefile Defs.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP*
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP*
 
+include Check.mak
 ##### EOF
