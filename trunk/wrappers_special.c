@@ -20,12 +20,13 @@ static char *rcsid =
 #include "mpiPconfig.h"
 #include "mpiPi.h"
 #include "symbols.h"
+#include <string.h>
 
 
 /* ----- INIT -------------------------------------------------- */
 
 static int
-_MPI_Init (int *argc, char ***argv, void *pc)
+_MPI_Init (int *argc, char ***argv)
 {
   int rc = 0;
   int enabledStatus;
@@ -37,7 +38,7 @@ _MPI_Init (int *argc, char ***argv, void *pc)
 
   mpiPi.enabled = enabledStatus;
 
-#ifdef Linux
+#if defined(Linux) && ! defined(ppc64)
   mpiPi.appFullName = getProcExeLink();
   mpiPi_msg_debug ("appFullName is %s\n", mpiPi.appFullName);
   mpiPi_init (GetBaseAppName (mpiPi.appFullName));
@@ -65,7 +66,7 @@ MPI_Init (int *argc, char ***argv)
   setjmp (jbuf);
   mpiPi.toolname = "mpiP";
 
-  rc = _MPI_Init (argc, argv, GetPPC (jbuf));
+  rc = _MPI_Init (argc, argv);
 
   if ( argc != NULL && argv != NULL )
     mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
@@ -97,7 +98,7 @@ F77_MPI_INIT (int *ierr)
 #endif
 
   tmp_argv = mpiPi.av;
-  rc = _MPI_Init (&(mpiPi.ac), (char ***) &tmp_argv, GetPPC (jbuf));
+  rc = _MPI_Init (&(mpiPi.ac), (char ***) &tmp_argv);
   *ierr = rc;
 
   return;
@@ -107,7 +108,7 @@ F77_MPI_INIT (int *ierr)
 /* ----- FINALIZE -------------------------------------------------- */
 
 extern int
-_MPI_Finalize (void *pc)
+_MPI_Finalize ()
 {
   int rc = 0;
 
@@ -127,7 +128,7 @@ MPI_Finalize (void)
   jmp_buf jbuf;
 
   setjmp (jbuf);
-  rc = _MPI_Finalize (GetPPC (jbuf));
+  rc = _MPI_Finalize ();
 
   return rc;
 }
@@ -140,7 +141,7 @@ F77_MPI_FINALIZE (int *ierr)
 
   setjmp (jbuf);
 
-  rc = _MPI_Finalize (GetPPC (jbuf));
+  rc = _MPI_Finalize ();
   *ierr = rc;
 
   return;
