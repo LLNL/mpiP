@@ -31,7 +31,7 @@ static int mpiPi_MPI_Pcontrol(const int flag)
       
       mpiPi_GETTIME (&mpiPi.endTime);
       dur = (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime)/1000000.0);
-      printf("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
+      mpiPi_msg_debug("In Pcontrol rank %d dur = %g\n", mpiPi.rank, dur);
       mpiPi.cumulativeTime += dur;
       assert( mpiPi.cumulativeTime >= 0 );
       mpiPi.enabled = 0;
