@@ -14,6 +14,13 @@ PYTHON  = python
 CFLAGS = @CFLAGS@
 FFLAGS = @FFLAGS@
 
+ifneq (-g,$(findstring -g,$(CFLAGS)))
+CFLAGS += -g
+endif
+ifneq (-g,$(findstring -g,$(FFLAGS)))
+FFLAGS += -g
+endif
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
