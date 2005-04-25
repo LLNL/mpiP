@@ -107,6 +107,7 @@ ${SHARED_C_TARGET}: cleanobjs ${OBJS}
 	${CC} -shared -o $@ ${OBJS}
 endif
 
+API: libmpiP-API.a
 libmpiP-API.a: ${API_OBJS} 
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
