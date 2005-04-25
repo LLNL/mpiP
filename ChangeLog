@@ -1,4 +1,135 @@
-Mon Feb  7 23:13:40 2005  Chris Chambreau  <chcham@llnl.gov>
+2005-04-07  Chris Chambreau  <chcham@llnl.gov>
+
+  * Defs.mak.in: More CFLAGS/FFLAGS and -g coordination.  -g should always be
+  set.  FFLAGS will be copied from CFLAGS if it is not set.
+
+2005-04-06  Chris Chambreau  <chcham@llnl.gov>
+
+  * Defs.mak.in: OPT flag no longer used.
+
+  * Defs.mak.in, configure, configure.in, testing/Makefile.in, testing/sweep-ops-stack.f, testing/sweep-ops-stack.src:
+  Change to use CFLAGS to set library and test compile flags.
+  Slight modifications to fortran stack test to address segfault
+  when optimized.
+
+  * testing/16-waitallf.f: Use mod instead of modulo.
+
+2005-04-03  Chris Chambreau  <chcham@llnl.gov>
+
+  * testing/16-waitallf.exp:
+  Environment variable MPIP needs to be reset after test 15
+
+  * make-wrappers.py, mpi.protos.txt.in:
+  cleaned out irrelevant wrapper generation warnings and errors.
+
+2005-04-02  Chris Chambreau  <chcham@llnl.gov>
+
+  * configure: Contains new configure test for MPIR_ToPointer
+
+  * testing/16-waitallf.exp, testing/16-waitallf.f, testing/16-waitallf.src, testing/Makefile.in:
+  Added opaque object Fortran/C translation test.
+
+  * mpiPi_proto.h:
+  Redundant MPI declarations seemed unnecessary and prone to distracting
+  warning messages.
+
+  * Makefile.in: Added additional header file dependencies for thoroughness.
+
+  * make-wrappers.py:
+  An extra malloc was messing up fortran opaque object conversion.
+
+  * configure.in, mpiPconfig.h.in, mpiPi.h.in:
+  Added configure test to address MPIR_ToPointer problem with Quadrics MPI.
+  Also fixed compile warning if no stack trace parameters have been defined
+  for the current architechture and libunwind is not being used.
+
+2005-04-01  Chris Chambreau  <chcham@llnl.gov>
+
+  * configure:
+  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
+
+  * testing/4-demangle.src:
+  More flexibility for demangled targets, in this case for GNU contructors
+  and destructors
+
+  * testing/15-pcontrol.src, testing/Makefile.in, testing/test_template.tcl, testing/15-pcontrol.c, testing/15-pcontrol.exp:
+  Added test for profiling activation/deactivation through
+  MPIP=-o
+  MPI_Pcontrol(0)
+  MPIP_Pcontrol(1)
+
+  * pcontrol.c: Do not print debug messages unless debug flag is set.
+
+2005-03-31  Chris Chambreau  <chcham@llnl.gov>
+
+  * Makefile.in, diag_msgs_api.c:
+  Added diag_msgs_api.c and Makefile.in target libmpiP-API.a
+  to make an API target library that does not profile MPI calls and
+  does not require that it is linked with an MPI library.
+
+  * mpiPi_proto.h:
+  Removed __STDC__ conditional that wreaked havoc on IBM default MPI compile scripts.
+
+  * make-wrappers.py:
+  Second pass at Fortran/C conversion in the make-wrappers script
+
+  * pc_lookup.c, mpiPconfig.h.in:
+  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
+
+  * configure.in: Corrected functionality to check for binutils 2.15 vs 2.15.96
+
+  * configure.in: Make fortran opaque object translation the default.
+  Fixed slight problem with -mpio.
+
+  * configure.in:
+  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
+
+  * mpiPi.c:
+  Found an incorrect use of strcmp that was causing all filenames to be overwritten with [unknown].
+
+2005-03-30  Chris Chambreau  <chcham@llnl.gov>
+
+  * pcontrol.c:
+  Somehow long ago the line that disables profiling with MPI_Pcontrol(0) was removed.
+  This just reinserts that line.
+
+2005-03-08  Chris Chambreau  <chcham@llnl.gov>
+
+  * testing/api-test.c: Minor message change.
+
+  * Defs.mak.in, Makefile.in, configure.in:
+  Added --enable-fortran-xlate configure option.  Ideally MPI_Fint and
+  MPI_Request sizes would be compared, but this would mean running an
+  test...
+
+  * Defs.mak.in, Makefile.in, make-wrappers.py, mpi.protos.txt.in:
+  Modifications to handle 64-bit plaforms where MPI_Fint is not
+  the same size as MPI_Request and other opaque objects.
+
+  This currently appears to be an issue on ia64 and x86_64.  An --xlate
+  argument is passed to the python wrapper script to add code for translation
+  between Fortran and C objects in the wrappers.c file.
+
+  * mpiPi.h.in: Remove unused macro.
+
+  * util.c: Fix for ensuring appropriate truncation of Linux app name
+
+2005-03-04  Chris Chambreau  <chcham@llnl.gov>
+
+  * mpiPi.c: Activate appropriate pc lookup routines when using dwarf.
+  Some error checking for dwarf return values.
+
+  * Makefile.in: Slight mod to switch between pc_lookup files
+
+2005-03-03  Chris Chambreau  <chcham@llnl.gov>
+
+  * Rules.mak: Corrected C target for removal during clean
+
+2005-02-07  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: Modifications for 2.8.1 patch release.
+
+  * glob.c: Increase patch level for 2.8.1 release.
 
   * util.c: Corrected use of readlink and added check/abort for malloc.
 
@@ -7,7 +138,7 @@ Mon Feb  7 23:13:40 2005  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in: add test to .PHONY
 
-Tue Jan 25 22:47:17 2005  Chris Chambreau  <chcham@llnl.gov>
+2005-01-25  Chris Chambreau  <chcham@llnl.gov>
 
   * ChangeLog: More commits for 2.8 release.
 
@@ -17,12 +148,12 @@ Tue Jan 25 22:47:17 2005  Chris Chambreau  <chcham@llnl.gov>
   * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
   Outstanding BG/L issues that have been addressed.
 
-Wed Jan 12 20:42:33 2005  Chris Chambreau  <chcham@llnl.gov>
+2005-01-12  Chris Chambreau  <chcham@llnl.gov>
 
   * doc/UserGuide.html, doc/UserGuide.txt:
   Last minute changes to documentation prior to v2.8 release.
 
-Tue Jan 11 22:26:17 2005  Chris Chambreau  <chcham@llnl.gov>
+2005-01-11  Chris Chambreau  <chcham@llnl.gov>
 
   * ChangeLog: Changes up to 2.8 Release.
 
@@ -38,7 +169,7 @@ Tue Jan 11 22:26:17 2005  Chris Chambreau  <chcham@llnl.gov>
 
   * configure.in: clock_gettime suuport and MPICH 2 C++ compile script support
 
-Thu Jan  6 23:33:20 2005  Chris Chambreau  <chcham@llnl.gov>
+2005-01-06  Chris Chambreau  <chcham@llnl.gov>
 
   * mpiP-API.c, util.c: Cleaning with lint.
 
@@ -68,14 +199,14 @@ Thu Jan  6 23:33:20 2005  Chris Chambreau  <chcham@llnl.gov>
   * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
   Modifications to support BlueGene/L ppc64 platform.
 
-Tue Dec 28 18:13:37 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-12-28  Chris Chambreau  <chcham@llnl.gov>
 
-  * timers/linux_posix.h, Attic/linux_posix.h: admin
+  * timers/linux_posix.h, linux_posix.h: admin
 
-  * Attic/linux_posix.h, _timers.h:
+  * _timers.h, linux_posix.h:
   Phil Roth additions to support linux/posix clock_gettime initially for Altix.
 
-Sat Dec  4 00:39:59 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-12-04  Chris Chambreau  <chcham@llnl.gov>
 
   * configure: updated.
 
@@ -93,7 +224,7 @@ Sat Dec  4 00:39:59 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * bin/config.guess, bin/config.sub: Updated config scripts
 
-Thu Dec  2 19:50:40 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-12-02  Chris Chambreau  <chcham@llnl.gov>
 
   * glob.c: new version numbers
 
@@ -103,7 +234,7 @@ Thu Dec  2 19:50:40 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * mpi.io.protos.txt: this should have been added before, but I missed it...
 
-Fri Nov  5 17:48:03 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-11-05  Chris Chambreau  <chcham@llnl.gov>
 
   * configure.in: Modification for correct parent frame count
 
@@ -111,14 +242,13 @@ Fri Nov  5 17:48:03 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * testing/Makefile.in: removed fortran api test
 
-  * testing/Attic/api-test-f.c, testing/Attic/api-test.f:
-  removed api fortran test
+  * testing/api-test-f.c, testing/api-test.f: removed api fortran test
 
   * util.c: *** empty log message ***
 
-  * testing/Attic/api-test-f.c, testing/Attic/api-test.f: minor corrections
+  * testing/api-test-f.c, testing/api-test.f: minor corrections
 
-Thu Nov  4 23:36:19 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-11-04  Chris Chambreau  <chcham@llnl.gov>
 
   * mpiPi.h.in: Do not use asserts by default
 
@@ -133,7 +263,7 @@ Thu Nov  4 23:36:19 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * testing/timer-info.c: Make use of new TIMER_NAME macro
 
-  * timers/Attic/crayx1_local.h: Does not appear to be needed
+  * timers/crayx1_local.h: Does not appear to be needed
 
   * mpiP-API.c: removed unnecessary version of function mpiP_open_executable
 
@@ -147,12 +277,12 @@ Thu Nov  4 23:36:19 2004  Chris Chambreau  <chcham@llnl.gov>
   o  Removed unused cray timer header file
   o  Changed new cray files to conform to new macro format
 
-Thu Oct 28 21:01:26 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-10-28  Chris Chambreau  <chcham@llnl.gov>
 
-  * timers/Attic/crayx1_local.h, timers/crayx1_hw.h:
+  * timers/crayx1_hw.h, timers/crayx1_local.h:
   Missed Phil's cray timer include files...
 
-Wed Oct 27 18:52:48 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-10-27  Chris Chambreau  <chcham@llnl.gov>
 
   * Defs.mak.in, get_fortran_arg.f, util.c:
   Slight modifications to allow forcing use of getargs on linux and
@@ -160,24 +290,24 @@ Wed Oct 27 18:52:48 2004  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in: added merged-install target for LLNL site installations.
 
-Tue Oct 26 23:29:56 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-10-26  Chris Chambreau  <chcham@llnl.gov>
 
   * timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
   *** empty log message ***
 
-  * Attic/aix_local.h, Attic/aix_swclock.h, Attic/sunos-timers.h, Makefile.in, Rules.mak, _timers.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, util.c, wrappers_special.c, Defs.mak.in:
+  * Makefile.in, Rules.mak, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in:
   o  Cray X1/UNICOS support
   o  Libdwarf support : note that Intel compilers do not provide full C++ symbols
   o  install target
 
-Fri Oct 22 21:38:59 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-10-22  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in: target for generating prototype file.
 
   * testing/timer-info.c:
   Not so much a test as a utility to report on timer info.
 
-  * testing/Attic/api-test-f.c, testing/Attic/api-test.f, testing/api-test.c:
+  * testing/api-test-f.c, testing/api-test.c, testing/api-test.f:
   New API tests.
 
   * get_fortran_arg.f, mpiPi_proto.h:
@@ -190,7 +320,7 @@ Fri Oct 22 21:38:59 2004  Chris Chambreau  <chcham@llnl.gov>
   * testing/12-null-null.src, testing/13-pcontrol-report.c, testing/9-test-mpip-time.c, testing/Makefile.in:
   *** empty log message ***
 
-  * Attic/sunos-timers.h, mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, util.c, wrappers_special.c, Attic/aix_local.h, Attic/aix_swclock.h, Attic/hash.c, Attic/hash.h, Defs.mak.in, Makefile.in, _timers.h, configure, configure.in, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
+  * mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in, Makefile.in, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, hash.c, hash.h, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
   Added mpiP API : provides stack tracing, address lookup and timing functionality
   1)  Added mpiP-API.c and mpiP-API.h.
   2)  Renamed hash files to avoid API conflict with hash.h.
@@ -212,12 +342,12 @@ Fri Oct 22 21:38:59 2004  Chris Chambreau  <chcham@llnl.gov>
   Added functionality to get executable name from /proc on Linux. <-- Assumes exec
   utable will not be longer than 4096.
 
-Thu Oct 21 21:05:03 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-10-21  Chris Chambreau  <chcham@llnl.gov>
 
   * _timers.h, configure, configure.in, make-wrappers.py, mpiPconfig.h.in:
   Added timing checking and gettimeday configuration switch.
 
-Tue Sep 21 22:05:16 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-09-21  Chris Chambreau  <chcham@llnl.gov>
 
   * Makefile.in, configure, mpiP-API.c, mpiP-API.h, pc_lookup.c:
   Added support for mpiP functionality API.
@@ -228,7 +358,7 @@ Tue Sep 21 22:05:16 2004  Chris Chambreau  <chcham@llnl.gov>
   Removed unnecessary timer argument to TIMER macros that was left over
   from AIX Switch Clock support, which is not being supported.
 
-Tue Sep 14 17:10:26 2004  Chris Chambreau  <chcham@llnl.gov>
+2004-09-14  Chris Chambreau  <chcham@llnl.gov>
 
   * pc_lookup.c: Added debugging info if can't BFD fails due to NULL file.
 
@@ -239,6 +369,6 @@ Tue Sep 14 17:10:26 2004  Chris Chambreau  <chcham@llnl.gov>
   * glob.c, mpiPi.c, mpiPi.h.in, report.c:
   Added patch number for release tracking
 
-  * Attic/mpi.protos.txt:
+  * mpi.protos.txt:
   Not necessary to archive, as there is an mpi.protos.txt.in file
 

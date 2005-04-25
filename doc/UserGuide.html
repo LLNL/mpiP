@@ -14,11 +14,12 @@ body,p,h1,h2,h3,th,td,ol,ul,li {
 -->
 </style><title>mpiP: Lightweight, Scalable MPI Profiling</title></head><body><p><a href="http://www.llnl.gov/disclaimer.html" class="privacyfoter">Privacy &amp; Legal Notice</a></p>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI Profiling</a></h1>
-<p align="center">Version 2.8 <br>
+<p align="center">Version 2.8.2<br>
 25 January 2005 <br>
 <br>
 Jeffrey Vetter <br>
 <a href="mailto:vetterjs@ornl.gov">vetterjs@ornl.gov</a><br>
+
 <br>
 Chris Chambreau <br>
 <a href="mailto:chcham@llnl.gov">chcham@llnl.gov</a></p>
@@ -29,6 +30,7 @@ Chris Chambreau <br>
 <li><a href="#Downloading">Downloading</a></li>
 <li><a href="#Contributing">Contributing</a></li>
 <li><a href="#New_Features">New Features</a></li></ul></li>
+
 <li><a href="#Using">Using mpiP (summary)</a><ul>
 <li><a href="#Supported">Supported Platforms</a></li>
 </ul>
@@ -40,6 +42,7 @@ Chris Chambreau <br>
 <li><a href="#Runtime_Configuration">Run-time Configuration</a></li>
 <li><a href="#mpiP_Output">mpiP Output</a></li>
 <ul><li><a href="#Report_Viewers">Report Viewers</a></li></ul>
+
 <li><a href="#Controlling_Scope">Controlling mpiP Profiling Scope</a></li>
 <li><a href="#Caveats">Caveats</a></li>
 <li><a href="#Profiled_Routines">List of Profiled Routines</a></li>
@@ -62,6 +65,7 @@ To receive mail regarding new mpiP releases, please subscribe to mpip-announce@l
 (send e-mail with body "subscribe mpip-announce" to <a href="mailto:majordomo@llnl.gov">majordomo@llnl.gov</a>).
 Please also consider subscribing to <a href="mailto:mpip-usersp@llnl.gov">mpip-users@llnl.gov</a> to contribute and receive mpiP use and
 status information.</p>
+
 <p> To learn more about performance analysis with mpiP, see Vetter, J.S. and M.O.
 McCracken, "<a href="http://www.llnl.gov/CASC/people/vetter/vetter_pubs.html">Statistical
 Scalability Analysis of Communication Operations in Distributed Applications</a>,"
@@ -75,10 +79,22 @@ always welcome. Many thanks to the following contributors (chronological order):
 <ul>
 <li>Michael McCracken (UCSD)</li>
 <li>Curt Janssen (Sandia National Laboratories)</li>
+
 <li>Mike Campbell (UIUC)</li>
 <li>Jim Brandt (Sandia National Laboratories)</li>
 <li>Philip Roth (Oak Ridge National Laboratory)</li></ul>
 <h3><a name="New_Features">New Features with v2.8</a></h3>
+<p>Release v2.8.2 addresses the following issues:
+<ul>
+<li>Document EM64T/ia64 libunwind requirement.</li>
+<li>Set compile flags with CFLAGS and FFLAGS.</li>
+<li>API library should work as stand-alone library now, target is libmpiP-API.a.</li>
+<li>mpiP wrappers now translate fortran opaque objects, but can be disabled with --disable-fortran-xlate.</li>
+<li>Changes to support differences between binutils 2.15 versions.</li>
+<li>API can be used with libelf/dwarf.</li>
+<li>Corrected MPI_Pcontrol(0) call to deactivate profiling.</li>
+</ul>
+</p>
 <p>Release v2.8 corrects some outstanding issues and provides the following new
 features:</p>
 <ul>
@@ -86,16 +102,26 @@ features:</p>
 <ul>
 <li>stackwalking</li>
 <li>address-to-source translation</li>
+
 <li>symbol demangling</li>
 <li>timing routines</li>
 <li>accessing the name of the executable</li>
 </ul>
 </li>
-<li>New platform and compiler support, including IBM ppc64-BG/L, Cray X1 & XD1, SGI Altix, and PGI compilers.</li>
-<li>Scripts are provided to use addr2line to translate report addresses to source information and demonstrate runtime profiling insertion.</li>
+<li>New platform and compiler support, including IBM ppc64-BG/L, Cray X1 &amp; XD1, SGI Altix, and PGI compilers.</li>
+<li>Scripts are provided to use addr2line to translate report addresses
+to source information and demonstrate runtime profiling insertion.</li>
 <li>A make install target has been implemented.</li>
-<li>The standard report filename format is now [executable or "Unknown"].[process count].[rank 0 PID].[report index].mpiP.  When generating reports, mpiP will not overwrite existing report files.  The report index will be incremented until a unique filename is found.  The report index is also incremented if multiple reports are generated within a single run.</li>
-<li>The default Linux timer is gettimeofday.  Either gettimeofday or clock_gettime can be specified as the timer routine used by mpiP with a configure option.</li>
+<li>The standard report filename format is now [executable or
+"Unknown"].[process count].[rank 0 PID].[report index].mpiP. When
+generating reports, mpiP will not overwrite existing report files. The
+report index will be incremented until a unique filename is found. The
+report index is also incremented if multiple reports are generated
+within a single run.</li>
+
+<li>The default Linux timer is gettimeofday. Either gettimeofday or
+clock_gettime can be specified as the timer routine used by mpiP with a
+configure option.</li>
 <li>To avoid attempting to run tests during configure, cross_compiling is set.</li>
 <li>COV calculation is now the default.  It can be disabled with the "-c" environment variable option.</li>
 <li>Previous Linux Fortran/C/C++ libraries have been merged into a single library.</li>
@@ -110,6 +136,7 @@ your application to use mpiP. Note that you might have to recompile to include
 the '-g' option. This is important if you want mpiP to decode the PC to a source
 code filename and line number automatically. mpiP will work without <span class="commandline">-g</span>,
 but mileage may vary.</p>
+
 <p> To compile a simple program on LLNL AIX, you need to add the following libraries
 to your compile/link line:</p>
 <blockquote>
@@ -123,6 +150,7 @@ to your compile/link line:</p>
 <p>from</p>
 <blockquote>
 <p class="commandline">$ mpcc -O mpi-foo.c -o mpi-foo.exe</p>
+
 </blockquote>
 <p> Make sure the mpiP library appears before the MPI library on your link line.
 The three libraries (<span class="commandline">-lbfd -liberty -lintl</span>) provide
@@ -131,9 +159,10 @@ support for decoding the symbol information; they are part of GNU binutils.</p>
 header and trailer in standard out.</p>
 <blockquote>
 <p class="commandline">0:mpiP:<br>
-0:mpiP: mpiP V2.8.0 (Build Jan  7 2005/10:59:14)<br>
-0:mpiP: Direct questions and errors to mpip-help@llnl.gov><br>
+0:mpiP: mpiP V2.8.2 (Build Jan  7 2005/10:59:14)<br>
+0:mpiP: Direct questions and errors to mpip-help@llnl.gov&gt;<br>
 0:mpiP:<br>
+
 0:mpiP:<br>
 0:mpiP: found 21557 symbols in file [./9-test-mpip-time.exe]<br>
 0:mpiP:<br>
@@ -148,7 +177,9 @@ is safe.</p>
 bug reports or questions regarding these platforms. Note that mpiP will not work
 with MPICH 1.1 nor with the IBM signal-based MPI library (libmpi.a, as opposed
 to the thread-based implementation libmpi_r.a). The following table indicates
+
 platforms where mpiP was succesfully run and any requirements for that platform.</p>
+
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
 <tbody><tr>
 <th>Platform</th>
@@ -160,16 +191,26 @@ platforms where mpiP was succesfully run and any requirements for that platform.
 </tr>
 <tr>
 <td rowspan="2">IA32-Linux</td>
+
 <td> 2.4.21 CHAOS Kernel</td>
 <td>Intel 8.1<br>PGI 5.1-6</td>
 <td>Quadrics MPI 1.24-38</td>
-<td rowspan="2">2.15</td>
-<td rowspan="2">Some binutils mods required for Intel 8.0 support.  Please send mail to the help list for more information.</td>
+<td rowspan="2">2.15, 2.15.9*</td>
+<td rowspan="2">Some binutils mods required for Intel 8.0 support.  Please send mail to the help list for more information.  When compiling optimized applications with Intel compilers, the -fp flag may be needed to get accurate stack trace information.</td>
 </tr>
 <tr>
 <td>2.4.22 Kernel</td>
 <td>gcc 3.3.1</td>
+
 <td>mpich2-1.0</td>
+</tr>
+<tr>
+<td>IA64-Linux</td>
+<td> 2.4.21 CHAOS Kernel</td>
+<td>Intel 8.1</td>
+<td>Quadrics MPI 1.24-41</td>
+<td>2.15, 2.15.9*</td>
+<td>The use of HP's <a href="http://www.hpl.hp.com/research/linux/libunwind/">libunwind</a> is required on this platform.</td>
 </tr>
 <tr>
 <td>IBM Power3/4</td>
@@ -178,6 +219,7 @@ platforms where mpiP was succesfully run and any requirements for that platform.
 VA Fortran 8.1</td>
 <td>PE 3.2<br>PE 4.1</td>
 <td>2.15</td>
+
 <td>Binutils currently requires that applications are linked with the <span class="commandline">-bnoobjreorder</span>
 linker flag.  Other mods are required for 64-bit builds of binutils.</td>
 </tr>
@@ -188,6 +230,7 @@ linker flag.  Other mods are required for 64-bit builds of binutils.</td>
 <td>Compaq C 6.4<br>
 Fortran 5.5</td>
 <td>Quadrics RMS 2.5 2.14</td>
+
 <td>2.15</td>
 <td>&nbsp;</td>
 </tr>
@@ -204,6 +247,7 @@ Fortran 5.5</td>
            --with-cc=cc
            --with-cxx=CC
           --with-f77=ftn<br>
+
 		  Python on an alternative system may be needed to "make wrappers.c", due to missing socket module.</td>
 </tr>
 <tr>
@@ -213,6 +257,7 @@ Fortran 5.5</td>
 <td>SGI Message Passing Toolkit for release 1.10.1 (sgi-mpt-1.10.1-sgi303r1)</td>
 <td>2.14.90.0.4-35sgi303r1</td>
 <td>configure may require --with-libs="-lmpi" to find MPI-I/O routines.</td>
+
 </tr>
 <tr>
 <td>Cray XD1</td>
@@ -225,38 +270,66 @@ Fortran 5.5</td>
 <tr>
 </tr>
 </tbody></table>
+
 <p class="privacyfoter"><a href="#top">Top</a></p>
 <hr width="75%">
 <h2><a name="Building">Building mpiP</a></h2>
+<h3>Configuring mpiP</h3>
 <p>Currently, mpiP requires a compatible GNU <a href="http://sources.redhat.com/binutils">binutils</a>
-installation. The binutils include and lib directories must be specified with
+installation for source lookup and demangling features.  Alternatively, <a href="http://directory.fsf.org/libs/misc/libelf.html">libelf</a> and <a href="http://reality.sgi.com/davea/">libdwarf</a> can be used for source lookup.  The binutils installation location may need to be specified with either the <span class="commandline">--with-binutils-dir</span> option or with
 the <span class="commandline">--with-include</span> and <span class="commandline">--with-ldflags</span>
-configure flags. It is very likely that the compilers will need to be indentified
+configure flags. It is likely that the compilers will need to be indentified
 as well, with the <span class="commandline">--with-cc</span>, <span class="commandline">--with-cxx</span>,
-and <span class="commandline">--with-f77</span> flags. After running configure
-with the appropriate arguments, "make" will build the appropriate libraries
-in the mpiP directory. </p>
+and <span class="commandline">--with-f77</span> flags. Use CFLAGS and FFLAGS variables to specify compiler options, as in <span class="commandline">CFLAGS="-O3" ./configure</span>.  </p>
+
 <p>There are many new configuration options available.  They are as follows:</p>
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
 <tbody><tr>
 <th>Flag</th>
 <th>Effect</th>
 <th>Description</th>
-</tr><tr><td>--enable-demangling</td><td>Specify demangling support.</td><td>If the GNU option is specified, demangling is applied to each symbol by default using the libiberty implementation.  For the IBM and Compaq options, demangling support is implemented in the library libmpiPdmg.a. Use GNU for the Intel compiler.</td></tr>
+</tr><tr><td>--enable-demangling</td><td>Specify demangling support.</td><td>If
+the GNU option is specified, demangling is applied to each symbol by
+default using the libiberty implementation. For the IBM and Compaq
+options, demangling support is implemented in the library libmpiPdmg.a.
+Use GNU for the Intel compiler.</td></tr>
 <tr><td>--enable-stackdepth</td><td>Specify maximum stacktrace depth (default is 8).</td><td>Stacktraces with larger than 8 levels are sometime useful for some applications.</td></tr>
+
 <tr><td>--enable-dwarf</td><td>Use libdwarf/libelf for source lookup.</td><td>libdwarf and libelf can be used for address-to-source translation as an alternative to binutils libbfd.</td></tr>
 <tr><td>--disable-bfd</td><td>Do not use GNU binutils libbfd for source lookup.</td><td>Binutils is not always available or compatible.</td></tr>
-<tr><td>--disable-libunwind</td><td>Do not use libunwind to generate stack traces.</td><td>Currently, libunwind seems useful on IA64-Linux and x86-Linux platforms, although it can conflict with the libunwind.a provided with the Intel compiler.</td></tr>
+<tr><td>--disable-libunwind</td><td>Do not use libunwind to generate stack traces.</td><td>Currently,
+libunwind seems useful on IA64-Linux and x86-Linux platforms, although
+it can conflict with the libunwind.a provided with the Intel compiler.</td></tr>
 <tr><td>--disable-mpi-io</td><td>Disable MPI-I/O reporting.</td><td>Useful
 for generating an mpiP library without MPI I/O for MPI implementations
 such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <tr><td>--with-gettimeofday</td><td>Use gettimeofday for timing.</td><td>Use the gettimeofday call for timing instead of the default platform timer.</td></tr>
+
 <tr><td>--with-clock_gettime</td><td>Use clock_gettime for timing.</td><td>Use the clock_gettime high-resolution per-process timer for timing instead of the default platform timer.</td></tr>
 <tr><td>--enable-check-time</td><td>Enable AIX check for negative time values.</td><td>Activate IBM timing debugging code.</td></tr>
 <tr><td>--enable-getarg</td><td>Use getarg to get Fortran command line args.</td><td>This is used on UNICOS to provide access to the command line for Fortran apllications.</td></tr>
+<tr><td>--disable-fortran-xlate</td><td>Do not translate Fortran opaque objects.</td><td>Opaque object translation is not necessary on some platforms, but necessary for Fortran applications on some 64-bit platforms.</td></tr>
 </tbody></table>
+<h3>Build targets</h3>
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tbody>
+<tr><th width="25%">Command</th><th>Effect</th></tr>
+<tr><td>make</td><td>Build mpiP library or libraries for MPI profiling</td></tr>
+<tr><td>make install</td><td>Install bin, include, lib, and slib (if applicable) directories.  The default install directory is the mpiP source directory.  The installation location can be specified with the prefix variable as in <span class="commandline">make prefix=[install directory] install</span>.</td></tr>
+<tr><td>make shared</td><td>Make shared object version of library for runtime insertion (Linux).  Support for runtime insertion on AIX and for MPI calls made within shared objects on Linux and AIX will be provided in a future release.</td></tr>
+<tr><td>make API</td><td>Make standalone API library.  See mpiP-API.c and mpiP-API.h for available features.</td></tr>
+<tr><td>make add_binutils_objs</td><td>For convenience, add the binutils objects to the mpiP library.  The binutils installation location must have been specified during configuration.</td></tr>
+<tr><td>make add_libunwind_objs</td><td>For convenience, add the libunwind objects to the mpiP library.</td></tr>
+</tbody>
+</table>
 <h3><a name="Linking_Examples">Example Application Link Commands</a></h3>
-<p><b>LLNL users can now use the srun-mpip, poe-mpip, and poe-mpip-cxx wrapper scripts to use mpiP without re-linking their application.  AIX executables would still need to be linked with -bnoobjreorder for successful runtime address lookup.  Additionally, all LLNL installations contain the appropriate binutils objects in the mpiP library, so the -lbfd, -liberty, and -lintl flags are not required.</b>  An example runtime script for mpirun is provided in the mpiP bin directory.
+<p><b>LLNL users can now use the srun-mpip, poe-mpip, and poe-mpip-cxx
+wrapper scripts to use mpiP without re-linking their application. AIX
+executables would still need to be linked with -bnoobjreorder for
+successful runtime address lookup. Additionally, all LLNL installations
+contain the appropriate binutils objects in the mpiP library, so the
+-lbfd, -liberty, and -lintl flags are not required.</b>  An example runtime script for mpirun is provided in the mpiP bin directory.
+
 </p>
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
 <tbody><tr>
@@ -268,6 +341,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <tr>
 <td rowspan="3" align="center">AIX</td>
 <td rowspan="3" align="center">Visual Age</td>
+
 <td>C</td>
 <td class="commandline">mpxlc -g -bnoobjreorder 1-hot-potato.c -o 1-hot-potato.exe
 -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lm</td>
@@ -282,6 +356,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <td class="commandline">mpxlf -g -bnoobjreorder sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
 -lmpiP -lbfd -liberty -lintl -lm</td>
 </tr>
+
 <tr>
 <td rowspan="9" align="center">Linux</td>
 <td rowspan="3" align="center">Intel</td>
@@ -295,6 +370,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 -lmpiP -lbfd -liberty-lm -lmpio</td>
 </tr>
 <tr>
+
 <td>Fortran</td>
 <td class="commandline">mpiifc -g sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
 -lmpiP -lbfd -liberty -lm -lmpio</td>
@@ -309,6 +385,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <td>C++</td>
 <td class="commandline">mpipgCC -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib
 -lmpiP -lbfd -liberty -lm -lmpio</td>
+
 </tr>
 <tr>
 <td>Fortran</td>
@@ -323,6 +400,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 </tr>
 <tr>
 <td>C++</td>
+
 <td class="commandline">mpiCC -g 4-demangle.C -o 4-demangle.exe -L/usr/local/tools/mpiP/lib
 -lmpiP -lbfd -liberty -lm</td>
 </tr>
@@ -337,6 +415,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <td>C</td>
 <td class="commandline">cc -g -I/usr/lib/mpi/include 1-hot-potato.c -o 1-hot-potato.exe
 -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lm -lmpi -lpmpi -lexc</td>
+
 </tr>
 <tr>
 <td>C++</td>
@@ -351,6 +430,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <tr>
 <td>Cray X1</td>
 <td>Cray</td>
+
 <td>C/C++/Fortran</td>
 <td>Link with <span class="commandline">-lmpiP -lbfd -liberty -ldwarf -lelf</span></td>
 </tr>
@@ -360,6 +440,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <td>C/C++/Fortran</td>
 <td>Link with <span class="commandline">-lmpiP -lunwind -lbfd -liberty</span></td>
 </tr>
+
 <tr>
 <td>Cray XD1</td>
 <td>GNU or PGI</td>
@@ -372,6 +453,7 @@ such as Quadrics MPI that has a separate MPI I/O library.</td></tr>
 <ul>
 <li>On BG/L machines, the script mpip-insert-src can be used from a login node to translate addresses
 in the mpiP report to source information.</li>
+
 <li>On Tru64, the exception library flag (<span class="commandline">-lexc</span>)
 must be added to the link command. </li>
 <li>Source lookup for callsites may fail with certain versions of binutils. If
@@ -385,6 +467,7 @@ you are running into trouble, you may want to download a recent snapshot from
 variable MPIP. The setting for MPIP looks like command-line parameters: "-t
 10 -k 2". Currently, mpiP has several configurable parameters.</p>
 <table border="1" cellpadding="3" cellspacing="0" width="90%">
+
 <tbody><tr>
 <th>Option</th>
 <th>Description</th>
@@ -396,6 +479,7 @@ variable MPIP. The setting for MPIP looks like command-line parameters: "-t
 <td align="center">enabled</td>
 </tr>
 <tr>
+
 <td class="commandline">-e</td>
 <td>Print report data using floating-point format.</td>
 <td align="center">&nbsp;</td>
@@ -406,6 +490,7 @@ variable MPIP. The setting for MPIP looks like command-line parameters: "-t
 <td align="center">.</td>
 </tr>
 <tr>
+
 <td class="commandline">-g</td>
 <td>Enable mpiP debug mode. </td>
 <td align="center">disabled</td>
@@ -415,6 +500,7 @@ variable MPIP. The setting for MPIP looks like command-line parameters: "-t
 <td>Sets callsite stack traceback depth to &lt;n&gt;.</td>
 <td align="center">1</td>
 </tr>
+
 <tr>
 <td class="commandline">-n</td>
 <td>Do not truncate full pathname of filename in callsites.</td>
@@ -428,6 +514,7 @@ MPI_Pcontrol().</td>
 </tr>
 <tr>
 <td class="commandline">-s n</td>
+
 <td>Set hash table size to &lt;n&gt;.</td>
 <td align="center">256</td>
 </tr>
@@ -436,6 +523,7 @@ MPI_Pcontrol().</td>
 <td>Set print threshold for report, where &lt;x&gt; is the MPI percentage of time
 for each callsite.</td>
 <td align="center">0.0</td>
+
 </tr>
 </tbody></table>
 <p>For example, to set the callsite stack walking depth to 2 and the report print
@@ -451,6 +539,7 @@ It is broken down by sections below. Here also is the experiment setup. <b>Note
 that MPIP does not capture information about ALL MPI calls</b><i>.</i> Local calls,
 such as <span class="commandline">MPI_Comm_size</span>, are omitted from the profiling
 library measurement to reduce perturbation and mpiP output.</p>
+
 <p><b>The test code</b>:</p>
 <pre>  sleeptime = 10;
   MPI_Init (&amp;argc, &amp;argv);
@@ -469,15 +558,17 @@ library measurement to reduce perturbation and mpiP output.</p>
        -L.. -L/g/g2/vetter/AIX/lib  -lmpiP -lbfd -liberty -lintl -lm
 </pre>
 <p><b>Environment variables were set as</b>:</p>
+
 <pre>  $ export MPIP="-t 10.0"</pre>
 <p><b>The example was executed on MCR like this</b>:</p>
 <pre>  $ srun -n 4 -ppdebug ./9-test-mpip-time.exe</pre>
 <p><b>This experiment produced an output file that we can now analyze</b>:</p>
 <pre> ./9-test-mpip-time.exe.4.25972.1.mpiP</pre>
 <p>Header information provides basic information about your performance experiment.</p>
+
 <pre>@ mpiP
 @ Command : /g/g0/chcham/mpiP/devo/testing/./9-test-mpip-time.exe
-@ Version                  : 2.8.0
+@ Version                  : 2.8.2
 @ MPIP Build date          : Jan 10 2005, 15:15:47
 @ Start time               : 2005 01 10 16:01:32
 @ Stop time                : 2005 01 10 16:01:42
@@ -527,6 +618,7 @@ and to the total MPI time, respectively.  The COV column indicates the variation
 in times of individual processes for this callsite by presenting the coefficient of variation
 as calculated from the individual process times.  A larger value indicates more variation
 between the process times.</p>
+
 <pre>---------------------------------------------------------------------------
 @--- Aggregate Time (top twenty, descending, milliseconds) ----------------
 ---------------------------------------------------------------------------
@@ -563,6 +655,7 @@ Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00</pre
 <tbody><tr>
 <th>Column</th>
 <th>Description</th>
+
 </tr>
 <tr>
 <td>Name</td>
@@ -575,6 +668,7 @@ Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00</pre
 <tr>
 <td>Rank</td>
 <td>Task rank in MPI_COMM_WORLD.</td>
+
 </tr>
 <tr>
 <td>Count</td>
@@ -587,6 +681,7 @@ Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00</pre
 <tr>
 <td>Mean</td>
 <td>Arithmetic mean of the wall-clock time for one call.</td>
+
 </tr>
 <tr>
 <td>Min</td>
@@ -599,6 +694,7 @@ Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00</pre
 <tr>
 <td>MPI%</td>
 <td>Ratio of time for this call to the overall MPI time for each task.</td>
+
 </tr>
 </tbody></table>
 <p> The aggregate result for each call has the same measurement meaning; however,
@@ -619,6 +715,7 @@ Send                 5    *     320      6000      6000      6000   1.92e+06</pr
 <th>Column</th>
 <th>Description</th>
 </tr>
+
 <tr>
 <td>Name</td>
 <td>Name of the MPI function at that callsite.</td>
@@ -630,6 +727,7 @@ Send                 5    *     320      6000      6000      6000   1.92e+06</pr
 <tr>
 <td>Rank</td>
 <td>Task rank in MPI_COMM_WORLD.</td>
+
 </tr>
 <tr>
 <td>Count</td>
@@ -642,6 +740,7 @@ Send                 5    *     320      6000      6000      6000   1.92e+06</pr
 <tr>
 <td>Mean</td>
 <td>Arithmetic mean of the sent message sizes in bytes for one call.</td>
+
 </tr>
 <tr>
 <td>Min</td>
@@ -660,6 +759,7 @@ Name              Site Rank   Count       Max      Mean       Min       Sum
 File_read            1    0      20        64        64        64      1280
 File_read            1    1      20        64        64        64      1280
 File_read            1    *      40        64        64        64      2560
+
 </pre>
 <h3><a name="Report_Viewers">Report Viewers</a></h3>
 <ul>
@@ -671,6 +771,7 @@ File_read            1    *      40        64        64        64      2560
 in your Application</a></h2>
 <p>In mpiP, you can limit the scope of profiling measurements to specific regions
 of your code using the <span class="commandline">MPI_Pcontrol(int level)</span>
+
 subroutine. A value of zero disables mpiP profiling, while any nonzero value enables
 profiling. To disable profiling initially at MPI_Init, use the <span class="commandline">-o</span>
 configuration option. mpiP will only record information about MPI commands encountered
@@ -695,6 +796,7 @@ that an application can activate profiling during execution.</p>
   /* ... compute and communicate for one timestep ... */
 }</pre>
 <h3>Arbitrary Report Generation</h3>
+
 <p>You can also generate arbitrary reports by making calls to <span class="commandline">MPI_Pcontrol(2)</span>.
 The first report generated will have the default report filename.  Subsequent report files will have an index
 number included, such as <span class="commandline">sweep3d.mpi.4.7371.1.mpiP, sweep3d.mpi.4.7371.2.mpiP,</span>etc.
@@ -707,6 +809,7 @@ source location and callstack.</p>
 <p class="privacyfoter"><a href="#top">Top</a></p>
 <hr width="75%">
 <h2><a name="Caveats">Caveats</a></h2>
+
 <ul>
 <li>If mpiP has problems with the source code translation, you might be able to
 decode the program counters on LLNL systems with some of the following techniques.
@@ -721,6 +824,7 @@ mapping these transformed PCs into a file name and line number.
 <li>look at the assembler listing, or with GNU's objdump (<span class="commandline">-d
 -S</span>)</li>
 <li>use Totalview or gdb to translate the PC</li>
+
 </ul>
 </li><li>There are known incompatibilities with certain binutils versions and recent
 versions of the IBM compilers. As of this release, a fix has not been incorporated
@@ -739,6 +843,7 @@ parent stack frames.</li>
 </li><li>If you are calling MPI functions from within dynamically loaded objects, you
 may need to recompile the library as a shared object.</li>
 <li>The mpiP library will not link with the signal-based IBM mpi library.</li>
+
 <li>We have encountered occaisional negative report values on Linux and
 AIX systems. We will continue to investigate this issue, but it is
 possible that this behavior may be experienced with mpiP v2.8.</li>
@@ -752,6 +857,7 @@ possible that this behavior may be experienced with mpiP v2.8.</li>
 MPI_Allgatherv<br>
 MPI_Allreduce<br>
 MPI_Alltoall<br>
+
 MPI_Alltoallv<br>
 MPI_Attr_delete<br>
 MPI_Attr_get<br>
@@ -761,6 +867,7 @@ MPI_Bcast<br>
 MPI_Bsend<br>
 MPI_Bsend_init<br>
 MPI_Buffer_attach<br>
+
 MPI_Buffer_detach<br>
 MPI_Cancel<br>
 MPI_Cart_coords<br>
@@ -770,6 +877,7 @@ MPI_Cart_map<br>
 MPI_Cart_rank<br>
 MPI_Cart_shift<br>
 MPI_Cart_sub<br>
+
 MPI_Cartdim_get<br>
 MPI_Comm_create<br>
 MPI_Comm_dup<br>
@@ -779,6 +887,7 @@ MPI_Comm_remote_size<br>
 MPI_Comm_split<br>
 MPI_Comm_test_inter<br>
 MPI_Dims_create<br>
+
 MPI_Error_class<br>
 MPI_File_close<br>
 MPI_File_open<br>
@@ -788,6 +897,7 @@ MPI_File_read_all<br>
 MPI_File_read_at<br>
 MPI_File_seek<br>
 MPI_File_set_view<br>
+
 MPI_File_write<br>
 MPI_File_write_all<br>
 MPI_File_write_at<br>
@@ -797,6 +907,7 @@ MPI_Graph_create<br>
 MPI_Graph_get<br>
 MPI_Graph_map<br>
 MPI_Graph_neighbors<br>
+
 MPI_Graph_neighbors_count<br>
 MPI_Graphdims_get<br>
 MPI_Group_compare<br>
@@ -806,6 +917,7 @@ MPI_Group_free<br>
 MPI_Group_incl<br>
 MPI_Group_intersection<br>
 MPI_Group_translate_ranks<br>
+
 MPI_Group_union<br>
 MPI_Ibsend <br>
 MPI_Intercomm_create <br>
@@ -815,6 +927,7 @@ MPI_Irecv<br>
 MPI_Irsend<br>
 MPI_Isend<br>
 MPI_Issend<br>
+
 MPI_Keyval_create<br>
 MPI_Keyval_free<br>
 MPI_Pack<br>
@@ -824,6 +937,7 @@ MPI_Recv_init<br>
 MPI_Reduce<br>
 MPI_Reduce_scatter<br>
 MPI_Request_free<br>
+
 MPI_Rsend<br>
 MPI_Rsend_init<br>
 MPI_Scan<br>
@@ -833,6 +947,7 @@ MPI_Send<br>
 MPI_Send_init<br>
 MPI_Sendrecv<br>
 MPI_Sendrecv_replace<br>
+
 MPI_Ssend<br>
 MPI_Ssend_init<br>
 MPI_Start<br>
@@ -842,6 +957,7 @@ MPI_Testall<br>
 MPI_Testany<br>
 MPI_Testsome<br>
 MPI_Topo_test<br>
+
 MPI_Type_commit<br>
 MPI_Type_free<br>
 MPI_Type_get_contents<br>
@@ -851,6 +967,7 @@ MPI_Wait<br>
 MPI_Waitall<br>
 MPI_Waitany<br>
 MPI_Waitsome</p>
+
 <p class="privacyfoter"><a href="#top">Top</a></p>
 <hr width="75%">
 <h2><a name="Message_Size_Routines">MPI Routines For Which mpiP Gathers Sent Message
@@ -861,6 +978,7 @@ MPI_Allreduce<br>
 MPI_Alltoall<br>
 MPI_Bcast<br>
 MPI_Bsend<br>
+
 MPI_Gather<br>
 MPI_Gatherv<br>
 MPI_Ibsend<br>
@@ -870,6 +988,7 @@ MPI_Issend<br>
 MPI_Reduce<br>
 MPI_Rsend<br>
 MPI_Scan<br>
+
 MPI_Scatter<br>
 MPI_Send<br>
 MPI_Sendrecv <br>
@@ -879,6 +998,7 @@ MPI_Ssend </p>
 <hr width="75%">
 <h2><a name="IO_Routines">MPI Routines For Which mpiP Gathers I/O Data</a></h2>
 <p>MPI_File_close<br>
+
 MPI_File_open<br>
 MPI_File_preallocate<br>
 MPI_File_read<br>
@@ -888,6 +1008,7 @@ MPI_File_seek<br>
 MPI_File_set_view<br>
 MPI_File_write<br>
 MPI_File_write_all<br>
+
 MPI_File_write_at<br>
 </p><p class="privacyfoter"><a href="#top">Top</a></p>
 <hr>
