@@ -38,7 +38,6 @@ API_SRCS =	diag_msgs_api.c \
 	mpiPi.c \
 	util.c \
 	lookup.c \
-	pc_lookup.c \
 	mpiP-API.c
 
 USE_GETARG   = @USE_GETARG@
@@ -46,8 +45,10 @@ USE_LIBDWARF = @USE_LIBDWARF@
 
 ifeq ($(USE_LIBDWARF),yes)
     SRCS += pc_lookup_dwarf.c
+    API_SRCS += pc_lookup_dwarf.c
 else
     SRCS += pc_lookup.c
+    API_SRCS += pc_lookup.c
 endif
 
 OBJS  = $(SRCS:.c=.o)
