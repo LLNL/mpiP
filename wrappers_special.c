@@ -62,8 +62,7 @@ extern int
 MPI_Init (int *argc, char ***argv)
 {
   int rc = 0;
-  jmp_buf jbuf;
-  setjmp (jbuf);
+
   mpiPi.toolname = "mpiP";
 
   rc = _MPI_Init (argc, argv);
@@ -86,10 +85,8 @@ extern void
 F77_MPI_INIT (int *ierr)
 {
   int rc = 0;
-  jmp_buf jbuf;
   char **tmp_argv;
 
-  setjmp (jbuf);
   mpiPi.toolname = "mpiP";
 #ifdef Linux
   getProcCmdLine (&(mpiPi.ac), mpiPi.av, 32);
@@ -107,7 +104,7 @@ F77_MPI_INIT (int *ierr)
 
 /* ----- FINALIZE -------------------------------------------------- */
 
-extern int
+static int
 _MPI_Finalize ()
 {
   int rc = 0;
@@ -125,9 +122,7 @@ extern int
 MPI_Finalize (void)
 {
   int rc = 0;
-  jmp_buf jbuf;
 
-  setjmp (jbuf);
   rc = _MPI_Finalize ();
 
   return rc;
@@ -137,9 +132,6 @@ extern void
 F77_MPI_FINALIZE (int *ierr)
 {
   int rc = 0;
-  jmp_buf jbuf;
-
-  setjmp (jbuf);
 
   rc = _MPI_Finalize ();
   *ierr = rc;
