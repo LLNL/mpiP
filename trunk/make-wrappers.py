@@ -90,6 +90,257 @@ noDefineList = [
     "MPI_Pcontrol"
     ]
 
+opaqueInArgDict = { 
+  ("MPI_Abort", "comm"):"MPI_Comm",
+  ("MPI_Allgather", "comm"):"MPI_Comm",
+  ("MPI_Allgather", "recvtype"):"MPI_Datatype",
+  ("MPI_Allgather", "sendtype"):"MPI_Datatype",
+  ("MPI_Allgatherv", "comm"):"MPI_Comm",
+  ("MPI_Allgatherv", "recvtype"):"MPI_Datatype",
+  ("MPI_Allgatherv", "sendtype"):"MPI_Datatype",
+  ("MPI_Allreduce", "comm"):"MPI_Comm",
+  ("MPI_Allreduce", "datatype"):"MPI_Datatype",
+  ("MPI_Allreduce", "op"):"MPI_Op",
+  ("MPI_Alltoall", "comm"):"MPI_Comm",
+  ("MPI_Alltoall", "recvtype"):"MPI_Datatype",
+  ("MPI_Alltoall", "sendtype"):"MPI_Datatype",
+  ("MPI_Alltoallv", "comm"):"MPI_Comm",
+  ("MPI_Alltoallv", "recvtype"):"MPI_Datatype",
+  ("MPI_Alltoallv", "sendtype"):"MPI_Datatype",
+  ("MPI_Attr_delete", "comm"):"MPI_Comm",
+  ("MPI_Attr_get", "comm"):"MPI_Comm",
+  ("MPI_Attr_put", "comm"):"MPI_Comm",
+  ("MPI_Attr_put", "comm"):"MPI_Comm",
+  ("MPI_Barrier", "comm"):"MPI_Comm",
+  ("MPI_Bcast", "datatype"):"MPI_Datatype",
+  ("MPI_Bcast", "comm"):"MPI_Comm",
+  ("MPI_Bsend", "comm"):"MPI_Comm",
+  ("MPI_Bsend", "datatype"):"MPI_Datatype",
+  ("MPI_Bsend_init", "comm"):"MPI_Comm",
+  ("MPI_Bsend_init", "datatype"):"MPI_Datatype",
+  ("MPI_Cancel", "request"):"MPI_Request",
+  ("MPI_Cart_coords", "comm"):"MPI_Comm",
+  ("MPI_Cart_create", "comm_old"):"MPI_Comm",
+  ("MPI_Cart_get", "comm"):"MPI_Comm",
+  ("MPI_Cart_map", "comm_old"):"MPI_Comm",
+  ("MPI_Cart_rank", "comm"):"MPI_Comm",
+  ("MPI_Cart_shift", "comm"):"MPI_Comm",
+  ("MPI_Cart_sub", "comm"):"MPI_Comm",
+  ("MPI_Cartdim_get", "comm"):"MPI_Comm",
+  ("MPI_Comm_compare", "comm1"):"MPI_Comm",
+  ("MPI_Comm_compare", "comm2"):"MPI_Comm",
+  ("MPI_Comm_create", "comm"):"MPI_Comm",
+  ("MPI_Comm_create", "group"):"MPI_Group",
+  ("MPI_Comm_dup", "comm"):"MPI_Comm",
+  ("MPI_Comm_free", "commp"):"MPI_Comm",
+  ("MPI_Comm_group", "comm"):"MPI_Comm",
+  ("MPI_Comm_rank", "comm"):"MPI_Comm",
+  ("MPI_Comm_remote_group", "comm"):"MPI_Comm",
+  ("MPI_Comm_remote_size", "comm"):"MPI_Comm",
+  ("MPI_Comm_size", "comm"):"MPI_Comm",
+  ("MPI_Comm_split", "comm"):"MPI_Comm",
+  ("MPI_Comm_test_inter", "comm"):"MPI_Comm",
+  ("MPI_Errhandler_get", "comm"):"MPI_Comm",
+  ("MPI_Errhandler_set", "comm"):"MPI_Comm",
+  ("MPI_File_close", "fh"):"MPI_File",
+  ("MPI_File_open", "comm"):"MPI_Comm",
+  ("MPI_File_open", "info"):"MPI_Info",
+  ("MPI_File_preallocate", "fh"):"MPI_File",
+  ("MPI_File_read", "fh"):"MPI_File",
+  ("MPI_File_read", "datatype"):"MPI_Datatype",
+  ("MPI_File_read_all", "fh"):"MPI_File",
+  ("MPI_File_read_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_read_at", "fh"):"MPI_File",
+  ("MPI_File_read_at", "datatype"):"MPI_Datatype",
+  ("MPI_File_seek", "fh"):"MPI_File",
+  ("MPI_File_set_view", "fh"):"MPI_File",
+  ("MPI_File_set_view", "etype"):"MPI_Datatype",
+  ("MPI_File_set_view", "filetype"):"MPI_Datatype",
+  ("MPI_File_set_view", "info"):"MPI_Info",
+  ("MPI_File_write", "fh"):"MPI_File",
+  ("MPI_File_write", "datatype"):"MPI_Datatype",
+  ("MPI_File_write_all", "fh"):"MPI_File",
+  ("MPI_File_write_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_write_at", "fh"):"MPI_File",
+  ("MPI_File_write_at", "datatype"):"MPI_Datatype",
+  ("MPI_Gather", "comm"):"MPI_Comm",
+  ("MPI_Gather", "recvtype"):"MPI_Datatype",
+  ("MPI_Gather", "sendtype"):"MPI_Datatype",
+  ("MPI_Gatherv", "comm"):"MPI_Comm",
+  ("MPI_Gatherv", "recvtype"):"MPI_Datatype",
+  ("MPI_Gatherv", "sendtype"):"MPI_Datatype",
+  ("MPI_Get_count", "datatype"):"MPI_Datatype",
+  ("MPI_Get_elements", "datatype"):"MPI_Datatype",
+  ("MPI_Graph_create", "comm_old"):"MPI_Comm",
+  ("MPI_Graph_get", "comm"):"MPI_Comm",
+  ("MPI_Graph_map", "comm_old"):"MPI_Comm",
+  ("MPI_Graph_neighbors", "comm"):"MPI_Comm",
+  ("MPI_Graph_neighbors_count", "comm"):"MPI_Comm",
+  ("MPI_Graphdims_get", "comm"):"MPI_Comm",
+  ("MPI_Group_compare", "group1"):"MPI_Group",
+  ("MPI_Group_compare", "group2"):"MPI_Group",
+  ("MPI_Group_difference", "group1"):"MPI_Group",
+  ("MPI_Group_difference", "group2"):"MPI_Group",
+  ("MPI_Group_excl", "group"):"MPI_Group",
+  ("MPI_Group_free", "group"):"MPI_Group",
+  ("MPI_Group_incl", "group"):"MPI_Group",
+  ("MPI_Group_intersection", "group1"):"MPI_Group",
+  ("MPI_Group_intersection", "group2"):"MPI_Group",
+  ("MPI_Group_range_excl", "group"):"MPI_Group",
+  ("MPI_Group_range_incl", "group"):"MPI_Group",
+  ("MPI_Group_rank", "group"):"MPI_Group",
+  ("MPI_Group_size", "group"):"MPI_Group",
+  ("MPI_Group_translate_ranks", "group_a"):"MPI_Group",
+  ("MPI_Group_translate_ranks", "group_b"):"MPI_Group",
+  ("MPI_Group_union", "group1"):"MPI_Group",
+  ("MPI_Group_union", "group2"):"MPI_Group",
+  ("MPI_Ibsend", "comm"):"MPI_Comm",
+  ("MPI_Ibsend", "datatype"):"MPI_Datatype",
+  ("MPI_Intercomm_create", "local_comm"):"MPI_Comm",
+  ("MPI_Intercomm_create", "peer_comm"):"MPI_Comm",
+  ("MPI_Intercomm_merge", "comm"):"MPI_Comm",
+  ("MPI_Iprobe", "comm"):"MPI_Comm",
+  ("MPI_Irecv", "comm"):"MPI_Comm",
+  ("MPI_Irecv", "datatype"):"MPI_Datatype",
+  ("MPI_Irsend", "comm"):"MPI_Comm",
+  ("MPI_Irsend", "datatype"):"MPI_Datatype",
+  ("MPI_Isend", "comm"):"MPI_Comm",
+  ("MPI_Isend", "datatype"):"MPI_Datatype",
+  ("MPI_Issend", "comm"):"MPI_Comm",
+  ("MPI_Issend", "datatype"):"MPI_Datatype",
+  ("MPI_Pack", "comm"):"MPI_Comm",
+  ("MPI_Pack", "datatype"):"MPI_Datatype",
+  ("MPI_Pack_size", "comm"):"MPI_Comm",
+  ("MPI_Pack_size", "datatype"):"MPI_Datatype",
+  ("MPI_Probe", "comm"):"MPI_Comm",
+  ("MPI_Recv", "comm"):"MPI_Comm",
+  ("MPI_Recv", "datatype"):"MPI_Datatype",
+  ("MPI_Recv_init", "comm"):"MPI_Comm",
+  ("MPI_Recv_init", "datatype"):"MPI_Datatype",
+  ("MPI_Reduce", "comm"):"MPI_Comm",
+  ("MPI_Reduce", "datatype"):"MPI_Datatype",
+  ("MPI_Reduce", "op"):"MPI_Op",
+  ("MPI_Reduce_scatter", "comm"):"MPI_Comm",
+  ("MPI_Reduce_scatter", "datatype"):"MPI_Datatype",
+  ("MPI_Reduce_scatter", "op"):"MPI_Op",
+  ("MPI_Request_free", "request"):"MPI_Request",
+  ("MPI_Rsend", "comm"):"MPI_Comm",
+  ("MPI_Rsend", "datatype"):"MPI_Datatype",
+  ("MPI_Rsend_init", "comm"):"MPI_Comm",
+  ("MPI_Rsend_init", "datatype"):"MPI_Datatype",
+  ("MPI_Scan", "comm"):"MPI_Comm",
+  ("MPI_Scan", "op"):"MPI_Op",
+  ("MPI_Scan", "datatype"):"MPI_Datatype",
+  ("MPI_Scatter", "comm"):"MPI_Comm",
+  ("MPI_Scatter", "recvtype"):"MPI_Datatype",
+  ("MPI_Scatter", "sendtype"):"MPI_Datatype",
+  ("MPI_Scatterv", "comm"):"MPI_Comm",
+  ("MPI_Scatterv", "recvtype"):"MPI_Datatype",
+  ("MPI_Scatterv", "sendtype"):"MPI_Datatype",
+  ("MPI_Send", "comm"):"MPI_Comm",
+  ("MPI_Send", "datatype"):"MPI_Datatype",
+  ("MPI_Send_init", "comm"):"MPI_Comm",
+  ("MPI_Send_init", "datatype"):"MPI_Datatype",
+  ("MPI_Sendrecv", "comm"):"MPI_Comm",
+  ("MPI_Sendrecv", "recvtag"):"MPI_Datatype",
+  ("MPI_Sendrecv", "recvtype"):"MPI_Datatype",
+  ("MPI_Sendrecv", "sendtype"):"MPI_Datatype",
+  ("MPI_Sendrecv_replace", "comm"):"MPI_Comm",
+  ("MPI_Sendrecv_replace", "datatype"):"MPI_Datatype",
+  ("MPI_Ssend", "comm"):"MPI_Comm",
+  ("MPI_Ssend", "datatype"):"MPI_Datatype",
+  ("MPI_Ssend_init", "comm"):"MPI_Comm",
+  ("MPI_Ssend_init", "datatype"):"MPI_Datatype",
+  ("MPI_Start", "request"):"MPI_Request",
+  ("MPI_Startall", "array_of_requests"):"MPI_Request",
+  ("MPI_Test", "request"):"MPI_Request",
+  ("MPI_Testall", "array_of_requests"):"MPI_Request",
+  ("MPI_Testany", "array_of_requests"):"MPI_Request",
+  ("MPI_Testsome", "array_of_requests"):"MPI_Request",
+  ("MPI_Topo_test", "comm"):"MPI_Comm",
+  ("MPI_Type_commit", "datatype"):"MPI_Datatype",
+  ("MPI_Type_contiguous", "oldtype"):"MPI_Datatype",
+  ("MPI_Type_extent", "datatype"):"MPI_Datatype",
+  ("MPI_Type_free", "datatype"):"MPI_Datatype",
+  ("MPI_Type_get_contents", "datatype"):"MPI_Datatype",
+  ("MPI_Type_get_envelope", "datatype"):"MPI_Datatype",
+  ("MPI_Type_hindexed", "oldtype"):"MPI_Datatype",
+  ("MPI_Type_hvector", "oldtype"):"MPI_Datatype",
+  ("MPI_Type_indexed", "oldtype"):"MPI_Datatype",
+  ("MPI_Type_lb", "datatype"):"MPI_Datatype",
+  ("MPI_Type_size", "datatype"):"MPI_Datatype",
+  ("MPI_Type_struct", "array_of_types"):"MPI_Datatype",
+  ("MPI_Type_ub", "datatype"):"MPI_Datatype",
+  ("MPI_Type_vector", "oldtype"):"MPI_Datatype",
+  ("MPI_Unpack", "comm"):"MPI_Comm",
+  ("MPI_Unpack", "datatype"):"MPI_Datatype",
+  ("MPI_Wait", "request"):"MPI_Request",
+  ("MPI_Waitall", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitany", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitsome", "array_of_requests"):"MPI_Request",
+}
+
+opaqueOutArgDict = { 
+  ("MPI_Bsend_init", "request"):"MPI_Request",
+  ("MPI_Cart_create", "comm_cart"):"MPI_Comm",
+  ("MPI_Cart_sub", "comm_new"):"MPI_Comm",
+  ("MPI_Comm_create", "comm_out"):"MPI_Comm",
+  ("MPI_Comm_dup", "comm_out"):"MPI_Comm",
+  ("MPI_Comm_free", "commp"):"MPI_Comm",
+  ("MPI_Comm_group", "group"):"MPI_Group",
+  ("MPI_Comm_remote_group", "group"):"MPI_Group",
+  ("MPI_Comm_split", "comm_out"):"MPI_Comm",
+  ("MPI_File_close", "fh"):"MPI_File",
+  ("MPI_File_open", "fh"):"MPI_File",
+  ("MPI_Graph_create", "comm_graph"):"MPI_Comm",
+  ("MPI_Group_difference", "group_out"):"MPI_Group",
+  ("MPI_Group_excl", "newgroup"):"MPI_Group",
+  ("MPI_Group_free", "group"):"MPI_Group",
+  ("MPI_Group_incl", "group_out"):"MPI_Group",
+  ("MPI_Group_intersection", "group_out"):"MPI_Group",
+  ("MPI_Group_range_excl", "newgroup"):"MPI_Group",
+  ("MPI_Group_range_incl", "newgroup"):"MPI_Group",
+  ("MPI_Group_union", "group_out"):"MPI_Group",
+  ("MPI_Ibsend", "request"):"MPI_Request",
+  ("MPI_Intercomm_create", "comm_out"):"MPI_Comm",
+  ("MPI_Intercomm_merge", "comm_out"):"MPI_Comm",
+  ("MPI_Irecv", "request"):"MPI_Request",
+  ("MPI_Irsend", "request"):"MPI_Request",
+  ("MPI_Isend", "request"):"MPI_Request",
+  ("MPI_Issend", "request"):"MPI_Request",
+  ("MPI_Op_create", "op"):"MPI_Op",
+  ("MPI_Recv_init", "request"):"MPI_Request",
+  ("MPI_Request_free", "request"):"MPI_Request",
+  ("MPI_Rsend_init", "request"):"MPI_Request",
+  ("MPI_Send_init", "request"):"MPI_Request",
+  ("MPI_Ssend_init", "request"):"MPI_Request",
+  ("MPI_Start", "request"):"MPI_Request",
+  ("MPI_Startall", "array_of_requests"):"MPI_Request",
+  ("MPI_Test", "request"):"MPI_Request",
+  ("MPI_Testall", "array_of_requests"):"MPI_Request",
+  ("MPI_Testany", "array_of_requests"):"MPI_Request",
+  ("MPI_Testsome", "array_of_requests"):"MPI_Request",
+  ("MPI_Type_commit", "datatype"):"MPI_Datatype",
+  ("MPI_Type_contiguous", "newtype"):"MPI_Datatype",
+  ("MPI_Type_free", "datatype"):"MPI_Datatype",
+  ("MPI_Type_get_contents", "array_of_datatypes"):"MPI_Datatype",
+  ("MPI_Type_hindexed", "newtype"):"MPI_Datatype",
+  ("MPI_Type_hvector", "newtype"):"MPI_Datatype",
+  ("MPI_Type_indexed", "newtype"):"MPI_Datatype",
+  ("MPI_Type_struct", "newtype"):"MPI_Datatype",
+  ("MPI_Type_vector", "newtype"):"MPI_Datatype",
+  ("MPI_Wait", "request"):"MPI_Request",
+  ("MPI_Waitall", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitany", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitsome", "array_of_requests"):"MPI_Request"
+}
+
+
+
+
+
+
+
 class VarDesc:
     def __init__ (self,name, basetype, pointerLevel, arrayLevel):
 	"initialize a new variable description structure"
@@ -810,37 +1061,69 @@ def CreateWrapper(funct, olist):
     ##### funct decl
     olist.append("\n\nextern void " + "F77_" + string.upper(funct) + "(" )
     
+    #================================================================================
+    # In the case where MPI_Fint and and opaque objects such as MPI_Request are not the same size,
+    #   we want to use MPI conversion functions.
+    #
+    # The most obvious problem we have encountered is for MPI_Request objects,
+    #   but Communicators, Group, Datatype, Op, and File are also possibily problems.
+    #
+    # There are two cases:
+    #   1) A single argument needs to be translated.
+    #   2) An array of objects needs to be allocated and translated.
+    #      This only appears necessary for Request and Datatype
+    #
+    # The algorithm for processing Fortran wrapper functions is as follows:
+    #   1.  Declare all C variable versions for Fortran arguments.
+    #   2.  Allocate any arrays to be used.
+    #   3.  Perform any necessary pre-call array and scalar xlation.
+    #   4.  Make the function call with appropriate C variables.
+    #   5.  Perform any necessary post-call array and scalar xlation.
+    #   6.  Free any arrays.
+    #================================================================================
+
     ###  Type translation information
     xlateVarName = ""
     xlateVarNames = []
     xlateTypes = []
     xlateCount = 0
     #  Input types to translate
-    xlateTargetTypes = [ "MPI_Comm", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
+    xlateTargetTypes = [ "MPI_Comm", "MPI_Datatype", "MPI_File", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
         
     freelist = []
     
+    #  Iterate through the arguments for this function
     for i in fdict[funct].paramConciseList:
-        # In the case where MPI_Fint and MPI_Request are not the same size,
-        #   we want to use MPI conversion functions.
-        # The most obvious problem we have encountered is for MPI_Request objects,
-        #   but Communicators, Group, Win, Info, Op are also possibily problems.
-        # There are two cases:
-        #   1) A single argument needs to be translated.
-        #   2) An array of objects needs to be allocated and translated.
-        #      This only appears necessary for Request and Datatype
+        xlateDone = 0
+        opaqueFound = 0
+        
         if ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype in xlateTargetTypes ) :
+            
+            #  Verify that there is a Dictionary entry for translating this argument
+            if ( not ( opaqueInArgDict.has_key((funct, i)) or opaqueOutArgDict.has_key((funct, i)) ) ):
+                print "*** Failed to find translation information for " + funct + ":" + i + "\n"
+            
+            opaqueFound = 1
+            # All Fortran opaque object are of type MPI_Fint
             currBasetype = "MPI_Fint"
+            
+            #  Store variable name and type
             xlateTypes.append(fdict[funct].paramDict[i].basetype)
             xlateVarNames.append(i)
-            #  Try to identify whether array or single value
+            
+            #  Try to identify whether array or single value by whether "array" is in the variable name
+            #  and add C declaration to declaration list.
             if ( xlateVarNames[xlateCount].count("array") > 0 ):
                 decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + ";\n";
             else:
                 decl += xlateTypes[xlateCount] + " c_" + xlateVarNames[xlateCount] + ";\n";
+                
             xlateCount += 1
         else:
+            #  Not translating this variable
     		currBasetype = fdict[funct].paramDict[i].basetype
+            
+        #  Add argument to function declaration    
     	if (fdict[funct].paramDict[i].pointerLevel == 0) \
     	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
     	   and (fdict[funct].paramDict[i].basetype != "void"):
@@ -854,7 +1137,9 @@ def CreateWrapper(funct, olist):
     	    pass
     	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
     	    olist.append(", ")
-    olist.append(" , int *ierr)")
+    
+    #  Add ierr argument and declarations to output list        
+    olist.append(" , MPI_Fint *ierr)")
     olist.append("{")
     olist.append(decl)
     olist.append("\n")
@@ -863,34 +1148,72 @@ def CreateWrapper(funct, olist):
 	    olist.extend(fdict[funct].wrapperPreList)
 
     olist.append("setjmp (jbuf);\n\n")
-    
-    #  Generate pre-call translation code if necessary
+
+    #  Allocate any arrays used for translation
     for i in range(len(xlateVarNames)) :
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
-        if ( xlateVarName.count("array") > 0 ):
-            olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*count));\n")
-            olist.append("{\n  int i; \n")
-            olist.append("  for (i = 0; i < *count; i++) { \n")
-            olist.append("    c_" + xlateVarName + "[i] = " + xlateType + "_f2c(" + xlateVarName + "[i]);\n")
-            olist.append("  }\n}\n")
-            freelist.append("c_"+xlateVarName);
-        else:
-            olist.append("c_" + xlateVarName + " = " + xlateType + "_f2c(*" + xlateVarName + ");\n")
+        
+        #  A pretty sketchy way of identifying an array size, but as far as I can tell,
+        #  only one array is passed as an argument per function.
+        if ( fdict[funct].paramConciseList.count("count") > 1 ):
+            print "*** Multiple arrays in 1 function!!!!\n";
             
-    olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
+        if ( "count" in fdict[funct].paramConciseList ):
+            countVar = "count";
+        else:
+            countVar = "max_integers"
+            
+        if ( xlateVarName.count("array") > 0 ):
+            olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*" + countVar + "));\n")
+            olist.append("if ( c_" + xlateVarName + " == NULL ) mpiPi_abort(\"Failed to allocate memory in " \
+                + funct + "\");\n")
+            freelist.append("c_"+xlateVarName)
     
-    argname = ""
-    for i in fdict[funct].paramConciseList:
-        #  Replace argument with the translated variable
-        if ( i in xlateVarNames ):
-            xlateVarName = i
-            if ( xlateVarName.count("array") > 0 ):
-                argname = "c_" + xlateVarName;
+    #  Generate pre-call translation code if necessary by iterating through arguments that
+    #  were identified as opaque objects needing translation above
+    for i in range(len(xlateVarNames)) :
+        
+        #  Set current argument name and type
+        xlateVarName = xlateVarNames[i]
+        xlateType = xlateTypes[i]
+        
+        #  Check for valid function:argument-name entry for pre-call translation.
+        if ( opaqueInArgDict.has_key((funct, xlateVarName)) \
+            and opaqueInArgDict[(funct, xlateVarName)] == xlateType ) :
+                
+            #  Datatype translation is the only call where the translation function
+            #  doesn't match the argument type.
+            if ( xlateType == "MPI_Datatype" ):
+                xlateFuncType = "MPI_Type"
             else:
-                argname = "&c_" + xlateVarName;
+                xlateFuncType = xlateType
+                
+            if ( xlateVarName.count("array") > 0 ):
+                olist.append("{\n  int i; \n")
+                olist.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
+                olist.append("    c_" + xlateVarName + "[i] = " + xlateFuncType + "_f2c(" + xlateVarName + "[i]);\n")
+                olist.append("  }\n}\n")
+            else:
+                olist.append("c_" + xlateVarName + " = " + xlateFuncType + "_f2c(*" + xlateVarName + ");\n")
+
+            xlateDone = 1
+            
+    #  Start generating call to C/Fortran common mpiP wrapper function        
+    olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )    
+    argname = ""
+
+    #  Iterate through mpiP wrapper function arguments, replacing argument with C version where appropriate
+    for i in fdict[funct].paramConciseList:
+        if ( i in xlateVarNames and 
+            ( opaqueInArgDict.has_key((funct, i)) or opaqueOutArgDict.has_key((funct, i))) ):
+            if ( i.count("array") > 0 ):
+                argname = "c_" + i;
+            else:
+                argname = "&c_" + i;
         else:
             argname = i
+            
         if (fdict[funct].paramDict[i].pointerLevel == 0) \
            and (fdict[funct].paramDict[i].arrayLevel == 0) \
            and (fdict[funct].paramDict[i].basetype != "void"):
@@ -899,35 +1222,49 @@ def CreateWrapper(funct, olist):
             olist.append(argname)
         else:
             pass
+            
         if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
             olist.append(", ")
 
     olist.append(" );\n\n")
-    olist.append("*ierr = rc;\n")
+    olist.append("*ierr = (MPI_Fint)rc;\n")
 
     #  Generate post-call translation code if necessary
     for i in range(len(xlateVarNames)) :
+        
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
-        if ( xlateVarName.count("array") > 0 ):
-            olist.append("{\n  int i; \n")
-            olist.append("  for (i = 0; i < *count; i++) { \n")
-            olist.append("    " + xlateVarName + "[i] = " + xlateType + "_c2f(c_" + xlateVarName + "[i]);\n")
-            olist.append("  }\n}\n")
-        else:
-            olist.append("*" + xlateVarName + " = " + xlateType + "_c2f(c_" + xlateVarName + ");\n")
+
+        if ( opaqueOutArgDict.has_key((funct, xlateVarName)) \
+            and opaqueOutArgDict[(funct, xlateVarName)] == xlateType ):
+
+            #  Datatype translation is the only call where the translation function
+            #  doesn't match the argument type.
+            if ( xlateType == "MPI_Datatype" ):
+                xlateFuncType = "MPI_Type"
+            else:
+                xlateFuncType = xlateType
+
+            #  Generate array or scalar translation code
+            if ( xlateVarName.count("array") > 0 ):
+                olist.append("{\n  int i; \n")
+                olist.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
+                olist.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
+                olist.append("  }\n}\n")
+            else:
+                olist.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
+                
+            xlateDone = 1
+                
+    #  Free allocated arrays
     for freeSym in freelist:
         olist.append("free("+freeSym+");\n")
                 
-#    #  Generate post-call translation code if necessary and free any allocated memory
-#    if ( doOpaqueXlate is True ) :
-#        if ( funct in xlateExitInfo ) :
-#            olist.append("*" + xlateExitInfo[funct].varName + " = MPI_" + xlateExitInfo[funct].mpiType + "_c2f(c_" + xlateExitInfo[funct].varName + ");\n")
-#        for freeSym in freelist:
-#            olist.append("free("+freeSym+");\n")
-
     olist.append("return;\n" + "}" + " /* " + string.lower(funct) + " */\n")
 
+    if ( opaqueFound == 1 and xlateDone == 0 ):
+        print "Function " + funct + " not translated!\n"
+        
     print "   Wrapped " + funct
 
 
