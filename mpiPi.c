@@ -463,16 +463,21 @@ mpiPi_mergeResults ()
       int i;
 
 #ifndef DISABLE_BFD
-      if ( mpiPi.av[0] != NULL )
+      if ( mpiPi.appFullName != NULL )
       {
-        open_bfd_executable (mpiPi.av[0]);
+        open_bfd_executable (mpiPi.appFullName);
       }
 #elif defined(USE_LIBDWARF)
-      if( mpiPi.av[0] != NULL )
+      if( mpiPi.appFullName != NULL )
       {
-        open_dwarf_executable( mpiPi.av[0] );
+        open_dwarf_executable( mpiPi.appFullName );
       }
 #endif
+      else
+      {
+	mpiPi_msg_warn("Failed to open executable\n");
+	return 0;
+      }
 
       /* convert data to src line; merge, if nec */
       mpiPi.global_callsite_stats = h_open (mpiPi.tableSize,
@@ -623,15 +628,9 @@ mpiPi_mergeResults ()
 
 #ifndef DISABLE_BFD
       /* clean up */
-      if ( mpiPi.av[0] != NULL )
-      {
-        close_bfd_executable ();
-      }
+      close_bfd_executable();
 #elif defined(USE_LIBDWARF)
-      if( mpiPi.av[0] != NULL )
-      {
-        close_dwarf_executable();
-      }
+      close_dwarf_executable();
 #endif
     }
 
