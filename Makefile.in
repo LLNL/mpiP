@@ -101,13 +101,37 @@ install::
 	  mkdir -p ${slibdir} ; \
 	  ${INSTALL} ${SHARED_C_TARGET} ${slibdir} ; \
 	fi
+clean::
+	rm -f ${SHARED_C_TARGET}
 
 ${SHARED_C_TARGET}: CFLAGS += -fpic
 ${SHARED_C_TARGET}: cleanobjs ${OBJS}
 	${CC} -shared -o $@ ${OBJS}
+
 endif
 
+ifeq ($(OS), AIX)
+SHARED_C_TARGET = $(C_TARGET:.a=.so)
+SHARED_FORTRAN_TARGET = $(FORTRAN_TARGET:.a=.so)
+SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
+
+shared: ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}
+install::
+	if [ -x ${SHARED_C_TARGET} ] ; then \
+	  mkdir -p ${slibdir} ; \
+	  ${INSTALL} ${SHARED_C_TARGET} ${slibdir} ; \
+	fi
+
+clean::
+	rm -f ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}
+
+${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}: ${C_TARGET}
+	mpxlc -G -o $@ ${OBJS}
+endif
+
+
 API: libmpiP-API.a
+
 libmpiP-API.a: ${API_OBJS} 
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
@@ -190,10 +214,10 @@ clean::
 	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
 
 clean::
-	rm -f ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
+	rm -f ${FORTRAN_TARGET} ${DEMANGLE_TARGET} ${API_TARGET}
 
 cleanobjs:
-	rm -f ${FOBJS}
+	rm -f ${FOBJS} ${API_OBJS}
 
 MPIINC	= -I/usr/lpp/ppe.poe/include
 lint: ${SRCS}
