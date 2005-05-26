@@ -65,6 +65,7 @@ ifeq ($(OS),Linux)
 endif
 
 C_TARGET = libmpiP.a
+API_TARGET = libmpiP-API.a
 MPIPLIB  = mpiP
 MPIPFLIB = mpiP
 
