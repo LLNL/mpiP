@@ -855,7 +855,7 @@ Optional Features:
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-mpi-io        Disable MPI-I/O reporting.
-  --disable-fortranxlate Disable translation of Fortran opaque objects.
+  --disable-fortranxlate  Disable translation of Fortran opaque objects.
   --enable-getarg         Use getarg to get fortran command line args.
   --enable-check-time     Enable AIX check for negative time values.
 

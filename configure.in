@@ -136,7 +136,7 @@ DISABLE_MPI_IO=no
 AC_SUBST(DISABLE_MPI_IO)
 
 AC_ARG_ENABLE(fortranxlate,
-[  --disable-fortranxlate Disable translation of Fortran opaque objects.],
+[  --disable-fortranxlate  Disable translation of Fortran opaque objects.],
 if test "$enable_fortranxlate" = "no" ; then
   ENABLE_FORTRAN_XLATE=no
   echo Translation of FORTRAN opaque objects has been disabled.
