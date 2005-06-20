@@ -43,7 +43,7 @@ _MPI_Init (int *argc, char ***argv)
   mpiPi_msg_debug ("appFullName is %s\n", mpiPi.appFullName);
   mpiPi_init (GetBaseAppName (mpiPi.appFullName));
 #else
-  if ( argv != NULL )
+  if ( argv != NULL && *argv != NULL && **argv != NULL )
   {
     mpiPi_init (GetBaseAppName (**argv));
     mpiPi.appFullName = strdup(**argv);
