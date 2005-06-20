@@ -855,7 +855,7 @@ Optional Features:
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-mpi-io        Disable MPI-I/O reporting.
-  --disable-fortran-xlate Disable translation of Fortran opaque objects.
+  --disable-fortranxlate Disable translation of Fortran opaque objects.
   --enable-getarg         Use getarg to get fortran command line args.
   --enable-check-time     Enable AIX check for negative time values.
 
@@ -1597,11 +1597,16 @@ else
 fi;
 
 
-# Check whether --enable-fortran-xlate or --disable-fortran-xlate was given.
-if test "${enable_fortran_xlate+set}" = set; then
-  enableval="$enable_fortran_xlate"
+# Check whether --enable-fortranxlate or --disable-fortranxlate was given.
+if test "${enable_fortranxlate+set}" = set; then
+  enableval="$enable_fortranxlate"
+  if test "$enable_fortranxlate" = "no" ; then
   ENABLE_FORTRAN_XLATE=no
-echo Translation of FORTRAN opaque objects has been disabled.
+  echo Translation of FORTRAN opaque objects has been disabled.
+else
+  ENABLE_FORTRAN_XLATE=yes
+  echo Translation of FORTRAN opaque objects has been enabled.
+fi
 
 else
   ENABLE_FORTRAN_XLATE=yes
@@ -4595,6 +4600,59 @@ fi
 
 else
   HAVE_MPI_IO=/dev/null
+fi
+if test "$ENABLE_FORTRAN_XLATE" = yes ; then
+     echo "$as_me:$LINENO: checking fortran to C conversion" >&5
+echo $ECHO_N "checking fortran to C conversion... $ECHO_C" >&6
+     cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include "mpi.h"
+int
+main ()
+{
+ MPI_Fint mi; MPI_Request ri; ri = MPI_Request_f2c(mi);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+(echo "$as_me:$LINENO: result: functions not found  translation deactivated" >&5
+echo "${ECHO_T}functions not found  translation deactivated" >&6
+                ENABLE_FORTRAN_XLATE=no)
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
 fi
 
 
