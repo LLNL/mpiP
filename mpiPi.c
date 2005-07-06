@@ -473,12 +473,13 @@ mpiPi_mergeResults ()
         open_dwarf_executable( mpiPi.appFullName );
       }
 #endif
+#if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
       else
       {
-	mpiPi_msg_warn("Failed to open executable\n");
-	return 0;
+    	mpiPi_msg_warn("Failed to open executable\n");
+        return 0;
       }
-
+#endif
       /* convert data to src line; merge, if nec */
       mpiPi.global_callsite_stats = h_open (mpiPi.tableSize,
 					    mpiPi_callsite_stats_src_hashkey,
