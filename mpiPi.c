@@ -145,6 +145,7 @@ mpiPi_init (char *appName)
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
   mpiPi.calcCOV = 1;
   mpiPi.inAPIrtb = 0;
+  mpiPi.do_lookup = 1;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -349,8 +350,16 @@ mpiPi_query_src (callsite_stats_t * p)
 
   for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
     {
-      mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
-		      &(p->lineno[i]));
+      if ( mpiPi.do_lookup == 1 )
+        mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
+  		        &(p->lineno[i]));
+      else
+      {
+        p->filename[i] = strdup("[unknown]");
+        p->functname[i] = strdup("[unknown]");
+        p->lineno[i] = 0;
+      }
+
       key.filename[i] = p->filename[i];
       key.functname[i] = p->functname[i];
       key.line[i] = p->lineno[i];
@@ -465,19 +474,21 @@ mpiPi_mergeResults ()
 #ifndef DISABLE_BFD
       if ( mpiPi.appFullName != NULL )
       {
-        open_bfd_executable (mpiPi.appFullName);
+        if ( open_bfd_executable (mpiPi.appFullName) == 0 )
+	  mpiPi.do_lookup = 0;
       }
 #elif defined(USE_LIBDWARF)
       if( mpiPi.appFullName != NULL )
       {
-        open_dwarf_executable( mpiPi.appFullName );
+        if ( open_dwarf_executable( mpiPi.appFullName ) == 0 )
+	  mpiPi.do_lookup = 0;
       }
 #endif
 #if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
       else
       {
     	mpiPi_msg_warn("Failed to open executable\n");
-        return 0;
+	mpiPi.do_lookup = 0;
       }
 #endif
       /* convert data to src line; merge, if nec */
@@ -627,12 +638,15 @@ mpiPi_mergeResults ()
 			   p->filename[0], p->lineno[0], p->functname[0]);
 	}
 
+      if ( mpiPi.do_lookup == 1 )
+      {
 #ifndef DISABLE_BFD
-      /* clean up */
-      close_bfd_executable();
+        /* clean up */
+        close_bfd_executable();
 #elif defined(USE_LIBDWARF)
-      close_dwarf_executable();
+        close_dwarf_executable();
 #endif
+      }
     }
 
   return 1;

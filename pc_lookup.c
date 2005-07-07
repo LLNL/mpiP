@@ -251,7 +251,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 }
 
 
-void open_bfd_executable (char *filename)
+int open_bfd_executable (char *filename)
 {
   char *target = NULL;
   char **matching = NULL;
@@ -262,7 +262,7 @@ void open_bfd_executable (char *filename)
   {
     mpiPi_msg_warn("Executable filename is NULL!\n");
     mpiPi_msg_warn("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
-    return;
+    return 0;
   }
 
   bfd_init ();
@@ -270,9 +270,17 @@ void open_bfd_executable (char *filename)
   mpiPi_msg_debug ("opening filename %s\n", filename);
   abfd = bfd_openr (filename, target);
   if (abfd == NULL)
-    mpiPi_abort ("could not open filename %s", filename);
+  {
+    mpiPi_msg_warn ("could not open filename %s", filename);
+    bfd_close (abfd);
+    return 0;
+  }
   if (bfd_check_format (abfd, bfd_archive))
-    mpiPi_abort ("can not get addresses from archive");
+  {
+    mpiPi_msg_warn ("can not get addresses from archive");
+    bfd_close (abfd);
+    return 0;
+  }
   if (!bfd_check_format_matches (abfd, bfd_object, &matching))
   {
     char *curr_match;
@@ -282,26 +290,42 @@ void open_bfd_executable (char *filename)
         mpiPi_msg_debug ("found matching type %s\n", curr_match);
       free(matching); 
     }
-    mpiPi_abort ("matching failed");
+    mpiPi_msg_warn ("matching failed");
+    bfd_close (abfd);
+    return 0;
   }
   
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
-    mpiPi_abort ("No symbols in the executable\n");
+  {
+    mpiPi_msg_warn ("No symbols in the executable\n");
+    bfd_close (abfd);
+    return 0;
+  }
   /* TODO: move this to the begining of the process so that the user
      knows before the application begins */
   storage = bfd_get_symtab_upper_bound (abfd);
   if (storage < 0)
-    mpiPi_abort ("storage < 0");
+  {
+    mpiPi_msg_warn ("storage < 0");
+    bfd_close (abfd);
+    return 0;
+  }
   syms = (asymbol **) malloc (storage);
   symcount = bfd_canonicalize_symtab (abfd, syms);
 
   if (symcount < 0)
-    mpiPi_abort ("symcount < 0");
+  {
+    mpiPi_msg_warn ("symcount < 0");
+    bfd_close (abfd);
+    return 0;
+  }
   else
     {
       mpiPi_msg_debug ("\n");
       mpiPi_msg_debug ("found %d symbols in file [%s]\n", symcount, filename);
     }
+
+  return 1;
 }
 
 void close_bfd_executable ()
