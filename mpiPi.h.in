@@ -166,6 +166,7 @@ typedef struct _mpiPi_t
   int baseNames;
   MPIP_REPORT_FORMAT_TYPE reportFormat;
   int calcCOV;
+  int do_lookup;
   int inAPIrtb;
 }
 mpiPi_t;
