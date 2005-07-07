@@ -5,9 +5,6 @@
 /* Define if demangle.h is present. */
 #undef HAVE_DEMANGLE_H
 
-/* Define if getarg in enabled. */
-#undef USE_GETARG
-
 /* Define if using libdwarf for source lookup */
 #undef USE_LIBDWARF
 
