@@ -1,5 +1,6 @@
 set test_targ "./testing/$test"
 global expect_out
+exec sleep $pause_time
 
 
 proc checkOutput { text type } {

@@ -2,5 +2,6 @@
 proc foo_exit {} {}
 proc foo_version {} {}
 set pool pdebug
-set rmpool 0
+set rmpool pdebug
+set pause_time 3
 
