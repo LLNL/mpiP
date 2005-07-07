@@ -232,6 +232,30 @@ if test "$ENABLE_FORTRAN_XLATE" = yes ; then
                 ENABLE_FORTRAN_XLATE=no) )
 fi
 
+#  If using Fortran routines to access command line,
+#  test whether get_command_argument is available, otherwise
+#  use getarg.
+if test "$USE_GETARG" = true ; then
+     AC_LANG_PUSH(Fortran 77)
+     # Force Fortran compiler tests
+     AC_LINK_IFELSE(AC_LANG_PROGRAM(,,), , )
+     AC_MSG_CHECKING(fortran command-line argument functions)
+     AC_LINK_IFELSE(
+       [ AC_LANG_PROGRAM(, 
+              [[
+       integer len
+       character*10 val
+       call get_command_argument(0, val, len)]] ) ],
+	      AC_MSG_RESULT([using get_command_argument]) 
+                FORTRAN_GETARG=get_command_argument,
+              AC_MSG_RESULT(using getarg) 
+                FORTRAN_GETARG=getarg
+                )
+     AC_LANG_POP(Fortran 77)
+     AC_SUBST(FORTRAN_GETARG)
+fi
+
+
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
 
 AC_MSG_CHECKING(fortran symbols)
@@ -281,6 +305,11 @@ if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   MPIPFLIB=mpiPpgf
   FORTRAN_FLAG=-DPGI
   FORTRAN_TARGET=libmpiPpgf.a
+elif echo $F77 2>&1 | grep 'xlf' 1> /dev/null 2> /dev/null ; then
+  F77_VENDOR=IBM
+  MPIPFLIB=mpiP
+  FORTRAN_FLAG=
+  FORTRAN_TARGET=libmpiPxlf.a
 elif test "$G77" = yes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
@@ -293,9 +322,9 @@ elif $F77 -v 2>&1 | grep -e gcc 1> /dev/null 2> /dev/null ; then
   MPIPFLIB=mpiPg77
 elif $F77 -V 2>&1 | grep -e Intel 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Intel
-  FORTRAN_FLAG=-DIntel_Fortran
-  FORTRAN_TARGET=libmpiPifc.a
-  MPIPFLIB=mpiPifc
+  FORTRAN_FLAG=
+  FORTRAN_TARGET=
+  MPIPFLIB=
 elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Compaq
   MPIPFLIB=mpiP
@@ -315,4 +344,4 @@ AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST_FILE(HAVE_MPI_IO)
 
-AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt])
+AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f])
