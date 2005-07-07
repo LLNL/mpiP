@@ -843,7 +843,7 @@ HandleFunctionDIE( Dwarf_Debug dwHandle,
 
 
 
-void
+int
 open_dwarf_executable(char *fileName)
 {
     int dwStatus = -1;
@@ -862,7 +862,8 @@ open_dwarf_executable(char *fileName)
     dwFd = open( fileName, O_RDONLY );
     if( dwFd == -1 )
     {
-        mpiPi_abort("could not open file %s\n", fileName);
+        mpiPi_msg_warn("could not open file %s\n", fileName);
+        return 0;
     }
 
     /* initialize the DWARF library */
@@ -883,7 +884,7 @@ open_dwarf_executable(char *fileName)
     if( dwStatus == DW_DLV_NO_ENTRY )
     {
         mpiPi_abort("No symbols in the executable\n");
-        return;
+        return 0;
     }
 
     /* initialize our function and addr-to-source mappings */
@@ -1120,6 +1121,8 @@ open_dwarf_executable(char *fileName)
      * in our address-to-source map.
      */
     AddrToSourceMap_PatchRanges();
+
+    return 1;
 }
 
 
