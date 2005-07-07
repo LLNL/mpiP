@@ -525,13 +525,6 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argc = p_xargc;
     argv = p_xargv;
   }
-#elif defined(Intel_Fortran) && !defined(Linux) && !defined(USE_GETARG)
-  {
-    extern int xargc;
-    extern char **xargv;
-    argc = xargc;
-    argv = xargv;
-  }
 #elif defined(GNU_Fortran)
   {
     extern int f__xargc;
@@ -568,7 +561,7 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
   assert( ac != NULL );
   assert( av != NULL );
 
-#if defined(USE_GETARG) && (defined(Intel_Fortran) || defined(Cray_Fortran))
+#if defined(USE_GETARG)
 
 #define EXECUTABLE_LEN 2048
 {
@@ -577,25 +570,15 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
   extern void F77_MPIPI_GET_FORTRAN_ARGC(int*);
 
   F77_MPIPI_GET_FORTRAN_ARGC(&mpiPi_argc);
+  mpiPi_argc++;
   *ac = mpiPi_argc;
-/*  mpiPi_msg_debug("ac is %d\n", *ac); */
 
-  for ( i = 0; i <= mpiPi_argc; i++ )
+  for ( i = 0; i < mpiPi_argc; i++ )
   {
     int buf_len = EXECUTABLE_LEN;
 
-#if defined(Intel_Fortran)
-    extern void F77_MPIPI_GET_FORTRAN_ARG(int, int, char*, int*);
-    F77_MPIPI_GET_FORTRAN_ARG(i,EXECUTABLE_LEN,buf,&len);
-#elif defined(Cray_Fortran)
-    /* As far as I can tell from the Cray C and C++ Reference Manual,
-     * parameter passing to Cray Fortran subroutines is always by
-     * reference, so we need to pass pointers for all arguments even
-     * if they are input-only parameters.
-     */
     extern void F77_MPIPI_GET_FORTRAN_ARG(int*, int*, char*, int*);
-    F77_MPIPI_GET_FORTRAN_ARG( &i, &buf_len, buf, &len);
-#endif
+    F77_MPIPI_GET_FORTRAN_ARG(&i,&buf_len,buf,&len);
 
     buf[len<EXECUTABLE_LEN ? len : EXECUTABLE_LEN-1] = 0;
     av[i] = strdup(buf);
