@@ -307,9 +307,10 @@ if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   FORTRAN_TARGET=libmpiPpgf.a
 elif echo $F77 2>&1 | grep 'xlf' 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=IBM
-  MPIPFLIB=mpiP
-  FORTRAN_FLAG=
-  FORTRAN_TARGET=libmpiPxlf.a
+  if test "$USE_GETARG" = true ; then
+    MPIPFLIB=mpiPxlf
+    FORTRAN_TARGET=libmpiPxlf.a
+  fi
 elif test "$G77" = yes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
