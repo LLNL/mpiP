@@ -39,7 +39,7 @@ extern void mpiPi_finalize ( void );
 extern void mpiPi_update_callsite_stats ( unsigned op, unsigned rank, void **pc, double dur, double sendSize, double ioSize );
 extern char* mpiPdemangle ( const char* mangledSym );
 extern int mpiP_find_src_loc ( void *i_addr_hex, char **o_file_str, int *o_lineno, char **o_funct_str );
-extern void open_bfd_executable ( char *filename );
+extern int open_bfd_executable ( char *filename );
 extern void close_bfd_executable ( void );
 extern int MPI_Pcontrol ( const int flag, ... );
 extern int mpi_pcontrol_ ( int *flag, ... );
