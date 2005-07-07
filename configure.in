@@ -310,6 +310,8 @@ elif echo $F77 2>&1 | grep 'xlf' 1> /dev/null 2> /dev/null ; then
   if test "$USE_GETARG" = true ; then
     MPIPFLIB=mpiPxlf
     FORTRAN_TARGET=libmpiPxlf.a
+  else
+    MPIPFLIB=mpiP
   fi
 elif test "$G77" = yes ; then
   F77_VENDOR=GNU
