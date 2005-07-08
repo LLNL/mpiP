@@ -5,7 +5,7 @@
  *   Created: Tue Oct 26 16:25:48 2004
  */
 
-extern void open_dwarf_executable ( char *fileName );
+extern int open_dwarf_executable ( char *fileName );
 extern void close_dwarf_executable ( void );
 extern void mpiPi_msg ( char *fmt, ... );
 extern void mpiPi_abort ( char *fmt, ... );
