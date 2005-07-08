@@ -3,7 +3,6 @@
 # $Header$
 
 SHELL	= /bin/sh
-MAKE	= make
 CC	= @CC@
 CXX	= @CXX@
 FC	= @F77@
