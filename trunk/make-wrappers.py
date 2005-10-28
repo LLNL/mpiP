@@ -642,47 +642,6 @@ def ParameterOptimization():
 	ParamDictUpdate(funct)
 
 
-
-###
-### Creates a structure entry for one function
-###
-def CreateStruct(funct,olist):
-    global flist
-    global fdict
-    count = 0
-    for p in fdict[funct].paramConciseList:
-	if fdict[funct].paramDict[p].recordIt:
-	    count = count + 1
-    for f in fdict[funct].extrafieldsList:
-	count = count + 1
-
-    if count > 0:
-	olist.append("\ntypedef struct _mpiTi_" + funct + "_t \n{\n")
-	for p in fdict[funct].paramConciseList:
-	    if fdict[funct].paramDict[p].recordIt:
-		olist.append(fdict[funct].paramDict[p].basetype + "\t" + p + ";\n")
-	for f in fdict[funct].extrafieldsList:
-	    olist.append(fdict[funct].extrafields[f] + "\t" + f + ";\n")
-	olist.append("} mpiTi_" + funct + "_t;\n")
-
-
-###
-### Creates the structure for storing extra parameters.
-###
-def CreateOptStruct(funct,olist):
-    global flist
-    global fdict
-    count = 0
-    for p in fdict[funct].paramConciseList:
-	if fdict[funct].paramDict[p].recordIt:
-	    count = count + 1
-    for f in fdict[funct].extrafieldsList:
-	count = count + 1
-
-    if count > 0:
-	olist.append("\tmpiTi_" + funct + "_t " + funct + ";\n")
-
-
 ###
 ### Create the structure files.
 ###
@@ -696,8 +655,6 @@ def GenerateStructureFile():
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
     
-##### -jsv 8/14/01
-#    olist.append("#include <mpi.h>\n")
     olist.append("\n")
     olist.append("#define mpiPi_BASE " + str(baseID) + "\n")
     olist.append("\n")
@@ -706,92 +663,7 @@ def GenerateStructureFile():
       if funct not in noDefineList:
 	olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
 
-    olist.append("\n")
-
-##### -jsv 8/14/01
-#     for funct in flist:
-# 	CreateStruct(funct,olist)
-
-#     olist.append("\n\n\ntypedef union _mpiTi_mpi_t\n{\n")
-#     for funct in flist:
-# 	CreateOptStruct(funct,olist)
-#     olist.append("} mpiTi_mpi_t;\n")
-
-    olist.append("\n")
-    olist.append("/* eof */\n")
-    g.writelines(olist)
-    g.close()
-
-###
-### generates one print statement for one function incl parameters
-###
-def CreatePrintStmt(funct,olist):
-    global flist
-    global fdict
-    count = 0
-    
-    olist.append("\n")
-    olist.append("void\n")
-    olist.append("mpiTi_eprint_" + funct + "(mpiTi_event_t*e)\n{\n")
-    olist.append("fprintf(mpiTi.oFile,")
-    olist.append("\"%lld %d %x %d \"")
-    olist.append(" \""+funct+" \"")
-    for param in fdict[funct].paramConciseList:
-	if fdict[funct].paramDict[param].recordIt:
-	    if fdict[funct].paramDict[param].basetype == "double":
-		olist.append("\"%g \"")
-	    else:
-		olist.append("\"%d \"")
-    for f in fdict[funct].extrafieldsList:
-	olist.append("\"%d \"")
-    olist.append("\"\\n\"")
-    olist.append(",e->ts,e->rank,(unsigned)e->pc, e->dur ")
-    for param in fdict[funct].paramConciseList:
-	if fdict[funct].paramDict[param].recordIt:
-	    olist.append(",e->opt.mpi."+funct+"."+param)
-    for f in fdict[funct].extrafieldsList:
-	olist.append(",e->opt.mpi."+funct+"."+ f)
-    olist.append(");\n")
-    olist.append("return;\n")
-    olist.append("}\n")
-    olist.append("\n")
-
-
-###
-### For all the functions, generate a print statement
-###
-def GeneratePrintStmtsFile():
-    global flist
-    global fdict
-
-    print "-----*----- Generating the event print statments"
-    cwd = os.getcwd()
-    os.chdir(cwd)
-    cname = cwd + "/eprint.c"
-    g = open(cname, "w")
-    olist = StandardFileHeader(cname)
-    olist.append("#include \"mpiTi.h\"\n")
-    olist.append("\n")
-
-    for funct in flist:
-	CreatePrintStmt(funct,olist)
-
-    olist.append("\n")
-    olist.append("/* eof */\n")
-    g.writelines(olist)
-    g.close()
-
-    cname = cwd + "/eprint.h"
-    g = open(cname, "w")
-    olist = StandardFileHeader(cname)
-    olist.append("#include \"mpiTi.h\"\n")
-    olist.append("\n")
-
-    for funct in flist:
-	olist.append("extern void mpiTi_eprint_"+funct+"(mpiTi_event_t*e);\n")
-
-    olist.append("\n")
-    olist.append("/* eof */\n")
+    olist.append("\n\n/* eof */\n")
     g.writelines(olist)
     g.close()
 
@@ -809,9 +681,7 @@ def GenerateLookup():
     sname = cwd + "/lookup.c"
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
-    ##### -jsv 8/14
-#    olist.append("#include \"mpiTi.h\"\n")
-#    olist.append("#include \"eprint.h\"\n")
+
     olist.append("#include \"mpiPi.h\"\n")
     olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
@@ -886,11 +756,6 @@ def CreateWrapper(funct, olist):
     # capture timer
     olist.append("mpiPi_GETTIME (&start);\n" )
 
-    # capture HW counters
-#    olist.append("if(mpiTi.hwc_enabled){ \n" \
-#		 + "mpiThwc_read_and_reset(hwc);\n"  \
-#		 + "}\n" )
-
     # capture call stack
     olist.append("mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
 
@@ -919,72 +784,8 @@ def CreateWrapper(funct, olist):
     olist.append("if (mpiPi.enabled) {\n")
     olist.append("\n" \
 		 + "mpiPi_GETTIME (&end);\n" \
-		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" 
-#		 + "{\n" \
-#		 + " mpiTi_event_t e;\n" \
-#		 + "e.op = mpiTi_"+funct+";\n" \
-# 		 + "e.rank = mpiTi.worldRank;\n" \
-# 		 + "e.pc = GetParentPC((*base_jbuf));\n" \
-# 		 + "e.dur = duration;\n" \
-# 		 + "if(!PROFILER_ONLY){\n"\
-# 		 + "e.ts = mpiTi_GETUSECS (&mpiTi.timer, &start) - mpiTi.initTime;\n" \
-		  )
+		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
 
-#     for p in fdict[funct].paramConciseList:
-# 	if fdict[funct].paramDict[p].recordIt:
-# 	    olist.append("e.opt.mpi."+funct+"."+p +" = *(" + p + ");\n")
-
-#     olist.append("}\n")
-
-#    if fdict[funct].wrapperPostList:
-#	olist.extend(fdict[funct].wrapperPostList)
-
-#     olist.append("\nif(mpiTi.callstack_enabled){"
-# 		 + "for(i=0; call_stack[i] != 0; i++) {\n" \
-# 		 + "cs_e[i].op = mpiTi_MPI_Z_StackFrame;\n" \
-# 		 + "cs_e[i].rank = mpiTi.worldRank;\n" \
-# 		 + "cs_e[i].pc = GetParentPC((*base_jbuf));\n" \
-# 		 + "cs_e[i].dur = 0;\n" \
-# 		 + "cs_e[i].ts = e.ts;\n" \
-# 		 + "cs_e[i].opt.mpi.MPI_Z_StackFrame.s = (long) call_stack[i];\n"\
-# 		 + "cs_e[i].opt.mpi.MPI_Z_StackFrame.ht = i;\n"\
-# 		 + "}\n" \
-# 		 + "for (; fbuf_Insert_Block (mpiTi.eBuf, i, (void *) cs_e) != 0;)\n" \
-# 		 + "{;\n" \
-# 		 + " }}\n" )
-
-#     olist.append("\n" \
-# 		 + "if(mpiTi.hwc_enabled) {"
-# 		 + "hwc_e.op = mpiTi_MPI_ZHW_Read;\n" \
-# 		 + "hwc_e.rank = mpiTi.worldRank;\n" \
-# 		 + "hwc_e.pc = GetParentPC((*base_jbuf));\n" \
-# 		 + "hwc_e.dur = 0;\n" \
-# 		 + "hwc_e.ts = e.ts;\n" \
-# 		 + "hwc_e.opt.mpi.MPI_ZHW_Read.cyc = hwc[0];\n"\
-# 		 + "hwc_e.opt.mpi.MPI_ZHW_Read.inst = hwc[1];\n"\
-# 		 + "hwc_e.opt.mpi.MPI_ZHW_Read.lds = hwc[2];\n"\
-# 		 + "hwc_e.opt.mpi.MPI_ZHW_Read.fops = hwc[3];\n"\
-# 		 + "hwc_e.opt.mpi.MPI_ZHW_Read.fmas = hwc[4];\n"\
-# 		 + "for (; fbuf_Insert (mpiTi.eBuf, (void *) &hwc_e) != 0;)\n" \
-# 		 + "{;\n" \
-# 		 + " }\n" \
-# 		 + "}\n" )
-
-#     olist.append( "\n" )
-
-#     olist.append( "if(mpiTi.tracing_enabled){" \
-# 		  + "for (; fbuf_Insert (mpiTi.eBuf, (void *) &e) != 0;)\n" \
-# 		  + "{;\n" \
-# 		  + " }\n" \
-# 		  + " }\n" 
-# 		  )
-
-
-#     olist.append( "}\n" \
-# 		  + "mpiTi_flush_if_nec();\n" \
-# 		  + "if(mpiTi.hwc_enabled) { mpiThwc_reset(); }\n" \
-# 		  + "return rc;\n" )
-    #
     if fdict[funct].sendCountPname != "":
         olist.append( "\n" 
                       + "PMPI_Type_size(*" + fdict[funct].sendTypePname + ", " 
@@ -1023,13 +824,6 @@ def CreateWrapper(funct, olist):
 	   + "int rc;\n" \
 	   + "jmp_buf jbuf;\n"
     
-#	   + "double dur;\n" \
-#	   + "mpiPi_TIME start, end;\n" \
-#	   + "void * call_stack[MPIP_CALLSITE_STACK_DEPTH] = {NULL};" 
-#	   + "int i;\n" \
-#	   + "long long hwc[16] = {0};\n"  \
-#	   + "mpiTi_event_t cs_e[64];\n" \
-#	   + "mpiTi_event_t hwc_e;\n" \
 
     #####
     ##### C wrapper
@@ -1361,8 +1155,7 @@ def main():
     GenerateWrappers()
     GenerateSymbolDefs()
     GenerateLookup()
-##### -jsv 8/14/01
-#   GeneratePrintStmtsFile()
+
 
 #####
 ##### Call main
