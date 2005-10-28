@@ -919,8 +919,7 @@ def CreateWrapper(funct, olist):
     olist.append("if (mpiPi.enabled) {\n")
     olist.append("\n" \
 		 + "mpiPi_GETTIME (&end);\n" \
-		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" \
-		 + "if ( dur < 0 ) mpiPi_msg_warn(\"Negative time difference : %11.9f\\n\", dur);\n" \
+		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n" 
 #		 + "{\n" \
 #		 + " mpiTi_event_t e;\n" \
 #		 + "e.op = mpiTi_"+funct+";\n" \
@@ -1000,8 +999,11 @@ def CreateWrapper(funct, olist):
                       + "ioSize = (double)(tsize * *"
                       +  fdict[funct].ioCountPname + ");\n")
     
-    olist.append( "\n" \
-		  + "mpiPi_update_callsite_stats(" + "mpiPi_" + funct + ", " \
+    olist.append("\n" \
+		 + "if ( dur < 0 )\n"
+		 + "  mpiPi_msg_warn(\"Rank %5d : Negative time difference : %11.9f in %s\\n\", mpiPi.rank, dur, \"" + funct + "\");\n"
+		 + "else\n")
+    olist.append( "  mpiPi_update_callsite_stats(" + "mpiPi_" + funct + ", " \
                   + "mpiPi.rank, "
                   + "call_stack, "
                   + "dur, "
