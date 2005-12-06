@@ -135,6 +135,13 @@ mpiPi_init (char *appName)
   mpiPi.enabled = 1;
   mpiPi.enabledCount = 1;
   mpiPi.cumulativeTime = 0.0;
+  mpiPi.global_app_time = 0.0;
+  mpiPi.global_mpi_time = 0.0;
+  mpiPi.global_mpi_size = 0.0;
+  mpiPi.global_mpi_io = 0.0;
+  mpiPi.global_mpi_msize_threshold_count = 0.0;
+  mpiPi.global_mpi_sent_count = 0.0;
+  
 
   /* set some defaults values */
   mpiPi.collectorRank = 0;
@@ -146,6 +153,7 @@ mpiPi_init (char *appName)
   mpiPi.calcCOV = 1;
   mpiPi.inAPIrtb = 0;
   mpiPi.do_lookup = 1;
+  mpiPi.messageCountThreshold = -1;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -548,6 +556,7 @@ mpiPi_mergeResults ()
 	      newp->maxIO = p->maxIO;
 	      newp->minIO = p->minIO;
 	      newp->cumulativeIO = p->cumulativeIO;
+	      newp->arbitraryMessageCount = p->arbitraryMessageCount;
 	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
 	      /* insert new record into global */
@@ -568,6 +577,7 @@ mpiPi_mergeResults ()
 	      csp->maxIO = max (csp->maxIO, p->maxIO);
 	      csp->minIO = min (csp->minIO, p->minIO);
               csp->cumulativeIO += p->cumulativeIO;
+	      csp->arbitraryMessageCount += p->arbitraryMessageCount;
 	    }
 
 	  /* agg. Don't use rank */
@@ -876,6 +886,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
       csp->minDur = DBL_MAX;
       csp->minDataSent = DBL_MAX;
       csp->minIO = DBL_MAX;
+      csp->arbitraryMessageCount = 0;
       h_insert (mpiPi.task_callsite_stats, csp);
     }
   /* ASSUME: csp cannot be deleted from list */
@@ -894,6 +905,14 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 
   csp->maxIO = max (csp->maxIO, ioSize);
   csp->minIO = min (csp->minIO, ioSize);
+
+  
+  if ( mpiPi.messageCountThreshold > -1 && sendSize >= (double)mpiPi.messageCountThreshold )
+    csp->arbitraryMessageCount++;
+
+  mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n", mpiPi.messageCountThreshold);
+  mpiPi_msg_debug ("sendSize is %f\n", sendSize);
+  mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n", csp->arbitraryMessageCount);
 
   return;
 }

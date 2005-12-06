@@ -355,6 +355,13 @@ mpiPi_profile_print (FILE * fp)
 	assert( mpiPi.global_mpi_time >= 0 );
 	mpiPi.global_mpi_size += av[i]->cumulativeDataSent;
 	mpiPi.global_mpi_io += av[i]->cumulativeIO;
+        if ( av[i]->cumulativeDataSent > 0 )
+        {
+	  mpiPi.global_mpi_msize_threshold_count += av[i]->arbitraryMessageCount;
+          mpiPi.global_mpi_sent_count += av[i]->count;
+        }
+
+	mpiPi_msg_debug ("adding %lld to mpiPi.global_mpi_msize_threshold_count of %lld\n", av[i]->arbitraryMessageCount, mpiPi.global_mpi_msize_threshold_count);
 	mpiPi_msg_debug ("filename ptr: 0x%x functname ptr: 0x%x\n", av[i]->filename[0], av[i]->functname[0]);
 	mpiPi_msg_debug ("Callsite(%d,%d=[%s,%d,%s],%d) %g Cumulative=%g\n",
 			 av[i]->op,
@@ -554,6 +561,13 @@ mpiPi_profile_print (FILE * fp)
                   av[i]->cumulativeDataSent/av[i]->count,
                   av[i]->cumulativeDataSent * 100 / mpiPi.global_mpi_size);
         }
+      }
+      if ( mpiPi.messageCountThreshold >= 0 )
+      {
+        fprintf(fp, "\nTotal send/collective operation calls >= %d bytes : %lld of %lld operations\n", 
+          mpiPi.messageCountThreshold,
+  	  mpiPi.global_mpi_msize_threshold_count,
+          mpiPi.global_mpi_sent_count);
       }
 
       free (av);

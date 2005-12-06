@@ -274,7 +274,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oe")) != EOF);)
+      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:")) != EOF);)
 	{
 	  switch (c) {
 	    case 'f':
@@ -400,6 +400,11 @@ mpiPi_getenv ()
               mpiPi.calcCOV = 0;
               break;
 
+	    case 'm':
+              mpiPi.messageCountThreshold = atoi (optarg);
+              mpiPi_msg_debug("Set messageCountThreshold to %d\n", mpiPi.messageCountThreshold);
+              break;
+
 	    case 'a':
 	    case 'b':
 	    case 'd':
@@ -407,7 +412,6 @@ mpiPi_getenv ()
 	    case 'i':
 	    case 'j':
 	    case 'l':
-	    case 'm':
 	    case 'p':
 	    case 'q':
 	    case 'r':

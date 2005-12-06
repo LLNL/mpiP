@@ -4668,6 +4668,7 @@ fi
 #  If using Fortran routines to access command line,
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
+FORTRAN_GETARG=getarg
 if test "$USE_GETARG" = true ; then
      ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -4767,7 +4768,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4770:" \
+echo "$as_me:4771:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4998,8 +4999,8 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-
 fi
+
 
 
 
