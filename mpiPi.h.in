@@ -59,6 +59,7 @@ typedef struct _callsite_stats
   double minIO;
   double cumulativeDataSent;
   double cumulativeIO;
+  long long arbitraryMessageCount; 
   double *siteData;
   int siteDataIdx;
   void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
@@ -152,6 +153,8 @@ typedef struct _mpiPi_t
   double global_mpi_time;
   double global_mpi_size;
   double global_mpi_io;
+  long long global_mpi_msize_threshold_count;
+  long long global_mpi_sent_count;
 
   int tableSize;
   h_t *task_callsite_stats;
@@ -168,6 +171,7 @@ typedef struct _mpiPi_t
   int calcCOV;
   int do_lookup;
   int inAPIrtb;
+  int messageCountThreshold;
 }
 mpiPi_t;
 
