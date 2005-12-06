@@ -235,6 +235,7 @@ fi
 #  If using Fortran routines to access command line,
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
+FORTRAN_GETARG=getarg
 if test "$USE_GETARG" = true ; then
      AC_LANG_PUSH(Fortran 77)
      # Force Fortran compiler tests
@@ -252,8 +253,8 @@ if test "$USE_GETARG" = true ; then
                 FORTRAN_GETARG=getarg
                 )
      AC_LANG_POP(Fortran 77)
-     AC_SUBST(FORTRAN_GETARG)
 fi
+AC_SUBST(FORTRAN_GETARG)
 
 
 dnl ========== Find out how FORTRAN symbol names appear in C ==========
