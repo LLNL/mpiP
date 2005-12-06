@@ -23,8 +23,8 @@
 
 
        subroutine mpipi_get_fortran_arg(idx, buf_len, buf, len)
-       !DEC$ attributes VALUE :: idx
-       !DEC$ attributes VALUE :: buf_len
+       !DEC$ attributes REFERENCE :: idx
+       !DEC$ attributes REFERENCE :: buf_len
        !DEC$ attributes REFERENCE :: buf
        !DEC$ attributes REFERENCE :: len
        integer idx
