@@ -172,6 +172,8 @@ typedef struct _mpiPi_t
   int do_lookup;
   int inAPIrtb;
   int messageCountThreshold;
+  long text_start;
+  int obj_mode;
 }
 mpiPi_t;
 

@@ -52,4 +52,4 @@ extern char* getProcExeLink ( void );
 extern void getProcCmdLine ( int* ac, char** av, int max_args );
 extern void mpiPi_copy_args ( int *ac, char **av, int av_len );
 extern void mpiPi_copy_given_args ( int *ac, char **av, int av_len, int argc, char **argv );
-
+extern long mpiPi_get_text_start(char *filename);

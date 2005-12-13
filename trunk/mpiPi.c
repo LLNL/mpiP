@@ -243,7 +243,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	  if ( *functname == NULL )
             *functname = "[unknown]";
           
-    mpiPi_msg_debug ("Successful Source lookup for [0x%x]: %s, %d, %s\n",
+    mpiPi_msg_debug ("Successful Source lookup for [0x%lx]: %s, %d, %s\n",
          pc, *filename, *lineno, *functname);
 
           csp->filename = strdup (*filename);
@@ -910,9 +910,11 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   if ( mpiPi.messageCountThreshold > -1 && sendSize >= (double)mpiPi.messageCountThreshold )
     csp->arbitraryMessageCount++;
 
+#if 0
   mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n", mpiPi.messageCountThreshold);
   mpiPi_msg_debug ("sendSize is %f\n", sendSize);
   mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n", csp->arbitraryMessageCount);
+#endif
 
   return;
 }
