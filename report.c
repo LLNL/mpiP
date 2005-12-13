@@ -361,7 +361,9 @@ mpiPi_profile_print (FILE * fp)
           mpiPi.global_mpi_sent_count += av[i]->count;
         }
 
+#if 0
 	mpiPi_msg_debug ("adding %lld to mpiPi.global_mpi_msize_threshold_count of %lld\n", av[i]->arbitraryMessageCount, mpiPi.global_mpi_msize_threshold_count);
+#endif
 	mpiPi_msg_debug ("filename ptr: 0x%x functname ptr: 0x%x\n", av[i]->filename[0], av[i]->functname[0]);
 	mpiPi_msg_debug ("Callsite(%d,%d=[%s,%d,%s],%d) %g Cumulative=%g\n",
 			 av[i]->op,

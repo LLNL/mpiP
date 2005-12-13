@@ -123,6 +123,14 @@ find_address_in_section (abfd, section, data)
 #elif defined(UNICOS_mp)
   /* use only least significant 32-bits */
   local_pc = pc & 0xFFFFFFFF;
+#elif defined(AIX)
+  local_pc = pc;
+  if ( mpiPi.obj_mode == 32 )
+    local_pc -= 0x10000000;
+  else
+    local_pc -= 0x100000000;
+  local_pc += mpiPi.text_start;
+  mpiPi_msg_debug("pc is 0x%lx, text_start is 0x%lx, local_pc is 0x%lx\n", pc, mpiPi.text_start, local_pc);
 #else
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
@@ -265,6 +273,14 @@ int open_bfd_executable (char *filename)
     return 0;
   }
 
+#ifdef AIX
+
+  /*  Kludge to get XCOFF text_start value to feed an approriate address
+      value to bfd for looking up source info
+  */
+  mpiPi.text_start = mpiPi_get_text_start(filename);
+#endif
+
   bfd_init ();
   /* set_default_bfd_target (); */
   mpiPi_msg_debug ("opening filename %s\n", filename);
@@ -295,12 +311,14 @@ int open_bfd_executable (char *filename)
     return 0;
   }
   
+#if 0
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
   {
     mpiPi_msg_warn ("No symbols in the executable\n");
     bfd_close (abfd);
     return 0;
   }
+#endif
   /* TODO: move this to the begining of the process so that the user
      knows before the application begins */
   storage = bfd_get_symtab_upper_bound (abfd);
@@ -344,5 +362,86 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 }
 
 #endif  /* DISABLE_BFD */
+
+#ifdef AIX
+/*  Get the text_start value from the auxiliary header
+    to provide BFD with pc values that match source information.
+*/
+#define __XCOFF32__
+#define __XCOFF64__
+#include <fcntl.h>
+#include <filehdr.h>
+#include <aouthdr.h>
+#include <scnhdr.h>
+
+long mpiPi_get_text_start(char *filename)
+{
+  int fh;
+  short magic;
+  FILHDR FileHeader32;
+  FILHDR_64 FileHeader64;
+  AOUTHDR AoutHeader32;
+  AOUTHDR_64 AoutHeader64;
+  SCNHDR SectHeader32;
+  SCNHDR_64 SectHeader64;
+
+  long text_start = 0;
+  int count = 0;
+
+  fh = open(filename, O_RDONLY);
+  if ( fh == -1 )
+    return 0;
+
+  read(fh, &magic, 2);
+  mpiPi_msg_debug("magic is 0x%x\n", magic);
+  lseek(fh, 0, 0);
+
+  if ( magic == 0x01DF )  /* 32-bit  */
+  {
+    mpiPi.obj_mode = 32;
+    read(fh, &FileHeader32, sizeof(FILHDR));
+    mpiPi_msg_debug("aout size is %d\n", FileHeader32.f_opthdr);
+    read(fh, &AoutHeader32, FileHeader32.f_opthdr);
+    mpiPi_msg_debug("text start is 0x%lx\n", AoutHeader32.o_text_start);
+
+    while ( count++ < FileHeader32.f_nscns )
+    {
+      read(fh, &SectHeader32, sizeof(SCNHDR));
+      mpiPi_msg_debug("found header name %s\n", SectHeader32.s_name);
+      mpiPi_msg_debug("found header raw ptr 0x%lx\n", SectHeader32.s_scnptr);
+      if ( SectHeader32.s_flags & STYP_TEXT )
+         text_start = AoutHeader64.o_text_start - SectHeader32.s_scnptr;
+    }
+  }
+  else if ( magic == 0x01EF || magic == 0x01F7 ) /*  64-bit  */
+  {
+    mpiPi.obj_mode = 64;
+    read(fh, &FileHeader64, sizeof(FILHDR_64));
+    mpiPi_msg_debug("aout size is %d\n", FileHeader64.f_opthdr);
+    read(fh, &AoutHeader64, FileHeader64.f_opthdr);
+    mpiPi_msg_debug("text start is 0x%lx\n", AoutHeader64.o_text_start);
+
+    while ( count++ < FileHeader64.f_nscns )
+    {
+      read(fh, &SectHeader64, sizeof(SCNHDR_64));
+      mpiPi_msg_debug("found header name %s\n", SectHeader64.s_name);
+      mpiPi_msg_debug("found header raw ptr 0x%lx\n", SectHeader64.s_scnptr);
+      if ( SectHeader64.s_flags & STYP_TEXT )
+         text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
+    }
+  }
+  else
+  {
+    mpiPi_msg_debug("invalid magic number.\n");
+    return 0;
+  }
+
+  mpiPi_msg_debug("text_start is 0x%lx\n", text_start);
+  close(fh);
+
+  return text_start;
+}
+
+#endif
 
 /* eof */
