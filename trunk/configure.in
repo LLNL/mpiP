@@ -222,6 +222,11 @@ AC_CHECK_FUNC(MPI_File_open,
 else
   HAVE_MPI_IO=/dev/null
 fi
+
+AC_CHECK_FUNC(mread_real_time, READ_REAL_TIME=mread_real_time, READ_REAL_TIME=read_real_time)
+AC_SUBST(READ_REAL_TIME)
+
+
 if test "$ENABLE_FORTRAN_XLATE" = yes ; then
      AC_MSG_CHECKING(fortran to C conversion)
      AC_LINK_IFELSE(
@@ -348,4 +353,4 @@ AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST_FILE(HAVE_MPI_IO)
 
-AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f])
+AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h])

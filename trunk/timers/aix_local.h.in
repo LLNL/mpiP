@@ -20,7 +20,7 @@
 #define mpiPi_TIMER_INIT(timer_addr) {*(timer_addr) = 0;}
 #define mpiPi_TIME timebasestruct_t
 #define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIME));}
-#define mpiPi_GETTIME(timeaddr) {read_real_time(timeaddr,TIMEBASE_SZ);}
+#define mpiPi_GETTIME(timeaddr) {@READ_REAL_TIME@(timeaddr,TIMEBASE_SZ);}
 
 extern void mpiPi_msg_warn (char *fmt, ...);
 
