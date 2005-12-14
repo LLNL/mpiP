@@ -128,7 +128,7 @@ find_address_in_section (abfd, section, data)
   if ( mpiPi.obj_mode == 32 )
     local_pc -= 0x10000000;
   else
-    local_pc -= 0x100000000;
+    local_pc &= 0x00000000FFFFFFFF;
   local_pc += mpiPi.text_start;
   mpiPi_msg_debug("pc is 0x%lx, text_start is 0x%lx, local_pc is 0x%lx\n", pc, mpiPi.text_start, local_pc);
 #else
