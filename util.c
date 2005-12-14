@@ -274,7 +274,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:")) != EOF);)
+      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:")) != EOF);)
 	{
 	  switch (c) {
 	    case 'f':
@@ -404,6 +404,15 @@ mpiPi_getenv ()
               mpiPi.messageCountThreshold = atoi (optarg);
               mpiPi_msg_debug("Set messageCountThreshold to %d\n", mpiPi.messageCountThreshold);
               break;
+	    case 'x':
+	      if ( optarg != NULL )
+	      {
+	        mpiPi.appFullName = strdup(optarg);
+	        mpiPi.av[0] = strdup(optarg);
+	        mpiPi.appName = strdup(GetBaseAppName(mpiPi.appFullName));
+		mpiPi_msg_debug("Set mpiPi.appFullName to %s\n", mpiPi.appFullName);
+	      }
+              break;
 
 	    case 'a':
 	    case 'b':
@@ -418,7 +427,6 @@ mpiPi_getenv ()
 	    case 'u':
 	    case 'v':
 	    case 'w':
-	    case 'x':
 	    case 'y':
 	    case 'z':
 	    default:
