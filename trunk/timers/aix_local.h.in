@@ -90,7 +90,7 @@ _aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
 
 #define mpiPi_GETTIMEDIFF(end,start) _aix_cnvt_read_real_time_diff(end,start)
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
-#define mpiPi_TIMER_NAME "read_real_time"
+#define mpiPi_TIMER_NAME "@READ_REAL_TIME@"
 
 #endif
 
