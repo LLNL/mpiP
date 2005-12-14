@@ -288,7 +288,6 @@ int open_bfd_executable (char *filename)
   if (abfd == NULL)
   {
     mpiPi_msg_warn ("could not open filename %s", filename);
-    bfd_close (abfd);
     return 0;
   }
   if (bfd_check_format (abfd, bfd_archive))
