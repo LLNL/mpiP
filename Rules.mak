@@ -9,6 +9,6 @@
 	${FC} ${CFLAGS} -c $< -o $@
 
 clean::
-	-rm -f $(OBJS) *.log core *~ ${C_TARGET} TAGS
+	-rm -f $(OBJS) *.mpiP *.log core *~ ${C_TARGET} TAGS
 
 ##### EOF
