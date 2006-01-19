@@ -15,9 +15,9 @@ include Defs.mak
 
 .PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs test
 
-default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}
+default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API
 
-all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} test
+all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API test
 	@echo All done.
 
 SRCS =	diag_msgs.c \
@@ -136,6 +136,8 @@ libmpiP-API.a: ${API_OBJS}
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
 
+clean :: 
+	rm -f ${API_OBJS}
 
 remake_util: CPPFLAGS += ${FORTRAN_FLAG}
 remake_util:
@@ -201,7 +203,8 @@ install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${libdir}/${FORTRAN_TARGET} ; fi
-	${INSTALL} mpiP-API.h timers/*h ${includedir}
+	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
+	${INSTALL} mpiP-API.h _timers.h timers/*h ${includedir}
 	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
 	${INSTALL} bin/*mpip* ${bindir}
 
