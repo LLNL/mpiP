@@ -130,11 +130,13 @@ ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}: ${C_TARGE
 endif
 
 
-API: libmpiP-API.a
+api API: libmpiP-API.a
 
 libmpiP-API.a: ${API_OBJS} 
+	${MAKE} remake_lookup
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
+	${MAKE} remove_lookup
 
 clean :: 
 	rm -f ${API_OBJS}
@@ -198,7 +200,7 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 
 ${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h
 
-install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
+install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} API
 	mkdir -p ${libdir} ${includedir} ${docdir} ${bindir}
 	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
