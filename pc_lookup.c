@@ -43,7 +43,7 @@ static bfd *abfd = NULL;
 
 /*  BFD boolean and bfd_boolean types have changed through versions.
     It looks like bfd_boolean will be preferred.                     */
-#ifdef BFD_TRUE_FALSE
+#ifdef HAVE_BFD_BOOLEAN
 typedef boolean bfd_boolean;
 #endif
 #ifndef FALSE

@@ -30,14 +30,25 @@ F77_SYMBOLS   = @F77_SYMBOLS@
 BINUTILS_DIR  = @BINUTILS_DIR@
 BIN_TYPE_FLAG = @BIN_TYPE_FLAG@
 
+CANONICAL_BUILD     = @build@
+CANONICAL_TARGET    = @target@
+TARGET_OS           = @target_os@
+TARGET_CPU          = @target_cpu@
+
 
 ifneq ( $(srcdir), "." )
 CPPFLAGS   += -I.
 endif
 CPPFLAGS    = -I$(srcdir) @CPPFLAGS@
 
+# check if we're *really* cross-compiling
+ifeq (${CANONICAL_TARGET},${CANONICAL_BUILD})
 OS	= $(shell uname)
 ARCH    = $(shell uname -m)
+else
+OS      = ${TARGET_OS}
+ARCH    = ${TARGET_CPU}
+endif
 
 ifeq ($(OS),UNICOS/mp)
   OS    = UNICOS_mp
@@ -61,6 +72,13 @@ ifeq ($(OS),Linux)
     CPPFLAGS += -Dppc64
   endif
 
+endif
+
+ifeq (${OS},catamount)
+OS      = Catamount
+ifeq (${ARCH},x86_64)
+  CPPFLAGS  += -DX86_64
+endif
 endif
 
 C_TARGET = libmpiP.a

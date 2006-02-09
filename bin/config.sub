@@ -1261,6 +1261,9 @@ case $os in
 	-kaos*)
 		os=-kaos
 		;;
+    -catamount*)
+        os=-catamount;
+        ;;
 	-none)
 		;;
 	*)
