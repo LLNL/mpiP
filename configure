@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DO_DEMANGLE STACKDEPTH USE_LIBDWARF DISABLE_MPI_IO ENABLE_FORTRAN_XLATE USE_GETARG INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP ac_ct_F77 FORTRAN_GETARG F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 FORTRAN_GETARG F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
 ac_subst_files='HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -857,14 +857,14 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
-  --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
-  --enable-dwarf          Use DWARF library for source lookup.
+  --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
-  --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-fortranxlate  Disable translation of Fortran opaque objects.
+  --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
+  --enable-dwarf          Use DWARF library for source lookup.
   --enable-getarg         Use getarg to get fortran command line args.
+  --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
   --enable-check-time     Enable AIX check for negative time values.
 
 Optional Packages:
@@ -1446,6 +1446,10 @@ echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in
 echo "        the case where test executables would need to be run as a parallel job."
 echo
 
+#
+#  With specifications
+#
+
 
 # Check whether --with-cc or --without-cc was given.
 if test "${with_cc+set}" = set; then
@@ -1475,7 +1479,7 @@ fi;
 if test "${with_include+set}" = set; then
   withval="$with_include"
   CPPFLAGS=$withval
-echo Using extra include directories: $withval
+	echo Using extra include directories: $withval
 
 fi;
 
@@ -1484,7 +1488,7 @@ fi;
 if test "${with_ldflags+set}" = set; then
   withval="$with_ldflags"
   LDFLAGS=$withval
-echo Using ld flags: $withval
+	echo Using ld flags: $withval
 
 fi;
 
@@ -1500,7 +1504,7 @@ fi
 if test "${with_libs+set}" = set; then
   withval="$with_libs"
   LIBS=$withval
-echo Using extra libraries: $withval
+	echo Using extra libraries: $withval
 
 fi;
 
@@ -1509,9 +1513,9 @@ fi;
 if test "${with_binutils_dir+set}" = set; then
   withval="$with_binutils_dir"
   BINUTILS_DIR=$withval
-LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
-CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
-echo Using binutils-dir: $withval
+	LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
+	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+	echo Using binutils-dir: $withval
 
 else
   BINUTILS_DIR=unknown
@@ -1524,118 +1528,10 @@ fi;
 if test "${with_bin_type_flag+set}" = set; then
   withval="$with_bin_type_flag"
   BIN_TYPE_FLAG=$withval
-echo Using bin-type-flag: $withval
+	echo Using bin-type-flag: $withval
 
 else
   BIN_TYPE_FLAG=
-
-fi;
-
-
-# Check whether --enable-demangling or --disable-demangling was given.
-if test "${enable_demangling+set}" = set; then
-  enableval="$enable_demangling"
-  DO_DEMANGLE=$enableval
-echo $DO_DEMANGLE demangling enabled
-
-else
-  DO_DEMANGLE=false
-
-fi;
-
-
-# Check whether --enable-stackdepth or --disable-stackdepth was given.
-if test "${enable_stackdepth+set}" = set; then
-  enableval="$enable_stackdepth"
-  STACKDEPTH=$enableval
-echo Maximum stacktrace depth is $STACKDEPTH
-
-else
-  STACKDEPTH=8
-
-fi;
-
-
-# Check whether --enable-dwarf or --disable-dwarf was given.
-if test "${enable_dwarf+set}" = set; then
-  enableval="$enable_dwarf"
-  if test x"$enableval" = xyes ; then
-cat >>confdefs.h <<\_ACEOF
-#define USE_LIBDWARF 1
-_ACEOF
-
-echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
-enable_bfd=no
-fi ;
-USE_LIBDWARF=yes
-
-else
-  USE_LIBDWARF=no
-
-fi;
-
-
-# Check whether --enable-bfd or --disable-bfd was given.
-if test "${enable_bfd+set}" = set; then
-  enableval="$enable_bfd"
-  cat >>confdefs.h <<\_ACEOF
-#define DISABLE_BFD 1
-_ACEOF
-
-echo Use of libbfd has been disabled
-DISABLE_BFD=yes
-
-fi;
-
-# Check whether --enable-libunwind or --disable-libunwind was given.
-if test "${enable_libunwind+set}" = set; then
-  enableval="$enable_libunwind"
-  DISABLE_LIBUNWIND=yes
-echo Use of libunwind has been disabled
-
-fi;
-
-# Check whether --enable-mpi-io or --disable-mpi-io was given.
-if test "${enable_mpi_io+set}" = set; then
-  enableval="$enable_mpi_io"
-  DISABLE_MPI_IO=yes
-echo Profiling of MPI I/O has been disabled.
-
-else
-  DISABLE_MPI_IO=no
-
-fi;
-
-
-# Check whether --enable-fortranxlate or --disable-fortranxlate was given.
-if test "${enable_fortranxlate+set}" = set; then
-  enableval="$enable_fortranxlate"
-  if test "$enable_fortranxlate" = "no" ; then
-  ENABLE_FORTRAN_XLATE=no
-  echo Translation of FORTRAN opaque objects has been disabled.
-else
-  ENABLE_FORTRAN_XLATE=yes
-  echo Translation of FORTRAN opaque objects has been enabled.
-fi
-
-else
-  ENABLE_FORTRAN_XLATE=yes
-
-fi;
-
-
-# Check whether --enable-getarg or --disable-getarg was given.
-if test "${enable_getarg+set}" = set; then
-  enableval="$enable_getarg"
-  cat >>confdefs.h <<\_ACEOF
-#define USE_GETARG 1
-_ACEOF
-
-echo Use of getarg has been enabled
-USE_GETARG=true
-
-else
-  USE_GETARG=false
 
 fi;
 
@@ -1648,7 +1544,7 @@ if test "${with_gettimeofday+set}" = set; then
 #define USE_GETTIMEOFDAY 1
 _ACEOF
 
-echo Using gettimeofday for timing.
+	echo Using gettimeofday for timing.
 
 fi;
 
@@ -1660,19 +1556,140 @@ if test "${with_clock_gettime+set}" = set; then
 #define USE_CLOCK_GETTIME 1
 _ACEOF
 
-USE_CLOCK_GETTIME=true
-echo Using clock_gettime for timing.
+	USE_CLOCK_GETTIME=true
+	echo Using clock_gettime for timing.
 
 fi;
+
+
+#
+#  Enable / Disable specifications
+#
+
+DISABLE_MPI_IO=no
+# Check whether --enable-mpi-io or --disable-mpi-io was given.
+if test "${enable_mpi_io+set}" = set; then
+  enableval="$enable_mpi_io"
+  if test x"$enableval" = xno ; then
+		DISABLE_MPI_IO=yes
+		echo Profiling of MPI I/O has been disabled.
+	fi
+
+fi;
+
+
+DISABLE_BFD=no
+# Check whether --enable-bfd or --disable-bfd was given.
+if test "${enable_bfd+set}" = set; then
+  enableval="$enable_bfd"
+  if test x"$enableval" = xno ; then
+		cat >>confdefs.h <<\_ACEOF
+#define DISABLE_BFD 1
+_ACEOF
+
+		echo Use of libbfd has been disabled
+		DISABLE_BFD=yes
+	fi
+
+fi;
+
+DISABLE_LIBUNWIND=no
+# Check whether --enable-libunwind or --disable-libunwind was given.
+if test "${enable_libunwind+set}" = set; then
+  enableval="$enable_libunwind"
+  if test x"$enableval" = xno ; then
+		DISABLE_LIBUNWIND=yes
+		echo Use of libunwind has been disabled
+	fi
+
+fi;
+
+# Check whether --enable-fortranxlate or --disable-fortranxlate was given.
+if test "${enable_fortranxlate+set}" = set; then
+  enableval="$enable_fortranxlate"
+  if test "$enable_fortranxlate" = "no" ; then
+		ENABLE_FORTRAN_XLATE=no
+		  echo Translation of FORTRAN opaque objects has been disabled.
+	else
+		ENABLE_FORTRAN_XLATE=yes
+		echo Translation of FORTRAN opaque objects has been enabled.
+	fi
+
+else
+  ENABLE_FORTRAN_XLATE=yes
+
+fi;
+
+
+# Check whether --enable-stackdepth or --disable-stackdepth was given.
+if test "${enable_stackdepth+set}" = set; then
+  enableval="$enable_stackdepth"
+  STACKDEPTH=$enableval
+	echo Maximum stacktrace depth is $STACKDEPTH
+
+else
+  STACKDEPTH=8
+
+fi;
+
+
+# Check whether --enable-dwarf or --disable-dwarf was given.
+if test "${enable_dwarf+set}" = set; then
+  enableval="$enable_dwarf"
+  if test x"$enableval" = xyes ; then
+		cat >>confdefs.h <<\_ACEOF
+#define USE_LIBDWARF 1
+_ACEOF
+
+		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
+		enable_bfd=no
+	fi ;
+	USE_LIBDWARF=yes
+
+else
+  USE_LIBDWARF=no
+
+fi;
+
+
+USE_GETARG=false
+# Check whether --enable-getarg or --disable-getarg was given.
+if test "${enable_getarg+set}" = set; then
+  enableval="$enable_getarg"
+  if test x"$enableval" = xyes ; then
+		cat >>confdefs.h <<\_ACEOF
+#define USE_GETARG 1
+_ACEOF
+
+		echo Use of getarg has been enabled
+		USE_GETARG=true
+	fi
+
+fi;
+
+
+# Check whether --enable-demangling or --disable-demangling was given.
+if test "${enable_demangling+set}" = set; then
+  enableval="$enable_demangling"
+  DO_DEMANGLE=$enableval
+	echo $DO_DEMANGLE demangling enabled
+
+else
+  DO_DEMANGLE=false
+
+fi;
+
 
 # Check whether --enable-check-time or --disable-check-time was given.
 if test "${enable_check_time+set}" = set; then
   enableval="$enable_check_time"
-  cat >>confdefs.h <<\_ACEOF
+  if test x"$enableval" = xyes ; then
+		cat >>confdefs.h <<\_ACEOF
 #define MPIP_CHECK_TIME 1
 _ACEOF
 
-echo AIX negative time value checking has been enabled
+		echo AIX negative time value checking has been enabled
+	fi
 
 fi;
 
@@ -4012,7 +4029,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include "bfd.h"
+'#include "bfd.h"'
 
 
 int
@@ -4142,6 +4159,78 @@ _ACEOF
 
 fi
 
+echo "$as_me:$LINENO: checking for MPIR_ToPointer in -lmpich" >&5
+echo $ECHO_N "checking for MPIR_ToPointer in -lmpich... $ECHO_C" >&6
+if test "${ac_cv_lib_mpich_MPIR_ToPointer+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char MPIR_ToPointer ();
+int
+main ()
+{
+MPIR_ToPointer ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_mpich_MPIR_ToPointer=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_mpich_MPIR_ToPointer=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_mpich_MPIR_ToPointer" >&5
+echo "${ECHO_T}$ac_cv_lib_mpich_MPIR_ToPointer" >&6
+if test $ac_cv_lib_mpich_MPIR_ToPointer = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_MPIR_TOPOINTER 1
+_ACEOF
+
+fi
+
+
 echo "$as_me:$LINENO: checking for bfd_boolean" >&5
 echo $ECHO_N "checking for bfd_boolean... $ECHO_C" >&6
 if test "${ac_cv_type_bfd_boolean+set}" = set; then
@@ -4154,7 +4243,6 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "bfd.h"
-
 
 int
 main ()
@@ -4210,7 +4298,8 @@ _ACEOF
 fi
 
 fi
-if test "$USE_CLOCK_GETTIME" = "true"; then
+
+if test "x$USE_CLOCK_GETTIME" = "xtrue"; then
 
 echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
 echo $ECHO_N "checking for clock_gettime in -lrt... $ECHO_C" >&6
@@ -4286,8 +4375,9 @@ _ACEOF
 fi
 
 fi
-if test -z "$DISABLE_LIBUNWIND" ; then
-if test "${ac_cv_header_libunwind_h+set}" = set; then
+
+if test "x$DISABLE_LIBUNWIND" = "xno" ; then
+	if test "${ac_cv_header_libunwind_h+set}" = set; then
   echo "$as_me:$LINENO: checking for libunwind.h" >&5
 echo $ECHO_N "checking for libunwind.h... $ECHO_C" >&6
 if test "${ac_cv_header_libunwind_h+set}" = set; then
@@ -4433,6 +4523,7 @@ fi
 
 
 fi
+
 if test "$DISABLE_MPI_IO" = no ; then
 echo "$as_me:$LINENO: checking for MPI_File_open" >&5
 echo $ECHO_N "checking for MPI_File_open... $ECHO_C" >&6
@@ -4611,6 +4702,106 @@ fi
 else
   HAVE_MPI_IO=/dev/null
 fi
+
+echo "$as_me:$LINENO: checking for mread_real_time" >&5
+echo $ECHO_N "checking for mread_real_time... $ECHO_C" >&6
+if test "${ac_cv_func_mread_real_time+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define mread_real_time to an innocuous variant, in case <limits.h> declares mread_real_time.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define mread_real_time innocuous_mread_real_time
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char mread_real_time (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef mread_real_time
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char mread_real_time ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_mread_real_time) || defined (__stub___mread_real_time)
+choke me
+#else
+char (*f) () = mread_real_time;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != mread_real_time;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_mread_real_time=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_mread_real_time=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_mread_real_time" >&5
+echo "${ECHO_T}$ac_cv_func_mread_real_time" >&6
+if test $ac_cv_func_mread_real_time = yes; then
+  READ_REAL_TIME=mread_real_time
+else
+  READ_REAL_TIME=read_real_time
+fi
+
+
+
+
 if test "$ENABLE_FORTRAN_XLATE" = yes ; then
      echo "$as_me:$LINENO: checking fortran to C conversion" >&5
 echo $ECHO_N "checking fortran to C conversion... $ECHO_C" >&6
@@ -4768,7 +4959,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4771:" \
+echo "$as_me:4962:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5112,7 +5303,7 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 
 
 
-                                                                      ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f"
+                                                                                ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h"
 
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -5592,6 +5783,7 @@ do
   "mpiPi.h" ) CONFIG_FILES="$CONFIG_FILES mpiPi.h" ;;
   "mpi.protos.txt" ) CONFIG_FILES="$CONFIG_FILES mpi.protos.txt" ;;
   "get_fortran_arg.f" ) CONFIG_FILES="$CONFIG_FILES get_fortran_arg.f" ;;
+  "timers/aix_local.h" ) CONFIG_FILES="$CONFIG_FILES timers/aix_local.h" ;;
   "mpiPconfig.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mpiPconfig.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -5694,12 +5886,12 @@ s,@CFLAGS@,$CFLAGS,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@BINUTILS_DIR@,$BINUTILS_DIR,;t t
 s,@BIN_TYPE_FLAG@,$BIN_TYPE_FLAG,;t t
-s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
-s,@STACKDEPTH@,$STACKDEPTH,;t t
-s,@USE_LIBDWARF@,$USE_LIBDWARF,;t t
 s,@DISABLE_MPI_IO@,$DISABLE_MPI_IO,;t t
 s,@ENABLE_FORTRAN_XLATE@,$ENABLE_FORTRAN_XLATE,;t t
+s,@STACKDEPTH@,$STACKDEPTH,;t t
+s,@USE_LIBDWARF@,$USE_LIBDWARF,;t t
 s,@USE_GETARG@,$USE_GETARG,;t t
+s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t
@@ -5715,6 +5907,7 @@ s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
+s,@READ_REAL_TIME@,$READ_REAL_TIME,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@FORTRAN_GETARG@,$FORTRAN_GETARG,;t t
 s,@F77_SYMBOLS@,$F77_SYMBOLS,;t t

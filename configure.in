@@ -20,31 +20,35 @@ echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in
 echo "        the case where test executables would need to be run as a parallel job."
 echo
 
+#
+#  With specifications
+#
+
 AC_ARG_WITH(cc,
-[  --with-cc               Gives the name of the C compiler to use.],
-CC=$withval
+	AC_HELP_STRING([--with-cc], [Gives the name of the C compiler to use.]),
+	CC=$withval
 )
 
 AC_ARG_WITH(cxx,
-[  --with-cxx              Gives the name of the C++ compiler to use.],
-CXX=$withval
+	AC_HELP_STRING([--with-cxx], [Gives the name of the C++ compiler to use.]),
+	CXX=$withval
 )
 
 AC_ARG_WITH(f77,
-[  --with-f77              Gives the name of the FORTRAN 77 compiler to use.],
-F77=$withval
+	AC_HELP_STRING([--with-f77], [Gives the name of the FORTRAN 77 compiler to use.]),
+	F77=$withval
 )
 
 AC_ARG_WITH(include,
-[  --with-include          Specifies include directories (-Idir1 -Idir2).],
-CPPFLAGS=$withval
-echo Using extra include directories: $withval
+	AC_HELP_STRING([--with-include], [Specifies include directories (-Idir1 -Idir2).]),
+	CPPFLAGS=$withval
+	echo Using extra include directories: $withval
 )
 
 AC_ARG_WITH(ldflags,
-[  --with-ldflags          Specifies ld flags (-L/usr/local/lib).],
-LDFLAGS=$withval
-echo Using ld flags: $withval
+	AC_HELP_STRING([--with-ldflags], [Specifies ld flags (-L/usr/local/lib).]),
+	LDFLAGS=$withval
+	echo Using ld flags: $withval
 )
 AC_SUBST(LDFLAGS)
 
@@ -55,130 +59,147 @@ fi
 AC_SUBST(FFLAGS)
 
 AC_ARG_WITH(libs,
-[  --with-libs             Specifies libraries (-llib1 -llib2).],
-LIBS=$withval
-echo Using extra libraries: $withval
+	AC_HELP_STRING([--with-libs], [Specifies libraries (-llib1 -llib2).]),
+	LIBS=$withval
+	echo Using extra libraries: $withval
 )
 
 AC_ARG_WITH(binutils-dir,
-[  --with-binutils-dir     Base directory of binutils installation.],
-BINUTILS_DIR=$withval
-LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
-CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
-echo Using binutils-dir: $withval
-,
-BINUTILS_DIR=unknown
+	AC_HELP_STRING([--with-binutils-dir], [Base directory of binutils installation.]),
+	BINUTILS_DIR=$withval
+	LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
+	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+	echo Using binutils-dir: $withval
+	,
+	BINUTILS_DIR=unknown
 )
 AC_SUBST(BINUTILS_DIR)
 
 AC_ARG_WITH(bin-type-flag,
-[  --with-bin-type-flag    Binary format for AIX ar operations.],
-BIN_TYPE_FLAG=$withval
-echo Using bin-type-flag: $withval
-,
-BIN_TYPE_FLAG=
+	AC_HELP_STRING([--with-bin-type-flag], [Binary format for AIX ar operations.]),
+	BIN_TYPE_FLAG=$withval
+	echo Using bin-type-flag: $withval
+	,
+	BIN_TYPE_FLAG=
 )
 AC_SUBST(BIN_TYPE_FLAG)
 
-AC_ARG_ENABLE(demangling,
-[  --enable-demangling     Specify GNU, IBM, or Compaq demangling support.],
-DO_DEMANGLE=$enableval
-echo $DO_DEMANGLE demangling enabled
-,
-DO_DEMANGLE=false
+AC_ARG_WITH(gettimeofday,
+	AC_HELP_STRING([--with-gettimeofday], [Use gettimeofday for timing.]),
+	AC_DEFINE(USE_GETTIMEOFDAY)
+	echo Using gettimeofday for timing.
+	,
 )
-AC_SUBST(DO_DEMANGLE)
+
+AC_ARG_WITH(clock_gettime,
+	AC_HELP_STRING([--with-clock_gettime], [Use clock_gettime for timing.]),
+	AC_DEFINE(USE_CLOCK_GETTIME)
+	USE_CLOCK_GETTIME=true
+	echo Using clock_gettime for timing.
+	,
+)
+
+
+#
+#  Enable / Disable specifications
+#
+
+DISABLE_MPI_IO=no
+AC_ARG_ENABLE(mpi-io,
+	AC_HELP_STRING([--disable-mpi-io], [Disable MPI-I/O reporting.]),
+	if test x"$enableval" = xno ; then
+		DISABLE_MPI_IO=yes
+		echo Profiling of MPI I/O has been disabled.
+	fi
+	,
+)
+AC_SUBST(DISABLE_MPI_IO)
+
+DISABLE_BFD=no
+AC_ARG_ENABLE(bfd,
+	AC_HELP_STRING([--disable-bfd], [Do not use GNU binutils libbfd for source lookup.]),
+	if test x"$enableval" = xno ; then
+		AC_DEFINE(DISABLE_BFD)
+		echo Use of libbfd has been disabled
+		DISABLE_BFD=yes
+	fi
+	,
+)
+
+DISABLE_LIBUNWIND=no
+AC_ARG_ENABLE(libunwind,
+	AC_HELP_STRING([--disable-libunwind], [Do not use libunwind to generate stack traces.]),
+	if test x"$enableval" = xno ; then
+		DISABLE_LIBUNWIND=yes
+		echo Use of libunwind has been disabled
+	fi
+	,
+)
+
+AC_ARG_ENABLE(fortranxlate,
+	AC_HELP_STRING([--disable-fortranxlate], [Disable translation of Fortran opaque objects.]),
+	if test "$enable_fortranxlate" = "no" ; then
+		ENABLE_FORTRAN_XLATE=no
+		  echo Translation of FORTRAN opaque objects has been disabled.
+	else
+		ENABLE_FORTRAN_XLATE=yes
+		echo Translation of FORTRAN opaque objects has been enabled.
+	fi
+	,
+	ENABLE_FORTRAN_XLATE=yes
+)
+AC_SUBST(ENABLE_FORTRAN_XLATE)
 
 AC_ARG_ENABLE(stackdepth,
-[  --enable-stackdepth     Specify maximum stacktrace depth (default is 8).],
-STACKDEPTH=$enableval
-echo Maximum stacktrace depth is $STACKDEPTH
-,
-STACKDEPTH=8
+	AC_HELP_STRING([--enable-stackdepth], [Specify maximum stacktrace depth (default is 8).]),
+	STACKDEPTH=$enableval
+	echo Maximum stacktrace depth is $STACKDEPTH
+	,
+	STACKDEPTH=8
 )
 AC_SUBST(STACKDEPTH)
 
 AC_ARG_ENABLE(dwarf,
-[  --enable-dwarf          Use DWARF library for source lookup.],
-if test x"$enableval" = xyes ; then
-AC_DEFINE(USE_LIBDWARF)
-echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
-enable_bfd=no
-fi ;
-USE_LIBDWARF=yes
-,
-USE_LIBDWARF=no
+	AC_HELP_STRING([--enable-dwarf], [Use DWARF library for source lookup.]),
+	if test x"$enableval" = xyes ; then
+		AC_DEFINE(USE_LIBDWARF)
+		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
+		enable_bfd=no
+	fi ;
+	USE_LIBDWARF=yes
+	,
+	USE_LIBDWARF=no
 )
 AC_SUBST(USE_LIBDWARF)
 
-AC_ARG_ENABLE(bfd,
-[  --disable-bfd           Do not use GNU binutils libbfd for source lookup.],
-AC_DEFINE(DISABLE_BFD)
-echo Use of libbfd has been disabled
-DISABLE_BFD=yes
-,
-)
-
-AC_ARG_ENABLE(libunwind,
-[  --disable-libunwind     Do not use libunwind to generate stack traces.],
-DISABLE_LIBUNWIND=yes
-echo Use of libunwind has been disabled
-,
-)
-
-AC_ARG_ENABLE(mpi-io,
-[  --disable-mpi-io        Disable MPI-I/O reporting.],
-DISABLE_MPI_IO=yes
-echo Profiling of MPI I/O has been disabled.
-,
-DISABLE_MPI_IO=no
-)
-AC_SUBST(DISABLE_MPI_IO)
-
-AC_ARG_ENABLE(fortranxlate,
-[  --disable-fortranxlate  Disable translation of Fortran opaque objects.],
-if test "$enable_fortranxlate" = "no" ; then
-  ENABLE_FORTRAN_XLATE=no
-  echo Translation of FORTRAN opaque objects has been disabled.
-else
-  ENABLE_FORTRAN_XLATE=yes
-  echo Translation of FORTRAN opaque objects has been enabled.
-fi
-,
-ENABLE_FORTRAN_XLATE=yes
-)
-AC_SUBST(ENABLE_FORTRAN_XLATE)
-
-AC_ARG_ENABLE(getarg,
-[  --enable-getarg         Use getarg to get fortran command line args.],
-AC_DEFINE(USE_GETARG)
-echo Use of getarg has been enabled
-USE_GETARG=true
-,
 USE_GETARG=false
+AC_ARG_ENABLE(getarg,
+	AC_HELP_STRING([--enable-getarg], [Use getarg to get fortran command line args.]),
+	if test x"$enableval" = xyes ; then
+		AC_DEFINE(USE_GETARG)
+		echo Use of getarg has been enabled
+		USE_GETARG=true
+	fi
+	,
 )
 AC_SUBST(USE_GETARG)
 
-AC_ARG_WITH(gettimeofday,
-[  --with-gettimeofday     Use gettimeofday for timing.],
-AC_DEFINE(USE_GETTIMEOFDAY)
-echo Using gettimeofday for timing.
-,
+AC_ARG_ENABLE(demangling,
+	AC_HELP_STRING([--enable-demangling], [Specify GNU, IBM, or Compaq demangling support.]),
+	DO_DEMANGLE=$enableval
+	echo $DO_DEMANGLE demangling enabled
+	,
+	DO_DEMANGLE=false
 )
-
-AC_ARG_WITH(clock_gettime,
-[  --with-clock_gettime    Use clock_gettime for timing.],
-AC_DEFINE(USE_CLOCK_GETTIME)
-USE_CLOCK_GETTIME=true
-echo Using clock_gettime for timing.
-,
-)
+AC_SUBST(DO_DEMANGLE)
 
 AC_ARG_ENABLE(check-time,
-[  --enable-check-time     Enable AIX check for negative time values.],
-AC_DEFINE(MPIP_CHECK_TIME)
-echo AIX negative time value checking has been enabled
-,
+	AC_HELP_STRING([--enable-check-time], [Enable AIX check for negative time values.]),
+	if test x"$enableval" = xyes ; then
+		AC_DEFINE(MPIP_CHECK_TIME)
+		echo AIX negative time value checking has been enabled
+	fi
+	,
 )
 
 
@@ -197,22 +218,24 @@ AC_CHECK_LIB(intl,dcgettext__)
 AC_CHECK_LIB(iberty,objalloc_create)
 AC_CHECK_HEADER(bfd.h,
   AC_CHECK_LIB(bfd,bfd_openr,,,)
-  AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), , #include "bfd.h"
+  AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), , '#include "bfd.h"'
   )
   )
   
 AC_CHECK_LIB(mpi,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
 AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
 
-AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), #include "bfd.h")
+AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
 fi
 
-if test "$USE_CLOCK_GETTIME" = "true"; then
+if test "x$USE_CLOCK_GETTIME" = "xtrue"; then
   AC_CHECK_LIB(rt,clock_gettime)
 fi
-if test -z "$DISABLE_LIBUNWIND" ; then
-AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
+
+if test "x$DISABLE_LIBUNWIND" = "xno" ; then
+	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
 fi
+
 if test "$DISABLE_MPI_IO" = no ; then
 AC_CHECK_FUNC(MPI_File_open,
               AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt,
