@@ -225,6 +225,12 @@ extern void *MPIR_ToPointer( int idx );
 #define FramePC(fp) ((void*)(((char**)fp)[1]))
 #define NextFP(fp) ((void*)((char**)fp)[0])
 
+/* Catamount */
+#elif defined(Catamount) && defined(X86_64)
+#define ParentFP(jb) ((void*) jb[0].__jmpbuf[1])
+#define FramePC(fp) ((void*)(((void**)fp)[1]))
+#define NextFP(fp) ((void*)((void**)fp)[0])
+
 /*  undefined  */
 #else  
 #if ! defined(HAVE_LIBUNWIND)

@@ -4204,7 +4204,7 @@ if test $ac_cv_type_bfd_boolean = yes; then
   :
 else
   cat >>confdefs.h <<\_ACEOF
-#define BFD_TRUE_FALSE 1
+#define HAVE_BFD_BOOLEAN 1
 _ACEOF
 
 fi
