@@ -18,7 +18,7 @@
 #undef HAVE_MPI_IO
 
 /* Define if bfd_boolean not defined */
-#undef BFD_TRUE_FALSE
+#undef HAVE_BFD_BOOLEAN
 
 /* Define to activate check for negative time values */
 #undef MPIP_CHECK_TIME
