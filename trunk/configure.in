@@ -202,9 +202,11 @@ AC_CHECK_HEADER(bfd.h,
   )
   
 AC_CHECK_LIB(mpi,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
-AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(BFD_TRUE_FALSE), #include "bfd.h" 
-)
+AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
+
+AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), #include "bfd.h")
 fi
+
 if test "$USE_CLOCK_GETTIME" = "true"; then
   AC_CHECK_LIB(rt,clock_gettime)
 fi
