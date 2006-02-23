@@ -411,12 +411,144 @@ mpiPi_query_src (callsite_stats_t * p)
 }
 
 
+static int mpiPi_insert_callsite_records(callsite_stats_t *p)
+{
+  callsite_stats_t *csp = NULL;
+
+  mpiPi_query_src (p);	/* sets the file/line in p */
+          
+  /* If exists, accumulate, otherwise insert. This is
+     specifically for optimizations that have multiple PCs for
+     one src line. We aggregate across rank after this. */
+  if (NULL ==
+      h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
+    {
+      int j;
+      callsite_stats_t *newp = NULL;
+      newp = (callsite_stats_t *) mpiPi_malloc (sizeof (callsite_stats_t), "global_callsite_stats entry");
+      bzero (newp, sizeof (callsite_stats_t));
+      newp->op = p->op;
+      newp->rank = p->rank;
+      for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
+        {
+          newp->pc[j] = p->pc[j];
+          newp->filename[j] = p->filename[j];
+          newp->functname[j] = p->functname[j];
+          newp->lineno[j] = p->lineno[j];
+        }
+      newp->csid = p->csid;
+      newp->count = p->count;
+      newp->cumulativeTime = p->cumulativeTime;
+      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
+      newp->maxDur = p->maxDur;
+      newp->minDur = p->minDur;
+      newp->maxDataSent = p->maxDataSent;
+      newp->minDataSent = p->minDataSent;
+      newp->cumulativeDataSent = p->cumulativeDataSent;
+      newp->maxIO = p->maxIO;
+      newp->minIO = p->minIO;
+      newp->cumulativeIO = p->cumulativeIO;
+      newp->arbitraryMessageCount = p->arbitraryMessageCount;
+      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
+
+      /* insert new record into global */
+      h_insert (mpiPi.global_callsite_stats, newp);
+    }
+  else
+    {
+      csp->count += p->count;
+      csp->cumulativeTime += p->cumulativeTime;
+      assert( csp->cumulativeTime >= 0 );
+      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
+      assert( csp->cumulativeTimeSquared >= 0 );
+      csp->maxDur = max (csp->maxDur, p->maxDur);
+      csp->minDur = min (csp->minDur, p->minDur);
+      csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
+      csp->minDataSent = min (csp->minDataSent, p->minDataSent);
+      csp->cumulativeDataSent += p->cumulativeDataSent;
+      csp->maxIO = max (csp->maxIO, p->maxIO);
+      csp->minIO = min (csp->minIO, p->minIO);
+      csp->cumulativeIO += p->cumulativeIO;
+      csp->arbitraryMessageCount += p->arbitraryMessageCount;
+    }
+
+  /* agg. Don't use rank */
+  if (NULL ==
+      h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
+    {
+      int j;
+      callsite_stats_t *newp = NULL;
+      newp = (callsite_stats_t *) mpiPi_malloc (sizeof (callsite_stats_t), "global_callsite_stats_agg entry");
+      bzero (newp, sizeof (callsite_stats_t));
+      newp->op = p->op;
+      newp->rank = -1;
+      for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
+        {
+          newp->pc[j] = p->pc[j];
+          newp->filename[j] = p->filename[j];
+          newp->functname[j] = p->functname[j];
+          newp->lineno[j] = p->lineno[j];
+        }
+      newp->csid = p->csid;
+      newp->count = p->count;
+      newp->cumulativeTime = p->cumulativeTime;
+      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
+      newp->maxDur = p->maxDur;
+      newp->minDur = p->minDur;
+      newp->maxDataSent = p->maxDataSent;
+      newp->minDataSent = p->minDataSent;
+      newp->cumulativeDataSent = p->cumulativeDataSent;
+      newp->cumulativeIO = p->cumulativeIO;
+      newp->maxIO = p->maxIO;
+      newp->minIO = p->minIO;
+      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
+
+      if ( mpiPi.calcCOV )
+        {
+          newp->siteData = (double*)mpiPi_malloc(mpiPi.size*sizeof(double), "COV data");
+          newp->siteData[0] = p->cumulativeTime;
+          newp->siteDataIdx = 1;
+        }
+
+      /* insert new record into global */
+      h_insert (mpiPi.global_callsite_stats_agg, newp);
+    }
+  else
+    {
+      csp->count += p->count;
+      csp->cumulativeTime += p->cumulativeTime;
+      assert( csp->cumulativeTime >= 0 );
+      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
+      assert( csp->cumulativeTimeSquared >= 0 );
+      csp->maxDur = max (csp->maxDur, p->maxDur);
+      csp->minDur = min (csp->minDur, p->minDur);
+      csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
+      csp->minDataSent = min (csp->minDataSent, p->minDataSent);
+      csp->cumulativeDataSent += p->cumulativeDataSent;
+      csp->maxIO = max (csp->maxIO, p->maxIO);
+      csp->minIO = min (csp->minIO, p->minIO);
+      csp->cumulativeIO += p->cumulativeIO;
+
+      if ( mpiPi.calcCOV )
+        {
+          csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
+          csp->siteDataIdx += 1;
+        }
+    }
+
+  return 1;
+}
+
+
 int
 mpiPi_mergeResults ()
 {
   int ac;
   callsite_stats_t **av;
   int totalCount = 0;
+  int maxCount = 0;
+  mpiPi_TIME tstart, tend;
+  mpiP_TIMER dur;
 
   /* gather local task data */
   h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
@@ -424,6 +556,9 @@ mpiPi_mergeResults ()
   /* determine size of space necessary on collector */
   PMPI_Reduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.collectorRank,
 	       mpiPi.comm);
+  PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
+	       mpiPi.comm);
+
   if ((totalCount < 1) && (mpiPi.rank == mpiPi.collectorRank))
     {
       mpiPi_msg_warn
@@ -436,48 +571,6 @@ mpiPi_mergeResults ()
     {
       int i;
       int ndx = 0;
-      mpiPi.rawCallsiteData =
-	(callsite_stats_t *) calloc (totalCount, sizeof (callsite_stats_t));
-      for (ndx = 0; ndx < ac; ndx++)
-	{
-	  bcopy (av[ndx], &(mpiPi.rawCallsiteData[ndx]),
-		 sizeof (callsite_stats_t));
-	}
-      for (i = 1; i < mpiPi.size; i++)	/* n-1 */
-	{
-	  MPI_Status status;
-	  int count;
-	  /* okay in any order */
-	  PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	  PMPI_Get_count (&status, MPI_CHAR, &count);
-	  PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
-		     status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	  count /= sizeof (callsite_stats_t);
-	  ndx += count;
-	}
-    }
-  else
-    {
-      int ndx;
-      char *sbuf = (char *) malloc (ac * sizeof (callsite_stats_t));
-      for (ndx = 0; ndx < ac; ndx++)
-	{
-	  bcopy (av[ndx],
-		 &(sbuf[ndx * sizeof (callsite_stats_t)]),
-		 sizeof (callsite_stats_t));
-	}
-      PMPI_Send (sbuf, ac * sizeof (callsite_stats_t),
-		 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
-      free (sbuf);
-    }
-
-  /* TODO: need to free all these pointers as well. */
-  free (av);
-
-  /* only work for collector remains */
-  if (mpiPi.rank == mpiPi.collectorRank)
-    {
-      int i;
 
 #ifndef DISABLE_BFD
       if ( mpiPi.appFullName != NULL )
@@ -512,142 +605,53 @@ mpiPi_mergeResults ()
       callsite_src_id_cache = h_open (mpiPi.tableSize,
 				      callsite_src_id_cache_hashkey,
 				      callsite_src_id_cache_comparator);
-
-      /* TODO: when is the best time to free/close these tables? */
-
-      mpiPi_msg_debug ("Beginning src code lookup and accumulation of raw "
-		       "callsite data. %d records.\n", totalCount);
-      for (i = 0; i < totalCount; i++)
+      /* Try to allocate space for max count of callsite info from all tasks  */
+      mpiPi.rawCallsiteData =
+	(callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
+      for (ndx = 0; ndx < ac; ndx++)
 	{
-	  callsite_stats_t *p = &(mpiPi.rawCallsiteData[i]);
-	  callsite_stats_t *csp = NULL;
-
-	  /* lookup file/line */
-          mpiPi_query_src (p);	/* sets the file/line in p */
-
-	  /* If exists, accumulate, otherwise insert. This is
-	     specifically for optimizations that have multiple PCs for
-	     one src line. We aggregate across rank after this. */
-	  if (NULL ==
-	      h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
-	    {
-	      int j;
-	      callsite_stats_t *newp = NULL;
-	      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
-	      bzero (newp, sizeof (callsite_stats_t));
-	      newp->op = p->op;
-	      newp->rank = p->rank;
-	      for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
-		{
-		  newp->pc[j] = p->pc[j];
-		  newp->filename[j] = p->filename[j];
-		  newp->functname[j] = p->functname[j];
-		  newp->lineno[j] = p->lineno[j];
-		}
-	      newp->csid = p->csid;
-	      newp->count = p->count;
-	      newp->cumulativeTime = p->cumulativeTime;
-	      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
-	      newp->maxDur = p->maxDur;
-	      newp->minDur = p->minDur;
-	      newp->maxDataSent = p->maxDataSent;
-	      newp->minDataSent = p->minDataSent;
-	      newp->cumulativeDataSent = p->cumulativeDataSent;
-	      newp->maxIO = p->maxIO;
-	      newp->minIO = p->minIO;
-	      newp->cumulativeIO = p->cumulativeIO;
-	      newp->arbitraryMessageCount = p->arbitraryMessageCount;
-	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
-
-	      /* insert new record into global */
-	      h_insert (mpiPi.global_callsite_stats, newp);
-	    }
-	  else
-	    {
-	      csp->count += p->count;
-	      csp->cumulativeTime += p->cumulativeTime;
-	      assert( csp->cumulativeTime >= 0 );
-	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
-	      assert( csp->cumulativeTimeSquared >= 0 );
-	      csp->maxDur = max (csp->maxDur, p->maxDur);
-	      csp->minDur = min (csp->minDur, p->minDur);
-              csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
-              csp->minDataSent = min (csp->minDataSent, p->minDataSent);
-              csp->cumulativeDataSent += p->cumulativeDataSent;
-	      csp->maxIO = max (csp->maxIO, p->maxIO);
-	      csp->minIO = min (csp->minIO, p->minIO);
-              csp->cumulativeIO += p->cumulativeIO;
-	      csp->arbitraryMessageCount += p->arbitraryMessageCount;
-	    }
-
-	  /* agg. Don't use rank */
-	  if (NULL ==
-	      h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
-	    {
-	      int j;
-	      callsite_stats_t *newp = NULL;
-	      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
-	      bzero (newp, sizeof (callsite_stats_t));
-	      newp->op = p->op;
-	      newp->rank = -1;
-	      for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
-		{
-		  newp->pc[j] = p->pc[j];
-		  newp->filename[j] = p->filename[j];
-		  newp->functname[j] = p->functname[j];
-		  newp->lineno[j] = p->lineno[j];
-		}
-	      newp->csid = p->csid;
-	      newp->count = p->count;
-	      newp->cumulativeTime = p->cumulativeTime;
-	      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
-	      newp->maxDur = p->maxDur;
-	      newp->minDur = p->minDur;
-	      newp->maxDataSent = p->maxDataSent;
-	      newp->minDataSent = p->minDataSent;
-	      newp->cumulativeDataSent = p->cumulativeDataSent;
-	      newp->cumulativeIO = p->cumulativeIO;
-	      newp->maxIO = p->maxIO;
-	      newp->minIO = p->minIO;
-	      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
-
-	      if ( mpiPi.calcCOV )
-	      {
-                newp->siteData = (double*)malloc(mpiPi.size*sizeof(double));
-                newp->siteData[0] = p->cumulativeTime;
-                newp->siteDataIdx = 1;
-	      }
-
-	      /* insert new record into global */
-	      h_insert (mpiPi.global_callsite_stats_agg, newp);
-	    }
-	  else
-	    {
-	      csp->count += p->count;
-	      csp->cumulativeTime += p->cumulativeTime;
-	      assert( csp->cumulativeTime >= 0 );
-	      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
-	      assert( csp->cumulativeTimeSquared >= 0 );
-	      csp->maxDur = max (csp->maxDur, p->maxDur);
-	      csp->minDur = min (csp->minDur, p->minDur);
-              csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
-              csp->minDataSent = min (csp->minDataSent, p->minDataSent);
-	      csp->cumulativeDataSent += p->cumulativeDataSent;
-              csp->maxIO = max (csp->maxIO, p->maxIO);
-              csp->minIO = min (csp->minIO, p->minIO);
-	      csp->cumulativeIO += p->cumulativeIO;
-
-	      if ( mpiPi.calcCOV )
-	      {
-                csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
-                csp->siteDataIdx++;
-	      }
-	    }
-
-	  mpiPi_msg_debug ("%d: %d %d=[%s,%d,%s]\n", i, p->op, p->csid,
-			   p->filename[0], p->lineno[0], p->functname[0]);
+      	  mpiPi_insert_callsite_records(av[ndx]);
 	}
+      ndx = 0;
+      for (i = 1; i < mpiPi.size; i++)	/* n-1 */
+	{
+	  MPI_Status status;
+	  int count;
+          int j;
 
+	  /* okay in any order */
+	  PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+	  PMPI_Get_count (&status, MPI_CHAR, &count);
+	  PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
+		     status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+	  count /= sizeof (callsite_stats_t);
+          for ( j = 0; j < count; j++ )
+            {
+              mpiPi_insert_callsite_records(&(mpiPi.rawCallsiteData[j]));
+            }
+	}
+      free(mpiPi.rawCallsiteData);
+    }
+  else
+    {
+      int ndx;
+      char *sbuf = (char *) malloc (ac * sizeof (callsite_stats_t));
+      for (ndx = 0; ndx < ac; ndx++)
+	{
+	  bcopy (av[ndx],
+		 &(sbuf[ndx * sizeof (callsite_stats_t)]),
+		 sizeof (callsite_stats_t));
+	}
+      PMPI_Send (sbuf, ac * sizeof (callsite_stats_t),
+		 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
+      free (sbuf);
+    }
+
+  /* TODO: need to free all these pointers as well. */
+  free (av);
+
+  if (mpiPi.rank == mpiPi.collectorRank)
+    {
       if ( mpiPi.do_lookup == 1 )
       {
 #ifndef DISABLE_BFD
@@ -661,6 +665,7 @@ mpiPi_mergeResults ()
 
   return 1;
 }
+
 
 void
 mpiPi_publishResults ()
