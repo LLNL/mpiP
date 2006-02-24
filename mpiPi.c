@@ -826,6 +826,7 @@ void
 mpiPi_generateReport ()
 {
   mpiP_TIMER dur;
+  mpiPi_TIME timer_start, timer_end;
   mpiPi_GETTIME (&mpiPi.endTime);
 
   if(mpiPi.enabled)
@@ -841,9 +842,32 @@ mpiPi_generateReport ()
     }
 
   /* collect results and publish */
+  mpiPi_msg_debug0("starting collect_basics\n");
+
+  mpiPi_GETTIME (&timer_start);
   mpiPi_collect_basics ();
-  if ( mpiPi_mergeResults () )
-    mpiPi_publishResults ();
+  mpiPi_GETTIME (&timer_end);
+  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+
+  mpiPi_msg_debug0("TIMING : collect_basics_time is %f\n", dur);
+
+  mpiPi_msg_debug0("starting mergeResults\n");
+
+  mpiPi_GETTIME (&timer_start);
+  mpiPi_mergeResults ();
+  mpiPi_GETTIME (&temerge);
+  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+
+  mpiPi_msg_debug0("TIMING : merge time is %f\n", dur);
+  mpiPi_msg_debug0("starting publishResults\n");
+
+  mpiPi_GETTIME (&timer_start);
+  mpiPi_publishResults ();
+  mpiPi_GETTIME (&timer_end);
+  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+
+  mpiPi_msg_debug0("TIMING : publish time is %f\n", dur);
+
 }
 
 
