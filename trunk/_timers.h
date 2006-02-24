@@ -39,9 +39,9 @@ typedef double mpiP_TIMER;
 #define mpiPi_TIMER double
 #define mpiPi_TIME double
 #define mpiPi_TIMER_NAME "PMPI_Wtime"
-#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()/USECS))
+#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()*USECS))
 #define mpiPi_GETUSECS(timeaddr) (*(timeaddr))
-#define mpiPi_GETTIMEDIFF(end,start) ((end)-(start))
+#define mpiPi_GETTIMEDIFF(end,start) ((*end)-(*start))
 #else
 
 /* gettimeofday returns microseconds */
