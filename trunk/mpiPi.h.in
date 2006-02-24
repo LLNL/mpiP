@@ -86,13 +86,14 @@ extern h_t *callsite_src_id_cache;
 
 typedef struct _mpiPi_task_info_t
 {
-  /* this section is received from each task */
-  int rank;
-  double app_time;		/* time from end of init to start of finalize */
-  char hostname[MPIPI_HOSTNAME_LEN_MAX];
-
   /* this section is calculated at the collector */
   double mpi_time;
+
+  /* this section is received from each task */
+  double app_time;		/* time from end of init to start of finalize */
+  int rank;
+  char hostname[MPIPI_HOSTNAME_LEN_MAX];
+
 }
 mpiPi_task_info_t;
 
@@ -174,6 +175,9 @@ typedef struct _mpiPi_t
   int messageCountThreshold;
   long text_start;
   int obj_mode;
+  int allocCount;
+  long allocSize;
+  int printRankInfo;
 }
 mpiPi_t;
 
