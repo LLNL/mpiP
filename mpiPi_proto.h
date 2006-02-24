@@ -11,6 +11,8 @@ extern void mpiPi_msg ( char *fmt, ... );
 extern void mpiPi_abort ( char *fmt, ... );
 extern void mpiPi_msg_debug ( char *fmt, ... );
 extern void mpiPi_msg_warn ( char *fmt, ... );
+extern void mpiPi_msg_debug0 (char *fmt, ...);
+
 extern void mpiP_init_api ( void );
 extern int mpiP_record_traceback ( void* pc_array[], int max_stack );
 extern int mpiP_open_executable ( char* filename );
@@ -53,3 +55,4 @@ extern void getProcCmdLine ( int* ac, char** av, int max_args );
 extern void mpiPi_copy_args ( int *ac, char **av, int av_len );
 extern void mpiPi_copy_given_args ( int *ac, char **av, int av_len, int argc, char **argv );
 extern long mpiPi_get_text_start(char *filename);
+
