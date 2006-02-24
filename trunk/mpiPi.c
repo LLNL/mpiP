@@ -803,7 +803,7 @@ mpiPi_collect_basics ()
                 recv_req_arr[i] = MPI_REQUEST_NULL;
 	      }
 	  }
-        MPI_Waitall(mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
+        PMPI_Waitall(mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
         free(recv_req_arr);
       }
     else
