@@ -425,7 +425,7 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
     {
       int j;
       callsite_stats_t *newp = NULL;
-      newp = (callsite_stats_t *) mpiPi_malloc (sizeof (callsite_stats_t), "global_callsite_stats entry");
+      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
       bzero (newp, sizeof (callsite_stats_t));
       newp->op = p->op;
       newp->rank = p->rank;
@@ -478,7 +478,7 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
     {
       int j;
       callsite_stats_t *newp = NULL;
-      newp = (callsite_stats_t *) mpiPi_malloc (sizeof (callsite_stats_t), "global_callsite_stats_agg entry");
+      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
       bzero (newp, sizeof (callsite_stats_t));
       newp->op = p->op;
       newp->rank = -1;
@@ -505,7 +505,7 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
 
       if ( mpiPi.calcCOV )
         {
-          newp->siteData = (double*)mpiPi_malloc(mpiPi.size*sizeof(double), "COV data");
+          newp->siteData = (double*)malloc(mpiPi.size*sizeof(double));
           newp->siteData[0] = p->cumulativeTime;
           newp->siteDataIdx = 1;
         }
@@ -855,7 +855,7 @@ mpiPi_generateReport ()
 
   mpiPi_GETTIME (&timer_start);
   mpiPi_mergeResults ();
-  mpiPi_GETTIME (&temerge);
+  mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
 
   mpiPi_msg_debug0("TIMING : merge time is %f\n", dur);
