@@ -29,6 +29,9 @@
 /* Define to use clock_gettime for timing */
 #undef USE_CLOCK_GETTIME
 
+/* Define to use MPI_Wtime for timing */
+#undef USE_WTIME
+
 /* Distinguish available BFD calls between 2.15 and 2.15.96 */
 #undef HAVE_BFD_GET_SECTION_SIZE
 

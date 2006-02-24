@@ -91,6 +91,13 @@ AC_ARG_WITH(gettimeofday,
 	,
 )
 
+AC_ARG_WITH(wtime,
+	AC_HELP_STRING([--with-wtime], [Use MPI_Wtime for timing.]),
+	AC_DEFINE(USE_WTIME)
+	echo Using MPI_Wtime for timing.
+	,
+)
+
 AC_ARG_WITH(clock_gettime,
 	AC_HELP_STRING([--with-clock_gettime], [Use clock_gettime for timing.]),
 	AC_DEFINE(USE_CLOCK_GETTIME)
