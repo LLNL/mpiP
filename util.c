@@ -359,7 +359,7 @@ mpiPi_getenv ()
 		  {
 		    if (mpiPi.rank == 0)
 		      mpiPi_msg_warn
-			("-k report print threshold invalid %g. Using default.\n",
+			("-t report print threshold invalid %g. Using default.\n",
 			 mpiPi.reportPrintThreshold);
 		    mpiPi.reportPrintThreshold = defaultThreshold;
 		  }
