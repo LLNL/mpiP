@@ -756,15 +756,18 @@ mpiPi_collect_basics ()
     int cnt;
     MPI_Status status;
     mpiPi_task_info_t mti;
-    int blockcounts[5] = { 1, 1, MPIPI_HOSTNAME_LEN_MAX };
-    MPI_Datatype types[5] = { MPI_INT, MPI_DOUBLE, MPI_CHAR };
+    int blockcounts[5] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
+    MPI_Datatype types[5] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
     MPI_Aint displs[5];
     MPI_Datatype mti_type;
+    MPI_Request *recv_req_arr;
 
     cnt = 0;
-    PMPI_Address (&mti.rank, &displs[cnt++]);
+    PMPI_Address (&mti.mpi_time, &displs[cnt++]);
     PMPI_Address (&mti.app_time, &displs[cnt++]);
+    PMPI_Address (&mti.rank, &displs[cnt++]);
     PMPI_Address (&mti.hostname, &displs[cnt++]);
+
     for (i = cnt; i >= 0; i--)
       {
 	displs[i] -= displs[0];
@@ -776,27 +779,32 @@ mpiPi_collect_basics ()
       {
 	mpiPi.global_task_info =
 	  (mpiPi_task_info_t *) calloc (mpiPi.size,
-					sizeof (mpiPi_task_info_t));
+		sizeof (mpiPi_task_info_t));
+      if ( mpiPi.global_task_info == NULL )
+        mpiPi_abort("Failed to allocate memory for global task_info");
+
 	bzero (mpiPi.global_task_info,
 	       mpiPi.size * sizeof (mpiPi_task_info_t));
+
+        recv_req_arr = (MPI_Request*) malloc (sizeof (MPI_Request)*mpiPi.size);
 	for (i = 0; i < mpiPi.size; i++)
 	  {
 	    mpiPi_task_info_t *p = &mpiPi.global_task_info[i];
 	    if (i != mpiPi.collectorRank)
 	      {
-		PMPI_Recv (&mti, 1, mti_type, i, mpiPi.tag,
-			   mpiPi.comm, &status);
-		strcpy (p->hostname, mti.hostname);
-		p->app_time = mti.app_time;
-		p->rank = mti.rank;
+		PMPI_Irecv (p, 1, mti_type, i, mpiPi.tag,
+			   mpiPi.comm, &(recv_req_arr[i]));
 	      }
 	    else
 	      {
 		strcpy (p->hostname, mpiPi.hostname);
 		p->app_time = app_time;
 		p->rank = mpiPi.rank;
+                recv_req_arr[i] = MPI_REQUEST_NULL;
 	      }
 	  }
+        MPI_Waitall(mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
+        free(recv_req_arr);
       }
     else
       {
