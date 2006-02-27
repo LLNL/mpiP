@@ -879,6 +879,7 @@ Optional Packages:
   --with-binutils-dir     Base directory of binutils installation.
   --with-bin-type-flag    Binary format for AIX ar operations.
   --with-gettimeofday     Use gettimeofday for timing.
+  --with-wtime            Use MPI_Wtime for timing.
   --with-clock_gettime    Use clock_gettime for timing.
 
 Some influential environment variables:
@@ -1545,6 +1546,18 @@ if test "${with_gettimeofday+set}" = set; then
 _ACEOF
 
 	echo Using gettimeofday for timing.
+
+fi;
+
+
+# Check whether --with-wtime or --without-wtime was given.
+if test "${with_wtime+set}" = set; then
+  withval="$with_wtime"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_WTIME 1
+_ACEOF
+
+	echo Using MPI_Wtime for timing.
 
 fi;
 
@@ -3024,7 +3037,7 @@ _ACEOF
 fi
 
 
-if test -z "$DISABLE_BFD" ; then
+if test "$DISABLE_BFD" = "no" ; then
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4029,7 +4042,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-'#include "bfd.h"'
+#include "bfd.h"
 
 
 int
@@ -4959,7 +4972,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4962:" \
+echo "$as_me:4975:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
