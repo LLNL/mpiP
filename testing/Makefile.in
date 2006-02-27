@@ -12,6 +12,7 @@ LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
+CPPFLAGS =
 
 CSRCS =	0-simple.c \
 	0-simple-c++.C \
