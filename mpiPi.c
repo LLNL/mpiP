@@ -554,12 +554,11 @@ mpiPi_mergeResults ()
   h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
 
   /* determine size of space necessary on collector */
-  PMPI_Reduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.collectorRank,
-	       mpiPi.comm);
+  PMPI_Allreduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.comm);
   PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
 	       mpiPi.comm);
 
-  if ((totalCount < 1) && (mpiPi.rank == mpiPi.collectorRank))
+  if ( totalCount < 1 ) 
     {
       mpiPi_msg_warn
 	("Collector found no records to merge. Omitting report.\n");
@@ -827,6 +826,8 @@ mpiPi_generateReport ()
 {
   mpiP_TIMER dur;
   mpiPi_TIME timer_start, timer_end;
+  int mergeResult;
+
   mpiPi_GETTIME (&mpiPi.endTime);
 
   if(mpiPi.enabled)
@@ -854,19 +855,21 @@ mpiPi_generateReport ()
   mpiPi_msg_debug0("starting mergeResults\n");
 
   mpiPi_GETTIME (&timer_start);
-  mpiPi_mergeResults ();
+  mergeResult = mpiPi_mergeResults ();
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
 
   mpiPi_msg_debug0("TIMING : merge time is %f\n", dur);
   mpiPi_msg_debug0("starting publishResults\n");
 
-  mpiPi_GETTIME (&timer_start);
-  mpiPi_publishResults ();
-  mpiPi_GETTIME (&timer_end);
-  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
-
-  mpiPi_msg_debug0("TIMING : publish time is %f\n", dur);
+  if ( mergeResult == 1 )
+  {
+    mpiPi_GETTIME (&timer_start);
+    mpiPi_publishResults ();
+    mpiPi_GETTIME (&timer_end);
+    dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+    mpiPi_msg_debug0("TIMING : publish time is %f\n", dur);
+  }
 
 }
 
