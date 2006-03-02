@@ -28,7 +28,9 @@ static char *rcsid =
 #endif
 
 #include "mpiPi.h"
+#ifndef ENABLE_API_ONLY
 #include "symbols.h"
+#endif
 
 #ifdef HAVE_LIBUNWIND
 #define UNW_LOCAL_ONLY
