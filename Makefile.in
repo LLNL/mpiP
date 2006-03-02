@@ -15,7 +15,11 @@ include Defs.mak
 
 .PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs test
 
+ifeq ($(ENABLE_API_ONLY), no)
 default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API
+else
+default: API
+endif
 
 all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API test
 	@echo All done.
@@ -37,7 +41,6 @@ API_SRCS =	diag_msgs_api.c \
 	glob.c \
 	mpiPi.c \
 	util.c \
-	lookup.c \
 	mpiP-API.c
 
 USE_GETARG   = @USE_GETARG@
@@ -132,11 +135,17 @@ endif
 
 api API: libmpiP-API.a
 
+ifeq ($(ENABLE_API_ONLY), no)
 libmpiP-API.a: ${API_OBJS} 
 	${MAKE} remake_lookup
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
 	${MAKE} remove_lookup
+else
+libmpiP-API.a: ${API_OBJS} 
+	${AR} ruv $@ ${API_OBJS}
+	${RANLIB} $@
+endif
 
 clean :: 
 	rm -f ${API_OBJS}
@@ -200,7 +209,11 @@ endif
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --f77symbol $(F77_SYMBOLS) $^
 
+ifeq ($(ENABLE_API_ONLY), no)
 ${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h _timers.h
+else
+${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h _timers.h
+endif
 
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} API
 	mkdir -p ${libdir} ${includedir} ${docdir} ${bindir}

@@ -26,14 +26,15 @@
 #include <time.h>
 #include <unistd.h>
 
-#ifndef CEXTRACT
+#include "mpiPconfig.h"
+
+#if !defined(CEXTRACT) && !defined(ENABLE_API_ONLY)
 #include <mpi.h>
+#include "mpiPi_def.h"
 #endif
 
 #include "mpiP-hash.h"
 
-#include "mpiPi_def.h"
-#include "mpiPconfig.h"
 #include "_timers.h"
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
@@ -125,13 +126,15 @@ typedef struct _mpiPi_t
   char *appName;
   char *appFullName;
   char oFilename[256];
-  MPI_Comm comm;
   int tag;
   int procID;
   int rank;
   int size;
   int collectorRank;
+#ifndef ENABLE_API_ONLY
+  MPI_Comm comm;
   char hostname[MPI_MAX_PROCESSOR_NAME];
+#endif
   int hostnamelen;
   char *outputDir;
   char *envStr;
