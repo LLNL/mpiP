@@ -131,4 +131,5 @@ endif
 LFLAGS	+=
 LIBS	+=
 
+ENABLE_API_ONLY = @ENABLE_API_ONLY@
 ##### EOF

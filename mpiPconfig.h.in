@@ -38,4 +38,7 @@
 /* Address bug in Quadrics MPI Opaque Object translation */
 #undef HAVE_MPIR_TOPOINTER
 
+/* Do non-MPI configure for API library only */
+#undef ENABLE_API_ONLY 
+
 #endif /* _CONFIG_H */

@@ -109,6 +109,7 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
   return 0;
 }
 
+#ifndef ENABLE_API_ONLY /* { */
 /* task level init 
    - executed by each MPI task only once immediately after MPI_Init
 */
@@ -182,6 +183,8 @@ mpiPi_init (char *appName)
 
   return;
 }
+#endif  /* } ifndef ENABLE_API_ONLY */
+
 
 typedef struct callsite_cache_entry_t
 {
@@ -539,6 +542,8 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
   return 1;
 }
 
+
+#ifndef ENABLE_API_ONLY /* { */
 
 int
 mpiPi_mergeResults ()
@@ -959,5 +964,6 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   return;
 }
 
+#endif /* } ifndef ENABLE_API_ONLY */
 
 /* eof */
