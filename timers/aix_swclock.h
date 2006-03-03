@@ -42,4 +42,3 @@ mpiTi_timer_t;
 #endif
 
 /* eof */
-

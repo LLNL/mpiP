@@ -25,12 +25,13 @@
 
 static int mpiP_api_init = 0;
 
-void mpiP_init_api()
+void
+mpiP_init_api ()
 {
-  char* mpiP_env;
+  char *mpiP_env;
 
-  mpiP_env = getenv("MPIP");
-  if ( mpiP_env != NULL && strstr(mpiP_env, "-g") != NULL )
+  mpiP_env = getenv ("MPIP");
+  if (mpiP_env != NULL && strstr (mpiP_env, "-g") != NULL)
     mpiPi_debug = 1;
   else
     mpiPi_debug = 0;
@@ -43,19 +44,20 @@ void mpiP_init_api()
 }
 
 
-int mpiP_record_traceback(void* pc_array[], int max_stack)
+int
+mpiP_record_traceback (void *pc_array[], int max_stack)
 {
   jmp_buf jb;
   int retval;
 
-  if ( mpiP_api_init == 0 )
-    mpiP_init_api();
+  if (mpiP_api_init == 0)
+    mpiP_init_api ();
 
-  setjmp(jb);
+  setjmp (jb);
 
-  mpiPi.inAPIrtb = 1;   /*  Used to correctly identify caller FP  */
+  mpiPi.inAPIrtb = 1;		/*  Used to correctly identify caller FP  */
 
-  retval = mpiPi_RecordTraceBack(jb, pc_array, max_stack);
+  retval = mpiPi_RecordTraceBack (jb, pc_array, max_stack);
 
   mpiPi.inAPIrtb = 0;
 
@@ -63,24 +65,25 @@ int mpiP_record_traceback(void* pc_array[], int max_stack)
 }
 
 extern int
-mpiP_find_src_loc(void *i_addr_hex, char **o_file_str, int *o_lineno,
-              char **o_funct_str);
+mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
+		   char **o_funct_str);
 
-int mpiP_open_executable(char* filename)
+int
+mpiP_open_executable (char *filename)
 {
-  if ( mpiP_api_init == 0 )
-    mpiP_init_api();
+  if (mpiP_api_init == 0)
+    mpiP_init_api ();
 
-  if ( access(filename, R_OK|F_OK) != 0 )
-  	return -1;
+  if (access (filename, R_OK | F_OK) != 0)
+    return -1;
 
 #ifndef DISABLE_BFD
 
-  open_bfd_executable(filename);
+  open_bfd_executable (filename);
 
 #elif defined(USE_LIBDWARF)
 
-  open_dwarf_executable(filename);
+  open_dwarf_executable (filename);
 
 #endif
 
@@ -88,36 +91,39 @@ int mpiP_open_executable(char* filename)
 }
 
 
-void mpiP_close_executable()
+void
+mpiP_close_executable ()
 {
 #ifndef DISABLE_BFD
   close_bfd_executable ();
 #elif defined(USE_LIBDWARF)
-  close_dwarf_executable();
+  close_dwarf_executable ();
 #endif
 }
 
 /*  Returns current time in usec  */
-mpiP_TIMER mpiP_gettime()
+mpiP_TIMER
+mpiP_gettime ()
 {
   mpiPi_TIME currtime;
 
-  mpiPi_GETTIME(&currtime);
+  mpiPi_GETTIME (&currtime);
 
-  return mpiPi_GETUSECS(&currtime);
+  return mpiPi_GETUSECS (&currtime);
 }
 
-char* mpiP_get_executable_name()
+char *
+mpiP_get_executable_name ()
 {
   int ac;
-  char* av[1];
+  char *av[1];
 
 #ifdef Linux
-  return getProcExeLink();
+  return getProcExeLink ();
 #else
-   mpiPi_copy_args (&ac, av, 1);
-   if ( av[0] != NULL )
-      return av[0];
+  mpiPi_copy_args (&ac, av, 1);
+  if (av[0] != NULL)
+    return av[0];
 #endif
   return NULL;
 }

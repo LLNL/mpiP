@@ -86,7 +86,7 @@ h_insert (h_t * ht, void *ptr)
     Abort ("h_insert: ptr == NULL");
   het->ptr = ptr;
   het->next = NULL;
-  tableIndex = (ht->hf (ptr)) ;
+  tableIndex = (ht->hf (ptr));
   tableIndex %= (ht->size);
   if (ht->table[tableIndex] != NULL)
     {
@@ -157,7 +157,7 @@ h_delete (h_t * ht, void *key, void **ptr)
     Abort ("h_insert: key == NULL");
   *ptr = NULL;
   tableIndex = (ht->hf (key));
-  tableIndex %=   (ht->size);
+  tableIndex %= (ht->size);
   if (ht->table[tableIndex] != NULL)
     {
       /* search list for similar key  */

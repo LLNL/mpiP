@@ -57,16 +57,17 @@ static bfd_boolean found;
 #include <demangle.h>
 #include <string.h>
 
-char* mpiPdemangle(const char* mangledSym)
+char *
+mpiPdemangle (const char *mangledSym)
 {
   Name *ret;
   char *rest;
   unsigned long opts = 0x1;
 
-  ret = demangle((char*)mangledSym, &rest, opts);
+  ret = demangle ((char *) mangledSym, &rest, opts);
 
-  if ( ret != NULL )
-    return strdup(text(ret));
+  if (ret != NULL)
+    return strdup (text (ret));
   else
     return NULL;
 }
@@ -76,13 +77,15 @@ char* mpiPdemangle(const char* mangledSym)
 #include <demangle.h>
 #include <string.h>
 
-char* mpiPdemangle(const char* mangledSym)
+char *
+mpiPdemangle (const char *mangledSym)
 {
   char out[1024];
 
-  MLD_demangle_string(mangledSym, out, 1024, MLD_SHOW_INFO | MLD_SHOW_DEMANGLED_NAME);
+  MLD_demangle_string (mangledSym, out, 1024,
+		       MLD_SHOW_INFO | MLD_SHOW_DEMANGLED_NAME);
 
-  return strdup(out);
+  return strdup (out);
 }
 
 
@@ -96,7 +99,8 @@ char* mpiPdemangle(const char* mangledSym)
 extern char *cplus_demangle (const char *mangled, int options);
 #endif
 
-char* mpiPdemangle(const char* mangledSym)
+char *
+mpiPdemangle (const char *mangledSym)
 {
   return cplus_demangle (mangledSym, DMGL_ANSI | DMGL_PARAMS);
 }
@@ -125,78 +129,81 @@ find_address_in_section (abfd, section, data)
   local_pc = pc & 0xFFFFFFFF;
 #elif defined(AIX)
   local_pc = pc;
-  if ( mpiPi.obj_mode == 32 )
+  if (mpiPi.obj_mode == 32)
     local_pc -= 0x10000000;
   else
     local_pc &= 0x00000000FFFFFFFF;
   local_pc += mpiPi.text_start;
-  mpiPi_msg_debug("pc is 0x%lx, text_start is 0x%lx, local_pc is 0x%lx\n", pc, mpiPi.text_start, local_pc);
+  mpiPi_msg_debug ("pc is 0x%lx, text_start is 0x%lx, local_pc is 0x%lx\n",
+		   pc, mpiPi.text_start, local_pc);
 #else
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
 
   if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
-  {
-    mpiPi_msg_debug ("failed bfd_get_section_flags\n");
-    return;
-  }
+    {
+      mpiPi_msg_debug ("failed bfd_get_section_flags\n");
+      return;
+    }
   vma = bfd_get_section_vma (abfd, section);
 
   if (local_pc < vma)
-  {
-    mpiPi_msg_debug ("failed bfd_get_section_vma: local_pc=0x%lx  vma=0x%lx\n",
-      local_pc, vma);
-    return;
-  }
+    {
+      mpiPi_msg_debug
+	("failed bfd_get_section_vma: local_pc=0x%lx  vma=0x%lx\n", local_pc,
+	 vma);
+      return;
+    }
 
 /* The following define addresses binutils modifications between
  * version 2.15 and 2.15.96
  */
 #ifdef HAVE_BFD_GET_SECTION_SIZE
   size = bfd_get_section_size (section);
-#else      
-  if ( section->reloc_done )
-     size = bfd_get_section_size_after_reloc (section);
+#else
+  if (section->reloc_done)
+    size = bfd_get_section_size_after_reloc (section);
   else
-     size = bfd_get_section_size_before_reloc (section);
+    size = bfd_get_section_size_before_reloc (section);
 #endif
 
   if (local_pc >= vma + size)
-  {
-    mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
-  		     local_pc, vma, vma+size);
-    return;
-  }
+    {
+      mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
+		       local_pc, vma, vma + size);
+      return;
+    }
 
 
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
 
-  if ( !found )
-  {
-    mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%x vma=%x-%x\n",
-                     local_pc, vma, vma+size);
-  }
+  if (!found)
+    {
+      mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%x vma=%x-%x\n",
+		       local_pc, vma, vma + size);
+    }
 
   mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%x vma=%x-%x\n",
-                   local_pc, vma, vma+size);
+		   local_pc, vma, vma + size);
   mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
-                   filename, functionname, line);
+		   filename, functionname, line);
 }
 
 
 int
 mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
-	      char **o_funct_str)
+		   char **o_funct_str)
 {
   char buf[128];
   assert (i_addr_hex);
 
-  if ( abfd == NULL )
-  {
-    mpiPi_msg_debug("mpiP_find_src_loc returning failure as abfd == NULL\n");
-    return 1;
-  }
+  if (abfd == NULL)
+    {
+      mpiPi_msg_debug
+	("mpiP_find_src_loc returning failure as abfd == NULL\n");
+      return 1;
+    }
 
   sprintf (buf, "0x%lx", (unsigned long) i_addr_hex);
   pc = bfd_scan_vma (buf, NULL, 16);
@@ -209,7 +216,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
   if (!found)
     {
-      mpiPi_msg_debug("returning not found in mpiP_find_src_loc\n");
+      mpiPi_msg_debug ("returning not found in mpiP_find_src_loc\n");
       return 1;
     }
   else
@@ -224,7 +231,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	  char *res = NULL;
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-          res = mpiPdemangle(functionname);
+	  res = mpiPdemangle (functionname);
 #endif
 	  if (res == NULL)
 	    {
@@ -236,7 +243,8 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 	    }
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname, *o_funct_str);
+	  mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
+			   *o_funct_str);
 #endif
 	}
 
@@ -259,7 +267,8 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 }
 
 
-int open_bfd_executable (char *filename)
+int
+open_bfd_executable (char *filename)
 {
   char *target = NULL;
   char **matching = NULL;
@@ -267,18 +276,19 @@ int open_bfd_executable (char *filename)
   long symcount;
 
   if (filename == NULL)
-  {
-    mpiPi_msg_warn("Executable filename is NULL!\n");
-    mpiPi_msg_warn("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
-    return 0;
-  }
+    {
+      mpiPi_msg_warn ("Executable filename is NULL!\n");
+      mpiPi_msg_warn
+	("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+      return 0;
+    }
 
 #ifdef AIX
 
   /*  Kludge to get XCOFF text_start value to feed an approriate address
-      value to bfd for looking up source info
-  */
-  mpiPi.text_start = mpiPi_get_text_start(filename);
+     value to bfd for looking up source info
+   */
+  mpiPi.text_start = mpiPi_get_text_start (filename);
 #endif
 
   bfd_init ();
@@ -286,56 +296,56 @@ int open_bfd_executable (char *filename)
   mpiPi_msg_debug ("opening filename %s\n", filename);
   abfd = bfd_openr (filename, target);
   if (abfd == NULL)
-  {
-    mpiPi_msg_warn ("could not open filename %s", filename);
-    return 0;
-  }
-  if (bfd_check_format (abfd, bfd_archive))
-  {
-    mpiPi_msg_warn ("can not get addresses from archive");
-    bfd_close (abfd);
-    return 0;
-  }
-  if (!bfd_check_format_matches (abfd, bfd_object, &matching))
-  {
-    char *curr_match;
-    if (matching != NULL)
     {
-      for ( curr_match = matching[0]; curr_match != NULL; curr_match++ )
-        mpiPi_msg_debug ("found matching type %s\n", curr_match);
-      free(matching); 
+      mpiPi_msg_warn ("could not open filename %s", filename);
+      return 0;
     }
-    mpiPi_msg_warn ("matching failed");
-    bfd_close (abfd);
-    return 0;
-  }
-  
+  if (bfd_check_format (abfd, bfd_archive))
+    {
+      mpiPi_msg_warn ("can not get addresses from archive");
+      bfd_close (abfd);
+      return 0;
+    }
+  if (!bfd_check_format_matches (abfd, bfd_object, &matching))
+    {
+      char *curr_match;
+      if (matching != NULL)
+	{
+	  for (curr_match = matching[0]; curr_match != NULL; curr_match++)
+	    mpiPi_msg_debug ("found matching type %s\n", curr_match);
+	  free (matching);
+	}
+      mpiPi_msg_warn ("matching failed");
+      bfd_close (abfd);
+      return 0;
+    }
+
 #if 0
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
-  {
-    mpiPi_msg_warn ("No symbols in the executable\n");
-    bfd_close (abfd);
-    return 0;
-  }
+    {
+      mpiPi_msg_warn ("No symbols in the executable\n");
+      bfd_close (abfd);
+      return 0;
+    }
 #endif
   /* TODO: move this to the begining of the process so that the user
      knows before the application begins */
   storage = bfd_get_symtab_upper_bound (abfd);
   if (storage < 0)
-  {
-    mpiPi_msg_warn ("storage < 0");
-    bfd_close (abfd);
-    return 0;
-  }
+    {
+      mpiPi_msg_warn ("storage < 0");
+      bfd_close (abfd);
+      return 0;
+    }
   syms = (asymbol **) malloc (storage);
   symcount = bfd_canonicalize_symtab (abfd, syms);
 
   if (symcount < 0)
-  {
-    mpiPi_msg_warn ("symcount < 0");
-    bfd_close (abfd);
-    return 0;
-  }
+    {
+      mpiPi_msg_warn ("symcount < 0");
+      bfd_close (abfd);
+      return 0;
+    }
   else
     {
       mpiPi_msg_debug ("\n");
@@ -345,7 +355,8 @@ int open_bfd_executable (char *filename)
   return 1;
 }
 
-void close_bfd_executable ()
+void
+close_bfd_executable ()
 {
   assert (abfd);
   bfd_close (abfd);
@@ -355,12 +366,12 @@ void close_bfd_executable ()
 
 int
 mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
-	      char **o_funct_str)
+		   char **o_funct_str)
 {
-  return 1;  /*  failure  */
+  return 1;			/*  failure  */
 }
 
-#endif  /* DISABLE_BFD */
+#endif /* DISABLE_BFD */
 
 #ifdef AIX
 /*  Get the text_start value from the auxiliary header
@@ -373,7 +384,8 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 #include <aouthdr.h>
 #include <scnhdr.h>
 
-long mpiPi_get_text_start(char *filename)
+long
+mpiPi_get_text_start (char *filename)
 {
   int fh;
   short magic;
@@ -387,56 +399,58 @@ long mpiPi_get_text_start(char *filename)
   long text_start = 0;
   int count = 0;
 
-  fh = open(filename, O_RDONLY);
-  if ( fh == -1 )
+  fh = open (filename, O_RDONLY);
+  if (fh == -1)
     return 0;
 
-  read(fh, &magic, 2);
-  mpiPi_msg_debug("magic is 0x%x\n", magic);
-  lseek(fh, 0, 0);
+  read (fh, &magic, 2);
+  mpiPi_msg_debug ("magic is 0x%x\n", magic);
+  lseek (fh, 0, 0);
 
-  if ( magic == 0x01DF )  /* 32-bit  */
-  {
-    mpiPi.obj_mode = 32;
-    read(fh, &FileHeader32, sizeof(FILHDR));
-    mpiPi_msg_debug("aout size is %d\n", FileHeader32.f_opthdr);
-    read(fh, &AoutHeader32, FileHeader32.f_opthdr);
-    mpiPi_msg_debug("text start is 0x%lx\n", AoutHeader32.o_text_start);
-
-    while ( count++ < FileHeader32.f_nscns )
+  if (magic == 0x01DF)		/* 32-bit  */
     {
-      read(fh, &SectHeader32, sizeof(SCNHDR));
-      mpiPi_msg_debug("found header name %s\n", SectHeader32.s_name);
-      mpiPi_msg_debug("found header raw ptr 0x%lx\n", SectHeader32.s_scnptr);
-      if ( SectHeader32.s_flags & STYP_TEXT )
-         text_start = AoutHeader64.o_text_start - SectHeader32.s_scnptr;
-    }
-  }
-  else if ( magic == 0x01EF || magic == 0x01F7 ) /*  64-bit  */
-  {
-    mpiPi.obj_mode = 64;
-    read(fh, &FileHeader64, sizeof(FILHDR_64));
-    mpiPi_msg_debug("aout size is %d\n", FileHeader64.f_opthdr);
-    read(fh, &AoutHeader64, FileHeader64.f_opthdr);
-    mpiPi_msg_debug("text start is 0x%lx\n", AoutHeader64.o_text_start);
+      mpiPi.obj_mode = 32;
+      read (fh, &FileHeader32, sizeof (FILHDR));
+      mpiPi_msg_debug ("aout size is %d\n", FileHeader32.f_opthdr);
+      read (fh, &AoutHeader32, FileHeader32.f_opthdr);
+      mpiPi_msg_debug ("text start is 0x%lx\n", AoutHeader32.o_text_start);
 
-    while ( count++ < FileHeader64.f_nscns )
-    {
-      read(fh, &SectHeader64, sizeof(SCNHDR_64));
-      mpiPi_msg_debug("found header name %s\n", SectHeader64.s_name);
-      mpiPi_msg_debug("found header raw ptr 0x%lx\n", SectHeader64.s_scnptr);
-      if ( SectHeader64.s_flags & STYP_TEXT )
-         text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
+      while (count++ < FileHeader32.f_nscns)
+	{
+	  read (fh, &SectHeader32, sizeof (SCNHDR));
+	  mpiPi_msg_debug ("found header name %s\n", SectHeader32.s_name);
+	  mpiPi_msg_debug ("found header raw ptr 0x%lx\n",
+			   SectHeader32.s_scnptr);
+	  if (SectHeader32.s_flags & STYP_TEXT)
+	    text_start = AoutHeader64.o_text_start - SectHeader32.s_scnptr;
+	}
     }
-  }
+  else if (magic == 0x01EF || magic == 0x01F7)	/*  64-bit  */
+    {
+      mpiPi.obj_mode = 64;
+      read (fh, &FileHeader64, sizeof (FILHDR_64));
+      mpiPi_msg_debug ("aout size is %d\n", FileHeader64.f_opthdr);
+      read (fh, &AoutHeader64, FileHeader64.f_opthdr);
+      mpiPi_msg_debug ("text start is 0x%lx\n", AoutHeader64.o_text_start);
+
+      while (count++ < FileHeader64.f_nscns)
+	{
+	  read (fh, &SectHeader64, sizeof (SCNHDR_64));
+	  mpiPi_msg_debug ("found header name %s\n", SectHeader64.s_name);
+	  mpiPi_msg_debug ("found header raw ptr 0x%lx\n",
+			   SectHeader64.s_scnptr);
+	  if (SectHeader64.s_flags & STYP_TEXT)
+	    text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
+	}
+    }
   else
-  {
-    mpiPi_msg_debug("invalid magic number.\n");
-    return 0;
-  }
+    {
+      mpiPi_msg_debug ("invalid magic number.\n");
+      return 0;
+    }
 
-  mpiPi_msg_debug("text_start is 0x%lx\n", text_start);
-  close(fh);
+  mpiPi_msg_debug ("text_start is 0x%lx\n", text_start);
+  close (fh);
 
   return text_start;
 }
