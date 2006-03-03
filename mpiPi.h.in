@@ -60,7 +60,7 @@ typedef struct _callsite_stats
   double minIO;
   double cumulativeDataSent;
   double cumulativeIO;
-  long long arbitraryMessageCount; 
+  long long arbitraryMessageCount;
   double *siteData;
   int siteDataIdx;
   void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
@@ -107,16 +107,18 @@ mpiPi_lookup_t;
 
 extern mpiPi_lookup_t mpiPi_lookup[];
 
-enum { MPIP_MPI_TIME_FMT, MPIP_MPI_TIME_SUMMARY_FMT,
-       MPIP_AGGREGATE_TIME_FMT, MPIP_AGGREGATE_COV_TIME_FMT,
-       MPIP_AGGREGATE_MESS_FMT, MPIP_AGGREGATE_IO_FMT,
-       MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT, 
-       MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
-       MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT
+enum
+{ MPIP_MPI_TIME_FMT, MPIP_MPI_TIME_SUMMARY_FMT,
+  MPIP_AGGREGATE_TIME_FMT, MPIP_AGGREGATE_COV_TIME_FMT,
+  MPIP_AGGREGATE_MESS_FMT, MPIP_AGGREGATE_IO_FMT,
+  MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT,
+  MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
+  MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT
 };
 
-typedef enum { MPIP_REPORT_SCI_FORMAT, MPIP_REPORT_FLT_FORMAT } 
-  MPIP_REPORT_FORMAT_TYPE;
+typedef enum
+{ MPIP_REPORT_SCI_FORMAT, MPIP_REPORT_FLT_FORMAT }
+MPIP_REPORT_FORMAT_TYPE;
 
 typedef struct _mpiPi_t
 {
@@ -143,7 +145,7 @@ typedef struct _mpiPi_t
   mpiPi_TIME startTime;
   mpiPi_TIME endTime;
 
-  double cumulativeTime; /* necessary for pcontrol */
+  double cumulativeTime;	/* necessary for pcontrol */
   time_t start_timeofday;
   time_t stop_timeofday;
 
@@ -196,22 +198,22 @@ extern int mpiPi_debug;
 extern int mpiPi_do_demangle;
 
 #ifdef HAVE_MPIR_TOPOINTER
-extern void *MPIR_ToPointer( int idx );
+extern void *MPIR_ToPointer (int idx);
 #endif
 
-#if !defined(UNICOS_mp) 
+#if !defined(UNICOS_mp)
 
 /*  AIX  */
 #if defined(AIX)
 
-#if defined(__64BIT__)  /*  64-bit AIX  */
+#if defined(__64BIT__)		/*  64-bit AIX  */
 #define ParentFP(jb) ((void *) *(long *) jb[5])
-#else  /*  32-bit AIX  */
+#else /*  32-bit AIX  */
 #define ParentFP(jb) ((void *) *(long *) jb[3])
 #endif
 
 /*  For both 32-bit and 64-bit AIX  */
-#define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *)))) 
+#define FramePC(fp) ((void *) *(long *) (((long) fp) + (2 * sizeof (void *))))
 #define NextFP(fp) ((void *) *(long *) fp)
 
 /*  IA32 Linux  */
@@ -239,7 +241,7 @@ extern void *MPIR_ToPointer( int idx );
 #define NextFP(fp) ((void*)((void**)fp)[0])
 
 /*  undefined  */
-#else  
+#else
 #if ! defined(HAVE_LIBUNWIND)
 #warning "No stack trace mechanism defined for this platform."
 #endif

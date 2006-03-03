@@ -25,22 +25,22 @@ main (int argc, char **argv)
 
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (1);		/* enable */
-  sleep(2);
+  sleep (2);
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (0);		/* disable */
-  sleep(2);
+  sleep (2);
   MPI_Pcontrol (1);		/* enable */
-  sleep(2);
+  sleep (2);
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (0);		/* disable */
-  sleep(2);
+  sleep (2);
   MPI_Barrier (MPI_COMM_WORLD);
-  sleep(2);
+  sleep (2);
   MPI_Finalize ();
-  if(rank==0)
+  if (rank == 0)
     {
-      printf("\n\n ---> This program should execute for ~10 secs, \n"
-	     " ---> but MPIP should measure only ~4 secs.\n\n\n");
+      printf ("\n\n ---> This program should execute for ~10 secs, \n"
+	      " ---> but MPIP should measure only ~4 secs.\n\n\n");
     }
 }
 

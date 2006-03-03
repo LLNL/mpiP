@@ -109,7 +109,7 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
   return 0;
 }
 
-#ifndef ENABLE_API_ONLY /* { */
+#ifndef ENABLE_API_ONLY		/* { */
 /* task level init 
    - executed by each MPI task only once immediately after MPI_Init
 */
@@ -142,12 +142,12 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_io = 0.0;
   mpiPi.global_mpi_msize_threshold_count = 0.0;
   mpiPi.global_mpi_sent_count = 0.0;
-  
+
 
   /* set some defaults values */
   mpiPi.collectorRank = 0;
   mpiPi.tableSize = 256;
-  mpiPi.stackDepth = 1;  /* the value 2 includes parent wrapper function */
+  mpiPi.stackDepth = 1;		/* the value 2 includes parent wrapper function */
   mpiPi.reportPrintThreshold = 0.0;
   mpiPi.baseNames = 0;
   mpiPi.reportFormat = MPIP_REPORT_SCI_FORMAT;
@@ -167,23 +167,21 @@ mpiPi_init (char *appName)
       mpiPi_msg ("\n");
       mpiPi_msg ("%s V%d.%d.%d (Build %s/%s)\n", mpiPi.toolname, mpiPi_vmajor,
 		 mpiPi_vminor, mpiPi_vpatch, mpiPi_vdate, mpiPi_vtime);
-      mpiPi_msg
-
-	("Direct questions and errors to mpip-help@llnl.gov>\n");
+      mpiPi_msg ("Direct questions and errors to mpip-help@llnl.gov>\n");
       mpiPi_msg ("\n");
     }
 
   mpiPi_msg_debug ("appName is %s\n", appName);
   mpiPi_msg_debug ("successful init on %d, %s\n", mpiPi.rank, mpiPi.hostname);
 
-  if(mpiPi.enabled)
+  if (mpiPi.enabled)
     {
       mpiPi_GETTIME (&mpiPi.startTime);
     }
 
   return;
 }
-#endif  /* } ifndef ENABLE_API_ONLY */
+#endif /* } ifndef ENABLE_API_ONLY */
 
 
 typedef struct callsite_cache_entry_t
@@ -240,29 +238,30 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 #if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
-	  if ( *filename == NULL || strcmp(*filename, "??") == 0 )
-            *filename = "[unknown]";
-          
-	  if ( *functname == NULL )
-            *functname = "[unknown]";
-          
-    mpiPi_msg_debug ("Successful Source lookup for [0x%lx]: %s, %d, %s\n",
-         pc, *filename, *lineno, *functname);
+	  if (*filename == NULL || strcmp (*filename, "??") == 0)
+	    *filename = "[unknown]";
 
-          csp->filename = strdup (*filename);
-          csp->functname = strdup (*functname);
-          csp->line = *lineno;
+	  if (*functname == NULL)
+	    *functname = "[unknown]";
+
+	  mpiPi_msg_debug
+	    ("Successful Source lookup for [0x%lx]: %s, %d, %s\n", pc,
+	     *filename, *lineno, *functname);
+
+	  csp->filename = strdup (*filename);
+	  csp->functname = strdup (*functname);
+	  csp->line = *lineno;
 	}
       else
 	{
 	  mpiPi_msg_warn ("Unsuccessful Source lookup for [0x%x]\n", pc);
-	  csp->filename = strdup("[unknown]");
-	  csp->functname = strdup("[unknown]");
+	  csp->filename = strdup ("[unknown]");
+	  csp->functname = strdup ("[unknown]");
 	  csp->line = 0;
 	}
 #else /* ! DISABLE_BFD */
-      csp->filename = strdup("[unknown]");
-      csp->functname = strdup("[unknown]");
+      csp->filename = strdup ("[unknown]");
+      csp->functname = strdup ("[unknown]");
       csp->line = 0;
 #endif
       h_insert (callsite_pc_cache, csp);
@@ -293,27 +292,27 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
       if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
-      {
-      if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
 	{
-	  return 1;
+	  if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
+	    {
+	      return 1;
+	    }
+	  if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
+	    {
+	      return -1;
+	    }
+	  express (line[i]);
+	  if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
+	    {
+	      return 1;
+	    }
+	  if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
+	    {
+	      return -1;
+	    }
 	}
-      if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
-	{
-	  return -1;
-	}
-      express (line[i]);
-      if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
-	{
-	  return 1;
-	}
-      if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
-	{
-	  return -1;
-	}
-      }
 
-      express(pc[i]);
+      express (pc[i]);
     }
 #undef express
   return 0;
@@ -327,17 +326,17 @@ callsite_src_id_cache_hashkey (const void *p1)
   callsite_src_id_cache_entry_t *cs1 = (callsite_src_id_cache_entry_t *) p1;
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
-      if ( cs1->filename[i] != NULL )
-      {
-      for (j = 0; cs1->filename[i][j] != '\0'; j++)
+      if (cs1->filename[i] != NULL)
 	{
-	  res ^= (unsigned) cs1->filename[i][j];
+	  for (j = 0; cs1->filename[i][j] != '\0'; j++)
+	    {
+	      res ^= (unsigned) cs1->filename[i][j];
+	    }
+	  for (j = 0; cs1->functname[i][j] != '\0'; j++)
+	    {
+	      res ^= (unsigned) cs1->functname[i][j];
+	    }
 	}
-      for (j = 0; cs1->functname[i][j] != '\0'; j++)
-	{
-	  res ^= (unsigned) cs1->functname[i][j];
-	}
-      }
       res ^= cs1->line[i];
     }
   return 662917 ^ res;
@@ -361,15 +360,15 @@ mpiPi_query_src (callsite_stats_t * p)
 
   for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
     {
-      if ( mpiPi.do_lookup == 1 )
-        mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
-  		        &(p->lineno[i]));
+      if (mpiPi.do_lookup == 1)
+	mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
+			&(p->lineno[i]));
       else
-      {
-        p->filename[i] = strdup("[unknown]");
-        p->functname[i] = strdup("[unknown]");
-        p->lineno[i] = 0;
-      }
+	{
+	  p->filename[i] = strdup ("[unknown]");
+	  p->functname[i] = strdup ("[unknown]");
+	  p->lineno[i] = 0;
+	}
 
       key.filename[i] = p->filename[i];
       key.functname[i] = p->functname[i];
@@ -377,14 +376,14 @@ mpiPi_query_src (callsite_stats_t * p)
       key.pc[i] = p->pc[i];
 
       /*  Do not bother recording frames above main  */
-      if ( p->functname[i] != NULL && 
-           ( strcmp(p->functname[i], "MAIN__") == 0 || 
-             strcmp(p->functname[i], "main") == 0   ||
-             strcmp(p->functname[i], ".main") == 0 ) )
-        {
-          p->pc[i+1] = NULL;
-          break;
-        }
+      if (p->functname[i] != NULL &&
+	  (strcmp (p->functname[i], "MAIN__") == 0 ||
+	   strcmp (p->functname[i], "main") == 0 ||
+	   strcmp (p->functname[i], ".main") == 0))
+	{
+	  p->pc[i + 1] = NULL;
+	  break;
+	}
     }
 
   /* lookup/generate an ID based on the callstack, not just the callsite pc */
@@ -401,7 +400,7 @@ mpiPi_query_src (callsite_stats_t * p)
 	  csp->filename[i] = strdup (key.filename[i]);
 	  csp->functname[i] = strdup (key.functname[i]);
 	  csp->line[i] = key.line[i];
-          csp->pc[i] = p->pc[i];
+	  csp->pc[i] = p->pc[i];
 	}
       csp->id = callsite_src_id_counter++;
       csp->op = p->op;
@@ -414,17 +413,17 @@ mpiPi_query_src (callsite_stats_t * p)
 }
 
 
-static int mpiPi_insert_callsite_records(callsite_stats_t *p)
+static int
+mpiPi_insert_callsite_records (callsite_stats_t * p)
 {
   callsite_stats_t *csp = NULL;
 
-  mpiPi_query_src (p);	/* sets the file/line in p */
-          
+  mpiPi_query_src (p);		/* sets the file/line in p */
+
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
      one src line. We aggregate across rank after this. */
-  if (NULL ==
-      h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
+  if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
     {
       int j;
       callsite_stats_t *newp = NULL;
@@ -433,12 +432,12 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
       newp->op = p->op;
       newp->rank = p->rank;
       for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
-        {
-          newp->pc[j] = p->pc[j];
-          newp->filename[j] = p->filename[j];
-          newp->functname[j] = p->functname[j];
-          newp->lineno[j] = p->lineno[j];
-        }
+	{
+	  newp->pc[j] = p->pc[j];
+	  newp->filename[j] = p->filename[j];
+	  newp->functname[j] = p->functname[j];
+	  newp->lineno[j] = p->lineno[j];
+	}
       newp->csid = p->csid;
       newp->count = p->count;
       newp->cumulativeTime = p->cumulativeTime;
@@ -461,9 +460,9 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
     {
       csp->count += p->count;
       csp->cumulativeTime += p->cumulativeTime;
-      assert( csp->cumulativeTime >= 0 );
+      assert (csp->cumulativeTime >= 0);
       csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
-      assert( csp->cumulativeTimeSquared >= 0 );
+      assert (csp->cumulativeTimeSquared >= 0);
       csp->maxDur = max (csp->maxDur, p->maxDur);
       csp->minDur = min (csp->minDur, p->minDur);
       csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
@@ -476,8 +475,7 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
     }
 
   /* agg. Don't use rank */
-  if (NULL ==
-      h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
+  if (NULL == h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
     {
       int j;
       callsite_stats_t *newp = NULL;
@@ -486,12 +484,12 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
       newp->op = p->op;
       newp->rank = -1;
       for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
-        {
-          newp->pc[j] = p->pc[j];
-          newp->filename[j] = p->filename[j];
-          newp->functname[j] = p->functname[j];
-          newp->lineno[j] = p->lineno[j];
-        }
+	{
+	  newp->pc[j] = p->pc[j];
+	  newp->filename[j] = p->filename[j];
+	  newp->functname[j] = p->functname[j];
+	  newp->lineno[j] = p->lineno[j];
+	}
       newp->csid = p->csid;
       newp->count = p->count;
       newp->cumulativeTime = p->cumulativeTime;
@@ -506,12 +504,12 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
       newp->minIO = p->minIO;
       newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
-      if ( mpiPi.calcCOV )
-        {
-          newp->siteData = (double*)malloc(mpiPi.size*sizeof(double));
-          newp->siteData[0] = p->cumulativeTime;
-          newp->siteDataIdx = 1;
-        }
+      if (mpiPi.calcCOV)
+	{
+	  newp->siteData = (double *) malloc (mpiPi.size * sizeof (double));
+	  newp->siteData[0] = p->cumulativeTime;
+	  newp->siteDataIdx = 1;
+	}
 
       /* insert new record into global */
       h_insert (mpiPi.global_callsite_stats_agg, newp);
@@ -520,9 +518,9 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
     {
       csp->count += p->count;
       csp->cumulativeTime += p->cumulativeTime;
-      assert( csp->cumulativeTime >= 0 );
+      assert (csp->cumulativeTime >= 0);
       csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
-      assert( csp->cumulativeTimeSquared >= 0 );
+      assert (csp->cumulativeTimeSquared >= 0);
       csp->maxDur = max (csp->maxDur, p->maxDur);
       csp->minDur = min (csp->minDur, p->minDur);
       csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
@@ -532,18 +530,18 @@ static int mpiPi_insert_callsite_records(callsite_stats_t *p)
       csp->minIO = min (csp->minIO, p->minIO);
       csp->cumulativeIO += p->cumulativeIO;
 
-      if ( mpiPi.calcCOV )
-        {
-          csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
-          csp->siteDataIdx += 1;
-        }
+      if (mpiPi.calcCOV)
+	{
+	  csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
+	  csp->siteDataIdx += 1;
+	}
     }
 
   return 1;
 }
 
 
-#ifndef ENABLE_API_ONLY /* { */
+#ifndef ENABLE_API_ONLY		/* { */
 
 int
 mpiPi_mergeResults ()
@@ -563,7 +561,7 @@ mpiPi_mergeResults ()
   PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
 	       mpiPi.comm);
 
-  if ( totalCount < 1 ) 
+  if (totalCount < 1)
     {
       mpiPi_msg_warn
 	("Collector found no records to merge. Omitting report.\n");
@@ -577,24 +575,24 @@ mpiPi_mergeResults ()
       int ndx = 0;
 
 #ifndef DISABLE_BFD
-      if ( mpiPi.appFullName != NULL )
-      {
-        if ( open_bfd_executable (mpiPi.appFullName) == 0 )
-	  mpiPi.do_lookup = 0;
-      }
+      if (mpiPi.appFullName != NULL)
+	{
+	  if (open_bfd_executable (mpiPi.appFullName) == 0)
+	    mpiPi.do_lookup = 0;
+	}
 #elif defined(USE_LIBDWARF)
-      if( mpiPi.appFullName != NULL )
-      {
-        if ( open_dwarf_executable( mpiPi.appFullName ) == 0 )
-	  mpiPi.do_lookup = 0;
-      }
+      if (mpiPi.appFullName != NULL)
+	{
+	  if (open_dwarf_executable (mpiPi.appFullName) == 0)
+	    mpiPi.do_lookup = 0;
+	}
 #endif
 #if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
       else
-      {
-    	mpiPi_msg_warn("Failed to open executable\n");
-	mpiPi.do_lookup = 0;
-      }
+	{
+	  mpiPi_msg_warn ("Failed to open executable\n");
+	  mpiPi.do_lookup = 0;
+	}
 #endif
       /* convert data to src line; merge, if nec */
       mpiPi.global_callsite_stats = h_open (mpiPi.tableSize,
@@ -614,14 +612,14 @@ mpiPi_mergeResults ()
 	(callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
       for (ndx = 0; ndx < ac; ndx++)
 	{
-      	  mpiPi_insert_callsite_records(av[ndx]);
+	  mpiPi_insert_callsite_records (av[ndx]);
 	}
       ndx = 0;
       for (i = 1; i < mpiPi.size; i++)	/* n-1 */
 	{
 	  MPI_Status status;
 	  int count;
-          int j;
+	  int j;
 
 	  /* okay in any order */
 	  PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
@@ -629,12 +627,12 @@ mpiPi_mergeResults ()
 	  PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
 		     status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
 	  count /= sizeof (callsite_stats_t);
-          for ( j = 0; j < count; j++ )
-            {
-              mpiPi_insert_callsite_records(&(mpiPi.rawCallsiteData[j]));
-            }
+	  for (j = 0; j < count; j++)
+	    {
+	      mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+	    }
 	}
-      free(mpiPi.rawCallsiteData);
+      free (mpiPi.rawCallsiteData);
     }
   else
     {
@@ -656,15 +654,15 @@ mpiPi_mergeResults ()
 
   if (mpiPi.rank == mpiPi.collectorRank)
     {
-      if ( mpiPi.do_lookup == 1 )
-      {
+      if (mpiPi.do_lookup == 1)
+	{
 #ifndef DISABLE_BFD
-        /* clean up */
-        close_bfd_executable();
+	  /* clean up */
+	  close_bfd_executable ();
 #elif defined(USE_LIBDWARF)
-        close_dwarf_executable();
+	  close_dwarf_executable ();
 #endif
-      }
+	}
     }
 
   return 1;
@@ -686,8 +684,7 @@ mpiPi_publishResults ()
     }
 
   /* take the final data from merge and display in a nice format */
-  if (0 ==
-      h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av))
+  if (0 == h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av))
     {
       mpiPi_msg_warn ("Global callsite table empty! Aborting report!\n");
       return;
@@ -713,12 +710,12 @@ mpiPi_publishResults ()
       }
 
     do
-    {
-      printCount++;
-      sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
-               mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
-    }
-    while ( access ( mpiPi.oFilename, F_OK ) == 0 ) ;
+      {
+	printCount++;
+	sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+		 mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+      }
+    while (access (mpiPi.oFilename, F_OK) == 0);
 
     fp = fopen (mpiPi.oFilename, "w");
   }
@@ -783,32 +780,33 @@ mpiPi_collect_basics ()
       {
 	mpiPi.global_task_info =
 	  (mpiPi_task_info_t *) calloc (mpiPi.size,
-		sizeof (mpiPi_task_info_t));
-      if ( mpiPi.global_task_info == NULL )
-        mpiPi_abort("Failed to allocate memory for global task_info");
+					sizeof (mpiPi_task_info_t));
+	if (mpiPi.global_task_info == NULL)
+	  mpiPi_abort ("Failed to allocate memory for global task_info");
 
 	bzero (mpiPi.global_task_info,
 	       mpiPi.size * sizeof (mpiPi_task_info_t));
 
-        recv_req_arr = (MPI_Request*) malloc (sizeof (MPI_Request)*mpiPi.size);
+	recv_req_arr =
+	  (MPI_Request *) malloc (sizeof (MPI_Request) * mpiPi.size);
 	for (i = 0; i < mpiPi.size; i++)
 	  {
 	    mpiPi_task_info_t *p = &mpiPi.global_task_info[i];
 	    if (i != mpiPi.collectorRank)
 	      {
 		PMPI_Irecv (p, 1, mti_type, i, mpiPi.tag,
-			   mpiPi.comm, &(recv_req_arr[i]));
+			    mpiPi.comm, &(recv_req_arr[i]));
 	      }
 	    else
 	      {
 		strcpy (p->hostname, mpiPi.hostname);
 		p->app_time = app_time;
 		p->rank = mpiPi.rank;
-                recv_req_arr[i] = MPI_REQUEST_NULL;
+		recv_req_arr[i] = MPI_REQUEST_NULL;
 	      }
 	  }
-        PMPI_Waitall(mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
-        free(recv_req_arr);
+	PMPI_Waitall (mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
+	free (recv_req_arr);
       }
     else
       {
@@ -835,11 +833,12 @@ mpiPi_generateReport ()
 
   mpiPi_GETTIME (&mpiPi.endTime);
 
-  if(mpiPi.enabled)
+  if (mpiPi.enabled)
     {
-      dur = (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime)/1000000.0);
+      dur =
+	(mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
       mpiPi.cumulativeTime += dur;
-      assert( mpiPi.cumulativeTime >= 0 );
+      assert (mpiPi.cumulativeTime >= 0);
     }
 
   if (time (&mpiPi.stop_timeofday) == (time_t) - 1)
@@ -848,33 +847,33 @@ mpiPi_generateReport ()
     }
 
   /* collect results and publish */
-  mpiPi_msg_debug0("starting collect_basics\n");
+  mpiPi_msg_debug0 ("starting collect_basics\n");
 
   mpiPi_GETTIME (&timer_start);
   mpiPi_collect_basics ();
   mpiPi_GETTIME (&timer_end);
-  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
-  mpiPi_msg_debug0("TIMING : collect_basics_time is %f\n", dur);
+  mpiPi_msg_debug0 ("TIMING : collect_basics_time is %f\n", dur);
 
-  mpiPi_msg_debug0("starting mergeResults\n");
+  mpiPi_msg_debug0 ("starting mergeResults\n");
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
   mpiPi_GETTIME (&timer_end);
-  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
+  dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
-  mpiPi_msg_debug0("TIMING : merge time is %f\n", dur);
-  mpiPi_msg_debug0("starting publishResults\n");
+  mpiPi_msg_debug0 ("TIMING : merge time is %f\n", dur);
+  mpiPi_msg_debug0 ("starting publishResults\n");
 
-  if ( mergeResult == 1 )
-  {
-    mpiPi_GETTIME (&timer_start);
-    mpiPi_publishResults ();
-    mpiPi_GETTIME (&timer_end);
-    dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start)/1000000.0);
-    mpiPi_msg_debug0("TIMING : publish time is %f\n", dur);
-  }
+  if (mergeResult == 1)
+    {
+      mpiPi_GETTIME (&timer_start);
+      mpiPi_publishResults ();
+      mpiPi_GETTIME (&timer_end);
+      dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
+      mpiPi_msg_debug0 ("TIMING : publish time is %f\n", dur);
+    }
 
 }
 
@@ -882,7 +881,7 @@ mpiPi_generateReport ()
 void
 mpiPi_finalize ()
 {
-  mpiPi_generateReport();
+  mpiPi_generateReport ();
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
@@ -899,7 +898,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   callsite_stats_t *csp = NULL;
   callsite_stats_t key;
 
-  if(!mpiPi.enabled)
+  if (!mpiPi.enabled)
     return;
 
 /*  fprintf(stderr, "received sendSize of %f\n", sendSize); */
@@ -937,9 +936,9 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   /* ASSUME: csp cannot be deleted from list */
   csp->count++;
   csp->cumulativeTime += dur;
-  assert( csp->cumulativeTime >= 0 );
+  assert (csp->cumulativeTime >= 0);
   csp->cumulativeTimeSquared += (dur * dur);
-  assert( csp->cumulativeTimeSquared >= 0 );
+  assert (csp->cumulativeTimeSquared >= 0);
   csp->maxDur = max (csp->maxDur, dur);
   csp->minDur = min (csp->minDur, dur);
   csp->cumulativeDataSent += sendSize;
@@ -951,14 +950,17 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   csp->maxIO = max (csp->maxIO, ioSize);
   csp->minIO = min (csp->minIO, ioSize);
 
-  
-  if ( mpiPi.messageCountThreshold > -1 && sendSize >= (double)mpiPi.messageCountThreshold )
+
+  if (mpiPi.messageCountThreshold > -1
+      && sendSize >= (double) mpiPi.messageCountThreshold)
     csp->arbitraryMessageCount++;
 
 #if 0
-  mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n", mpiPi.messageCountThreshold);
+  mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n",
+		   mpiPi.messageCountThreshold);
   mpiPi_msg_debug ("sendSize is %f\n", sendSize);
-  mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n", csp->arbitraryMessageCount);
+  mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n",
+		   csp->arbitraryMessageCount);
 #endif
 
   return;

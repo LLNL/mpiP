@@ -15,7 +15,8 @@ int dest, src;
 float data = 0.0;
 
 
-void sendData()
+void
+sendData ()
 {
   dest = (rank == nprocs - 1) ? (0) : (rank + 1);
   data = rank;
@@ -25,7 +26,8 @@ void sendData()
 }
 
 
-void recvData()
+void
+recvData ()
 {
   int src = (rank == 0) ? (nprocs - 1) : (rank - 1);
   MPI_Status status;
@@ -35,20 +37,21 @@ void recvData()
 }
 
 
-void exchangeData()
+void
+exchangeData ()
 {
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier (MPI_COMM_WORLD);
 
-  if ( rank % 2 )
-  {
-    sendData();
-    recvData();
-  }
+  if (rank % 2)
+    {
+      sendData ();
+      recvData ();
+    }
   else
-  {
-    recvData();
-    sendData();
-  }
+    {
+      recvData ();
+      sendData ();
+    }
 }
 
 
@@ -66,9 +69,9 @@ main (int argc, char **argv)
   printf ("(%d) is alive on %s\n", rank, processor_name);
   fflush (stdout);
 
-  exchangeData();
+  exchangeData ();
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier (MPI_COMM_WORLD);
 
   MPI_Finalize ();
   printf ("(%d) Finished normally\n", rank);
