@@ -24,23 +24,24 @@
 #ifndef __CEXTRACT__
 #if __STDC__
 
-extern void mpiP_init_api ( void );
-extern int mpiP_record_traceback ( void* pc_array[], int max_stack );
-extern int mpiP_open_executable ( char* filename );
-extern void mpiP_close_executable ( void );
-extern mpiP_TIMER mpiP_gettime ( void );
-extern char* mpiP_get_executable_name ( void );
-extern int mpiP_find_src_loc ( void *i_addr_hex, char **o_file_str, int *o_lineno, char **o_funct_str );
+extern void mpiP_init_api (void);
+extern int mpiP_record_traceback (void *pc_array[], int max_stack);
+extern int mpiP_open_executable (char *filename);
+extern void mpiP_close_executable (void);
+extern mpiP_TIMER mpiP_gettime (void);
+extern char *mpiP_get_executable_name (void);
+extern int mpiP_find_src_loc (void *i_addr_hex, char **o_file_str,
+			      int *o_lineno, char **o_funct_str);
 
 
 #else /* __STDC__ */
 
-extern void mpiP_init_api (/* void */);
-extern int mpiP_record_traceback (/* void* pc_array[], int max_stack */);
-extern int mpiP_open_executable (/* char* filename */);
-extern void mpiP_close_executable (/* void */);
-extern mpiP_TIMER mpiP_gettime (/* void */);
-extern char* mpiP_get_executable_name (/* void */);
-extern int mpiP_find_src_loc (/* void */);
+extern void mpiP_init_api ( /* void */ );
+extern int mpiP_record_traceback ( /* void* pc_array[], int max_stack */ );
+extern int mpiP_open_executable ( /* char* filename */ );
+extern void mpiP_close_executable ( /* void */ );
+extern mpiP_TIMER mpiP_gettime ( /* void */ );
+extern char *mpiP_get_executable_name ( /* void */ );
+extern int mpiP_find_src_loc ( /* void */ );
 #endif /* __STDC__ */
 #endif /* __CEXTRACT__ */

@@ -34,4 +34,3 @@
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %lf usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
 
 #endif /* _CRAYX1_LOCAL_H */
-

@@ -9,126 +9,133 @@
 int depth = 0;
 int target_depth = 0;
 
-void thisIsTheTargetFunction()
+void
+thisIsTheTargetFunction ()
 {
   void **pc_array = NULL;
   char *file, *func;
   int i, line_no;
 
-  pc_array = malloc(sizeof(void*)*target_depth);
+  pc_array = malloc (sizeof (void *) * target_depth);
 
-  mpiP_record_traceback(pc_array, target_depth);
+  mpiP_record_traceback (pc_array, target_depth);
 
 #ifdef TESTING
-  file = malloc(MAX_STRING);
-  func = malloc(MAX_STRING);
-  for ( i = 0; i < target_depth && pc_array[i] != NULL; i++ )
-  {
-      if ( mpiP_find_src_loc(pc_array[i], &file, &line_no, &func) == 0 )
-        {
-          printf("found 0x%0x = file:%s  line:%d  func:%s\n", pc_array[i],
-                 file, line_no, func);
-        }
+  file = malloc (MAX_STRING);
+  func = malloc (MAX_STRING);
+  for (i = 0; i < target_depth && pc_array[i] != NULL; i++)
+    {
+      if (mpiP_find_src_loc (pc_array[i], &file, &line_no, &func) == 0)
+	{
+	  printf ("found 0x%0x = file:%s  line:%d  func:%s\n", pc_array[i],
+		  file, line_no, func);
+	}
       else
-        printf("lookup failed for 0x%x\n", pc_array[i]);
-  }
-  free(file);
-  free(func);
+	printf ("lookup failed for 0x%x\n", pc_array[i]);
+    }
+  free (file);
+  free (func);
 #endif
 
-  free(pc_array);
+  free (pc_array);
 }
 
-void  thisIsTheTopLevelFunction()
+void
+thisIsTheTopLevelFunction ()
 {
-  if ( depth == target_depth )
-    thisIsTheTargetFunction();
+  if (depth == target_depth)
+    thisIsTheTargetFunction ();
   else
-  {
-    depth++;
-    thisIsTheTopLevelFunction();
-  }
+    {
+      depth++;
+      thisIsTheTopLevelFunction ();
+    }
 }
 
-void  getStackWalkOH(char* infile, int target_depth, long iters)
+void
+getStackWalkOH (char *infile, int target_depth, long iters)
 {
   long idx;
   mpiP_TIMER start, end;
 
 #ifdef TESTING
-  if ( mpiP_open_executable(infile) != 0 )
-  {
-  	fprintf(stderr, "failed to open %s\n", infile);
-	exit(1);
-  }
+  if (mpiP_open_executable (infile) != 0)
+    {
+      fprintf (stderr, "failed to open %s\n", infile);
+      exit (1);
+    }
 #endif
 
-  start = mpiP_gettime();
-  for ( idx = 0; idx < iters; idx++ )
-  {
-    thisIsTheTopLevelFunction();
-  }
-  end = mpiP_gettime();
+  start = mpiP_gettime ();
+  for (idx = 0; idx < iters; idx++)
+    {
+      thisIsTheTopLevelFunction ();
+    }
+  end = mpiP_gettime ();
 
 #ifdef TESTING
-  mpiP_close_executable();
+  mpiP_close_executable ();
 #endif
 
-  printf("\nStackwalk OH testing\n");
-  printf("target_depth is     %d\n", target_depth);
-  printf("start is            %f\n", start);
-  printf("end   is            %f\n", end);
-  printf("time diff is        %.9f sec\n", ((double)end - start)/1000000);
-  printf("time/stack walk     %.9f sec\n", (((double)end - start)/1000000)/iters);
-  printf("time/stack level is %.9f sec\n", (((double)end - start)/1000000)/(target_depth * iters));
+  printf ("\nStackwalk OH testing\n");
+  printf ("target_depth is     %d\n", target_depth);
+  printf ("start is            %f\n", start);
+  printf ("end   is            %f\n", end);
+  printf ("time diff is        %.9f sec\n", ((double) end - start) / 1000000);
+  printf ("time/stack walk     %.9f sec\n",
+	  (((double) end - start) / 1000000) / iters);
+  printf ("time/stack level is %.9f sec\n",
+	  (((double) end - start) / 1000000) / (target_depth * iters));
 }
 
 
-void  getGranAndOH(long iters)
+void
+getGranAndOH (long iters)
 {
   mpiP_TIMER start, end;
   long idx;
 
-  printf("\nGranularity Testing\n");
-  printf("\nUsing timer : %s\n", mpiPi_TIMER_NAME);
-  while ( mpiP_gettime() == (start = mpiP_gettime()) )
-  {
-  	fprintf(stderr, "start is %f\n", start);
-  }
-  while ( start == (end = mpiP_gettime()) );
+  printf ("\nGranularity Testing\n");
+  printf ("\nUsing timer : %s\n", mpiPi_TIMER_NAME);
+  while (mpiP_gettime () == (start = mpiP_gettime ()))
+    {
+      fprintf (stderr, "start is %f\n", start);
+    }
+  while (start == (end = mpiP_gettime ()));
 
-  printf("start is %f\n", start);
-  printf("end   is %f\n", end);
-  printf("timer granularity appears to be <%f usec\n\n", end-start);
+  printf ("start is %f\n", start);
+  printf ("end   is %f\n", end);
+  printf ("timer granularity appears to be <%f usec\n\n", end - start);
 
-  while ( mpiP_gettime() == (start = mpiP_gettime()) );
-  for ( idx = 0; idx < iters; idx++ )
-    end = mpiP_gettime();
+  while (mpiP_gettime () == (start = mpiP_gettime ()));
+  for (idx = 0; idx < iters; idx++)
+    end = mpiP_gettime ();
 
-  printf("\nOH Testing\n");
-  printf("start is %f\n", start);
-  printf("end   is %f\n", end);
-  printf("timer OH appears to be %f usec\n", (end-start)/iters);
+  printf ("\nOH Testing\n");
+  printf ("start is %f\n", start);
+  printf ("end   is %f\n", end);
+  printf ("timer OH appears to be %f usec\n", (end - start) / iters);
 }
 
 
-main(int argc, char* argv[])
+main (int argc, char *argv[])
 {
-  char* infile;
+  char *infile;
   long iters;
   mpiP_TIMER start, end;
 
-  if ( argc != 3 )
-  {
-    fprintf(stderr, "arguments are target stack depth and test loop interations.\n");
-    exit(1);
-  }
+  if (argc != 3)
+    {
+      fprintf (stderr,
+	       "arguments are target stack depth and test loop interations.\n");
+      exit (1);
+    }
 
   infile = argv[0];
-  target_depth = atoi(argv[1]);
-  iters = atol(argv[2]);
+  target_depth = atoi (argv[1]);
+  iters = atol (argv[2]);
 
-  getStackWalkOH(infile, target_depth, iters);
+  getStackWalkOH (infile, target_depth, iters);
 
-  getGranAndOH(iters);
+  getGranAndOH (iters);
 }

@@ -26,19 +26,20 @@ main (int argc, char **argv)
 	  nprocs, rank, buf);
 
   MPI_Barrier (MPI_COMM_WORLD);
-  sleep(1);
+  sleep (1);
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (2);		/* generate report */
   MPI_Barrier (MPI_COMM_WORLD);
-  exit(1);
+  exit (1);
 #if 0
-  sleep(1);
+  sleep (1);
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (-1);		/* generate report */
-  sleep(1);
+  sleep (1);
   MPI_Barrier (MPI_COMM_WORLD);
-  sleep(1);
+  sleep (1);
   MPI_Finalize ();
 #endif
 }
+
 				 /* EOF */

@@ -248,4 +248,7 @@ distclean: clean
 
 include Check.mak
 
+indent:
+	indent *.c *.h *.h.in testing/*.c timers/*.h timers/*.h.in
+
 ##### EOF
