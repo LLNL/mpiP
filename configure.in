@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 CPPFLAGS=
 LDFLAGS=
-AC_PREFIX_DEFAULT("..")
+AC_PREFIX_DEFAULT(".")
 cross_compiling=yes
 echo
 echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in"
