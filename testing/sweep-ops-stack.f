@@ -94,8 +94,8 @@ c ---  the mpi features that sweep3D uses.
       call mpi_init(info)
       print *,'successfully called init.'
 
-      call mpi_comm_size(MPI_COMM_WORLD, size, info);
-      call mpi_comm_rank(MPI_COMM_WORLD, rank, info);
+      call mpi_comm_size(MPI_COMM_WORLD, size, info)
+      call mpi_comm_rank(MPI_COMM_WORLD, rank, info)
       print *,'size = ', size, ' rank = ', rank
 
       if(size.ne.4)then
