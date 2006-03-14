@@ -299,7 +299,7 @@ fi
 #  If using Fortran routines to access command line,
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
-FORTRAN_GETARG=getarg
+FORTRAN_GETARG=""
 if test "$USE_GETARG" = true ; then
      AC_LANG_PUSH(Fortran 77)
      # Force Fortran compiler tests
@@ -312,13 +312,16 @@ if test "$USE_GETARG" = true ; then
        character*10 val
        call get_command_argument(0, val, len)]] ) ],
 	      AC_MSG_RESULT([using get_command_argument]) 
-                FORTRAN_GETARG=get_command_argument,
+                echo "       call get_command_argument(idx, buf, len)" > getarg.src
+                FORTRAN_GETARG=getarg.src,
               AC_MSG_RESULT(using getarg) 
-                FORTRAN_GETARG=getarg
+	      echo "       call getarg(idx, buf)" > getarg.src
+	      echo "       len = mpipi_get_strlen(buf)" >> getarg.src
+	      FORTRAN_GETARG=getarg.src
+              AC_SUBST_FILE(FORTRAN_GETARG)
                 )
      AC_LANG_POP(Fortran 77)
 fi
-AC_SUBST(FORTRAN_GETARG)
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -355,7 +358,7 @@ if test -n "$F77" -a "$F77" != no ; then
     AC_MSG_RESULT(giving up)
     AC_MSG_ERROR(could not determine F77 symbol names)
   fi
-  /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
+  #/bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
   F77_SYMBOLS=symbol_
   AC_MSG_RESULT(guessing lowercase with underscore)
@@ -405,6 +408,13 @@ else
   FORTRAN_FLAG=
   FORTRAN_TARGET=
 fi
+
+if test x"$F77_VENDOR" = x"IBM" ; then
+  FORTRAN_STR_DECL="character (buf_len) buf"
+else
+  FORTRAN_STR_DECL="character buf*(*)"
+fi
+
 fi #if test "$ENABLE_API_ONLY" = no ; then
 
 AC_MSG_RESULT($F77_VENDOR)
@@ -412,6 +422,10 @@ AC_SUBST(F77_VENDOR,$F77_VENDOR)
 AC_SUBST(MPIPFLIB,$MPIPFLIB)
 AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
+AC_SUBST(FORTRAN_STR_DECL, $FORTRAN_STR_DECL)
 AC_SUBST_FILE(HAVE_MPI_IO)
+AC_SUBST_FILE(FORTRAN_GETARG)
 
 AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h])
+
+rm -f getarg.src
