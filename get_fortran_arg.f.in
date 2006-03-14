@@ -13,13 +13,28 @@
 !   get_fortran_arg.f -- access fortran command line arguments
 !
 
+       function mpipi_get_strlen(str)
+       integer i
+       character str*(*)
+
+       i = len(str)
+
+       do while (str(i:i) .eq. ' ')
+         i = i - 1
+       enddo
+
+       strlen = i
+       return
+       end
+
+
        subroutine mpipi_get_fortran_argc(argc_val)
        !DEC$ attributes REFERENCE :: argc_val
        integer argc_val
 
        argc_val = iargc()
 
-       end subroutine mpipi_get_fortran_argc
+       end 
 
 
        subroutine mpipi_get_fortran_arg(idx, buf_len, buf, len)
@@ -29,10 +44,10 @@
        !DEC$ attributes REFERENCE :: len
        integer idx
        integer buf_len
-       character (buf_len) buf
        integer len
        integer ierr
+       @FORTRAN_STR_DECL@
 
-       call @FORTRAN_GETARG@(idx, buf, len)
+       @FORTRAN_GETARG@
 
-       end subroutine mpipi_get_fortran_arg
+       end 
