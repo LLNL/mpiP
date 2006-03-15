@@ -311,8 +311,8 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG ENABLE_API_ONLY DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 FORTRAN_GETARG F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET LIBOBJS LTLIBOBJS'
-ac_subst_files='HAVE_MPI_IO'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG ENABLE_API_ONLY DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL LIBOBJS LTLIBOBJS'
+ac_subst_files='FORTRAN_GETARG HAVE_MPI_IO'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -5024,7 +5024,7 @@ fi
 #  If using Fortran routines to access command line,
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
-FORTRAN_GETARG=getarg
+FORTRAN_GETARG=""
 if test "$USE_GETARG" = true ; then
      ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -5337,14 +5337,18 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: using get_command_argument" >&5
 echo "${ECHO_T}using get_command_argument" >&6
-                FORTRAN_GETARG=get_command_argument
+                echo "       call get_command_argument(idx, buf, len)" > getarg.src
+                FORTRAN_GETARG=getarg.src
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: using getarg" >&5
 echo "${ECHO_T}using getarg" >&6
-                FORTRAN_GETARG=getarg
+	      echo "       call getarg(idx, buf)" > getarg.src
+	      echo "       len = mpipi_get_strlen(buf)" >> getarg.src
+	      FORTRAN_GETARG=getarg.src
+
 
 fi
 rm -f conftest.err conftest.$ac_objext \
@@ -5356,7 +5360,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 fi
-
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -5402,7 +5405,7 @@ echo "${ECHO_T}giving up" >&6
 echo "$as_me: error: could not determine F77 symbol names" >&2;}
    { (exit 1); exit 1; }; }
   fi
-  /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
+  #/bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
   F77_SYMBOLS=symbol_
   echo "$as_me:$LINENO: result: guessing lowercase with underscore" >&5
@@ -5456,6 +5459,13 @@ else
   FORTRAN_FLAG=
   FORTRAN_TARGET=
 fi
+
+if test x"$F77_VENDOR" = x"IBM" ; then
+  FORTRAN_STR_DECL="character (buf_len) buf"
+else
+  FORTRAN_STR_DECL="character buf*(*)"
+fi
+
 fi #if test "$ENABLE_API_ONLY" = no ; then
 
 echo "$as_me:$LINENO: result: $F77_VENDOR" >&5
@@ -5467,6 +5477,9 @@ MPIPFLIB=$MPIPFLIB
 FORTRAN_FLAG=$FORTRAN_FLAG
 
 FORTRAN_TARGET=$FORTRAN_TARGET
+
+FORTRAN_STR_DECL=$FORTRAN_STR_DECL
+
 
 
 
@@ -6077,14 +6090,16 @@ s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@READ_REAL_TIME@,$READ_REAL_TIME,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
-s,@FORTRAN_GETARG@,$FORTRAN_GETARG,;t t
 s,@F77_SYMBOLS@,$F77_SYMBOLS,;t t
 s,@F77_VENDOR@,$F77_VENDOR,;t t
 s,@MPIPFLIB@,$MPIPFLIB,;t t
 s,@FORTRAN_FLAG@,$FORTRAN_FLAG,;t t
 s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
+s,@FORTRAN_STR_DECL@,$FORTRAN_STR_DECL,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
+/@FORTRAN_GETARG@/r $FORTRAN_GETARG
+s,@FORTRAN_GETARG@,,;t t
 /@HAVE_MPI_IO@/r $HAVE_MPI_IO
 s,@HAVE_MPI_IO@,,;t t
 CEOF
@@ -6578,3 +6593,5 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+
+rm -f getarg.src
