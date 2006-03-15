@@ -422,7 +422,7 @@ mpiPi_get_text_start (char *filename)
 	  mpiPi_msg_debug ("found header raw ptr 0x%lx\n",
 			   SectHeader32.s_scnptr);
 	  if (SectHeader32.s_flags & STYP_TEXT)
-	    text_start = AoutHeader64.o_text_start - SectHeader32.s_scnptr;
+	    text_start = AoutHeader32.o_text_start - SectHeader32.s_scnptr;
 	}
     }
   else if (magic == 0x01EF || magic == 0x01F7)	/*  64-bit  */
