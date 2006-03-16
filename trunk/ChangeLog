@@ -1,3 +1,33 @@
+2006-03-16  Chris Chambreau  <chcham@llnl.gov>
+
+  * util.c: Forgot to run indent before last commit.
+
+  * util.c:
+  As indentified through Phil Roth's XT3 testing, added a character length
+  int argument at the end of the get_fortran_arg argument list to provide
+  correct type signature for compilers currently supported.
+
+2006-03-15  Chris Chambreau  <chcham@llnl.gov>
+
+  * configure, glob.c, pc_lookup.c:
+  Corrected 32-bit AIX Text start lookup error.
+
+2006-03-14  Chris Chambreau  <chcham@llnl.gov>
+
+  * glob.c: Patch number updated to reflect recent changes.
+
+  * configure.in, get_fortran_arg.f.in:
+  Changes to better handle access to fortran command line arguments.
+
+2006-03-13  Chris Chambreau  <chcham@llnl.gov>
+
+  * testing/sweep-ops-stack.f, testing/sweep-ops.f:
+  Removed unnecessary semi-colons.
+
+2006-03-09  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: Updated to reflect recent acitivity
+
 2006-03-07  Chris Chambreau  <chcham@llnl.gov>
 
   * testing/3-stacktrace.src:
