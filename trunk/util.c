@@ -598,7 +598,8 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
       {
 	int buf_len = EXECUTABLE_LEN;
 
-	extern void F77_MPIPI_GET_FORTRAN_ARG (int *, int *, char *, int *, int);
+	extern void F77_MPIPI_GET_FORTRAN_ARG (int *, int *, char *, int *,
+					       int);
 	F77_MPIPI_GET_FORTRAN_ARG (&i, &buf_len, buf, &len, EXECUTABLE_LEN);
 
 	buf[len < EXECUTABLE_LEN ? len : EXECUTABLE_LEN - 1] = 0;
