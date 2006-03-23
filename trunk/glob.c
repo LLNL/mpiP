@@ -25,7 +25,7 @@ int mpiPi_debug = 0;
 
 int mpiPi_vmajor = 2;
 int mpiPi_vminor = 8;
-int mpiPi_vpatch = 10;
+int mpiPi_vpatch = 11;
 char *mpiPi_vdate = __DATE__;
 char *mpiPi_vtime = __TIME__;
 

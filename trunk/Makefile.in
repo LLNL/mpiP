@@ -138,14 +138,11 @@ endif
 
 api API: ${API_TARGET}
 
+#  Remake pc_lookup if demangling library is built
 ifeq ($(ENABLE_API_ONLY), no)
-
 ifeq ($(DISABLE_BFD), no)
-ifeq ($(DEMANGLE_TARGET),)
-${API_TARGET}: ${API_OBJS} 
-	${AR} ruv $@ ${API_OBJS}
-	${RANLIB} $@
-else
+ifneq ($(DEMANGLE_TARGET),)
+API_REMAKE_LOOKUP=yes
 ${API_TARGET}: ${API_OBJS} 
 	${MAKE} remake_lookup
 	${AR} ruv $@ ${API_OBJS}
@@ -153,9 +150,10 @@ ${API_TARGET}: ${API_OBJS}
 	${MAKE} remove_lookup
 endif
 endif
+endif
 
-
-else
+#  Default API behavior if pc_lookup does not need to be recompiled
+ifneq ($(API_REMAKE_LOOKUP),yes)
 ${API_TARGET}: ${API_OBJS} 
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
