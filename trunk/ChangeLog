@@ -1,5 +1,11 @@
 2006-03-23  Chris Chambreau  <chcham@llnl.gov>
 
+  * Makefile.in, glob.c:
+  Hopefully corrected logic concerning when pc_lookup should be rebuild when
+  building the API library.
+
+  * ChangeLog: Updates.
+
   * configure.in, glob.c, pc_lookup.c, Defs.mak.in, Makefile.in, configure:
   o Renamed API library from libmpiP-API.a to libmpiPapi.a to avoid AIX MPI
   compile scripts interpreting '-A' as a flag.
