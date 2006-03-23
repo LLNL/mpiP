@@ -1,4 +1,19 @@
+2006-03-23  Chris Chambreau  <chcham@llnl.gov>
+
+  * configure.in, glob.c, pc_lookup.c, Defs.mak.in, Makefile.in, configure:
+  o Renamed API library from libmpiP-API.a to libmpiPapi.a to avoid AIX MPI
+  compile scripts interpreting '-A' as a flag.
+  o Added DISABLE_BFD macro to avoid recompiling pc_lookup.c when BFD is
+  not used on systems that build a separate demangling library.
+  o Set API_TARGET once an refer to macro in other cases that reference the API lib.
+  o Install taget copies timer include file directory structure.
+  o Added Cray F77_VENDOR test for X1E support.
+  o mpiP_find_src_loc returns failure and optionally prints a debugging message
+  if the input pc value is NULL, rather than failing an assert.
+
 2006-03-16  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: New commits.
 
   * util.c: Forgot to run indent before last commit.
 
