@@ -358,7 +358,7 @@ if test -n "$F77" -a "$F77" != no ; then
     AC_MSG_RESULT(giving up)
     AC_MSG_ERROR(could not determine F77 symbol names)
   fi
-  #/bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
+  /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
   F77_SYMBOLS=symbol_
   AC_MSG_RESULT(guessing lowercase with underscore)
@@ -397,6 +397,11 @@ elif $F77 -V 2>&1 | grep -e Intel 1> /dev/null 2> /dev/null ; then
   FORTRAN_FLAG=
   FORTRAN_TARGET=
   MPIPFLIB=
+elif $F77 -V 2>&1 | grep -e Cray 1>/dev/null 2>/dev/null ; then
+  F77_VENDOR=Cray
+  FORTRAN_FLAG=-DCray_Fortran
+  FORTRAN_TARGET=libmpiPftn.a
+  MPIPFLIB=mpiPftn 
 elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Compaq
   MPIPFLIB=mpiP
@@ -423,6 +428,7 @@ AC_SUBST(MPIPFLIB,$MPIPFLIB)
 AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST(FORTRAN_STR_DECL, $FORTRAN_STR_DECL)
+AC_SUBST(DISABLE_BFD, $DISABLE_BFD)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(FORTRAN_GETARG)
 

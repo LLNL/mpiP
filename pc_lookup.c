@@ -196,7 +196,13 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 		   char **o_funct_str)
 {
   char buf[128];
-  assert (i_addr_hex);
+
+  if (i_addr_hex == NULL)
+    {
+      mpiPi_msg_debug
+	("mpiP_find_src_loc returning failure as i_addr_hex == NULL\n");
+      return 1;
+    }
 
   if (abfd == NULL)
     {

@@ -86,7 +86,10 @@ ${FORTRAN_TARGET}: remake_util ${FOBJS}
 	${RANLIB} $@
 	rm -f util.o
 
-${DEMANGLE_TARGET}: remake_lookup ${OBJS} 
+ifeq ($(DISABLE_BFD), no)
+${DEMANGLE_TARGET}:: remake_lookup 
+endif
+${DEMANGLE_TARGET}:: ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 	rm -f pc_lookup.o
@@ -133,16 +136,27 @@ ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}: ${C_TARGE
 endif
 
 
-api API: libmpiP-API.a
+api API: ${API_TARGET}
 
 ifeq ($(ENABLE_API_ONLY), no)
-libmpiP-API.a: ${API_OBJS} 
+
+ifeq ($(DISABLE_BFD), no)
+ifeq ($(DEMANGLE_TARGET),)
+${API_TARGET}: ${API_OBJS} 
+	${AR} ruv $@ ${API_OBJS}
+	${RANLIB} $@
+else
+${API_TARGET}: ${API_OBJS} 
 	${MAKE} remake_lookup
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
 	${MAKE} remove_lookup
+endif
+endif
+
+
 else
-libmpiP-API.a: ${API_OBJS} 
+${API_TARGET}: ${API_OBJS} 
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
 endif
@@ -155,7 +169,7 @@ remake_util:
 	rm -f util.o
 	$(MAKE) util.o CPPFLAGS='${CPPFLAGS}'
 
-remake_lookup: CPPFLAGS += ${DEMANGLE_FLAG}
+remake_lookup: CPPFLAGS += ${DEMANGLE_FLAG} 
 remake_lookup: remove_lookup
 	$(MAKE) pc_lookup.o CPPFLAGS='${CPPFLAGS}'
 	$(MAKE) util.o 
@@ -215,15 +229,25 @@ else
 ${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h _timers.h
 endif
 
+ifeq ($(ENABLE_API_ONLY), no)
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} API
-	mkdir -p ${libdir} ${includedir} ${docdir} ${bindir}
+	mkdir -p ${libdir} ${includedir}/timers ${docdir} ${bindir}
 	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${libdir}/${FORTRAN_TARGET} ; fi
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
-	${INSTALL} mpiP-API.h _timers.h timers/*h ${includedir}
+	${INSTALL} mpiP-API.h _timers.h ${includedir}
+	${INSTALL} timers/*h ${includedir}/timers
 	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
 	${INSTALL} bin/*mpip* ${bindir}
+else
+install:: API
+	mkdir -p ${libdir} ${includedir}/timers ${docdir}
+	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
+	${INSTALL} mpiP-API.h _timers.h ${includedir}
+	${INSTALL} timers/*h ${includedir}/timers
+	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
+endif
 
 merged-install: add_binutils_objs add_libunwind_objs install
 
