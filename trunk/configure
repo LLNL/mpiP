@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG ENABLE_API_ONLY DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG ENABLE_API_ONLY DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL DISABLE_BFD LIBOBJS LTLIBOBJS'
 ac_subst_files='FORTRAN_GETARG HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -5405,7 +5405,7 @@ echo "${ECHO_T}giving up" >&6
 echo "$as_me: error: could not determine F77 symbol names" >&2;}
    { (exit 1); exit 1; }; }
   fi
-  #/bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
+  /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
   F77_SYMBOLS=symbol_
   echo "$as_me:$LINENO: result: guessing lowercase with underscore" >&5
@@ -5448,6 +5448,11 @@ elif $F77 -V 2>&1 | grep -e Intel 1> /dev/null 2> /dev/null ; then
   FORTRAN_FLAG=
   FORTRAN_TARGET=
   MPIPFLIB=
+elif $F77 -V 2>&1 | grep -e Cray 1>/dev/null 2>/dev/null ; then
+  F77_VENDOR=Cray
+  FORTRAN_FLAG=-DCray_Fortran
+  FORTRAN_TARGET=libmpiPftn.a
+  MPIPFLIB=mpiPftn
 elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Compaq
   MPIPFLIB=mpiP
@@ -5479,6 +5484,8 @@ FORTRAN_FLAG=$FORTRAN_FLAG
 FORTRAN_TARGET=$FORTRAN_TARGET
 
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
+
+DISABLE_BFD=$DISABLE_BFD
 
 
 
@@ -6096,6 +6103,7 @@ s,@MPIPFLIB@,$MPIPFLIB,;t t
 s,@FORTRAN_FLAG@,$FORTRAN_FLAG,;t t
 s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
 s,@FORTRAN_STR_DECL@,$FORTRAN_STR_DECL,;t t
+s,@DISABLE_BFD@,$DISABLE_BFD,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 /@FORTRAN_GETARG@/r $FORTRAN_GETARG
