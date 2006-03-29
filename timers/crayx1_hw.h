@@ -25,7 +25,7 @@
 /* mpiPi_GETTIME uses _rtc, which returns a value in ticks */
 #define mpiPi_GETTIME(timeaddr)   {(*timeaddr)=_rtc();}
 
-/* #define mpiPi_GETUSECS(timer,timeaddr)  (((*timeaddr)*1000000)/((double)sysconf(_SC_SV2_USER_TIME_RATE))) */
+#define mpiPi_GETUSECS(timeaddr)  (((*timeaddr)*1000000)/((double)sysconf(_SC_SV2_USER_TIME_RATE)))
 
 #define mpiPi_PRINTTIME(taddr) printf("Time is %lf usec.\n", mpiPi_GETUSECS(0,taddr))
 

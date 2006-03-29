@@ -43,8 +43,6 @@ API_SRCS =	diag_msgs_api.c \
 	util.c \
 	mpiP-API.c
 
-USE_GETARG   = @USE_GETARG@
-USE_LIBDWARF = @USE_LIBDWARF@
 
 ifeq ($(USE_LIBDWARF),yes)
     SRCS += pc_lookup_dwarf.c
@@ -155,6 +153,7 @@ endif
 #  Default API behavior if pc_lookup does not need to be recompiled
 ifneq ($(API_REMAKE_LOOKUP),yes)
 ${API_TARGET}: ${API_OBJS} 
+	${MAKE} util.o
 	${AR} ruv $@ ${API_OBJS}
 	${RANLIB} $@
 endif
@@ -266,7 +265,7 @@ lint: ${SRCS}
 	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f timers/aix_local.h
 
 include Check.mak
 
