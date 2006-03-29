@@ -13,6 +13,9 @@ PYTHON  = python
 CFLAGS = @CFLAGS@
 FFLAGS = @FFLAGS@
 
+USE_GETARG   = @USE_GETARG@
+USE_LIBDWARF = @USE_LIBDWARF@
+
 ifneq (-g,$(findstring -g,$(CFLAGS)))
 CFLAGS += -g
 endif
@@ -86,7 +89,6 @@ API_TARGET = libmpiPapi.a
 MPIPLIB  = mpiP
 MPIPFLIB = mpiP
 
-USE_GETARG = @USE_GETARG@
 BUILD_FLIB=false
 ifeq ($(USE_GETARG),true)
   BUILD_FLIB=true
@@ -135,6 +137,7 @@ ifneq ($(ARCH),ppc64)
 endif
 LFLAGS	+=
 LIBS	+=
+
 
 ENABLE_API_ONLY = @ENABLE_API_ONLY@
 ##### EOF
