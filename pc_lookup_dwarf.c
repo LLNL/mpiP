@@ -847,7 +847,7 @@ open_dwarf_executable (char *fileName)
 
   if (dwStatus == DW_DLV_NO_ENTRY)
     {
-      mpiPi_abort ("No symbols in the executable\n");
+      mpiPi_msg_warn ("No symbols in the executable\n");
       return 0;
     }
 
