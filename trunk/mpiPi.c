@@ -225,6 +225,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
   int rc = 0;
   callsite_pc_cache_entry_t key;
   callsite_pc_cache_entry_t *csp;
+  char addr_buf[24];
 
   key.pc = pc;
   /* do we have a cache entry for this pc? If so, use entry */
@@ -245,8 +246,9 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	    *functname = "[unknown]";
 
 	  mpiPi_msg_debug
-	    ("Successful Source lookup for [0x%lx]: %s, %d, %s\n", pc,
-	     *filename, *lineno, *functname);
+	    ("Successful Source lookup for [%s]: %s, %d, %s\n",
+	     mpiP_format_address (pc, addr_buf), *filename, *lineno,
+	     *functname);
 
 	  csp->filename = strdup (*filename);
 	  csp->functname = strdup (*functname);
@@ -254,7 +256,8 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	}
       else
 	{
-	  mpiPi_msg_warn ("Unsuccessful Source lookup for [0x%x]\n", pc);
+	  mpiPi_msg_warn ("Unsuccessful Source lookup for [%s]\n",
+			  mpiP_format_address (pc, addr_buf));
 	  csp->filename = strdup ("[unknown]");
 	  csp->functname = strdup ("[unknown]");
 	  csp->line = 0;
