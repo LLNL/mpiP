@@ -1,4 +1,27 @@
+2006-03-30  Chris Chambreau  <chcham@llnl.gov>
+
+  * testing/api-test.c, testing/timer-info.c, glob.c, mpiP-API.h, mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, report.c, util.c, configure:
+  o Corrected various printing issues with incorrect types.
+  o Added mpiP_format_address() to consistently format printed addresses, which
+  should also be available through the API.
+  o Corrected field widths when printing addresses instead of source info.
+  o Modified api-test and timer-info tests to behave appropriately when DISABLE_BFD
+  is set.
+
+2006-03-29  Chris Chambreau  <chcham@llnl.gov>
+
+  * timers/crayx1_hw.h, Defs.mak.in, Makefile.in, configure.in, pc_lookup_dwarf.c:
+  Modifications by Phil Roth and Chris Chambreau:
+
+  o address use of libelf/libdwarf
+    - Have configure check for libs and define DISABLE_BFD
+    - Move configure substitution to Defs.mak and set DISABLE_BFD & USE_LIBDWARF
+  o add files to remove to distclean target
+  o make no symbol failure warning rather than abort.
+
 2006-03-23  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: new changes
 
   * Makefile.in, glob.c:
   Hopefully corrected logic concerning when pc_lookup should be rebuild when
