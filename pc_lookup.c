@@ -117,6 +117,7 @@ find_address_in_section (abfd, section, data)
   bfd_vma vma;
   bfd_size_type size;
   bfd_vma local_pc = pc;
+  char addr_buf1[24], addr_buf2[24], addr_buf3[24];
 
   assert (abfd);
   if (found)
@@ -134,8 +135,10 @@ find_address_in_section (abfd, section, data)
   else
     local_pc &= 0x00000000FFFFFFFF;
   local_pc += mpiPi.text_start;
-  mpiPi_msg_debug ("pc is 0x%lx, text_start is 0x%lx, local_pc is 0x%lx\n",
-		   pc, mpiPi.text_start, local_pc);
+  mpiPi_msg_debug ("pc is %s, text_start is %s, local_pc is %s\n",
+		   mpiP_format_address ((void *) pc, addr_buf1),
+		   mpiP_format_address ((void *) mpiPi.text_start, addr_buf2),
+		   mpiP_format_address ((void *) local_pc, addr_buf3));
 #else
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
@@ -150,8 +153,9 @@ find_address_in_section (abfd, section, data)
   if (local_pc < vma)
     {
       mpiPi_msg_debug
-	("failed bfd_get_section_vma: local_pc=0x%lx  vma=0x%lx\n", local_pc,
-	 vma);
+	("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
+	 mpiP_format_address ((void *) local_pc, addr_buf1),
+	 mpiP_format_address ((void *) vma, addr_buf2));
       return;
     }
 
@@ -169,8 +173,11 @@ find_address_in_section (abfd, section, data)
 
   if (local_pc >= vma + size)
     {
-      mpiPi_msg_debug ("PC not in section: pc=%lx vma=%lx-%lx\n",
-		       local_pc, vma, vma + size);
+      mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
+		       mpiP_format_address ((void *) local_pc, addr_buf1),
+		       mpiP_format_address ((void *) vma, addr_buf2),
+		       mpiP_format_address ((void *) (vma + size),
+					    addr_buf3));
       return;
     }
 
@@ -180,12 +187,18 @@ find_address_in_section (abfd, section, data)
 
   if (!found)
     {
-      mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%x vma=%x-%x\n",
-		       local_pc, vma, vma + size);
+      mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
+		       mpiP_format_address ((void *) local_pc, addr_buf1),
+		       mpiP_format_address ((void *) vma, addr_buf2),
+		       mpiP_format_address ((void *) (vma + size),
+					    addr_buf3));
     }
 
-  mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%x vma=%x-%x\n",
-		   local_pc, vma, vma + size);
+  mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
+		   mpiP_format_address ((void *) local_pc, addr_buf1),
+		   mpiP_format_address ((void *) vma, addr_buf2),
+		   mpiP_format_address ((void *) (vma + size), addr_buf3));
+
   mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
 		   filename, functionname, line);
 }
@@ -196,6 +209,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 		   char **o_funct_str)
 {
   char buf[128];
+  char addr_buf[24];
 
   if (i_addr_hex == NULL)
     {
@@ -211,7 +225,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       return 1;
     }
 
-  sprintf (buf, "0x%lx", (unsigned long) i_addr_hex);
+  sprintf (buf, "%s", mpiP_format_address (i_addr_hex, addr_buf));
   pc = bfd_scan_vma (buf, NULL, 16);
 
   /* jsv hack - trim high bit off of address */
@@ -390,7 +404,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 #include <aouthdr.h>
 #include <scnhdr.h>
 
-long
+unsigned long long
 mpiPi_get_text_start (char *filename)
 {
   int fh;
@@ -402,7 +416,7 @@ mpiPi_get_text_start (char *filename)
   SCNHDR SectHeader32;
   SCNHDR_64 SectHeader64;
 
-  long text_start = 0;
+  unsigned long long text_start = 0;
   int count = 0;
 
   fh = open (filename, O_RDONLY);
@@ -419,14 +433,15 @@ mpiPi_get_text_start (char *filename)
       read (fh, &FileHeader32, sizeof (FILHDR));
       mpiPi_msg_debug ("aout size is %d\n", FileHeader32.f_opthdr);
       read (fh, &AoutHeader32, FileHeader32.f_opthdr);
-      mpiPi_msg_debug ("text start is 0x%lx\n", AoutHeader32.o_text_start);
+      mpiPi_msg_debug ("text start is 0x%0x\n", AoutHeader32.o_text_start);
 
       while (count++ < FileHeader32.f_nscns)
 	{
 	  read (fh, &SectHeader32, sizeof (SCNHDR));
 	  mpiPi_msg_debug ("found header name %s\n", SectHeader32.s_name);
-	  mpiPi_msg_debug ("found header raw ptr 0x%lx\n",
+	  mpiPi_msg_debug ("found header raw ptr 0x%0x\n",
 			   SectHeader32.s_scnptr);
+
 	  if (SectHeader32.s_flags & STYP_TEXT)
 	    text_start = AoutHeader32.o_text_start - SectHeader32.s_scnptr;
 	}
@@ -437,14 +452,15 @@ mpiPi_get_text_start (char *filename)
       read (fh, &FileHeader64, sizeof (FILHDR_64));
       mpiPi_msg_debug ("aout size is %d\n", FileHeader64.f_opthdr);
       read (fh, &AoutHeader64, FileHeader64.f_opthdr);
-      mpiPi_msg_debug ("text start is 0x%lx\n", AoutHeader64.o_text_start);
+      mpiPi_msg_debug ("text start is 0x%0llx\n", AoutHeader64.o_text_start);
 
       while (count++ < FileHeader64.f_nscns)
 	{
 	  read (fh, &SectHeader64, sizeof (SCNHDR_64));
 	  mpiPi_msg_debug ("found header name %s\n", SectHeader64.s_name);
-	  mpiPi_msg_debug ("found header raw ptr 0x%lx\n",
+	  mpiPi_msg_debug ("found header raw ptr 0x%0llx\n",
 			   SectHeader64.s_scnptr);
+
 	  if (SectHeader64.s_flags & STYP_TEXT)
 	    text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
 	}
@@ -455,7 +471,7 @@ mpiPi_get_text_start (char *filename)
       return 0;
     }
 
-  mpiPi_msg_debug ("text_start is 0x%lx\n", text_start);
+  mpiPi_msg_debug ("text_start is 0x%0llx\n", text_start);
   close (fh);
 
   return text_start;
