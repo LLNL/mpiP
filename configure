@@ -1617,10 +1617,6 @@ DISABLE_BFD=no
 if test "${enable_bfd+set}" = set; then
   enableval="$enable_bfd"
   if test x"$enableval" = xno ; then
-		cat >>confdefs.h <<\_ACEOF
-#define DISABLE_BFD 1
-_ACEOF
-
 		echo Use of libbfd has been disabled
 		DISABLE_BFD=yes
 	fi
@@ -1671,12 +1667,8 @@ fi;
 if test "${enable_dwarf+set}" = set; then
   enableval="$enable_dwarf"
   if test x"$enableval" = xyes ; then
-		cat >>confdefs.h <<\_ACEOF
-#define USE_LIBDWARF 1
-_ACEOF
-
 		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
-		enable_bfd=no
+		DISABLE_BFD=yes
 	fi ;
 	USE_LIBDWARF=yes
 
@@ -3185,7 +3177,7 @@ _ACEOF
 fi
 
 
-if test "$DISABLE_BFD" = "no" ; then
+if test "x$DISABLE_BFD" = "xno" ; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4314,6 +4306,166 @@ _ACEOF
 
 fi
 
+else
+  cat >>confdefs.h <<\_ACEOF
+#define DISABLE_BFD 1
+_ACEOF
+
+  if test x$USE_LIBDWARF = xyes ; then
+    echo "$as_me:$LINENO: checking for elf_begin in -lelf" >&5
+echo $ECHO_N "checking for elf_begin in -lelf... $ECHO_C" >&6
+if test "${ac_cv_lib_elf_elf_begin+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lelf  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char elf_begin ();
+int
+main ()
+{
+elf_begin ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_elf_elf_begin=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_elf_elf_begin=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_elf_elf_begin" >&5
+echo "${ECHO_T}$ac_cv_lib_elf_elf_begin" >&6
+if test $ac_cv_lib_elf_elf_begin = yes; then
+  LIBELF_FOUND=yes
+else
+  ELFDWARF_ERR="failed to find libelf." ; LIBELF_FOUND=no
+
+fi
+
+    echo "$as_me:$LINENO: checking for dwarf_init in -ldwarf" >&5
+echo $ECHO_N "checking for dwarf_init in -ldwarf... $ECHO_C" >&6
+if test "${ac_cv_lib_dwarf_dwarf_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldwarf  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char dwarf_init ();
+int
+main ()
+{
+dwarf_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_dwarf_dwarf_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_dwarf_dwarf_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_dwarf_dwarf_init" >&5
+echo "${ECHO_T}$ac_cv_lib_dwarf_dwarf_init" >&6
+if test $ac_cv_lib_dwarf_dwarf_init = yes; then
+  LIBDWARF_FOUND=yes
+else
+  ELFDWARF_ERR="failed to find libdwarf." ; LIBDWARF_FOUND=no
+
+fi
+
+    echo $ECHO_N "checking for libelf/libdwarf..." $ECHO_C
+    if test x$LIBELF_FOUND = xyes -a x$LIBDWARF_FOUND = xyes ; then
+      LIBS="${LIBS} -ldwarf -lelf"
+      cat >>confdefs.h <<\_ACEOF
+#define USE_LIBDWARF 1
+_ACEOF
+
+      echo " found libelf/libdwarf"
+    else
+      echo " $ELFDWARF_ERR Not using libelf/libdwarf"
+    fi
+  fi
 fi
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -5124,7 +5276,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5127:" \
+echo "$as_me:5279:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

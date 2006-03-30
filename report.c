@@ -358,8 +358,6 @@ mpiPi_profile_print (FILE * fp)
 	   av[i]->arbitraryMessageCount,
 	   mpiPi.global_mpi_msize_threshold_count);
 #endif
-	mpiPi_msg_debug ("filename ptr: 0x%x functname ptr: 0x%x\n",
-			 av[i]->filename[0], av[i]->functname[0]);
 	mpiPi_msg_debug ("Callsite(%d,%d=[%s,%d,%s],%d) %g Cumulative=%g\n",
 			 av[i]->op, av[i]->csid, av[i]->filename[0],
 			 av[i]->lineno[0], av[i]->functname[0], av[i]->rank,
@@ -404,8 +402,9 @@ mpiPi_profile_print (FILE * fp)
   {
     int ac;
     callsite_src_id_cache_entry_t **av;
-    int fileLenMax = 15;
+    int fileLenMax = 18;
     int funcLenMax = 24;
+    char addr_buf[24];
 
     h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
     sprintf (buf, "Callsites: %d", ac);
@@ -442,12 +441,11 @@ mpiPi_profile_print (FILE * fp)
 		(strcmp (av[i]->filename[j], "[unknown]") == 0 ||
 		 strcmp (av[i]->functname[j], "[unknown]") == 0))
 	      {
-		fprintf (fp, "%3d %3d 0x%-*.*lx %-*s %s\n",
+		fprintf (fp, "%3d %3d %-*s %-*s %s\n",
 			 av[i]->id,
 			 j,
-			 fileLenMax + 4,
-			 (int) sizeof (void *) * 2,
-			 av[i]->pc[j],
+			 fileLenMax + 6,
+			 mpiP_format_address (av[i]->pc[j], addr_buf),
 			 funcLenMax,
 			 av[i]->functname[j],
 			 (j ==

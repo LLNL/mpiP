@@ -615,4 +615,29 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 #endif
 }
 
+
+char *
+mpiP_format_address (void *pval, char *addr_buf)
+{
+  static int get_sys_info = 0;
+  static int ptr_hex_chars = 0;
+  static char hex_prefix[3] = "";
+  char test_buf[8] = "";
+
+  if (get_sys_info == 0)
+    {
+      ptr_hex_chars = sizeof (char *) * 2;
+      sprintf (test_buf, "%0p", (void *) 0x1);
+
+      if (strcmp (test_buf, "0x1") != 0)
+	strcpy (hex_prefix, "0x");
+
+      get_sys_info = 1;
+    }
+
+  sprintf (addr_buf, "%s%0.*p", hex_prefix, ptr_hex_chars, pval);
+
+  return addr_buf;
+}
+
 /* eof */

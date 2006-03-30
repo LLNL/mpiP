@@ -1111,6 +1111,7 @@ mpiP_find_src_loc (void *i_addr_hex,
 {
   const struct AddrToSourceInfo *addrToSrcMapping = NULL;
   const struct FunctionInfo *functionInfo = NULL;
+  char addr_buf[24];
 
 
   /* initialize the out parameters */
@@ -1157,8 +1158,8 @@ mpiP_find_src_loc (void *i_addr_hex,
     }
   else
     {
-      mpiPi_msg_warn ("unable to find function info for address 0x%p\n",
-		      i_addr_hex);
+      mpiPi_msg_warn ("unable to find function info for address %s\n",
+		      mpiP_format_address (i_addr_hex, addr_buf));
     }
 
   return (((addrToSrcMapping != NULL) || (functionInfo != NULL)) ? 0 : 1);
