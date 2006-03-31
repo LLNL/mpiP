@@ -148,11 +148,13 @@ add_binutils_objs:
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libbfd.a ; \
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libiberty.a ; \
 	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libintl.a ; \
-	ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
-	if [ "x${FORTRAN_TARGET}" != "x" ]; then \
-	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
-	if [ "${DEMANGLE_TARGET}" != "x" ]; then \
-	  ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi ; \
+	if [ "x$(ENABLE_API_ONLY)" = "xno" ] ; then \
+	  ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
+	  if [ "x${FORTRAN_TARGET}" != "x" ]; then \
+	    ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
+	  if [ "x${DEMANGLE_TARGET}" != "x" ]; then \
+	    ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi ; \
+	fi ; \
 	if [ "x${API_TARGET}" != "x" ]; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${API_TARGET} *.o ; fi ; 
 	rm -rf mpip_temp_obj_dir
