@@ -11,9 +11,9 @@ RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
 	
 # The flags to pass to runtest
 RUNTESTFLAGS =
-TEST = 	
+TEST = @TEST_LIST@	
 # Execute the tests 
-check: site.exp all 
+check: site.exp @DEFAULT_TARGS@ test
 	DEJAGNU="./lib/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
 	--tool testing --srcdir . $(TEST)
 	

@@ -1,0 +1,29 @@
+
+set test_title "api-test.exe: Check API functionality"
+set type "Text match for"
+set test "api-test.exe"
+set test_targ "./testing/$test"
+
+send_user "\n\n"
+
+spawn $test_targ
+expect { 
+   "opened executable file" { 
+     send_user "found $type $expect_out(0,string)\n" ; exp_continue
+     }
+   "func:thisIsTheTopLevelFunction" { 
+     send_user "found $type $expect_out(0,string)\n" ; exp_continue
+     }
+   "time diff is" { 
+     send_user "found $type $expect_out(0,string)\n" 
+     }
+
+   timeout { fail "$test timed out\n" }
+   eof     { fail "$test failed\n" }
+  }
+
+#send_user "$expect_out(buffer)"
+
+pass "$test passed"
+
+send_user "\n\n"

@@ -13,16 +13,17 @@ VPATH = ${srcdir}
 
 include Defs.mak
 
-.PHONY: default all install clean shared remake_util remake_lookup proto merged-install cleanobjs test
+.PHONY: default all install clean api API shared proto merged-install \
+  cleanobjs test add_binutils_objs add_libunwind_objs TAGS cleanobjs distclean \
+  lint indent proto
 
-ifeq ($(ENABLE_API_ONLY), no)
-default: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API
-else
-default: API
-endif
+default: @DEFAULT_TARGS@
 
 all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API test
 	@echo All done.
+
+PC_LOOKUP_FILE=@PC_LOOKUP_FILE@
+PC_LOOKUP_OBJ = $(PC_LOOKUP_FILE:.c=.o)
 
 SRCS =	diag_msgs.c \
 	mpiP-hash.c \
@@ -34,64 +35,87 @@ SRCS =	diag_msgs.c \
 	lookup.c \
 	report.c \
 	pcontrol.c \
-	mpiP-API.c
+	mpiP-API.c \
+	${PC_LOOKUP_FILE}
 
 API_SRCS =	diag_msgs_api.c \
 	mpiP-hash.c \
 	glob.c \
 	mpiPi.c \
 	util.c \
-	mpiP-API.c
-
-
-ifeq ($(USE_LIBDWARF),yes)
-    SRCS += pc_lookup_dwarf.c
-    API_SRCS += pc_lookup_dwarf.c
-else
-    SRCS += pc_lookup.c
-    API_SRCS += pc_lookup.c
-endif
+	mpiP-API.c \
+	${PC_LOOKUP_FILE}
 
 OBJS  = $(SRCS:.c=.o)
 FOBJS = $(OBJS)
 
 API_OBJS = $(API_SRCS:.c=.o)
 
+FORTRAN_GETARG_OBJ_FILE=@FORTRAN_GETARG_OBJ_FILE@
+FOBJS += $(FORTRAN_GETARG_OBJ_FILE)
+
+clean::
+	rm -f $(FORTRAN_GETARG_OBJ_FILE)
+
+
+#  If using BFD and need a separate demangling library,
+#  defensively rebuild pc_lookup.o for each target
+ifeq ($(DISABLE_BFD),no)
+ifneq ($(DEMANGLE_TARGET),)
+
+${C_TARGET} ${FORTRAN_TARGET} :: 
+	rm -f $(PC_LOOKUP_OBJ)
+	$(MAKE) $(PC_LOOKUP_OBJ)
+
+${DEMANGLE_TARGET} :: 
+	rm -f $(PC_LOOKUP_OBJ)
+	$(MAKE) CPPFLAGS="${CPPFLAGS} ${DEMANGLE_FLAG}" $(PC_LOOKUP_OBJ)
+
+ifeq ($(ENABLE_API_ONLY),no)
+${API_TARGET}:: 
+	rm -f $(PC_LOOKUP_OBJ)
+	$(MAKE) $(PC_LOOKUP_OBJ)
+endif
+endif
+endif
+
+#  If using Fortran iargc/getarg intrinsics to get command-line arguments,
+#  defensively rebuild util.o for each target
 ifeq ($(USE_GETARG),true)
-ifeq ($(F77_VENDOR),Cray)
+${C_TARGET} ${DEMANGLE_TARGET} :: 
+	rm -f util.o
+	$(MAKE) util.o
 
-    FOBJS += get_fortran_arg_pxf.o
+${FORTRAN_TARGET} ::
+	rm -f util.o
+	$(MAKE) util.o CPPFLAGS="${CPPFLAGS} ${FORTRAN_FLAG}"
 
-clean::
-	rm -f get_fortran_arg_pfx.o
-
-else
-    FOBJS   += get_fortran_arg.o
-
-clean::
-	rm -f get_fortran_arg.o
-
+ifeq ($(ENABLE_API_ONLY),no)
+${API_TARGET}:: 
+	rm -f util.o
+	$(MAKE) util.o
 endif
 endif
 
 
-${C_TARGET}: ${OBJS} 
+${C_TARGET}:: ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 
-${FORTRAN_TARGET}: remake_util ${FOBJS} 
+${FORTRAN_TARGET}:: ${FOBJS} 
 	${AR} ruv $@ ${FOBJS}
 	${RANLIB} $@
-	rm -f util.o
 
-ifeq ($(DISABLE_BFD), no)
-${DEMANGLE_TARGET}:: remake_lookup 
-endif
 ${DEMANGLE_TARGET}:: ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
 	rm -f pc_lookup.o
 
+api API: ${API_TARGET}
+
+${API_TARGET}:: ${API_OBJS} 
+	${AR} ruv $@ ${API_OBJS}
+	${RANLIB} $@
 
 
 ifeq ($(OS), Linux)
@@ -114,65 +138,9 @@ ${SHARED_C_TARGET}: cleanobjs ${OBJS}
 
 endif
 
-ifeq ($(OS), AIX)
-SHARED_C_TARGET = $(C_TARGET:.a=.so)
-SHARED_FORTRAN_TARGET = $(FORTRAN_TARGET:.a=.so)
-SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
-
-shared: ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}
-install::
-	if [ -x ${SHARED_C_TARGET} ] ; then \
-	  mkdir -p ${slibdir} ; \
-	  ${INSTALL} ${SHARED_C_TARGET} ${slibdir} ; \
-	fi
-
-clean::
-	rm -f ${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}
-
-${SHARED_C_TARGET} ${SHARED_FORTRAN_TARGET} ${SHARED_DEMANGLE_TARGET}: ${C_TARGET}
-	mpxlc -G -o $@ ${OBJS}
-endif
-
-
-api API: ${API_TARGET}
-
-#  Remake pc_lookup if demangling library is built
-ifeq ($(ENABLE_API_ONLY), no)
-ifeq ($(DISABLE_BFD), no)
-ifneq ($(DEMANGLE_TARGET),)
-API_REMAKE_LOOKUP=yes
-${API_TARGET}: ${API_OBJS} 
-	${MAKE} remake_lookup
-	${AR} ruv $@ ${API_OBJS}
-	${RANLIB} $@
-	${MAKE} remove_lookup
-endif
-endif
-endif
-
-#  Default API behavior if pc_lookup does not need to be recompiled
-ifneq ($(API_REMAKE_LOOKUP),yes)
-${API_TARGET}: ${API_OBJS} 
-	${MAKE} util.o
-	${AR} ruv $@ ${API_OBJS}
-	${RANLIB} $@
-endif
 
 clean :: 
 	rm -f ${API_OBJS}
-
-remake_util: CPPFLAGS += ${FORTRAN_FLAG}
-remake_util:
-	rm -f util.o
-	$(MAKE) util.o CPPFLAGS='${CPPFLAGS}'
-
-remake_lookup: CPPFLAGS += ${DEMANGLE_FLAG} 
-remake_lookup: remove_lookup
-	$(MAKE) pc_lookup.o CPPFLAGS='${CPPFLAGS}'
-	$(MAKE) util.o 
-
-remove_lookup:
-	rm -f pc_lookup.o
 
 add_binutils_objs:
 	-mkdir mpip_temp_obj_dir
