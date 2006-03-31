@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG ENABLE_API_ONLY DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL DISABLE_BFD LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF PC_LOOKUP_FILE USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL DISABLE_BFD ENABLE_API_ONLY DEFAULT_TARGS FORTRAN_GETARG_OBJ_FILE TEST_LIST LIBOBJS LTLIBOBJS'
 ac_subst_files='FORTRAN_GETARG HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -1580,6 +1580,7 @@ fi;
 #  Enable / Disable specifications
 #
 
+DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API'
 ENABLE_API_ONLY=no
 # Check whether --enable-api-only or --disable-api-only was given.
 if test "${enable_api_only+set}" = set; then
@@ -1591,10 +1592,10 @@ if test "${enable_api_only+set}" = set; then
 #define ENABLE_API_ONLY 1
 _ACEOF
 
+		DEFAULT_TARGS="API test"
 	fi
 
 fi;
-
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -1663,12 +1664,14 @@ else
 fi;
 
 
+PC_LOOKUP_FILE=pc_lookup.c
 # Check whether --enable-dwarf or --disable-dwarf was given.
 if test "${enable_dwarf+set}" = set; then
   enableval="$enable_dwarf"
   if test x"$enableval" = xyes ; then
 		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
 		DISABLE_BFD=yes
+		PC_LOOKUP_FILE=pc_lookup_dwarf.c
 	fi ;
 	USE_LIBDWARF=yes
 
@@ -1676,6 +1679,7 @@ else
   USE_LIBDWARF=no
 
 fi;
+
 
 
 USE_GETARG=false
@@ -1879,6 +1883,7 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
   for ac_prog in mpcc_r xlc_r mpicc cmpicc gcc cc icc
 do
@@ -2168,7 +2173,8 @@ fi
 done
 test -n "$F77" || F77="mpif77"
 
-  LAUNCH=""
+  LAUNCH="\\\"\\\""
+  TEST_LIST="api-test.exp"
 fi
 
 ac_ext=c
@@ -5177,6 +5183,7 @@ fi
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
 FORTRAN_GETARG=""
+FORTRAN_GETARG_SRC_FILE=mpiP_getarg.f.part
 if test "$USE_GETARG" = true ; then
      ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -5276,7 +5283,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5279:" \
+echo "$as_me:5286:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5489,17 +5496,17 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: using get_command_argument" >&5
 echo "${ECHO_T}using get_command_argument" >&6
-                echo "       call get_command_argument(idx, buf, len)" > getarg.src
-                FORTRAN_GETARG=getarg.src
+                echo "       call get_command_argument(idx, buf, len)" > $FORTRAN_GETARG_SRC_FILE
+                FORTRAN_GETARG=$FORTRAN_GETARG_SRC_FILE
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: using getarg" >&5
 echo "${ECHO_T}using getarg" >&6
-	      echo "       call getarg(idx, buf)" > getarg.src
-	      echo "       len = mpipi_get_strlen(buf)" >> getarg.src
-	      FORTRAN_GETARG=getarg.src
+	      echo "       call getarg(idx, buf)" > $FORTRAN_GETARG_SRC_FILE
+	      echo "       len = mpipi_get_strlen(buf)" >> $FORTRAN_GETARG_SRC_FILE
+	      FORTRAN_GETARG=$FORTRAN_GETARG_SRC_FILE
 
 
 fi
@@ -5570,6 +5577,8 @@ _ACEOF
 
 
 
+FORTRAN_GETARG_OBJ_FILE=get_fortran_arg.o
+
 echo "$as_me:$LINENO: checking fortran compiler" >&5
 echo $ECHO_N "checking fortran compiler... $ECHO_C" >&6
 if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
@@ -5579,13 +5588,13 @@ if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   FORTRAN_TARGET=libmpiPpgf.a
 elif echo $F77 2>&1 | grep 'xlf' 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=IBM
-  if test "$USE_GETARG" = true ; then
+  if test "x$USE_GETARG" = xtrue ; then
     MPIPFLIB=mpiPxlf
     FORTRAN_TARGET=libmpiPxlf.a
   else
     MPIPFLIB=mpiP
   fi
-elif test "$G77" = yes ; then
+elif test "x$G77" = xyes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
   FORTRAN_TARGET=libmpiPg77.a
@@ -5605,6 +5614,9 @@ elif $F77 -V 2>&1 | grep -e Cray 1>/dev/null 2>/dev/null ; then
   FORTRAN_FLAG=-DCray_Fortran
   FORTRAN_TARGET=libmpiPftn.a
   MPIPFLIB=mpiPftn
+  if test "x$USE_GETARG" = xtrue ; then
+    FORTRAN_GETARG_OBJ_FILE=get_fortran_arg_pxf.o
+  fi
 elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Compaq
   MPIPFLIB=mpiP
@@ -5638,6 +5650,10 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 DISABLE_BFD=$DISABLE_BFD
+
+
+
+
 
 
 
@@ -6225,11 +6241,11 @@ s,@CFLAGS@,$CFLAGS,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@BINUTILS_DIR@,$BINUTILS_DIR,;t t
 s,@BIN_TYPE_FLAG@,$BIN_TYPE_FLAG,;t t
-s,@ENABLE_API_ONLY@,$ENABLE_API_ONLY,;t t
 s,@DISABLE_MPI_IO@,$DISABLE_MPI_IO,;t t
 s,@ENABLE_FORTRAN_XLATE@,$ENABLE_FORTRAN_XLATE,;t t
 s,@STACKDEPTH@,$STACKDEPTH,;t t
 s,@USE_LIBDWARF@,$USE_LIBDWARF,;t t
+s,@PC_LOOKUP_FILE@,$PC_LOOKUP_FILE,;t t
 s,@USE_GETARG@,$USE_GETARG,;t t
 s,@DO_DEMANGLE@,$DO_DEMANGLE,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
@@ -6256,6 +6272,10 @@ s,@FORTRAN_FLAG@,$FORTRAN_FLAG,;t t
 s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
 s,@FORTRAN_STR_DECL@,$FORTRAN_STR_DECL,;t t
 s,@DISABLE_BFD@,$DISABLE_BFD,;t t
+s,@ENABLE_API_ONLY@,$ENABLE_API_ONLY,;t t
+s,@DEFAULT_TARGS@,$DEFAULT_TARGS,;t t
+s,@FORTRAN_GETARG_OBJ_FILE@,$FORTRAN_GETARG_OBJ_FILE,;t t
+s,@TEST_LIST@,$TEST_LIST,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 /@FORTRAN_GETARG@/r $FORTRAN_GETARG
@@ -6754,4 +6774,3 @@ if test "$no_create" != yes; then
 fi
 
 
-rm -f getarg.src
