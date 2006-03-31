@@ -11,6 +11,7 @@ CFLAGS	+= -I..
 LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
+API_LIBS := -lmpiPapi $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 CPPFLAGS =
 
@@ -31,20 +32,26 @@ CSRCS =	0-simple.c \
 	13-pcontrol-report.c \
 	14-mpiio.c \
 	15-pcontrol.c \
-	api-test.c \
 	timer-info.c
 
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
+API_SRCS = api-test.c
+
+ifneq ($(ENABLE_API_ONLY),yes)
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
+EXES += $(API_SRCS:.c=.exe)
+else
+EXES = $(API_SRCS:.c=.exe)
+endif
 
 all: ${EXES}
 	@echo All done.
 
 .SUFFIXES: .exe
-.c.exe:
+.c.exe::
 	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
 
 .C.exe:
@@ -52,6 +59,8 @@ all: ${EXES}
 
 .f.exe:
 	${FC} ${FFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${FLIBS}
+
+api-test.exe :: LIBS=$(API_LIBS)
 
 clean::
 	rm -f ${EXES} *.mpiP *.o

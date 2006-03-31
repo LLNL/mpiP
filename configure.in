@@ -111,6 +111,7 @@ AC_ARG_WITH(clock_gettime,
 #  Enable / Disable specifications
 #
 
+DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API'
 ENABLE_API_ONLY=no
 AC_ARG_ENABLE(api-only,
 	AC_HELP_STRING([--enable-api-only], [Only build the API library.]),
@@ -118,10 +119,10 @@ AC_ARG_ENABLE(api-only,
 		ENABLE_API_ONLY=yes
 		echo Configuring for API library only.
                	AC_DEFINE(ENABLE_API_ONLY)
+		DEFAULT_TARGS="API test"
 	fi
 	,
 )
-AC_SUBST(ENABLE_API_ONLY)
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -181,17 +182,20 @@ AC_ARG_ENABLE(stackdepth,
 )
 AC_SUBST(STACKDEPTH)
 
+PC_LOOKUP_FILE=pc_lookup.c
 AC_ARG_ENABLE(dwarf,
 	AC_HELP_STRING([--enable-dwarf], [Use DWARF library for source lookup.]),
 	if test x"$enableval" = xyes ; then
 		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
 		DISABLE_BFD=yes
+		PC_LOOKUP_FILE=pc_lookup_dwarf.c
 	fi ;
 	USE_LIBDWARF=yes
 	,
 	USE_LIBDWARF=no
 )
 AC_SUBST(USE_LIBDWARF)
+AC_SUBST(PC_LOOKUP_FILE)
 
 USE_GETARG=false
 AC_ARG_ENABLE(getarg,
@@ -226,6 +230,7 @@ AC_ARG_ENABLE(check-time,
 
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
   AC_CHECK_PROGS(CC, mpcc_r xlc_r mpicc cmpicc gcc cc icc, mpicc)
   AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpiCC)
@@ -235,7 +240,8 @@ else
   AC_CHECK_PROGS(CC, gcc cc icc, mpicc)
   AC_CHECK_PROGS(CXX, c++ g++ CC cxx icc, mpiCC)
   AC_CHECK_PROGS(F77, f77 g77 pgf77 fort ifc, mpif77)
-  LAUNCH=""
+  LAUNCH="\\\"\\\""
+  TEST_LIST="api-test.exp"
 fi
 
 AC_CHECK_LIB(m,sqrt)
@@ -318,6 +324,7 @@ fi
 #  test whether get_command_argument is available, otherwise
 #  use getarg.
 FORTRAN_GETARG=""
+FORTRAN_GETARG_SRC_FILE=mpiP_getarg.f.part
 if test "$USE_GETARG" = true ; then
      AC_LANG_PUSH(Fortran 77)
      # Force Fortran compiler tests
@@ -330,12 +337,12 @@ if test "$USE_GETARG" = true ; then
        character*10 val
        call get_command_argument(0, val, len)]] ) ],
 	      AC_MSG_RESULT([using get_command_argument]) 
-                echo "       call get_command_argument(idx, buf, len)" > getarg.src
-                FORTRAN_GETARG=getarg.src,
+                echo "       call get_command_argument(idx, buf, len)" > $FORTRAN_GETARG_SRC_FILE
+                FORTRAN_GETARG=$FORTRAN_GETARG_SRC_FILE,
               AC_MSG_RESULT(using getarg) 
-	      echo "       call getarg(idx, buf)" > getarg.src
-	      echo "       len = mpipi_get_strlen(buf)" >> getarg.src
-	      FORTRAN_GETARG=getarg.src
+	      echo "       call getarg(idx, buf)" > $FORTRAN_GETARG_SRC_FILE
+	      echo "       len = mpipi_get_strlen(buf)" >> $FORTRAN_GETARG_SRC_FILE
+	      FORTRAN_GETARG=$FORTRAN_GETARG_SRC_FILE
               AC_SUBST_FILE(FORTRAN_GETARG)
                 )
      AC_LANG_POP(Fortran 77)
@@ -386,6 +393,8 @@ AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
 
 
 dnl ========== Identify F77 ==========
+FORTRAN_GETARG_OBJ_FILE=get_fortran_arg.o
+
 AC_MSG_CHECKING(fortran compiler)
 if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=PGI
@@ -394,13 +403,13 @@ if $F77 -V 2>&1 | grep -e 'Portland Group' 1> /dev/null 2> /dev/null ; then
   FORTRAN_TARGET=libmpiPpgf.a
 elif echo $F77 2>&1 | grep 'xlf' 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=IBM
-  if test "$USE_GETARG" = true ; then
+  if test "x$USE_GETARG" = xtrue ; then
     MPIPFLIB=mpiPxlf
     FORTRAN_TARGET=libmpiPxlf.a
   else
     MPIPFLIB=mpiP
   fi
-elif test "$G77" = yes ; then
+elif test "x$G77" = xyes ; then
   F77_VENDOR=GNU
   FORTRAN_FLAG=-DGNU_Fortran
   FORTRAN_TARGET=libmpiPg77.a
@@ -420,6 +429,9 @@ elif $F77 -V 2>&1 | grep -e Cray 1>/dev/null 2>/dev/null ; then
   FORTRAN_FLAG=-DCray_Fortran
   FORTRAN_TARGET=libmpiPftn.a
   MPIPFLIB=mpiPftn 
+  if test "x$USE_GETARG" = xtrue ; then
+    FORTRAN_GETARG_OBJ_FILE=get_fortran_arg_pxf.o
+  fi
 elif $F77 -version 2>&1 | grep -e Compaq 1> /dev/null 2> /dev/null ; then
   F77_VENDOR=Compaq
   MPIPFLIB=mpiP
@@ -447,9 +459,12 @@ AC_SUBST(FORTRAN_FLAG,$FORTRAN_FLAG)
 AC_SUBST(FORTRAN_TARGET,$FORTRAN_TARGET)
 AC_SUBST(FORTRAN_STR_DECL, $FORTRAN_STR_DECL)
 AC_SUBST(DISABLE_BFD, $DISABLE_BFD)
+AC_SUBST(ENABLE_API_ONLY)
+AC_SUBST(DEFAULT_TARGS)
+AC_SUBST(FORTRAN_GETARG_OBJ_FILE)
+AC_SUBST(TEST_LIST)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(FORTRAN_GETARG)
 
 AC_OUTPUT([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h])
 
-rm -f getarg.src
