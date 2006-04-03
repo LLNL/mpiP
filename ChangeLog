@@ -1,11 +1,33 @@
+2006-04-03  Chris Chambreau  <chcham@llnl.gov>
+
+  * configure, configure.in: Minor configure error.
+
+2006-03-31  Chris Chambreau  <chcham@llnl.gov>
+
+  * Makefile.in:
+  When running add_binutils_objs, check whether we are only configured
+  for the API library.
+
+  * testing/Makefile.in, testing/api-test.exp, configure.in, Check.mak.in, Makefile.in, configure:
+  o Added api-test test for check target (testing/api-test.exp).
+  o Configured check target for use with --enable-api-only configuration.
+  o Added other phony targets.
+  o Moved some Makefile conditional logic to configure.
+  o Reorganized pc_lookup and util rebuilding logic.
+  o Removed shared library target for AIX.
+  o Do not remove fortran getarg configure source file, to address the case
+    where files are re-configured with config.status.
+
 2006-03-30  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: new changes
 
   * testing/api-test.c, testing/timer-info.c, glob.c, mpiP-API.h, mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, report.c, util.c, configure:
   o Corrected various printing issues with incorrect types.
   o Added mpiP_format_address() to consistently format printed addresses, which
   should also be available through the API.
   o Corrected field widths when printing addresses instead of source info.
-  o Modified api-test and timer-info tests to behave appropriately when DISABLE_BFD
+  o Modified api-test and imer-info tests to behave appropriately when DISABLE_BFD
   is set.
 
 2006-03-29  Chris Chambreau  <chcham@llnl.gov>
