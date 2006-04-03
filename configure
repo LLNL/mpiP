@@ -1496,7 +1496,7 @@ fi;
 
 
 
-if test -z ${FFLAGS} ; then
+if test -z "${FFLAGS}" ; then
   FFLAGS=${CFLAGS}
 fi
 
