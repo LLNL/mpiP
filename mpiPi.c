@@ -553,8 +553,6 @@ mpiPi_mergeResults ()
   callsite_stats_t **av;
   int totalCount = 0;
   int maxCount = 0;
-  mpiPi_TIME tstart, tend;
-  mpiP_TIMER dur;
 
   /* gather local task data */
   h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
@@ -758,7 +756,6 @@ mpiPi_collect_basics ()
    */
   {
     int cnt;
-    MPI_Status status;
     mpiPi_task_info_t mti;
     int blockcounts[5] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
     MPI_Datatype types[5] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
