@@ -454,7 +454,7 @@ mpiPi_getenv ()
 char *
 getProcExeLink ()
 {
-  int pid, fh, exelen, insize = 256;
+  int pid, exelen, insize = 256;
   char *inbuf = NULL, file[256];
 
   pid = getpid ();
@@ -494,11 +494,10 @@ getProcExeLink ()
 void
 getProcCmdLine (int *ac, char **av, int max_args)
 {
-  int i = 0, pid, exelen, insize = 256;
+  int i = 0, pid;
   char *inbuf, file[256];
   FILE *infile;
   char *arg_ptr;
-  long fsize;
 
   *ac = 0;
   *av = NULL;
