@@ -1,6 +1,7 @@
 # Makefile for MPIP	-*-Makefile-*-
 # Copyright (C) 2001 Jeffrey Vetter vetter3@llnl.gov
 # $Header$
+# @configure_input@
 
 srcdir=@srcdir@
 prefix=@prefix@
@@ -196,24 +197,26 @@ else
 ${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h _timers.h
 endif
 
+install::
+	mkdir -p ${libdir} ${includedir}/timers ${docdir} ${bindir}
+	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
+	  ${INSTALL} doc/*txt doc/*html doc/README ${docdir} ; \
+	  ${INSTALL} bin/*mpip* ${bindir} ; \
+	fi
+
 ifeq ($(ENABLE_API_ONLY), no)
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} API
-	mkdir -p ${libdir} ${includedir}/timers ${docdir} ${bindir}
 	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${libdir}/${FORTRAN_TARGET} ; fi
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
 	${INSTALL} mpiP-API.h _timers.h ${includedir}
 	${INSTALL} timers/*h ${includedir}/timers
-	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
-	${INSTALL} bin/*mpip* ${bindir}
 else
 install:: API
-	mkdir -p ${libdir} ${includedir}/timers ${docdir}
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
 	${INSTALL} mpiP-API.h _timers.h ${includedir}
 	${INSTALL} timers/*h ${includedir}/timers
-	${INSTALL} doc/*txt doc/*html doc/README ${docdir}
 endif
 
 merged-install: add_binutils_objs add_libunwind_objs install

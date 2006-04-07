@@ -1,4 +1,6 @@
 #
+#  @configure_input@
+#
 #  Make targets for dejagnu evaluation of test codes
 #
 
@@ -14,7 +16,7 @@ RUNTESTFLAGS =
 TEST = @TEST_LIST@	
 # Execute the tests 
 check: site.exp @DEFAULT_TARGS@ test
-	DEJAGNU="./lib/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
+	DEJAGNU="./config/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
 	--tool testing --srcdir . $(TEST)
 	
 # Make the local config file
