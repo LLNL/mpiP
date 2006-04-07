@@ -1,6 +1,9 @@
-@ MPI specification file for wrapper generator.
 @
+@  @configure_input@
 @
+@  MPI specification file for wrapper generator.
+@
+
 int MPI_Abort ( MPI_Comm comm, int errorcode )
 directives
 	nowrapper

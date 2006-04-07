@@ -8,7 +8,9 @@
    Center for Applied Scientific Computing, LLNL
    01 Feb 2001
 
-   aix_local.h -- local aix high res timers
+   @configure_input@
+
+   local aix high res timers
 
 */
 

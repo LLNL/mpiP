@@ -10,6 +10,8 @@
 
    mpiPi.h -- internal mpiP header
 
+   @configure_input@
+
 */
 
 #ifndef _MPIPI_H
