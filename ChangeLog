@@ -1,4 +1,44 @@
+2006-04-12  Chris Chambreau  <chcham@llnl.gov>
+
+  * report.c, configure, configure.in, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in:
+  This commit adds substantial reporting changes to address memory use for
+  platforms such as Blue Gene.
+
+  The previous reporting mechanism is the default configuration,
+  but the new low-memory-use approach can be configured with the
+  --enable-low-mem-report configure flag, which defines LOW_MEM_REPORT in
+  mpiPconfig.h.
+
+  Instead of aggregating all process information at a single process,
+  process-specific information is printed by allocating
+  sizeof(callsite_stats_t)*process_count and iterating through callsites
+  using PMPI_Gather to collect and then print process-specific callsite information.
+
+  This results in a fixed amount of memory use which is independent of the number of
+  MPI callsites in the application.
+
+  * glob.c: Patch version update to reflect changes.
+
+  * diag_msgs.c: Make debug messages have consistent debug label DBG.
+
+  * Makefile.in:
+  Specify '-gnu' option for indent to override any local .indent.pro settings.
+
+2006-04-07  Chris Chambreau  <chcham@llnl.gov>
+
+  * mpiPi.c, util.c: Removed unused variables.
+
+  * config/testing.exp:
+  Actual commit of moving dejagnu global config file from lib to config directory.
+
+  * timers/aix_local.h.in, testing/Makefile.in, Check.mak.in, Defs.mak.in, Makefile.in, get_fortran_arg.f.in, mpi.protos.txt.in, mpiPi.h.in:
+  o Added configure_input substitution message in configured files.
+  o Moved dejagnu global file from lib dir into config dir.
+  o Added install logic to test whether doc and bin dirs need to be copied.
+
 2006-04-03  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: new changes.
 
   * configure, configure.in: Minor configure error.
 
