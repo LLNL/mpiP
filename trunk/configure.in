@@ -124,6 +124,13 @@ AC_ARG_ENABLE(api-only,
 	,
 )
 
+AC_ARG_ENABLE(low-mem-report,
+	AC_HELP_STRING([--enable-low-mem-report], [Reduce memory use by only gathering individual process data for each callsite.]),
+	if test x"$enableval" = xyes ; then
+                AC_DEFINE(LOW_MEM_REPORT)
+	fi
+	,
+)
 
 if test "$ENABLE_API_ONLY" = no ; then
 

@@ -142,6 +142,7 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_io = 0.0;
   mpiPi.global_mpi_msize_threshold_count = 0.0;
   mpiPi.global_mpi_sent_count = 0.0;
+  mpiPi.global_time_callsite_count = 0;
 
 
   /* set some defaults values */
@@ -423,6 +424,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 
   mpiPi_query_src (p);		/* sets the file/line in p */
 
+#ifndef LOW_MEM_REPORT		/* { */
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
      one src line. We aggregate across rank after this. */
@@ -476,6 +478,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
       csp->cumulativeIO += p->cumulativeIO;
       csp->arbitraryMessageCount += p->arbitraryMessageCount;
     }
+#endif /* } ifndef LOW_MEM_REPORT */
 
   /* agg. Don't use rank */
   if (NULL == h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
@@ -538,6 +541,22 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 	  csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
 	  csp->siteDataIdx += 1;
 	}
+    }
+
+  /* Do global accumulation while we are iterating through individual callsites */
+  mpiPi.global_task_info[p->rank].mpi_time += p->cumulativeTime;
+
+  mpiPi.global_mpi_time += p->cumulativeTime;
+  assert (mpiPi.global_mpi_time >= 0);
+  mpiPi.global_mpi_size += p->cumulativeDataSent;
+  mpiPi.global_mpi_io += p->cumulativeIO;
+  if (p->cumulativeTime > 0)
+    mpiPi.global_time_callsite_count++;
+
+  if (p->cumulativeDataSent > 0)
+    {
+      mpiPi.global_mpi_msize_threshold_count += p->arbitraryMessageCount;
+      mpiPi.global_mpi_sent_count += p->count;
     }
 
   return 1;
@@ -649,6 +668,18 @@ mpiPi_mergeResults ()
 		 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
       free (sbuf);
     }
+  if (mpiPi.rank == mpiPi.collectorRank)
+    {
+#ifndef LOW_MEM_REPORT
+      mpiPi_msg_debug
+	("MEMORY : Allocated for global_callsite_stats     : %13ld\n",
+	 h_count (mpiPi.global_callsite_stats) * sizeof (callsite_stats_t));
+#endif
+      mpiPi_msg_debug
+	("MEMORY : Allocated for global_callsite_stats_agg : %13ld\n",
+	 h_count (mpiPi.global_callsite_stats_agg) *
+	 sizeof (callsite_stats_t));
+    }
 
   /* TODO: need to free all these pointers as well. */
   free (av);
@@ -676,64 +707,65 @@ mpiPi_publishResults ()
   int ac;
   callsite_stats_t **av;
   int i;
-  FILE *fp;
+  FILE *fp = NULL;
   static int printCount = 0;
 
-  if (mpiPi.collectorRank != mpiPi.rank)
+  if (mpiPi.collectorRank == mpiPi.rank)
     {
-      return;
-    }
 
-  /* take the final data from merge and display in a nice format */
-  if (0 == h_gather_data (mpiPi.global_callsite_stats, &ac, (void ***) &av))
-    {
-      mpiPi_msg_warn ("Global callsite table empty! Aborting report!\n");
-      return;
-    }
+      /* take the final data from merge and display in a nice format */
+      if (0 ==
+	  h_gather_data (mpiPi.global_callsite_stats_agg, &ac,
+			 (void ***) &av))
+	{
+	  mpiPi_msg_warn ("Global callsite table empty! Aborting report!\n");
+	  return;
+	}
 
-  mpiPi_msg_debug ("Found %d entries in global callsite table.\n", ac);
-  mpiPi_msg_debug ("\n");
+      mpiPi_msg_debug ("Found %d entries in global callsite table.\n", ac);
+      mpiPi_msg_debug ("\n");
 
-  /* Generate output filename, and open */
-  {
-    char nowstr[128];
-    const struct tm *nowstruct;
-    char *fmtstr = "%Y %m %d %H %M %S";
-    nowstruct = localtime (&mpiPi.start_timeofday);
-    if (strftime (nowstr, 128, fmtstr, nowstruct) == (size_t) 0)
-      mpiPi_msg_warn ("Could not get string from strftime()\n");
-    for (i = 0; nowstr[i] != '\0'; i++)
+      /* Generate output filename, and open */
       {
-	if (nowstr[i] == ' ')
+	char nowstr[128];
+	const struct tm *nowstruct;
+	char *fmtstr = "%Y %m %d %H %M %S";
+	nowstruct = localtime (&mpiPi.start_timeofday);
+	if (strftime (nowstr, 128, fmtstr, nowstruct) == (size_t) 0)
+	  mpiPi_msg_warn ("Could not get string from strftime()\n");
+	for (i = 0; nowstr[i] != '\0'; i++)
 	  {
-	    nowstr[i] = '-';
+	    if (nowstr[i] == ' ')
+	      {
+		nowstr[i] = '-';
+	      }
 	  }
-      }
 
-    do
-      {
-	printCount++;
-	sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
-		 mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
-      }
-    while (access (mpiPi.oFilename, F_OK) == 0);
+	do
+	  {
+	    printCount++;
+	    sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+		     mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+	  }
+	while (access (mpiPi.oFilename, F_OK) == 0);
 
-    fp = fopen (mpiPi.oFilename, "w");
-  }
-  if (fp == NULL)
-    {
-      mpiPi_msg_warn ("Could not open [%s], writing to stdout\n",
-		      mpiPi.oFilename);
-      fp = stdout;
-    }
-  else
-    {
-      mpiPi_msg ("\n");
-      mpiPi_msg ("Storing mpiP output in [%s].\n", mpiPi.oFilename);
-      mpiPi_msg ("\n");
+	fp = fopen (mpiPi.oFilename, "w");
+      }
+      if (fp == NULL)
+	{
+	  mpiPi_msg_warn ("Could not open [%s], writing to stdout\n",
+			  mpiPi.oFilename);
+	  fp = stdout;
+	}
+      else
+	{
+	  mpiPi_msg ("\n");
+	  mpiPi_msg ("Storing mpiP output in [%s].\n", mpiPi.oFilename);
+	  mpiPi_msg ("\n");
+	}
     }
   mpiPi_profile_print (fp);
-  if (fp != stdout)
+  if (fp != stdout && fp != NULL)
     {
       fclose (fp);
     }
@@ -748,77 +780,73 @@ mpiPi_collect_basics ()
 {
   int i = 0;
   double app_time = mpiPi.cumulativeTime;
+  int cnt;
+  mpiPi_task_info_t mti;
+  int blockcounts[5] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
+  MPI_Datatype types[5] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
+  MPI_Aint displs[5];
+  MPI_Datatype mti_type;
+  MPI_Request *recv_req_arr;
 
   mpiPi_msg_debug ("Collect Basics\n");
 
-  /* 
-   * -- sweep across all tasks, collecting task information about them 
-   */
-  {
-    int cnt;
-    mpiPi_task_info_t mti;
-    int blockcounts[5] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
-    MPI_Datatype types[5] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
-    MPI_Aint displs[5];
-    MPI_Datatype mti_type;
-    MPI_Request *recv_req_arr;
+  cnt = 0;
+  PMPI_Address (&mti.mpi_time, &displs[cnt++]);
+  PMPI_Address (&mti.app_time, &displs[cnt++]);
+  PMPI_Address (&mti.rank, &displs[cnt++]);
+  PMPI_Address (&mti.hostname, &displs[cnt++]);
 
-    cnt = 0;
-    PMPI_Address (&mti.mpi_time, &displs[cnt++]);
-    PMPI_Address (&mti.app_time, &displs[cnt++]);
-    PMPI_Address (&mti.rank, &displs[cnt++]);
-    PMPI_Address (&mti.hostname, &displs[cnt++]);
+  for (i = cnt; i >= 0; i--)
+    {
+      displs[i] -= displs[0];
+    }
+  PMPI_Type_struct (cnt, blockcounts, displs, types, &mti_type);
+  PMPI_Type_commit (&mti_type);
 
-    for (i = cnt; i >= 0; i--)
-      {
-	displs[i] -= displs[0];
-      }
-    PMPI_Type_struct (cnt, blockcounts, displs, types, &mti_type);
-    PMPI_Type_commit (&mti_type);
+  if (mpiPi.rank == mpiPi.collectorRank)
+    {
+      mpiPi.global_task_info =
+	(mpiPi_task_info_t *) calloc (mpiPi.size, sizeof (mpiPi_task_info_t));
+      if (mpiPi.global_task_info == NULL)
+	mpiPi_abort ("Failed to allocate memory for global_task_info");
 
-    if (mpiPi.rank == mpiPi.collectorRank)
-      {
-	mpiPi.global_task_info =
-	  (mpiPi_task_info_t *) calloc (mpiPi.size,
-					sizeof (mpiPi_task_info_t));
-	if (mpiPi.global_task_info == NULL)
-	  mpiPi_abort ("Failed to allocate memory for global task_info");
+      mpiPi_msg_debug
+	("MEMORY : Allocated for global_task_info :          %13ld\n",
+	 mpiPi.size * sizeof (mpiPi_task_info_t));
 
-	bzero (mpiPi.global_task_info,
-	       mpiPi.size * sizeof (mpiPi_task_info_t));
+      bzero (mpiPi.global_task_info, mpiPi.size * sizeof (mpiPi_task_info_t));
 
-	recv_req_arr =
-	  (MPI_Request *) malloc (sizeof (MPI_Request) * mpiPi.size);
-	for (i = 0; i < mpiPi.size; i++)
-	  {
-	    mpiPi_task_info_t *p = &mpiPi.global_task_info[i];
-	    if (i != mpiPi.collectorRank)
-	      {
-		PMPI_Irecv (p, 1, mti_type, i, mpiPi.tag,
-			    mpiPi.comm, &(recv_req_arr[i]));
-	      }
-	    else
-	      {
-		strcpy (p->hostname, mpiPi.hostname);
-		p->app_time = app_time;
-		p->rank = mpiPi.rank;
-		recv_req_arr[i] = MPI_REQUEST_NULL;
-	      }
-	  }
-	PMPI_Waitall (mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
-	free (recv_req_arr);
-      }
-    else
-      {
-	strcpy (mti.hostname, mpiPi.hostname);
-	mti.app_time = app_time;
-	mti.rank = mpiPi.rank;
-	PMPI_Send (&mti, 1, mti_type, mpiPi.collectorRank,
-		   mpiPi.tag, mpiPi.comm);
-      }
+      recv_req_arr =
+	(MPI_Request *) malloc (sizeof (MPI_Request) * mpiPi.size);
+      for (i = 0; i < mpiPi.size; i++)
+	{
+	  mpiPi_task_info_t *p = &mpiPi.global_task_info[i];
+	  if (i != mpiPi.collectorRank)
+	    {
+	      PMPI_Irecv (p, 1, mti_type, i, mpiPi.tag,
+			  mpiPi.comm, &(recv_req_arr[i]));
+	    }
+	  else
+	    {
+	      strcpy (p->hostname, mpiPi.hostname);
+	      p->app_time = app_time;
+	      p->rank = mpiPi.rank;
+	      recv_req_arr[i] = MPI_REQUEST_NULL;
+	    }
+	}
+      PMPI_Waitall (mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
+      free (recv_req_arr);
+    }
+  else
+    {
+      strcpy (mti.hostname, mpiPi.hostname);
+      mti.app_time = app_time;
+      mti.rank = mpiPi.rank;
+      PMPI_Send (&mti, 1, mti_type, mpiPi.collectorRank,
+		 mpiPi.tag, mpiPi.comm);
+    }
 
-    PMPI_Type_free (&mti_type);
-  }
+  PMPI_Type_free (&mti_type);
 
   return;
 }
@@ -854,7 +882,7 @@ mpiPi_generateReport ()
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
-  mpiPi_msg_debug0 ("TIMING : collect_basics_time is %f\n", dur);
+  mpiPi_msg_debug0 ("TIMING : collect_basics_time is %12.6f\n", dur);
 
   mpiPi_msg_debug0 ("starting mergeResults\n");
 
@@ -863,7 +891,7 @@ mpiPi_generateReport ()
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
-  mpiPi_msg_debug0 ("TIMING : merge time is %f\n", dur);
+  mpiPi_msg_debug0 ("TIMING : merge time is          %12.6f\n", dur);
   mpiPi_msg_debug0 ("starting publishResults\n");
 
   if (mergeResult == 1)
@@ -872,7 +900,7 @@ mpiPi_generateReport ()
       mpiPi_publishResults ();
       mpiPi_GETTIME (&timer_end);
       dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
-      mpiPi_msg_debug0 ("TIMING : publish time is %f\n", dur);
+      mpiPi_msg_debug0 ("TIMING : publish time is        %12.6f\n", dur);
     }
 
 }
@@ -900,8 +928,6 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 
   if (!mpiPi.enabled)
     return;
-
-/*  fprintf(stderr, "received sendSize of %f\n", sendSize); */
 
   assert (mpiPi.task_callsite_stats != NULL);
   assert (dur >= 0);
