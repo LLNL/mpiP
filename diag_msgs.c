@@ -74,7 +74,7 @@ mpiPi_msg_debug0 (char *fmt, ...)
   if (mpiPi.rank == 0)
     {
       va_start (args, fmt);
-      fprintf (fp, "%s: ", mpiPi.toolname);
+      fprintf (fp, "%s: DBG: ", mpiPi.toolname);
       vfprintf (fp, fmt, args);
       va_end (args);
       fflush (fp);
