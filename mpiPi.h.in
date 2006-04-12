@@ -163,6 +163,7 @@ typedef struct _mpiPi_t
   double global_mpi_io;
   long long global_mpi_msize_threshold_count;
   long long global_mpi_sent_count;
+  long long global_time_callsite_count;
 
   int tableSize;
   h_t *task_callsite_stats;

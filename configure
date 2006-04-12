@@ -858,6 +858,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-api-only       Only build the API library.
+  --enable-low-mem-report Reduce memory use by only gathering individual
+                          process data for each callsite.
   --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
@@ -1597,6 +1599,17 @@ _ACEOF
 
 fi;
 
+# Check whether --enable-low-mem-report or --disable-low-mem-report was given.
+if test "${enable_low_mem_report+set}" = set; then
+  enableval="$enable_low_mem_report"
+  if test x"$enableval" = xyes ; then
+                cat >>confdefs.h <<\_ACEOF
+#define LOW_MEM_REPORT 1
+_ACEOF
+
+	fi
+
+fi;
 
 if test "$ENABLE_API_ONLY" = no ; then
 
@@ -5283,7 +5296,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5286:" \
+echo "$as_me:5299:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

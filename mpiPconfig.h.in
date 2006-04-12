@@ -41,4 +41,7 @@
 /* Do non-MPI configure for API library only */
 #undef ENABLE_API_ONLY
 
+/* Do not aggregate all task info on collectorRank for reporting */
+#undef LOW_MEM_REPORT
+
 #endif /* _CONFIG_H */
