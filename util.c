@@ -217,7 +217,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   for (i = 0; i < max_back; i++)
     {
-      if (fp != NULL)
+      if (fp != NULL && pc != NULL)
 	{
 	  /* record this frame's pc */
 	  pc = FramePC (fp);
