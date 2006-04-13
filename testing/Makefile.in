@@ -4,6 +4,7 @@
 # @configure_input@
 
 srcdir=@srcdir@
+exclude_mpi_io_tests=@DISABLE_MPI_IO@
 VPATH = $(srcdir)
 
 include ../Defs.mak
@@ -31,10 +32,12 @@ CSRCS =	0-simple.c \
 	11-p2p-mess-size.c \
 	12-null-null.c \
 	13-pcontrol-report.c \
-	14-mpiio.c \
 	15-pcontrol.c \
 	timer-info.c
 
+ifeq (${exclude_mpi_io_tests},no)
+CSRCS = 14-mpiio.c
+endif
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
 API_SRCS = api-test.c

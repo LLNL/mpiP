@@ -5027,6 +5027,7 @@ else
   echo "$as_me:$LINENO: result: MPI I/O symbols not found.  MPI I/O reporting deactivated." >&5
 echo "${ECHO_T}MPI I/O symbols not found.  MPI I/O reporting deactivated." >&6
                 HAVE_MPI_IO=/dev/null
+                DISABLE_MPI_IO=yes
 fi
 
 
@@ -5296,7 +5297,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5299:" \
+echo "$as_me:5300:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

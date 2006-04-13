@@ -2,7 +2,6 @@ set test_targ "./testing/$test"
 global expect_out
 exec sleep $pause_time
 
-
 proc checkOutput { text type } {
   global outFile
   global test
@@ -86,7 +85,9 @@ proc checkSource { } {
 
   global expect_out
   global source_check_file
-  global test outFile
+  global test outFile test_targ
+
+  if ![file executable $test_targ ] { return }
 
   runTest
 
