@@ -304,7 +304,8 @@ AC_CHECK_FUNC(MPI_File_open,
 	      AC_CHECK_LIB(mpio,MPI_File_open, 
                 AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio",
                 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
-                HAVE_MPI_IO=/dev/null)
+                HAVE_MPI_IO=/dev/null
+                DISABLE_MPI_IO=yes )
 )
 else
   HAVE_MPI_IO=/dev/null
