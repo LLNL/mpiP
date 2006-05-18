@@ -143,7 +143,7 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_msize_threshold_count = 0.0;
   mpiPi.global_mpi_sent_count = 0.0;
   mpiPi.global_time_callsite_count = 0;
-
+  mpiPi.global_task_info = NULL;
 
   /* set some defaults values */
   mpiPi.collectorRank = 0;
@@ -621,12 +621,18 @@ mpiPi_mergeResults ()
       mpiPi.global_callsite_stats_agg = h_open (mpiPi.tableSize,
 						mpiPi_callsite_stats_src_id_hashkey,
 						mpiPi_callsite_stats_src_id_comparator);
-      callsite_pc_cache = h_open (mpiPi.tableSize,
-				  callsite_pc_cache_hashkey,
-				  callsite_pc_cache_comparator);
-      callsite_src_id_cache = h_open (mpiPi.tableSize,
-				      callsite_src_id_cache_hashkey,
-				      callsite_src_id_cache_comparator);
+      if (callsite_pc_cache == NULL)
+	{
+	  callsite_pc_cache = h_open (mpiPi.tableSize,
+				      callsite_pc_cache_hashkey,
+				      callsite_pc_cache_comparator);
+	}
+      if (callsite_src_id_cache == NULL)
+	{
+	  callsite_src_id_cache = h_open (mpiPi.tableSize,
+					  callsite_src_id_cache_hashkey,
+					  callsite_src_id_cache_comparator);
+	}
       /* Try to allocate space for max count of callsite info from all tasks  */
       mpiPi.rawCallsiteData =
 	(callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
@@ -765,6 +771,7 @@ mpiPi_publishResults ()
 	}
     }
   mpiPi_profile_print (fp);
+  PMPI_Barrier (MPI_COMM_WORLD);
   if (fp != stdout && fp != NULL)
     {
       fclose (fp);
@@ -805,14 +812,20 @@ mpiPi_collect_basics ()
 
   if (mpiPi.rank == mpiPi.collectorRank)
     {
-      mpiPi.global_task_info =
-	(mpiPi_task_info_t *) calloc (mpiPi.size, sizeof (mpiPi_task_info_t));
+      /* In the case where multiple reports are generated per run,
+         only allocate memory for global_task_info once */
       if (mpiPi.global_task_info == NULL)
-	mpiPi_abort ("Failed to allocate memory for global_task_info");
+	{
+	  mpiPi.global_task_info =
+	    (mpiPi_task_info_t *) calloc (mpiPi.size,
+					  sizeof (mpiPi_task_info_t));
+	  if (mpiPi.global_task_info == NULL)
+	    mpiPi_abort ("Failed to allocate memory for global_task_info");
 
-      mpiPi_msg_debug
-	("MEMORY : Allocated for global_task_info :          %13ld\n",
-	 mpiPi.size * sizeof (mpiPi_task_info_t));
+	  mpiPi_msg_debug
+	    ("MEMORY : Allocated for global_task_info :          %13ld\n",
+	     mpiPi.size * sizeof (mpiPi_task_info_t));
+	}
 
       bzero (mpiPi.global_task_info, mpiPi.size * sizeof (mpiPi_task_info_t));
 
@@ -836,6 +849,11 @@ mpiPi_collect_basics ()
 	}
       PMPI_Waitall (mpiPi.size, recv_req_arr, MPI_STATUSES_IGNORE);
       free (recv_req_arr);
+      /* task MPI time is calculated from callsites data 
+         in mpiPi_insert_callsite_records.
+       */
+      for (i = 0; i < mpiPi.size; i++)
+	mpiPi.global_task_info[i].mpi_time = 0.0;
     }
   else
     {
@@ -867,6 +885,7 @@ mpiPi_generateReport ()
 	(mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
       mpiPi.cumulativeTime += dur;
       assert (mpiPi.cumulativeTime >= 0);
+      mpiPi_GETTIME (&mpiPi.startTime);
     }
 
   if (time (&mpiPi.stop_timeofday) == (time_t) - 1)
@@ -902,7 +921,6 @@ mpiPi_generateReport ()
       dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
       mpiPi_msg_debug0 ("TIMING : publish time is        %12.6f\n", dur);
     }
-
 }
 
 
