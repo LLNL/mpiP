@@ -175,7 +175,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 {
   int i, frame_count = 0;
   void *fp, *lastfp;
-  void *pc;
+  void *pc = (void *) 1;
 
   /*  
      For standard mpiP, the current stack looks like:
