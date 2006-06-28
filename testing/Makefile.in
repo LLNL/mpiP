@@ -36,7 +36,7 @@ CSRCS =	0-simple.c \
 	timer-info.c
 
 ifeq (${exclude_mpi_io_tests},no)
-CSRCS = 14-mpiio.c
+CSRCS += 14-mpiio.c
 endif
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
