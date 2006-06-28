@@ -115,7 +115,8 @@ enum
   MPIP_AGGREGATE_MESS_FMT, MPIP_AGGREGATE_IO_FMT,
   MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT,
   MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
-  MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT
+  MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT,
+  MPIP_CALLSITE_TIME_CONCISE_FMT, MPIP_CALLSITE_MESS_CONCISE_FMT
 };
 
 typedef enum
@@ -183,9 +184,10 @@ typedef struct _mpiPi_t
   int messageCountThreshold;
   long text_start;
   int obj_mode;
-  int allocCount;
-  long allocSize;
   int printRankInfo;
+  enum mpiPi_report_style
+  { mpiPi_style_verbose, mpiPi_style_concise, mpiPi_style_both } report_style;
+  int print_callsite_detail;
 }
 mpiPi_t;
 

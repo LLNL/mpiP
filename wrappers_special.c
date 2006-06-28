@@ -72,7 +72,7 @@ MPI_Init (int *argc, char ***argv)
   else
     {
 #ifdef Linux
-      getProcCmdLine (&(mpiPi.ac), mpiPi.av, 32);
+      getProcCmdLine (&(mpiPi.ac), mpiPi.av);
 #else
       mpiPi.ac = 0;
 #endif
@@ -89,7 +89,7 @@ F77_MPI_INIT (int *ierr)
 
   mpiPi.toolname = "mpiP";
 #ifdef Linux
-  getProcCmdLine (&(mpiPi.ac), mpiPi.av, 32);
+  getProcCmdLine (&(mpiPi.ac), mpiPi.av);
 #else
   mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, 32);
 #endif

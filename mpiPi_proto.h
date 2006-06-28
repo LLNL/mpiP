@@ -36,9 +36,9 @@ extern int callsite_src_id_cache_comparator (const void *p1, const void *p2);
 extern int callsite_src_id_cache_hashkey (const void *p1);
 extern int mpiPi_query_src (callsite_stats_t * p);
 extern int mpiPi_mergeResults (void);
-extern void mpiPi_publishResults (void);
+extern void mpiPi_publishResults (int report_style);
 extern void mpiPi_collect_basics (void);
-extern void mpiPi_generateReport (void);
+extern void mpiPi_generateReport (int report_style);
 extern void mpiPi_finalize (void);
 extern void mpiPi_update_callsite_stats (unsigned op, unsigned rank,
 					 void **pc, double dur,
@@ -51,13 +51,24 @@ extern void close_bfd_executable (void);
 extern int MPI_Pcontrol (const int flag, ...);
 extern int mpi_pcontrol_ (int *flag, ...);
 extern double calc_COV (double *data, int dataSize);
-extern int mpiPi_profile_print (FILE * fp);
+extern void mpiPi_profile_print (FILE * fp, int report_style);
+extern void mpiPi_profile_print_verbose (FILE * fp);
+extern void mpiPi_profile_print_concise (FILE * fp);
 extern char *GetBaseAppName (char *rawName);
 extern int mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back);
 extern void mpiPi_getenv (void);
 extern char *getProcExeLink (void);
-extern void getProcCmdLine (int *ac, char **av, int max_args);
+extern void getProcCmdLine (int *ac, char **av);
 extern void mpiPi_copy_args (int *ac, char **av, int av_len);
 extern void mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc,
 				   char **argv);
 extern unsigned long long mpiPi_get_text_start (char *filename);
+extern void mpiPi_print_callsite_time_info (FILE * fp);
+extern void mpiPi_print_all_callsite_time_info (FILE * fp);
+extern void mpiPi_print_concise_callsite_time_info (FILE * fp);
+extern void mpiPi_print_callsite_sent_info (FILE * fp);
+extern void mpiPi_print_all_callsite_sent_info (FILE * fp);
+extern void mpiPi_print_concise_callsite_sent_info (FILE * fp);
+extern void mpiPi_print_task_info (FILE * fp, int report_style);
+extern void mpiPi_print_verbose_task_info (FILE * fp);
+extern void mpiPi_print_concise_task_info (FILE * fp);

@@ -233,9 +233,10 @@ clean::
 cleanobjs:
 	rm -f ${FOBJS} ${API_OBJS}
 
-MPIINC	= -I/usr/lpp/ppe.poe/include
+MPIINC	= -I/usr/lpp/ppe.poe/include -I /usr/lib/mpi/mpi_intel/include
+LINT = gcc -Wall
 lint: ${SRCS}
-	gcc -Wall -Dlint ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
+	${LINT} -Dlint -I. ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
 	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f timers/aix_local.h
