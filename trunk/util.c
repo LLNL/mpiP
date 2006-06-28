@@ -39,7 +39,7 @@ static char *rcsid =
 
 
 static int argc = 0;
-static char **argv = 0;
+static char **argv = NULL;
 
 
 char *
@@ -261,7 +261,6 @@ mpiPi_getenv ()
     {
       int c;
       extern char *optarg;
-      extern int optind;
       int ac = 0;
       char *av[64];
       char *sep = " \t";
@@ -278,7 +277,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:")) != EOF);)
+      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:dv")) != EOF);)
 	{
 	  switch (c)
 	    {
@@ -286,8 +285,7 @@ mpiPi_getenv ()
 	      mpiPi.outputDir = optarg;
 	      if (mpiPi.rank == 0)
 		mpiPi_msg
-		  ("Set the final tracfile output directory to [%s].\n",
-		   mpiPi.outputDir);
+		  ("Set the output directory to [%s].\n", mpiPi.outputDir);
 	      break;
 
 	    case 'g':
@@ -401,8 +399,12 @@ mpiPi_getenv ()
 	      mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
 	      break;
 
-	    case 'c':		/* changed to disable COV value */
-	      mpiPi.calcCOV = 0;
+	    case 'c':
+	      mpiPi.report_style = mpiPi_style_concise;
+	      break;
+
+	    case 'v':
+	      mpiPi.report_style = mpiPi_style_both;
 	      break;
 
 	    case 'm':
@@ -420,10 +422,13 @@ mpiPi_getenv ()
 				   mpiPi.appFullName);
 		}
 	      break;
+	    case 'd':
+	      /*  Suppress printing of call site detail   */
+	      mpiPi.print_callsite_detail = 0;
+	      break;
 
 	    case 'a':
 	    case 'b':
-	    case 'd':
 	    case 'h':
 	    case 'i':
 	    case 'j':
@@ -432,7 +437,6 @@ mpiPi_getenv ()
 	    case 'q':
 	    case 'r':
 	    case 'u':
-	    case 'v':
 	    case 'w':
 	    case 'y':
 	    case 'z':
@@ -458,7 +462,7 @@ getProcExeLink ()
   char *inbuf = NULL, file[256];
 
   pid = getpid ();
-  sprintf (file, "/proc/%d/exe", pid);
+  snprintf (file, 256, "/proc/%d/exe", pid);
   inbuf = malloc (insize);
   if (inbuf == NULL)
     {
@@ -476,7 +480,7 @@ getProcExeLink ()
 	      inbuf = realloc (inbuf, insize);
 	      exelen = readlink (file, inbuf, insize);
 	    }
-	  inbuf[exelen] = 0;
+	  inbuf[exelen] = '\0';
 	  return inbuf;
 	}
       else
@@ -484,7 +488,7 @@ getProcExeLink ()
     }
   else
     {
-      inbuf[exelen] = 0;
+      inbuf[exelen] = '\0';
       return inbuf;
     }
   return NULL;
@@ -492,7 +496,7 @@ getProcExeLink ()
 
 #define MPIP_MAX_ARG_STRING_SIZE 4096
 void
-getProcCmdLine (int *ac, char **av, int max_args)
+getProcCmdLine (int *ac, char **av)
 {
   int i = 0, pid;
   char *inbuf, file[256];
@@ -503,7 +507,7 @@ getProcCmdLine (int *ac, char **av, int max_args)
   *av = NULL;
 
   pid = getpid ();
-  sprintf (file, "/proc/%d/cmdline", pid);
+  snprintf (file, 256, "/proc/%d/cmdline", pid);
   infile = fopen (file, "r");
 
   if (infile != NULL)
@@ -514,7 +518,7 @@ getProcCmdLine (int *ac, char **av, int max_args)
 	  if (fread (inbuf, 1, MPIP_MAX_ARG_STRING_SIZE, infile) > 0)
 	    {
 	      arg_ptr = inbuf;
-	      while (*arg_ptr != 0)
+	      while (*arg_ptr != '\0')
 		{
 		  av[i] = strdup (arg_ptr);
 		  arg_ptr += strlen (av[i]) + 1;
@@ -626,7 +630,7 @@ mpiP_format_address (void *pval, char *addr_buf)
   if (get_sys_info == 0)
     {
       ptr_hex_chars = sizeof (char *) * 2;
-      sprintf (test_buf, "%0p", (void *) 0x1);
+      snprintf (test_buf, 8, "%0p", (void *) 0x1);
 
       if (strcmp (test_buf, "0x1") != 0)
 	strcpy (hex_prefix, "0x");
