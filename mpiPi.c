@@ -140,8 +140,8 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_time = 0.0;
   mpiPi.global_mpi_size = 0.0;
   mpiPi.global_mpi_io = 0.0;
-  mpiPi.global_mpi_msize_threshold_count = 0.0;
-  mpiPi.global_mpi_sent_count = 0.0;
+  mpiPi.global_mpi_msize_threshold_count = 0;
+  mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
   mpiPi.global_task_info = NULL;
 
@@ -156,6 +156,8 @@ mpiPi_init (char *appName)
   mpiPi.inAPIrtb = 0;
   mpiPi.do_lookup = 1;
   mpiPi.messageCountThreshold = -1;
+  mpiPi.report_style = mpiPi_style_verbose;
+  mpiPi.print_callsite_detail = 1;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -378,16 +380,6 @@ mpiPi_query_src (callsite_stats_t * p)
       key.functname[i] = p->functname[i];
       key.line[i] = p->lineno[i];
       key.pc[i] = p->pc[i];
-
-      /*  Do not bother recording frames above main  */
-      if (p->functname[i] != NULL &&
-	  (strcmp (p->functname[i], "MAIN__") == 0 ||
-	   strcmp (p->functname[i], "main") == 0 ||
-	   strcmp (p->functname[i], ".main") == 0))
-	{
-	  p->pc[i + 1] = NULL;
-	  break;
-	}
     }
 
   /* lookup/generate an ID based on the callstack, not just the callsite pc */
@@ -572,6 +564,7 @@ mpiPi_mergeResults ()
   callsite_stats_t **av;
   int totalCount = 0;
   int maxCount = 0;
+  int retval = 1, sendval;
 
   /* gather local task data */
   h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
@@ -636,29 +629,46 @@ mpiPi_mergeResults ()
       /* Try to allocate space for max count of callsite info from all tasks  */
       mpiPi.rawCallsiteData =
 	(callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
-      for (ndx = 0; ndx < ac; ndx++)
+      if (mpiPi.rawCallsiteData == NULL)
 	{
-	  mpiPi_insert_callsite_records (av[ndx]);
+	  mpiPi_msg_warn
+	    ("Failed to allocate memory to collect callsite info");
+	  retval = 0;
 	}
-      ndx = 0;
-      for (i = 1; i < mpiPi.size; i++)	/* n-1 */
-	{
-	  MPI_Status status;
-	  int count;
-	  int j;
 
-	  /* okay in any order */
-	  PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	  PMPI_Get_count (&status, MPI_CHAR, &count);
-	  PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
-		     status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	  count /= sizeof (callsite_stats_t);
-	  for (j = 0; j < count; j++)
+      /* Clear global_mpi_time and global_mpi_size before accumulation in mpiPi_insert_callsite_records */
+      mpiPi.global_mpi_time = 0.0;
+      mpiPi.global_mpi_size = 0.0;
+
+      if (retval == 1)
+	{
+	  /* Insert collector callsite data into global and task-specific hash tables */
+	  for (ndx = 0; ndx < ac; ndx++)
 	    {
-	      mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+	      mpiPi_insert_callsite_records (av[ndx]);
 	    }
+	  ndx = 0;
+	  for (i = 1; i < mpiPi.size; i++)	/* n-1 */
+	    {
+	      MPI_Status status;
+	      int count;
+	      int j;
+
+	      /* okay in any order */
+	      PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+	      PMPI_Get_count (&status, MPI_CHAR, &count);
+	      PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
+			 status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+	      count /= sizeof (callsite_stats_t);
+
+
+	      for (j = 0; j < count; j++)
+		{
+		  mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+		}
+	    }
+	  free (mpiPi.rawCallsiteData);
 	}
-      free (mpiPi.rawCallsiteData);
     }
   else
     {
@@ -674,7 +684,7 @@ mpiPi_mergeResults ()
 		 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
       free (sbuf);
     }
-  if (mpiPi.rank == mpiPi.collectorRank)
+  if (mpiPi.rank == mpiPi.collectorRank && retval == 1)
     {
 #ifndef LOW_MEM_REPORT
       mpiPi_msg_debug
@@ -703,60 +713,33 @@ mpiPi_mergeResults ()
 	}
     }
 
-  return 1;
+  /*  Quadrics MPI does not appear to support MPI_IN_PLACE   */
+  sendval = retval;
+  PMPI_Allreduce (&sendval, &retval, 1, MPI_INT, MPI_MIN, mpiPi.comm);
+  return retval;
 }
 
 
 void
-mpiPi_publishResults ()
+mpiPi_publishResults (int report_style)
 {
-  int ac;
-  callsite_stats_t **av;
-  int i;
   FILE *fp = NULL;
   static int printCount = 0;
 
   if (mpiPi.collectorRank == mpiPi.rank)
     {
 
-      /* take the final data from merge and display in a nice format */
-      if (0 ==
-	  h_gather_data (mpiPi.global_callsite_stats_agg, &ac,
-			 (void ***) &av))
-	{
-	  mpiPi_msg_warn ("Global callsite table empty! Aborting report!\n");
-	  return;
-	}
-
-      mpiPi_msg_debug ("Found %d entries in global callsite table.\n", ac);
-      mpiPi_msg_debug ("\n");
-
       /* Generate output filename, and open */
-      {
-	char nowstr[128];
-	const struct tm *nowstruct;
-	char *fmtstr = "%Y %m %d %H %M %S";
-	nowstruct = localtime (&mpiPi.start_timeofday);
-	if (strftime (nowstr, 128, fmtstr, nowstruct) == (size_t) 0)
-	  mpiPi_msg_warn ("Could not get string from strftime()\n");
-	for (i = 0; nowstr[i] != '\0'; i++)
-	  {
-	    if (nowstr[i] == ' ')
-	      {
-		nowstr[i] = '-';
-	      }
-	  }
+      do
+	{
+	  printCount++;
+	  snprintf (mpiPi.oFilename, 256, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
+		   mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
+	}
+      while (access (mpiPi.oFilename, F_OK) == 0);
 
-	do
-	  {
-	    printCount++;
-	    sprintf (mpiPi.oFilename, "%s/%s.%d.%d.%d.mpiP", mpiPi.outputDir,
-		     mpiPi.appName, mpiPi.size, mpiPi.procID, printCount);
-	  }
-	while (access (mpiPi.oFilename, F_OK) == 0);
+      fp = fopen (mpiPi.oFilename, "w");
 
-	fp = fopen (mpiPi.oFilename, "w");
-      }
       if (fp == NULL)
 	{
 	  mpiPi_msg_warn ("Could not open [%s], writing to stdout\n",
@@ -770,7 +753,7 @@ mpiPi_publishResults ()
 	  mpiPi_msg ("\n");
 	}
     }
-  mpiPi_profile_print (fp);
+  mpiPi_profile_print (fp, report_style);
   PMPI_Barrier (MPI_COMM_WORLD);
   if (fp != stdout && fp != NULL)
     {
@@ -789,9 +772,9 @@ mpiPi_collect_basics ()
   double app_time = mpiPi.cumulativeTime;
   int cnt;
   mpiPi_task_info_t mti;
-  int blockcounts[5] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
-  MPI_Datatype types[5] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
-  MPI_Aint displs[5];
+  int blockcounts[4] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
+  MPI_Datatype types[4] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
+  MPI_Aint displs[4];
   MPI_Datatype mti_type;
   MPI_Request *recv_req_arr;
 
@@ -871,7 +854,7 @@ mpiPi_collect_basics ()
 
 
 void
-mpiPi_generateReport ()
+mpiPi_generateReport (int report_style)
 {
   mpiP_TIMER dur;
   mpiPi_TIME timer_start, timer_end;
@@ -916,7 +899,13 @@ mpiPi_generateReport ()
   if (mergeResult == 1)
     {
       mpiPi_GETTIME (&timer_start);
-      mpiPi_publishResults ();
+      if (mpiPi.report_style == mpiPi_style_both)
+	{
+	  mpiPi_publishResults (mpiPi_style_concise);
+	  mpiPi_publishResults (mpiPi_style_verbose);
+	}
+      else
+	mpiPi_publishResults (report_style);
       mpiPi_GETTIME (&timer_end);
       dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
       mpiPi_msg_debug0 ("TIMING : publish time is        %12.6f\n", dur);
@@ -927,10 +916,21 @@ mpiPi_generateReport ()
 void
 mpiPi_finalize ()
 {
-  mpiPi_generateReport ();
+  mpiPi_generateReport (mpiPi.report_style);
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
+
+  /*  Could do a lot of housekeeping before calling PMPI_Finalize()
+   *  but is it worth the additional work?
+   *  For instance:
+   h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
+   for (i = 0; (i < 20) && (i < ac); i++)
+   {
+   if (av[i]->siteData != NULL )
+   free (av[i]->siteData);
+   }
+   */
 
   return;
 }

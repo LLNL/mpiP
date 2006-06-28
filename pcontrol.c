@@ -92,11 +92,17 @@ mpiPi_MPI_Pcontrol (const int flag)
     }
   else if (flag == 2)
     {
-      mpiPi_generateReport ();
+      mpiPi_reset_callsite_data ();
     }
   else if (flag == 3)
     {
-      mpiPi_reset_callsite_data ();
+      mpiPi_generateReport (mpiPi_style_verbose);
+      mpiPi_GETTIME (&mpiPi.startTime);
+    }
+  else if (flag == 4)
+    {
+      mpiPi_generateReport (mpiPi_style_concise);
+      mpiPi_GETTIME (&mpiPi.startTime);
     }
   else
     {
