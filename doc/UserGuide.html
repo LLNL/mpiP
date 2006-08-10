@@ -14,11 +14,11 @@ body,p,h1,h2,h3,th,td,ol,ul,li {
 -->
 </style><title>mpiP: Lightweight, Scalable MPI Profiling</title></head><body><p><a href="http://www.llnl.gov/disclaimer.html" class="privacyfoter">Privacy &amp; Legal Notice</a></p>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI Profiling</a></h1>
-<p align="center">Version 2.8.2<br>
-25 January 2005 <br>
+<p align="center">Version 3.0.0<br>
+17 July 2006 <br>
 <br>
 Jeffrey Vetter <br>
-<a href="mailto:vetterjs@ornl.gov">vetterjs@ornl.gov</a><br>
+<a href="mailto:vetter@computer.org">vetter@computer.org</a><br>
 
 <br>
 Chris Chambreau <br>
@@ -83,7 +83,15 @@ always welcome. Many thanks to the following contributors (chronological order):
 <li>Mike Campbell (UIUC)</li>
 <li>Jim Brandt (Sandia National Laboratories)</li>
 <li>Philip Roth (Oak Ridge National Laboratory)</li></ul>
-<h3><a name="New_Features">New Features with v2.8</a></h3>
+<h3><a name="New_Features">New Features with v3.0</a></h3>
+<p>Release v3.0.0 addresses the following issues:
+<ul>
+<li>New reporting formats with summary statistics.</li>
+<li>Users can optionally suppress process detail in reports.</li>
+<li>New reporting algorithms to reduce memory requirements.</li>
+<li>MPI_Pcontrol calls can reset statistics, generate multiple reports per run, and generate reports in various formats.</li>
+</ul>
+</p>
 <p>Release v2.8.2 addresses the following issues:
 <ul>
 <li>Document EM64T/ia64 libunwind requirement.</li>
@@ -1013,6 +1021,6 @@ MPI_File_write_at<br>
 </p><p class="privacyfoter"><a href="#top">Top</a></p>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@llnl.gov">mpip-help@llnl.gov</a>.</p>
-<p class="privacyfoter"> Last modified on January 25th, 2005.<br>
+<p class="privacyfoter"> Last modified on July 17th, 2006.<br>
 UCRL-CODE-2002-020, Version 2.</p>
 </body></html>
