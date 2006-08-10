@@ -781,12 +781,13 @@ mpiPi_collect_basics ()
   mpiPi_msg_debug ("Collect Basics\n");
 
   cnt = 0;
+
   PMPI_Address (&mti.mpi_time, &displs[cnt++]);
   PMPI_Address (&mti.app_time, &displs[cnt++]);
   PMPI_Address (&mti.rank, &displs[cnt++]);
   PMPI_Address (&mti.hostname, &displs[cnt++]);
 
-  for (i = cnt; i >= 0; i--)
+  for (i = (cnt-1); i >= 0; i--)
     {
       displs[i] -= displs[0];
     }
