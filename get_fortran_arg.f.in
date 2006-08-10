@@ -25,7 +25,7 @@
          i = i - 1
        enddo
 
-       strlen = i
+       mpipi_get_strlen = i
        return
        end
 
