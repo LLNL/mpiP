@@ -8,8 +8,8 @@
 /* Define if using libdwarf for source lookup */
 #undef USE_LIBDWARF
 
-/* Define if not using binutils libbfd */
-#undef DISABLE_BFD
+/* Define if using binutils libbfd */
+#undef ENABLE_BFD
 
 /* Define if using libunwind */
 #undef HAVE_LIBUNWIND

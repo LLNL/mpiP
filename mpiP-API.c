@@ -77,7 +77,7 @@ mpiP_open_executable (char *filename)
   if (access (filename, R_OK | F_OK) != 0)
     return -1;
 
-#ifndef DISABLE_BFD
+#ifdef ENABLE_BFD
 
   open_bfd_executable (filename);
 
@@ -94,7 +94,7 @@ mpiP_open_executable (char *filename)
 void
 mpiP_close_executable ()
 {
-#ifndef DISABLE_BFD
+#ifdef ENABLE_BFD
   close_bfd_executable ();
 #elif defined(USE_LIBDWARF)
   close_dwarf_executable ();

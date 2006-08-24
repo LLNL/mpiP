@@ -61,7 +61,7 @@ clean::
 
 #  If using BFD and need a separate demangling library,
 #  defensively rebuild pc_lookup.o for each target
-ifeq ($(DISABLE_BFD),no)
+ifeq ($(ENABLE_BFD),yes)
 ifneq ($(DEMANGLE_TARGET),)
 
 ${C_TARGET} ${FORTRAN_TARGET} :: 
