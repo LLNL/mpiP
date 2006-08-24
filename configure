@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF PC_LOOKUP_FILE USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL DISABLE_BFD ENABLE_API_ONLY DEFAULT_TARGS FORTRAN_GETARG_OBJ_FILE TEST_LIST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF PC_LOOKUP_FILE USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL ENABLE_BFD ENABLE_API_ONLY DEFAULT_TARGS FORTRAN_GETARG_OBJ_FILE TEST_LIST LIBOBJS LTLIBOBJS'
 ac_subst_files='FORTRAN_GETARG HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -1626,13 +1626,13 @@ fi;
 
 fi
 
-DISABLE_BFD=no
+ENABLE_BFD=yes
 # Check whether --enable-bfd or --disable-bfd was given.
 if test "${enable_bfd+set}" = set; then
   enableval="$enable_bfd"
   if test x"$enableval" = xno ; then
 		echo Use of libbfd has been disabled
-		DISABLE_BFD=yes
+		ENABLE_BFD=no
 	fi
 
 fi;
@@ -1683,7 +1683,7 @@ if test "${enable_dwarf+set}" = set; then
   enableval="$enable_dwarf"
   if test x"$enableval" = xyes ; then
 		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
-		DISABLE_BFD=yes
+		ENABLE_BFD=no
 		PC_LOOKUP_FILE=pc_lookup_dwarf.c
 	fi ;
 	USE_LIBDWARF=yes
@@ -3196,7 +3196,7 @@ _ACEOF
 fi
 
 
-if test "x$DISABLE_BFD" = "xno" ; then
+if test "x$ENABLE_BFD" = "xyes" ; then
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4325,11 +4325,11 @@ _ACEOF
 
 fi
 
-else
   cat >>confdefs.h <<\_ACEOF
-#define DISABLE_BFD 1
+#define ENABLE_BFD 1
 _ACEOF
 
+else
   if test x$USE_LIBDWARF = xyes ; then
     echo "$as_me:$LINENO: checking for elf_begin in -lelf" >&5
 echo $ECHO_N "checking for elf_begin in -lelf... $ECHO_C" >&6
@@ -5663,7 +5663,7 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
-DISABLE_BFD=$DISABLE_BFD
+ENABLE_BFD=$ENABLE_BFD
 
 
 
@@ -6285,7 +6285,7 @@ s,@MPIPFLIB@,$MPIPFLIB,;t t
 s,@FORTRAN_FLAG@,$FORTRAN_FLAG,;t t
 s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
 s,@FORTRAN_STR_DECL@,$FORTRAN_STR_DECL,;t t
-s,@DISABLE_BFD@,$DISABLE_BFD,;t t
+s,@ENABLE_BFD@,$ENABLE_BFD,;t t
 s,@ENABLE_API_ONLY@,$ENABLE_API_ONLY,;t t
 s,@DEFAULT_TARGS@,$DEFAULT_TARGS,;t t
 s,@FORTRAN_GETARG_OBJ_FILE@,$FORTRAN_GETARG_OBJ_FILE,;t t

@@ -239,7 +239,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	(callsite_pc_cache_entry_t *)
 	malloc (sizeof (callsite_pc_cache_entry_t));
       csp->pc = pc;
-#if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
+#if defined(ENABLE_BFD) || defined(USE_LIBDWARF)
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
 	{
 	  if (*filename == NULL || strcmp (*filename, "??") == 0)
@@ -265,7 +265,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	  csp->functname = strdup ("[unknown]");
 	  csp->line = 0;
 	}
-#else /* ! DISABLE_BFD */
+#else /* ! ENABLE_BFD || USE_LIBDWARF */
       csp->filename = strdup ("[unknown]");
       csp->functname = strdup ("[unknown]");
       csp->line = 0;
@@ -419,7 +419,11 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 #ifndef LOW_MEM_REPORT		/* { */
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
-     one src line. We aggregate across rank after this. */
+     one src line. We aggregate across rank after this. 
+     
+     The LOW_MEM_REPORT reporting approach does not aggregate individual 
+     process callsite information at the collector process.
+     */
   if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
     {
       int j;
@@ -472,7 +476,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
     }
 #endif /* } ifndef LOW_MEM_REPORT */
 
-  /* agg. Don't use rank */
+  /* Collect aggregate callsite summary information indpendent of rank. */
   if (NULL == h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
     {
       int j;
@@ -587,7 +591,7 @@ mpiPi_mergeResults ()
       int i;
       int ndx = 0;
 
-#ifndef DISABLE_BFD
+#ifdef ENABLE_BFD
       if (mpiPi.appFullName != NULL)
 	{
 	  if (open_bfd_executable (mpiPi.appFullName) == 0)
@@ -600,7 +604,7 @@ mpiPi_mergeResults ()
 	    mpiPi.do_lookup = 0;
 	}
 #endif
-#if !defined(DISABLE_BFD) || defined(USE_LIBDWARF)
+#if defined(ENABLE_BFD) || defined(USE_LIBDWARF)
       else
 	{
 	  mpiPi_msg_warn ("Failed to open executable\n");
@@ -704,7 +708,7 @@ mpiPi_mergeResults ()
     {
       if (mpiPi.do_lookup == 1)
 	{
-#ifndef DISABLE_BFD
+#ifdef ENABLE_BFD
 	  /* clean up */
 	  close_bfd_executable ();
 #elif defined(USE_LIBDWARF)
@@ -939,7 +943,7 @@ mpiPi_finalize ()
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
-			     double dur, double sendSize, double ioSize)
+			     double dur, dotype filter textuble sendSize, double ioSize)
 {
   int i;
   callsite_stats_t *csp = NULL;

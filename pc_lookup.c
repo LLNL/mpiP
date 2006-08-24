@@ -30,7 +30,7 @@ static char *rcsid =
 #include "mpiPi.h"
 #include "mpiPconfig.h"
 
-#ifndef DISABLE_BFD
+#ifdef ENABLE_BFD
 #ifndef CEXTRACT
 #include "bfd.h"
 #endif
@@ -340,7 +340,7 @@ open_bfd_executable (char *filename)
       return 0;
     }
 
-#if 0
+#if 1
   if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
     {
       mpiPi_msg_warn ("No symbols in the executable\n");
@@ -391,7 +391,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   return 1;			/*  failure  */
 }
 
-#endif /* DISABLE_BFD */
+#endif /* ENABLE_BFD */
 
 #ifdef AIX
 /*  Get the text_start value from the auxiliary header
