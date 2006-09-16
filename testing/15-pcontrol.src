@@ -1,4 +1,4 @@
 
-checkOutput "0 15-pcontrol.c +20 \.?main"                   "Source check:"
-checkAbsent "0 15-pcontrol.c +22 \.?main"                   "Source check:"
-checkOutput "0 15-pcontrol.c +24 \.?main"                   "Source check:"
+checkOutput "0 15-pcontrol.c +27 \.?main"                   "Source check:"
+checkAbsent "0 15-pcontrol.c +29 \.?main"                   "Source check:"
+checkOutput "0 15-pcontrol.c +31 \.?main"                   "Source check:"
