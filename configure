@@ -4408,8 +4408,7 @@ if test "${ac_cv_lib_dwarf_dwarf_init+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-ldwarf -lelf
-       $LIBS"
+LIBS="-ldwarf  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4471,6 +4470,7 @@ if test $ac_cv_lib_dwarf_dwarf_init = yes; then
   LIBDWARF_FOUND=yes
 else
   ELFDWARF_ERR="failed to find libdwarf." ; LIBDWARF_FOUND=no
+
 fi
 
     echo $ECHO_N "checking for libelf/libdwarf..." $ECHO_C
