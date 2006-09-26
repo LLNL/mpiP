@@ -364,6 +364,6 @@ extern void *MPIR_ToPointer (int idx);
   
   </license>
   
-*/ 
+*/
 
 /* EOF */
