@@ -418,10 +418,10 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
      one src line. We aggregate across rank after this. 
-     
+
      The LOW_MEM_REPORT reporting approach does not aggregate individual 
      process callsite information at the collector process.
-     */
+   */
   if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
     {
       int j;
