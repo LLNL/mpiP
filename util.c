@@ -206,7 +206,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
      be the application function from an API call.
      If we are not in the API, we step through an additional frame.
    */
-  fp = NextFP (NextFP (GetFP ()));
+  fp = NextFP (GetFP ());
 
   if (!mpiPi.inAPIrtb)
     fp = NextFP (fp);
