@@ -731,15 +731,25 @@ def CreateWrapper(funct, olist):
     olist.append("\nstatic int mpiPif_" + funct + "( jmp_buf * base_jbuf, " )
     # add parameters
     for i in fdict[funct].paramConciseList:
+
+	olist.append(fdict[funct].paramDict[i].basetype + ' ')
+
 	if (fdict[funct].paramDict[i].pointerLevel == 0) \
 	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
 	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append(fdict[funct].paramDict[i].basetype + " * " + i)
-	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-	    olist.append(fdict[funct].paramDict[i].basetype)
+	    olist.append(" * ")
+
+	if (fdict[funct].paramDict[i].pointerLevel > 0):
 	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
 		olist.append(" *")
-	    olist.append(i)
+
+	olist.append(i)
+
+	if (fdict[funct].paramDict[i].arrayLevel > 0):
+	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+	      olist.append('[')
+	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+	      olist.append(']')
 	else:
 	    pass
 	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
@@ -773,6 +783,8 @@ def CreateWrapper(funct, olist):
 	   and (fdict[funct].paramDict[i].basetype != "void"):
 	    olist.append(" * " + i)
 	elif (fdict[funct].paramDict[i].pointerLevel > 0):
+	    olist.append(i)
+	elif (fdict[funct].paramDict[i].arrayLevel > 0):
 	    olist.append(i)
 	else:
 	    print "Warning: passing on arg",i,"in",funct
@@ -840,6 +852,8 @@ def CreateWrapper(funct, olist):
 	   and (fdict[funct].paramDict[i].basetype != "void"):
 	    olist.append(" & " + i)
 	elif (fdict[funct].paramDict[i].pointerLevel > 0):
+	    olist.append(i)
+	elif (fdict[funct].paramDict[i].arrayLevel > 0):
 	    olist.append(i)
 	else:
 	    pass
@@ -920,15 +934,24 @@ def CreateWrapper(funct, olist):
     		currBasetype = fdict[funct].paramDict[i].basetype
             
         #  Add argument to function declaration    
+    	olist.append(currBasetype + ' ')
+
     	if (fdict[funct].paramDict[i].pointerLevel == 0) \
     	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
     	   and (fdict[funct].paramDict[i].basetype != "void"):
-    	    olist.append(currBasetype + " * " + i)
-    	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-    	    olist.append(currBasetype)
+    	    olist.append(" * ")
+
+    	if (fdict[funct].paramDict[i].pointerLevel > 0):
     	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
     		olist.append(" *")
-    	    olist.append(i)
+
+    	olist.append(i)
+
+	if (fdict[funct].paramDict[i].arrayLevel > 0):
+	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+	      olist.append('[')
+	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+	      olist.append(']')
     	else:
     	    pass
     	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
@@ -1015,6 +1038,8 @@ def CreateWrapper(funct, olist):
            and (fdict[funct].paramDict[i].basetype != "void"):
             olist.append(argname)
         elif (fdict[funct].paramDict[i].pointerLevel > 0):
+            olist.append(argname)
+        elif (fdict[funct].paramDict[i].arrayLevel > 0):
             olist.append(argname)
         else:
             pass
