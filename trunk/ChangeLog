@@ -1,4 +1,82 @@
+2006-10-02  Chris Chambreau  <chcham@llnl.gov>
+
+  * doc/UserGuide.html, doc/UserGuide.txt:
+  Updated with 3.0 release information.
+
+  * make-wrappers.py:
+  Added some MPI prototype support for arrays, for example: int array_of_errcodes[].
+
+2006-09-26  Chris Chambreau  <chcham@llnl.gov>
+
+  * timers/crayx1_hw.h, testing/10-coll-mess-size.c, testing/14-mpiio.c, testing/15-pcontrol.c, testing/7-nonblock-waitall.c, hash_proto.h, mpiP-API.h, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, configure:
+  Slight GNU indent modifications.
+
+  * util.c: Correction to UNICOS stack tracing.
+
+2006-09-16  Chris Chambreau  <chcham@llnl.gov>
+
+  * timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h, timers/sunos-timers.h, testing/0-simple-c++.C, testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c, testing/1-hot-potato.src, testing/10-coll-mess-size.c, testing/11-p2p-mess-size.c, testing/12-null-null.c, testing/13-pcontrol-report.c, testing/14-mpiio.c, testing/15-pcontrol.c, testing/15-pcontrol.src, testing/16-waitallf.f, testing/16-waitallf.src, testing/2-pcontrol.c, testing/3-stacktrace.c, testing/3-stacktrace.src, testing/4-demangle.C, testing/4-demangle.src, testing/5-medley.c, testing/6-nonblock.c, testing/7-nonblock-waitall.c, testing/8-test.c, testing/9-test-mpip-time.c, testing/api-test.c, testing/bfd-test.c, testing/sweep-ops-stack.f, testing/sweep-ops-stack.src, testing/sweep-ops.f, testing/sweep-ops.src, testing/timer-info.c, _timers.h, configure, diag_msgs.c, diag_msgs_api.c, get_fortran_arg.f.in, glob.c, hash_proto.h, mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, util.c, wrappers_special.c:
+  BSD License insertion and header comment reorg.
+
+  * testing/verify-timers.c: Removed test files using outdated timer macros.
+
+2006-08-24  Chris Chambreau  <chcham@llnl.gov>
+
+  * .project: Remove unnecessary eclipse project file.
+
+  * configure.in, mpiPconfig.h.in, Defs.mak.in, Makefile.in, configure, mpiPi.c, pc_lookup.c, mpiP-API.c:
+  Changed DISABLE_BFD to ENABLE_BFD for clarity.
+
+2006-08-10  Chris Chambreau  <chcham@llnl.gov>
+
+  * doc/UserGuide.html, doc/UserGuide.txt, glob.c: Preparation for 3.0 release:
+  o Version numbers update.
+  o Documentation update.
+
+  * mpiPi.c: Fix for derived datatype generation from Phil Roth.
+
+  * get_fortran_arg.f.in: Fix for return value from Phil Roth.
+
+  * configure, configure.in: Fix for correct dwarf testing from Phil Roth.
+
+2006-06-28  Chris Chambreau  <chcham@llnl.gov>
+
+  * testing/Makefile.in: Corrected I/O test append.
+
+  * mpiPi.h.in, mpiPi_proto.h, pcontrol.c, report.c, util.c, wrappers_special.c, Makefile.in, glob.c, mpiPi.c:
+  New concise reporting format and related features:
+    o Generate verbose (default), concise, or both reports.
+    o Disable callsite detail sections.
+    o Use Pcontrol to generate either report format or reset statistics counters.
+
+  Minor change for lint/splint support.
+
+2006-05-22  Chris Chambreau  <chcham@llnl.gov>
+
+  * glob.c: New release to address callsite numbering problems on x86_64.
+
+2006-05-18  Chris Chambreau  <chcham@llnl.gov>
+
+  * pcontrol.c: Removed unnecesary debug message.
+
+  * util.c: Initialize pc value to pass first pc check.
+
+  * mpiPi.c, pcontrol.c:
+  Changes to reset callsite data with MPI_Pcontrol(3) call.  Can be used with
+  MPI_Pcontrol(2) to generate periodic reports without accumulative data.
+
+2006-04-13  Chris Chambreau  <chcham@llnl.gov>
+
+  * util.c: Stop unwinding if PC is NULL
+
+  * glob.c: Patch number update
+
+  * testing/Makefile.in, testing/test_template.tcl, configure, configure.in:
+  Changes to avoid testing MPI-IO for 'check' target if MPI-IO functions not found.
+
 2006-04-12  Chris Chambreau  <chcham@llnl.gov>
+
+  * ChangeLog: Recent changes.
 
   * report.c, configure, configure.in, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in:
   This commit adds substantial reporting changes to address memory use for
