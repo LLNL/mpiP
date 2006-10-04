@@ -1,12 +1,14 @@
 
+   SourceForge.net Logo 
+
                  mpiP: Lightweight, Scalable MPI Profiling
 
                                Version 3.0.0
-                                17 July 2006
+                              02 October 2006
                                Jeffrey Vetter
-                            vetter@computer.org
+                       jsvetter@users.sourceforge.net
                               Chris Chambreau
-                              chcham@llnl.gov
+                        chcham@users.sourceforge.net
    ______________________________________________________________________
 
 Contents
@@ -51,11 +53,12 @@ Introduction
    We have tested mpiP on a variety of C/C++/Fortran applications from 2 to
    4096 processes, including a 3584-process run on ASCI Q and a 4096-process
    run on ASCI White. Please send your comments, questions, and ideas for
-   enhancements to mpip-help@llnl.gov. To receive mail regarding new mpiP
-   releases, please subscribe to mpip-announce@llnl.gov (send e-mail with body
-   "subscribe mpip-announce" to majordomo@llnl.gov). Please also consider
-   subscribing to mpip-users@llnl.gov to contribute and receive mpiP use and
-   status information.
+   enhancements to mpip-help@lists.sourceforge.net. To receive mail regarding
+   new mpiP releases, please subscribe to mpip-announce@lists.sourceforge.net
+   (send e-mail with body "subscribe" to
+   mpip-announce-request@lists.sourceforge.net).   Please  also  consider
+   subscribing to mpip-users@lists.sourceforge.net to contribute and receive
+   mpiP use and status information.
 
    To learn more about performance analysis with mpiP, see Vetter, J.S. and
    M.O.  McCracken,  "Statistical  Scalability  Analysis of Communication
@@ -65,7 +68,7 @@ Introduction
   Downloading
 
    You    may    download    the    current    version   of   mpiP   from
-   http://www.llnl.gov/CASC/mpip/download/
+   http://sourceforge.net/projects/mpip.
 
   Contributing
 
@@ -130,7 +133,6 @@ Introduction
        library.
      * Greater configuration flexibility. See configure --help.
 
-   Top
             ____________________________________________________
 
 Using mpiP
@@ -163,15 +165,13 @@ Using mpiP
    Run your application. You can verify that mpiP is working by identifying the
    header and trailer in standard out.
 
-     0:mpiP:
-     0:mpiP: mpiP V2.8.2 (Build Jan 7 2005/10:59:14)
-     0:mpiP: Direct questions and errors to mpip-help@llnl.gov>
-     0:mpiP:
-     0:mpiP:
-     0:mpiP: found 21557 symbols in file [./9-test-mpip-time.exe]
-     0:mpiP:
-     0:mpiP: Storing mpiP output in [./9-test-mpip-time.exe.4.37266.1.mpiP].
-     0:mpiP:
+mpiP:
+mpiP: mpiP V3.0.0 (Build Oct  4 2006/12:40:28)
+mpiP: Direct questions and errors to mpip-help@lists.sourceforge.net
+mpiP:
+mpiP:
+mpiP: Storing mpiP output in [./9-test-mpip-time.exe.2.12390.1.mpiP].
+mpiP:
 
    By default, the output file is written to the current directory of the
    application. mpiP files are always much smaller than trace files, so writing
@@ -226,7 +226,6 @@ Using mpiP
    Python on an alternative system may be needed to "make wrappers.c", due to
    missing socket module.
 
-   Top
             ____________________________________________________
 
 Building mpiP
@@ -371,7 +370,6 @@ Building mpiP
        If you are running into trouble, you may want to download a recent
        snapshot from ftp://sources.redhat.com/pub/binutils/snapshots.
 
-   Top
             ____________________________________________________
 
 Run-time Configuration of mpiP
@@ -405,7 +403,6 @@ Run-time Configuration of mpiP
    mpiP prints a message at initialization if it successfully finds this MPIP
    variable.
 
-   Top
             ____________________________________________________
 
 mpiP Output
@@ -417,17 +414,17 @@ mpiP Output
    measurement to reduce perturbation and mpiP output.
 
    The test code:
- sleeptime = 10;
- MPI_Init (&argc, &argv);
- MPI_Comm_size (comm, &nprocs);
- MPI_Comm_rank (comm, &rank);
- MPI_Barrier (comm);
- if (rank == 0)
- {
- sleep (sleeptime); /* slacker! delaying everyone else */
- }
- MPI_Barrier (comm);
- MPI_Finalize ();
+  sleeptime = 10;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (comm, &nprocs);
+  MPI_Comm_rank (comm, &rank);
+  MPI_Barrier (comm);
+  if (rank == 0)
+    {
+      sleep (sleeptime);        /* slacker! delaying everyone else */
+    }
+  MPI_Barrier (comm);
+  MPI_Finalize ();
 
    The code was compiled with:
  $ mpcc -g -DAIX 9-test-mpip-time.c -o 9-test-mpip-time.exe \
@@ -468,12 +465,12 @@ mpiP Output
 ---------------------------------------------------------------------------
 @--- MPI Time (seconds) ---------------------------------------------------
 ---------------------------------------------------------------------------
-Task AppTime MPITime MPI%
- 0 10 0.000243 0.00
- 1 10 10 99.92
- 2 10 10 99.92
- 3 10 10 99.92
- * 40 30 74.94
+Task    AppTime    MPITime    MPI%
+   0         10   0.000243    0.00
+   1         10         10   99.92
+   2         10         10   99.92
+   3         10         10   99.92
+   *         40         30   74.94
 
    The  callsite  section  identifies  all  the  MPI callsites within the
    application. The first number is the callsite ID for this mpiP file. The
@@ -486,9 +483,9 @@ Task AppTime MPITime MPI%
 ---------------------------------------------------------------------------
 @--- Callsites: 2 ---------------------------------------------------------
 ---------------------------------------------------------------------------
- ID Lev File/Address Line Parent_Funct MPI_Call
- 1 0 9-test-mpip-time.c 52 main Barrier
- 2 0 9-test-mpip-time.c 61 main Barrier
+ ID Lev File/Address        Line Parent_Funct             MPI_Call
+  1   0 9-test-mpip-time.c    52 main                     Barrier
+  2   0 9-test-mpip-time.c    61 main                     Barrier
 
    The aggregate time section is a very quick overview of the top twenty MPI
    callsites that consume the most aggregate time in your application. Call
@@ -503,18 +500,18 @@ Task AppTime MPITime MPI%
 ---------------------------------------------------------------------------
 @--- Aggregate Time (top twenty, descending, milliseconds) ----------------
 ---------------------------------------------------------------------------
-Call Site Time App% MPI% COV
-Barrier 2 3e+04 75.00 100.00 0.67
-Barrier 1 0.405 0.00 0.00 0.59
+Call                 Site       Time    App%    MPI%     COV
+Barrier                 2      3e+04   75.00  100.00    0.67
+Barrier                 1      0.405    0.00    0.00    0.59
 
    The next section is similar to the aggregate time section, although it
    reports on the top 20 callsites for total sent message sizes. For example:
 ---------------------------------------------------------------------------
 @--- Aggregate Sent Message Size (top twenty, descending, bytes) ----------
 ---------------------------------------------------------------------------
-Call Site Count Total Avrg MPI%
-Send 7 320 1.92e+06 6e+03 99.96
-Bcast 1 12 336 28 0.02
+Call                 Site      Count      Total    Avrg      MPI%
+Send                    7        320   1.92e+06   6e+03     99.96
+Bcast                   1         12        336      28      0.02
 
    The final sections are the ad nauseum listing of the statistics for each
    callsite across all tasks, followed by an aggregate line (indicated by an
@@ -523,14 +520,15 @@ Bcast 1 12 336 28 0.02
 ---------------------------------------------------------------------------
 @--- Callsite Time statistics (all, milliseconds): 8 ----------------------
 ---------------------------------------------------------------------------
-Name Site Rank Count Max Mean Min App% MPI%
-Barrier 1 0 1 0.107 0.107 0.107 0.00 44.03
-Barrier 1 * 4 0.174 0.137 0.107 0.00 0.00
-Barrier 2 0 1 0.136 0.136 0.136 0.00 55.97
-Barrier 2 1 1 1e+04 1e+04 1e+04 99.92 100.00
-Barrier 2 2 1 1e+04 1e+04 1e+04 99.92 100.00
-Barrier 2 3 1 1e+04 1e+04 1e+04 99.92 100.00
-Barrier 2 * 4 1e+04 7.5e+03 0.136 74.94 100.00
+Name              Site Rank  Count      Max     Mean      Min   App%   MPI%
+Barrier              1    0      1    0.107    0.107    0.107   0.00  44.03
+Barrier              1    *      4    0.174    0.137    0.107   0.00   0.00
+
+Barrier              2    0      1    0.136    0.136    0.136   0.00  55.97
+Barrier              2    1      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    2      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    3      1    1e+04    1e+04    1e+04  99.92 100.00
+Barrier              2    *      4    1e+04  7.5e+03    0.136  74.94 100.00
 
    Remember that we configured MPIP to not print lines where MPI% was less than
    10%.  All  aggregate lines are printed regardless of the configuration
@@ -556,12 +554,12 @@ Barrier 2 * 4 1e+04 7.5e+03 0.136 74.94 100.00
 ---------------------------------------------------------------------------
 @--- Callsite Message Sent statistics (all, sent bytes) -------------------
 ---------------------------------------------------------------------------
-Name Site Rank Count Max Mean Min Sum
-Send 5 0 80 6000 6000 6000 4.8e+05
-Send 5 1 80 6000 6000 6000 4.8e+05
-Send 5 2 80 6000 6000 6000 4.8e+05
-Send 5 3 80 6000 6000 6000 4.8e+05
-Send 5 * 320 6000 6000 6000 1.92e+06
+Name              Site Rank   Count       Max      Mean       Min       Sum
+Send                 5    0      80      6000      6000      6000   4.8e+05
+Send                 5    1      80      6000      6000      6000   4.8e+05
+Send                 5    2      80      6000      6000      6000   4.8e+05
+Send                 5    3      80      6000      6000      6000   4.8e+05
+Send                 5    *     320      6000      6000      6000   1.92e+06
 
    Column                           Description
    Name   Name of the MPI function at that callsite.
@@ -578,17 +576,16 @@ Send 5 * 320 6000 6000 6000 1.92e+06
 ---------------------------------------------------------------------------
 @--- Callsite I/O statistics (all, I/O bytes) -----------------------------
 ---------------------------------------------------------------------------
-Name Site Rank Count Max Mean Min Sum
-File_read 1 0 20 64 64 64 1280
-File_read 1 1 20 64 64 64 1280
-File_read 1 * 40 64 64 64 2560
+Name              Site Rank   Count       Max      Mean       Min       Sum
+File_read            1    0      20        64        64        64      1280
+File_read            1    1      20        64        64        64      1280
+File_read            1    *      40        64        64        64      2560
 
   Report Viewers
 
      * The Tool Gear project has a Qt mpiP viewer. LLNL users can run this as
        mpipview.
 
-   Top
             ____________________________________________________
 
 Controlling the Scope of mpiP Profiling in your Application
@@ -606,18 +603,18 @@ Controlling the Scope of mpiP Profiling in your Application
    variable to include -o when using this feature.
 for(i=1; i < 10; i++)
 {
- switch(i)
- {
- case 5:
- MPI_Pcontrol(1);
- break;
- case 6:
- MPI_Pcontrol(0);
- break;
- default:
- break;
- }
- /* ... compute and communicate for one timestep ... */
+  switch(i)
+  {
+    case 5:
+      MPI_Pcontrol(1);
+      break;
+    case 6:
+      MPI_Pcontrol(0);
+      break;
+    default:
+      break;
+  }
+  /* ... compute and communicate for one timestep ... */
 }
 
   Arbitrary Report Generation
@@ -634,12 +631,12 @@ for(i=1; i < 10; i++)
    MPI_Pcontrol  features should be fully functional for C/C++ as well as
    Fortran.
 
-   Pcontrol Argument Value Behavior
-   0                       Disable profiling.
-   1                       Enable Profiling.
-   2                       Reset all callsite data.
-   3                       Generate verbose report.
-   4                       Generate concise report.
+   Pcontrol Argument         Behavior
+                   0 Disable profiling.
+                   1 Enable Profiling.
+                   2 Reset all callsite data.
+                   3 Generate verbose report.
+                   4 Generate concise report.
 
    If you want to generate individual reports each time a section of code is
    executed, but don't want the profile data to accumulate, you can specify
@@ -647,24 +644,23 @@ for(i=1; i < 10; i++)
    example:
 for(i=1; i < 10; i++)
 {
- switch(i)
- {
- case 5:
- MPI_Pcontrol(2); // make sure profile data is reset
- MPI_Pcontrol(1); // enable profiling
- break;
- case 6:
- MPI_Pcontrol(0); // disable profiling
- MPI_Pcontrol(3); // generate verbose report
- MPI_Pcontrol(4); // generate concise report
- break;
- default:
- break;
- }
- /* ... compute and communicate for one timestep ... */
+  switch(i)
+  {
+    case 5:
+      MPI_Pcontrol(2); // make sure profile data is reset
+      MPI_Pcontrol(1); // enable profiling
+      break;
+    case 6:
+      MPI_Pcontrol(3); // generate verbose report
+      MPI_Pcontrol(4); // generate concise report
+      MPI_Pcontrol(0); // disable profiling
+      break;
+    default:
+      break;
+  }
+  /* ... compute and communicate for one timestep ... */
 }
 
-   Top
             ____________________________________________________
 
 Caveats
@@ -704,7 +700,6 @@ Caveats
        systems. We will continue to investigate this issue, but it is possible
        that this behavior may be experienced with mpiP v2.8.
 
-   Top
              __________________________________________________
 
 MPI Routines Profiled with mpiP
@@ -813,7 +808,6 @@ MPI Routines Profiled with mpiP
    MPI_Waitany
    MPI_Waitsome
 
-   Top
             ____________________________________________________
 
 MPI Routines For Which mpiP Gathers Sent Message Size Data
@@ -839,7 +833,6 @@ MPI Routines For Which mpiP Gathers Sent Message Size Data
    MPI_Sendrecv_replace
    MPI_Ssend
 
-   Top
             ____________________________________________________
 
 MPI Routines For Which mpiP Gathers I/O Data
@@ -856,7 +849,6 @@ MPI Routines For Which mpiP Gathers I/O Data
    MPI_File_write_all
    MPI_File_write_at
 
-   Top
      _________________________________________________________________
 
 How to add MPI calls to profile
@@ -883,7 +875,6 @@ How to add MPI calls to profile
      When you build mpiP, you should see an MPI_Comm_spawn wrapper in the
    generated wrappers.c file.
 
-   Top
      _________________________________________________________________
 
   License
@@ -894,7 +885,7 @@ How to add MPI calls to profile
    UCRL-CODE-223450.
    All rights reserved.
 
-   This file is part of mpiP.  For details, see http://www.llnl.gov/CASC/mpip/.
+   This file is part of mpiP.  For details, see http://mpip.sourceforge.net/.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
@@ -946,10 +937,9 @@ How to add MPI calls to profile
    Government or the University of California, and shall not be used for
    advertising or product endorsement purposes.
 
-   Top
      _________________________________________________________________
 
-   For further information please send mail to mpip-help@llnl.gov.
+   For further information please send mail to mpip-help@lists.sourceforge.net.
 
    Last modified on October 2nd, 2006.
    UCRL-CODE-223450
