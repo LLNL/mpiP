@@ -168,7 +168,7 @@ mpiPi_init (char *appName)
       mpiPi_msg ("\n");
       mpiPi_msg ("%s V%d.%d.%d (Build %s/%s)\n", mpiPi.toolname, mpiPi_vmajor,
 		 mpiPi_vminor, mpiPi_vpatch, mpiPi_vdate, mpiPi_vtime);
-      mpiPi_msg ("Direct questions and errors to mpip-help@llnl.gov>\n");
+      mpiPi_msg ("Direct questions and errors to %s\n", MPIP_HELP_LIST);
       mpiPi_msg ("\n");
     }
 
