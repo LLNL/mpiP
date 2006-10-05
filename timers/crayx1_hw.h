@@ -8,6 +8,8 @@
 
    crayx1_hw.h -- local high res timers
 
+   $Id$
+
 */
 #ifndef _CRAYX1_LOCAL_H
 #define _CRAYX1_LOCAL_H

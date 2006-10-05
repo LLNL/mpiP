@@ -8,6 +8,8 @@
 
    mpiP-API.h -- include file for mpiP functionality API
 
+   $Id$
+
  */
 
 /*

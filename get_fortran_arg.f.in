@@ -10,7 +10,7 @@
 !
 !   access fortran command line arguments
 !
-!   $Header: /g/g0/chcham/CVS-depot/mpiP/get_fortran_arg.f,v 1.5 2004/10/27 18:52:48 chcham Exp $
+!   $Id$
 !
 
        function mpipi_get_strlen(str)

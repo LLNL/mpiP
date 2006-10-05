@@ -1,6 +1,7 @@
 # Makefile for MPIP	-*-Makefile-*-
 # Please see license in doc/UserGuide.html
 # @configure_input@
+# $Id$
 
 SHELL	= /bin/sh
 CC	= @CC@

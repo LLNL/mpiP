@@ -8,6 +8,8 @@
 
    sunos-timers.h -- sun os timers
 
+   $Id$
+
 */
 
 #ifndef _SUNOS_TIMERS_H

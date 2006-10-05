@@ -8,6 +8,8 @@
 
    aix_swclock.h -- aix global switch clock
 
+   $Id$
+
 */
 
 #ifndef _AIX_SWCLOCK_H
