@@ -1,6 +1,6 @@
 /*
   
-     mpiP MPI Profiler ( http://www.llnl.gov/CASC/mpip/ )
+     mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
   
      Please see COPYRIGHT AND LICENSE information at the end of this file.
   
@@ -44,7 +44,7 @@ extern int h_gather_data ( /* h_t * ht, int *ac, void ***ptr */ );
   UCRL-CODE-223450. 
   All rights reserved. 
    
-  This file is part of mpiP.  For details, see http://www.llnl.gov/CASC/mpip/. 
+  This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are

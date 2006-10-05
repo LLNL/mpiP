@@ -1,6 +1,6 @@
 ! -*- Fortran -*-
 !
-!   mpiP MPI Profiler ( http://www.llnl.gov/CASC/mpip/ )
+!   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
 !
 !   Please see COPYRIGHT AND LICENSE information at the end of this file.
 !
@@ -39,7 +39,7 @@ c  Written by Jeffery Vetter and Christopher Chambreau.
 c  UCRL-CODE-223450. 
 c  All rights reserved. 
 c   
-c  This file is part of mpiP.  For details, see http://www.llnl.gov/CASC/mpip/. 
+c  This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
 c   
 c  Redistribution and use in source and binary forms, with or without
 c  modification, are permitted provided that the following conditions are
