@@ -11,8 +11,8 @@
  */
 
 #ifndef lint
-static char *rcsid =
-  "$Header$";
+static char *svnid =
+  "$Id$";
 #endif
 
 #include <string.h>

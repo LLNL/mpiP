@@ -8,6 +8,7 @@
   
      hash_proto.h
   
+     $Id$
 */
 
 #ifndef __CEXTRACT__
