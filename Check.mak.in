@@ -3,6 +3,8 @@
 #
 #  Make targets for dejagnu evaluation of test codes
 #
+#  $Id$
+#
 
 # Look for a local version of DejaGnu, otherwise use one in the path
 RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \

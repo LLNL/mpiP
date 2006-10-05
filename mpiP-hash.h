@@ -8,6 +8,8 @@
 
    hash.h -- generic hash table
 
+   $Id$
+
 */
 
 #ifndef _HASH_H

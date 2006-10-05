@@ -8,6 +8,8 @@
 
    linux_posix.h -- POSIX high-resolution timers on Linux
 
+   $Id$
+
 */
 
 #ifndef _LINUX_POSIX_H

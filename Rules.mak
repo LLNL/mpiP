@@ -1,5 +1,6 @@
 # Makefile for MPIP	-*-Makefile-*-
 # Please see license in doc/UserGuide.html
+# $Id$
 
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
