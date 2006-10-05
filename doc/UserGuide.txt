@@ -3,7 +3,7 @@
 
                  mpiP: Lightweight, Scalable MPI Profiling
 
-                               Version 3.0.0
+                                Version 3.0
                               02 October 2006
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
@@ -83,7 +83,7 @@ Introduction
 
   New Features with v3.0
 
-   Release v3.0.0 addresses the following issues:
+   Release v3.0 addresses the following issues:
      * New reporting formats with summary statistics ( See runtime options 'c'
        and 'v' ).
      * New reporting algorithms to reduce memory requirements ( See configure
@@ -188,19 +188,16 @@ mpiP:
 
    Platform OS Compiler MPI binutils Requirements
    IA32-Linux 2.6.9 CHAOS Kernel Intel 9.0
-   PGI 6.2.3 Quadrics MPI 1.24-48 2.17 Some binutils mods required for Intel
-   8.0 support. Please send mail to the help list for more information. When
-   compiling optimized applications with Intel compilers, the -fp flag may be
-   needed to get accurate stack trace information.
+   PGI  6.2.3  Quadrics  MPI 1.24-48 2.17 Some binutils mods required for
+   demangling support. Please send mail to the help list for more information.
+   When compiling optimized applications with Intel compilers, the -fp flag may
+   be needed to get accurate stack trace information.
    2.6.11 Kernel gcc 4.0.0 mpich2-1.0.4p1
    IA64-Linux 2.6.9 CHAOS Kernel Intel 9.1 Quadrics MPI 1.24-48 2.17 The use of
    HP's libunwind is required on this platform.
-   IBM Power3/4 AIX 5.1
-   AIX 5.2 VA C 6.0
-   VA Fortran 8.1 PE 3.2
-   PE 4.1 2.15 Binutils currently requires that applications are linked with
-   the -bnoobjreorder linker flag. Other mods are required for 64-bit builds of
-   binutils.
+   IBM Power4/5 AIX 5.3 VA C 7.0
+   VA Fortran 9.1 PE 4.2 2.16.1 Binutils currently requires that applications
+   are linked with the -bnoobjreorder linker flag.
    Cray XT3 Catamount 1.4.32
 
    PGI 6.1-4 C/C/Fortran, from Cray PrgEnv-pgi module version 1.4.32
