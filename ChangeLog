@@ -1,994 +1,1505 @@
-2006-10-02  Chris Chambreau  <chcham@llnl.gov>
-
-  * doc/UserGuide.html, doc/UserGuide.txt:
-  Updated with 3.0 release information.
-
-  * make-wrappers.py:
-  Added some MPI prototype support for arrays, for example: int array_of_errcodes[].
-
-2006-09-26  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/crayx1_hw.h, testing/10-coll-mess-size.c, testing/14-mpiio.c, testing/15-pcontrol.c, testing/7-nonblock-waitall.c, hash_proto.h, mpiP-API.h, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, configure:
-  Slight GNU indent modifications.
-
-  * util.c: Correction to UNICOS stack tracing.
-
-2006-09-16  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h, timers/sunos-timers.h, testing/0-simple-c++.C, testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c, testing/1-hot-potato.src, testing/10-coll-mess-size.c, testing/11-p2p-mess-size.c, testing/12-null-null.c, testing/13-pcontrol-report.c, testing/14-mpiio.c, testing/15-pcontrol.c, testing/15-pcontrol.src, testing/16-waitallf.f, testing/16-waitallf.src, testing/2-pcontrol.c, testing/3-stacktrace.c, testing/3-stacktrace.src, testing/4-demangle.C, testing/4-demangle.src, testing/5-medley.c, testing/6-nonblock.c, testing/7-nonblock-waitall.c, testing/8-test.c, testing/9-test-mpip-time.c, testing/api-test.c, testing/bfd-test.c, testing/sweep-ops-stack.f, testing/sweep-ops-stack.src, testing/sweep-ops.f, testing/sweep-ops.src, testing/timer-info.c, _timers.h, configure, diag_msgs.c, diag_msgs_api.c, get_fortran_arg.f.in, glob.c, hash_proto.h, mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, util.c, wrappers_special.c:
-  BSD License insertion and header comment reorg.
-
-  * testing/verify-timers.c: Removed test files using outdated timer macros.
-
-2006-08-24  Chris Chambreau  <chcham@llnl.gov>
-
-  * .project: Remove unnecessary eclipse project file.
-
-  * configure.in, mpiPconfig.h.in, Defs.mak.in, Makefile.in, configure, mpiPi.c, pc_lookup.c, mpiP-API.c:
-  Changed DISABLE_BFD to ENABLE_BFD for clarity.
-
-2006-08-10  Chris Chambreau  <chcham@llnl.gov>
-
-  * doc/UserGuide.html, doc/UserGuide.txt, glob.c: Preparation for 3.0 release:
-  o Version numbers update.
-  o Documentation update.
-
-  * mpiPi.c: Fix for derived datatype generation from Phil Roth.
-
-  * get_fortran_arg.f.in: Fix for return value from Phil Roth.
-
-  * configure, configure.in: Fix for correct dwarf testing from Phil Roth.
-
-2006-06-28  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/Makefile.in: Corrected I/O test append.
-
-  * mpiPi.h.in, mpiPi_proto.h, pcontrol.c, report.c, util.c, wrappers_special.c, Makefile.in, glob.c, mpiPi.c:
-  New concise reporting format and related features:
-    o Generate verbose (default), concise, or both reports.
-    o Disable callsite detail sections.
-    o Use Pcontrol to generate either report format or reset statistics counters.
-
-  Minor change for lint/splint support.
-
-2006-05-22  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: New release to address callsite numbering problems on x86_64.
-
-2006-05-18  Chris Chambreau  <chcham@llnl.gov>
-
-  * pcontrol.c: Removed unnecesary debug message.
-
-  * util.c: Initialize pc value to pass first pc check.
-
-  * mpiPi.c, pcontrol.c:
-  Changes to reset callsite data with MPI_Pcontrol(3) call.  Can be used with
-  MPI_Pcontrol(2) to generate periodic reports without accumulative data.
-
-2006-04-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * util.c: Stop unwinding if PC is NULL
-
-  * glob.c: Patch number update
-
-  * testing/Makefile.in, testing/test_template.tcl, configure, configure.in:
-  Changes to avoid testing MPI-IO for 'check' target if MPI-IO functions not found.
-
-2006-04-12  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: Recent changes.
-
-  * report.c, configure, configure.in, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in:
-  This commit adds substantial reporting changes to address memory use for
-  platforms such as Blue Gene.
-
-  The previous reporting mechanism is the default configuration,
-  but the new low-memory-use approach can be configured with the
-  --enable-low-mem-report configure flag, which defines LOW_MEM_REPORT in
-  mpiPconfig.h.
-
-  Instead of aggregating all process information at a single process,
-  process-specific information is printed by allocating
-  sizeof(callsite_stats_t)*process_count and iterating through callsites
-  using PMPI_Gather to collect and then print process-specific callsite information.
-
-  This results in a fixed amount of memory use which is independent of the number of
-  MPI callsites in the application.
-
-  * glob.c: Patch version update to reflect changes.
-
-  * diag_msgs.c: Make debug messages have consistent debug label DBG.
-
-  * Makefile.in:
-  Specify '-gnu' option for indent to override any local .indent.pro settings.
-
-2006-04-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.c, util.c: Removed unused variables.
-
-  * config/testing.exp:
-  Actual commit of moving dejagnu global config file from lib to config directory.
-
-  * timers/aix_local.h.in, testing/Makefile.in, Check.mak.in, Defs.mak.in, Makefile.in, get_fortran_arg.f.in, mpi.protos.txt.in, mpiPi.h.in:
-  o Added configure_input substitution message in configured files.
-  o Moved dejagnu global file from lib dir into config dir.
-  o Added install logic to test whether doc and bin dirs need to be copied.
-
-2006-04-03  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: new changes.
-
-  * configure, configure.in: Minor configure error.
-
-2006-03-31  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in:
-  When running add_binutils_objs, check whether we are only configured
-  for the API library.
-
-  * testing/Makefile.in, testing/api-test.exp, configure.in, Check.mak.in, Makefile.in, configure:
-  o Added api-test test for check target (testing/api-test.exp).
-  o Configured check target for use with --enable-api-only configuration.
-  o Added other phony targets.
-  o Moved some Makefile conditional logic to configure.
-  o Reorganized pc_lookup and util rebuilding logic.
-  o Removed shared library target for AIX.
-  o Do not remove fortran getarg configure source file, to address the case
-    where files are re-configured with config.status.
-
-2006-03-30  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: new changes
-
-  * testing/api-test.c, testing/timer-info.c, glob.c, mpiP-API.h, mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, report.c, util.c, configure:
-  o Corrected various printing issues with incorrect types.
-  o Added mpiP_format_address() to consistently format printed addresses, which
-  should also be available through the API.
-  o Corrected field widths when printing addresses instead of source info.
-  o Modified api-test and imer-info tests to behave appropriately when DISABLE_BFD
-  is set.
-
-2006-03-29  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/crayx1_hw.h, Defs.mak.in, Makefile.in, configure.in, pc_lookup_dwarf.c:
-  Modifications by Phil Roth and Chris Chambreau:
-
-  o address use of libelf/libdwarf
-    - Have configure check for libs and define DISABLE_BFD
-    - Move configure substitution to Defs.mak and set DISABLE_BFD & USE_LIBDWARF
-  o add files to remove to distclean target
-  o make no symbol failure warning rather than abort.
-
-2006-03-23  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: new changes
-
-  * Makefile.in, glob.c:
-  Hopefully corrected logic concerning when pc_lookup should be rebuild when
-  building the API library.
-
-  * ChangeLog: Updates.
-
-  * configure.in, glob.c, pc_lookup.c, Defs.mak.in, Makefile.in, configure:
-  o Renamed API library from libmpiP-API.a to libmpiPapi.a to avoid AIX MPI
-  compile scripts interpreting '-A' as a flag.
-  o Added DISABLE_BFD macro to avoid recompiling pc_lookup.c when BFD is
-  not used on systems that build a separate demangling library.
-  o Set API_TARGET once an refer to macro in other cases that reference the API lib.
-  o Install taget copies timer include file directory structure.
-  o Added Cray F77_VENDOR test for X1E support.
-  o mpiP_find_src_loc returns failure and optionally prints a debugging message
-  if the input pc value is NULL, rather than failing an assert.
-
-2006-03-16  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: New commits.
-
-  * util.c: Forgot to run indent before last commit.
-
-  * util.c:
-  As indentified through Phil Roth's XT3 testing, added a character length
-  int argument at the end of the get_fortran_arg argument list to provide
-  correct type signature for compilers currently supported.
-
-2006-03-15  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure, glob.c, pc_lookup.c:
-  Corrected 32-bit AIX Text start lookup error.
-
-2006-03-14  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: Patch number updated to reflect recent changes.
-
-  * configure.in, get_fortran_arg.f.in:
-  Changes to better handle access to fortran command line arguments.
-
-2006-03-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/sweep-ops-stack.f, testing/sweep-ops.f:
-  Removed unnecessary semi-colons.
-
-2006-03-09  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: Updated to reflect recent acitivity
-
-2006-03-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/3-stacktrace.src:
-  New line nu,bers to reflect changes from formatting commit.
-
-  * configure.in: Reverting to '.' for default prefix.
-
-2006-03-06  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure.in: Trying new directory hierarchy for ease of use at LLNL.
-
-2006-03-03  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h, timers/sunos-timers.h, testing/10-coll-mess-size.c, testing/11-p2p-mess-size.c, testing/13-pcontrol-report.c, testing/14-mpiio.c, testing/15-pcontrol.c, testing/2-pcontrol.c, testing/3-stacktrace.c, testing/api-test.c, testing/timer-info.c, Makefile.in, diag_msgs.c, diag_msgs_api.c, mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, util.c, wrappers_special.c:
-  Added indent make target and formatted source using GNU indent defaults.
-
-2006-03-02  Chris Chambreau  <chcham@llnl.gov>
-
-  * util.c, Defs.mak.in, Makefile.in, configure, configure.in, glob.c, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in:
-  Modifications for API lib only configuration and build.
-
-2006-03-01  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in: For add_binutils_obj target, also address API lib.
-
-  * mpiPi.c:
-  Modified global condition for check whether any records were collected.
-  Also corrected return value checking from mergeResults.
-
-2006-02-27  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/Makefile.in:
-  Reset CPPFLAGS as this was messing up bgl test compiles.
-
-  * configure, glob.c: 2.8.6 commit.
-
-2006-02-24  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in, _timers.h, configure.in, mpiPconfig.h.in:
-  Support for using PMPI_Wtime for timing
-
-  * util.c: Fixed typo.
-
-  * mpiPi_proto.h: extern for debug0 function.
-
-  * diag_msgs.c: Corrected debug0 message.
-
-  * mpiPi.c: Needed P for MPI_Waitall.
-
-  * mpiPi.c: Removed lingering memory debugging calls.
-
-  * diag_msgs_api.c: Adding debug0 message for API
-
-  * diag_msgs.c, mpiPi.c:
-  Added report generation timing and a rank0 debug message.
-
-  * mpiPi.c, mpiPi.h.in:
-  Modification to collect_basics to use Irecv and eliminate extra copy by
-  using rank_info structure as recv buffer.
-
-2006-02-23  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.c: Extract callsite insertion code into function.
-  Remove rawCallsiteData memory overhead and insert callsite info in hash
-  tables as process callsite data is received.
-
-  * configure.in: Corrected errors from recent modifications.
-
-2006-02-09  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure, configure.in:
-  Substantial modifications to correct enable/disable use and use of AC_HELP_STRING macro.
-
-  * Defs.mak.in, bin/config.sub, configure, mpiPi.h.in, pc_lookup.c:
-  Additional modifications from Phil Roth to correctly label preprocessing macro as HAVE_BFD_BOOLEAN and to add some XT3 support.
-
-  * configure.in, mpiPconfig.h.in:
-  Modifications from Phil Roth to correctly label preprocessing macro as HAVE_BFD_BOOLEAN
-
-2006-01-27  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: Another patch update to track development.
-
-  * Makefile.in: Added API dependency for install target
-
-2006-01-19  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiP-API.h:
-  Additional extern for find_src_loc to address compiler warnings.
-
-  * Makefile.in: Build API lib by default
-
-2006-01-18  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiP-API.h:
-  It looks like _timers.h is the only API dependency.  Hopefully this won't result in problems on obscure platforms.
-
-  * Rules.mak: Get rid of any mpiP report files when cleaning.
-
-2005-12-14  Chris Chambreau  <chcham@llnl.gov>
-
-  * pc_lookup.c: Additional mods for massaging pc values.
-
-  * timers/aix_local.h.in: Make sure timer is labelled correctly.
-
-  * util.c: Added -X runtime option to specify executable location.
-
-  * get_fortran_arg.f: Generated by configure now.
-
-  * pc_lookup.c:
-  Calling bfd_close with an unopened file descriptior resulted in segfaults on AIX.
-
-2005-12-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * report.c, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c:
-  Added capability to get XCOFF Text start address to calculate the
-  appropriate address to pass to BFD to get source info.  Ideally this
-  would be handled by BFD, but I have not investigated this yet.
-
-  * glob.c: Increase patch level for local version tracking.
-
-  * timers/aix_local.h.in, timers/aix_local.h, configure.in:
-  Added configuration test for AIX monotonically-non-decreasing timer function
-  mread_real_time.
-
-2005-12-06  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure, mpiPi.c, mpiPi.h.in, report.c, util.c:
-  First pass of message threshold reporting.
-
-  * configure.in, get_fortran_arg.f: Cleaned up fortran support a bit.
-
-2005-10-28  Chris Chambreau  <chcham@llnl.gov>
-
-  * make-wrappers.py:
-  Cleaned up what appeared to be old code added by Jeff around 2001 and having since been commented out.  I couldn't find any code that supported the statements generated, so it seemed safe to get rid of.
-
-  * make-wrappers.py:
-  Changed timer rollback failure to issue more information and discard sample.
-
-2005-07-08  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in:
-  Do not define MAKE, as it was messing up recursive make settings.
-
-  * mpiPi_proto.h: Change return value of open_dwarf_executable.
-
-2005-07-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.h.in: missed this file in previous commit
-
-  * mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c:
-  Added return value checking for lookup open commands.  If lookup fails, report completes with unknown values and addresses.
-
-  * .project, config/unix.exp, testing/0-simple-c++.exp, testing/0-simple.exp, testing/0-simplef.exp, testing/test_template.tcl:
-  Added capability of setting global test pause time between tests.
-
-  * configure, configure.in:
-  Minor changes to ensure Fortran lib set for testing on AIX
-
-  * Defs.mak.in, configure.in, mpiPconfig.h.in:
-  Address XLF configuration issues for differences between XLF 9 and previous versions.
-
-  * configure, configure.in, get_fortran_arg.f.in, util.c:
-  Changes to support fortran command-line arguments and executable identification on BG/L.
-
-2005-07-06  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.c: Add define to work around DISABLE_BFD build error
-
-  * glob.c: Set patch level for next update
-
-2005-06-20  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure, configure.in:
-  Corrected message format error from previous commit.
-
-  * configure, configure.in:
-  Added configuration testing for enable vs disable fortranxlate option.
-  Also added check for opaque object translation function/macros.
-
-  * wrappers_special.c: Add extra check for valid argv pointer value
-
-2005-05-26  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in, Makefile.in:
-  Added AIX shared object target support and fixed up clean target to
-  remove shared libs and API lib.
-
-2005-05-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.c: Included changes to use appFullName instead of command-line args,
-  as Phil Mucci indicated that ScaliMPI munged the arguments such that
-  the application is not argv[0].
-
-2005-05-05  Chris Chambreau  <chcham@llnl.gov>
-
-  * make-wrappers.py:
-  Implemented new fortran opaque object translation approach using IN/OUT dictionaries to identify the translation required.
-
-2005-04-29  Chris Chambreau  <chcham@llnl.gov>
-
-  * wrappers_special.c:
-  Removed what appeared to be unnecesary setjmp calls and cleaned up
-  symbol specifiers.
-
-  * report.c: Switched printfs to mpiPi_msg_warn.
-
-  * mpiPi.h.in:
-  Small edit: removed NDEBUG, and reference to outdated PARENT_FRAME_COUNT
-
-2005-04-25  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in: Add shorter API target name.
-
-  * Makefile.in: Select appropriate pc_lookup file for API library.
-
-  * doc/UserGuide.html, ChangeLog, glob.c: Final Changes for 2.8.2 release.
-
-2005-04-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in: More CFLAGS/FFLAGS and -g coordination.  -g should always be
-  set.  FFLAGS will be copied from CFLAGS if it is not set.
-
-2005-04-06  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in: OPT flag no longer used.
-
-  * Defs.mak.in, configure, configure.in, testing/Makefile.in, testing/sweep-ops-stack.f, testing/sweep-ops-stack.src:
-  Change to use CFLAGS to set library and test compile flags.
-  Slight modifications to fortran stack test to address segfault
-  when optimized.
-
-  * testing/16-waitallf.f: Use mod instead of modulo.
-
-2005-04-03  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/16-waitallf.exp:
-  Environment variable MPIP needs to be reset after test 15
-
-  * make-wrappers.py, mpi.protos.txt.in:
-  cleaned out irrelevant wrapper generation warnings and errors.
-
-2005-04-02  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure: Contains new configure test for MPIR_ToPointer
-
-  * testing/16-waitallf.exp, testing/16-waitallf.f, testing/16-waitallf.src, testing/Makefile.in:
-  Added opaque object Fortran/C translation test.
-
-  * mpiPi_proto.h:
-  Redundant MPI declarations seemed unnecessary and prone to distracting
-  warning messages.
-
-  * Makefile.in: Added additional header file dependencies for thoroughness.
-
-  * make-wrappers.py:
-  An extra malloc was messing up fortran opaque object conversion.
-
-  * configure.in, mpiPconfig.h.in, mpiPi.h.in:
-  Added configure test to address MPIR_ToPointer problem with Quadrics MPI.
-  Also fixed compile warning if no stack trace parameters have been defined
-  for the current architechture and libunwind is not being used.
-
-2005-04-01  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure:
-  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
-
-  * testing/4-demangle.src:
-  More flexibility for demangled targets, in this case for GNU contructors
-  and destructors
-
-  * testing/15-pcontrol.src, testing/Makefile.in, testing/test_template.tcl, testing/15-pcontrol.c, testing/15-pcontrol.exp:
-  Added test for profiling activation/deactivation through
-  MPIP=-o
-  MPI_Pcontrol(0)
-  MPIP_Pcontrol(1)
-
-  * pcontrol.c: Do not print debug messages unless debug flag is set.
-
-2005-03-31  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in, diag_msgs_api.c:
-  Added diag_msgs_api.c and Makefile.in target libmpiP-API.a
-  to make an API target library that does not profile MPI calls and
-  does not require that it is linked with an MPI library.
-
-  * mpiPi_proto.h:
-  Removed __STDC__ conditional that wreaked havoc on IBM default MPI compile scripts.
-
-  * make-wrappers.py:
-  Second pass at Fortran/C conversion in the make-wrappers script
-
-  * pc_lookup.c, mpiPconfig.h.in:
-  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
-
-  * configure.in: Corrected functionality to check for binutils 2.15 vs 2.15.96
-
-  * configure.in: Make fortran opaque object translation the default.
-  Fixed slight problem with -mpio.
-
-  * configure.in:
-  Attempt to figure out different function calls between binutils 2.15 and 2.15.96
-
-  * mpiPi.c:
-  Found an incorrect use of strcmp that was causing all filenames to be overwritten with [unknown].
-
-2005-03-30  Chris Chambreau  <chcham@llnl.gov>
-
-  * pcontrol.c:
-  Somehow long ago the line that disables profiling with MPI_Pcontrol(0) was removed.
-  This just reinserts that line.
-
-2005-03-08  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/api-test.c: Minor message change.
-
-  * Defs.mak.in, Makefile.in, configure.in:
-  Added --enable-fortran-xlate configure option.  Ideally MPI_Fint and
-  MPI_Request sizes would be compared, but this would mean running an
-  test...
-
-  * Defs.mak.in, Makefile.in, make-wrappers.py, mpi.protos.txt.in:
-  Modifications to handle 64-bit plaforms where MPI_Fint is not
-  the same size as MPI_Request and other opaque objects.
-
-  This currently appears to be an issue on ia64 and x86_64.  An --xlate
-  argument is passed to the python wrapper script to add code for translation
-  between Fortran and C objects in the wrappers.c file.
-
-  * mpiPi.h.in: Remove unused macro.
-
-  * util.c: Fix for ensuring appropriate truncation of Linux app name
-
-2005-03-04  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.c: Activate appropriate pc lookup routines when using dwarf.
-  Some error checking for dwarf return values.
-
-  * Makefile.in: Slight mod to switch between pc_lookup files
-
-2005-03-03  Chris Chambreau  <chcham@llnl.gov>
-
-  * Rules.mak: Corrected C target for removal during clean
-
-2005-02-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: Modifications for 2.8.1 patch release.
-
-  * glob.c: Increase patch level for 2.8.1 release.
-
-  * util.c: Corrected use of readlink and added check/abort for malloc.
-
-  * mpiPi.c: Changed MPI_INTEGER to MPI_INT to avoid problems with MPICH 1.2
-  when f77 support is not configured.
-
-  * Makefile.in: add test to .PHONY
-
-2005-01-25  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: More commits for 2.8 release.
-
-  * doc/UserGuide.html, doc/UserGuide.txt:
-  Include new Platform doc info for X1, XD1, Altix.
-
-  * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
-  Outstanding BG/L issues that have been addressed.
-
-2005-01-12  Chris Chambreau  <chcham@llnl.gov>
-
-  * doc/UserGuide.html, doc/UserGuide.txt:
-  Last minute changes to documentation prior to v2.8 release.
-
-2005-01-11  Chris Chambreau  <chcham@llnl.gov>
-
-  * ChangeLog: Changes up to 2.8 Release.
-
-  * configure: 2.8 release version
-
-  * doc/UserGuide.html, doc/UserGuide.txt: Updated for 2.8 release.
-
-  * configure.in, mpi.protos.txt.in, mpiPconfig.h.in:
-  Make gettimeofday the default Linux timer, but clock_gettime can be
-  activated with configure switch.
-
-  * testing/0-simple-c++.C: Avoid MPICH2 compile script warning.
-
-  * configure.in: clock_gettime suuport and MPICH 2 C++ compile script support
-
-2005-01-06  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiP-API.c, util.c: Cleaning with lint.
-
-  * bin/mpip-insert-src, bin/mpirun-mpip, bin/srun-mpip:
-  Scripts for replacing address info in report with addr2line output and
-  example runtime profiling.
-
-  * Makefile.in:
-  Modifications to install target to account for new scripts in bin.
-
-  * mpiPi.c:
-  Do not overwrite existing report files.  If a report file exists, increment
-  the report count and check until a new filename is generated.
-
-  * configure.in, mpiPi.c, pc_lookup.c:
-  Addressed DISABLE_BFD and MPI-I/O configuration issues.
-
-  * _timers.h: Phil Roth's support for POSIX clock_gettime for Linux/Altix.
-
-  * util.c: Added stdlib.h
-
-  * mpiPi_proto.h, wrappers_special.c:
-  Remove unnecessary PC sampling at Init and Finalize.
-
-  * mpiP-API.c: additional comment
-
-  * Defs.mak.in, diag_msgs.c, mpiPi.h.in:
-  Modifications to support BlueGene/L ppc64 platform.
-
-2004-12-28  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/linux_posix.h, linux_posix.h: admin
-
-  * _timers.h, linux_posix.h:
-  Phil Roth additions to support linux/posix clock_gettime initially for Altix.
-
-2004-12-04  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure: updated.
-
-  * configure.in, make-wrappers.py, mpiP-API.c, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, util.c:
-  Completely re-wrote code to address the differences of the number of
-  frames to unwind to get to the calling application function from
-  libunwind, Tru64 unwind, UNICOS, as well as MPI vs API calls.
-
-  * testing/test_template.tcl:
-  Added sleep during test loop to keep some tests from failing.
-
-  * pc_lookup.c: Added demangling defines if demangle.h is not available.
-
-  * report.c: Addressed Tru64 compile warning.
-
-  * bin/config.guess, bin/config.sub: Updated config scripts
-
-2004-12-02  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: new version numbers
-
-  * testing/14-mpiio.exp, testing/14-mpiio.src:
-  more MPI-I/O related files that didn't quite make it into the
-  distribution for 2.7 (oops!)
-
-  * mpi.io.protos.txt: this should have been added before, but I missed it...
-
-2004-11-05  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure.in: Modification for correct parent frame count
-
-  * configure, configure.in, report.c: More minor modifications
-
-  * testing/Makefile.in: removed fortran api test
-
-  * testing/api-test-f.c, testing/api-test.f: removed api fortran test
-
-  * util.c: *** empty log message ***
-
-  * testing/api-test-f.c, testing/api-test.f: minor corrections
-
-2004-11-04  Chris Chambreau  <chcham@llnl.gov>
-
-  * mpiPi.h.in: Do not use asserts by default
-
-  * Makefile.in: o  Expanded phony targets
-  o  shared lib build and install targets for Linux
-
-  * configure.in: o  Set default prefix to .
-  o  Use kludge of setting cross_compiling to yes to avoid test execution
-  o  Added test to identify UNICOS OS for frame depth
-
-  * report.c: *** empty log message ***
-
-  * testing/timer-info.c: Make use of new TIMER_NAME macro
-
-  * timers/crayx1_local.h: Does not appear to be needed
-
-  * mpiP-API.c: removed unnecessary version of function mpiP_open_executable
-
-  * mpiPi.c, util.c: Made COV reporting the default
-
-  * _timers.h: *** empty log message ***
-
-  * timers/aix_local.h, timers/aix_swclock.h, timers/crayx1_hw.h, timers/sunos-timers.h:
-  o  Cleaned up gettimeofday types
-  o  Added TIMER_NAME macro
-  o  Removed unused cray timer header file
-  o  Changed new cray files to conform to new macro format
-
-2004-10-28  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/crayx1_hw.h, timers/crayx1_local.h:
-  Missed Phil's cray timer include files...
-
-2004-10-27  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in, get_fortran_arg.f, util.c:
-  Slight modifications to allow forcing use of getargs on linux and
-  support getargs file compatability with Linux and UNICOS.
-
-  * Makefile.in: added merged-install target for LLNL site installations.
-
-2004-10-26  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
-  *** empty log message ***
-
-  * Makefile.in, Rules.mak, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, get_fortran_arg.f, get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in:
-  o  Cray X1/UNICOS support
-  o  Libdwarf support : note that Intel compilers do not provide full C++ symbols
-  o  install target
-
-2004-10-22  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in: target for generating prototype file.
-
-  * testing/timer-info.c:
-  Not so much a test as a utility to report on timer info.
-
-  * testing/api-test-f.c, testing/api-test.c, testing/api-test.f:
-  New API tests.
-
-  * get_fortran_arg.f, mpiPi_proto.h:
-  This file should no longer be necessary if getting Linux executable
-  name from /proc.
-
-  * timers/aix_local.h, timers/aix_swclock.h, timers/sunos-timers.h:
-  moved files out of this directory for ease of API use.
-
-  * testing/12-null-null.src, testing/13-pcontrol-report.c, testing/9-test-mpip-time.c, testing/Makefile.in:
-  *** empty log message ***
-
-  * mpiP-hash.h, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c, sunos-timers.h, util.c, wrappers_special.c, Defs.mak.in, Makefile.in, _timers.h, aix_local.h, aix_swclock.h, configure, configure.in, hash.c, hash.h, make-wrappers.py, mpiP-API.c, mpiP-API.h, mpiP-hash.c:
-  Added mpiP API : provides stack tracing, address lookup and timing functionality
-  1)  Added mpiP-API.c and mpiP-API.h.
-  2)  Renamed hash files to avoid API conflict with hash.h.
-  3)  To make compilation with API easier, moved timers include files to main dir
-  and removed timers dir.
-  4)  Added mpiP_TIMER typedef for API.
-  5)  API required some additional issues, such as PARENT_FRAME_COUNT to help
-  coordinate which stack frames are recorded through the API.
-
-  also other modifications:
-
-  Added binutils-dir flag for easier configuration.
-  Added bin-type-flag to address issues with 32/64 mixed systems.
-  Always call demangling on symbols and remove libmpiPdmg on system where this mak
-  es sense.
-  Added makefile targets to merge binutils and libunwind objects into libmpiP.
-  Added negative time value checking for all time difference calculation in wrappe
-  rs.c.
-  Added functionality to get executable name from /proc on Linux. <-- Assumes exec
-  utable will not be longer than 4096.
-
-2004-10-21  Chris Chambreau  <chcham@llnl.gov>
-
-  * _timers.h, configure, configure.in, make-wrappers.py, mpiPconfig.h.in:
-  Added timing checking and gettimeday configuration switch.
-
-2004-09-21  Chris Chambreau  <chcham@llnl.gov>
-
-  * Makefile.in, configure, mpiP-API.c, mpiP-API.h, pc_lookup.c:
-  Added support for mpiP functionality API.
-
-  * timers/aix_local.h, timers/aix_swclock.h: *** empty log message ***
-
-  * _timers.h, make-wrappers.py, mpiPi.c, mpiPi.h.in, pcontrol.c:
-  Removed unnecessary timer argument to TIMER macros that was left over
-  from AIX Switch Clock support, which is not being supported.
-
-2004-09-14  Chris Chambreau  <chcham@llnl.gov>
-
-  * pc_lookup.c: Added debugging info if can't BFD fails due to NULL file.
-
-  * util.c:
-  Moved mpiPi.h above HAVE_LIBUNWIND pre-processor conditionals so that
-  HAVE_LIBUNWIND is actually set!
-
-  * glob.c, mpiPi.c, mpiPi.h.in, report.c:
-  Added patch number for release tracking
-
-  * mpi.protos.txt:
-  Not necessary to archive, as there is an mpi.protos.txt.in file
-
-2004-08-03  Chris Chambreau  <chcham@llnl.gov>
-
-  * doc/UserGuide.html, doc/UserGuide.txt:
-  slight mod to warn about negative values
-
-  * doc/INSTALL.txt, doc/README, doc/UserGuide.html, doc/UserGuide.txt:
-  Updated doc info for 2.7 release.
-
-2004-07-20  Chris Chambreau  <chcham@llnl.gov>
-
-  * timers/aix_local.h:
-  Cast secs as double to prevent overflow of int value when multiplying
-  with USECS value for long running tests.
-
-  * _timers.h: Correct printing of time difference macro
-
-  * testing/13-pcontrol-report.c: *** empty log message ***
-
-  * pcontrol.c:
-  Modify Pcontrol report generation code to 2 to fit standard "flush
-  buffers" functionality.
-
-2004-07-14  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure: Ready for v2o7 release?
-
-  * timers/aix_local.h: *** empty log message ***
-
-  * configure.in, mpiPconfig.h.in: Clean up timers and add AIX time check.
-
-  * util.c: Only use getarg when building Intel Fortran lib
-
-  * configure.in: MPI I/O and getarg configuration changes
-
-  * Makefile.in: More Intelv8 Fortran support issues
-
-2004-07-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/4-demangle.src: *** empty log message ***
-
-  * configure.in, util.c: Add PGI support
-
-  * pc_lookup.c: Make sure all mpiP output lines prefixed with mpiP:
-
-2004-07-08  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/1-hot-potato.src, testing/3-stacktrace.src, testing/sweep-ops-stack.src, testing/sweep-ops.src:
-  corrected dependence on space-count formatting for pass case
-
-2004-07-07  Chris Chambreau  <chcham@llnl.gov>
-
-  * util.c: Added option for COV calcultions to getopts
-
-  * report.c: Small change to account for 10000+ line source files
-
-  * Makefile.in: Correction to Fortran variable
-
-  * ChangeLog: Comment for v2.7 release
-
-2004-06-25  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: Update to 2.7
-
-2004-06-24  Chris Chambreau  <chcham@llnl.gov>
-
-  * configure: consistency
-
-  * Defs.mak.in, configure.in, mpiPconfig.h.in:
-  Configure details: libs, bfd_boolean, MPI I/O message, etc.
-
-  * mpi.protos.txt.in: more MPI I/O support
-
-  * configure, configure.in, mpi.protos.txt, mpiPconfig.h.in, report.c:
-  Changes to address configurations that do not provide MPI I/O
-
-  * configure: consistency
-
-  * configure.in:
-  looks like MPICH mpif77 uses f77 driver, so look for g77 with gcc
-
-  * configure: To test against other configure behavior
-
-  * testing/test_template.tcl: Increase timeout that caused failure on AIX
-
-  * report.c: Address 0-div faults from 0 time values
-
-  * Makefile.in, configure.in: More Intel8.0 support issues
-
-2004-06-23  Chris Chambreau  <chcham@llnl.gov>
-
-  * get_fortran_arg.f: hopefully working change for CVS info
-
-  * mpiPi_proto.h, pc_lookup.c: Prototyping and various cleanup
-
-  * make-wrappers.py, mpi.protos.txt, mpiPi.c, mpiPi.h.in, report.c:
-  Added MPI I/O support
-
-  * Makefile.in: Another mod for Intel8.0 fortran args support
-
-  * get_fortran_arg.f, util.c:
-  Added functionality to get fortran args with Intel8.0 compiler
-
-  * Defs.mak.in, configure.in, mpiPconfig.h.in:
-  Configure cleanup to use mpiPconfig.h
-
-  * testing/1-hot-potato.c: changed header info
-
-  * testing/13-pcontrol-report.c: Test for report generation through pcontrol
-
-  * testing/0-simple-c++.exp, testing/0-simple.exp, testing/0-simplef.exp, testing/14-mpiio.c, testing/Makefile.in:
-  Corrected case where close/wait in expect seemed to cause hangs.
-  Added MPI I/O test
-
-2004-06-19  Chris Chambreau  <chcham@llnl.gov>
-
-  * make-wrappers.py, mpi.protos.txt, mpiPi.c, pcontrol.c:
-  changes that should fix fortran pcontrol calls and also add the ability
-  to call MPI_Pcontrol(-1) to generate an intermediate report.
-
-  * Defs.mak.in, configure.in: Better identification of vendor F77 (I hope...)
-
-2004-06-17  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/0-simple-c++.exp, testing/0-simple.exp, testing/0-simplef.exp, testing/test_template.tcl:
-  Added test support for srun
-
-  * testing/12-null-null.c, testing/12-null-null.exp, testing/12-null-null.src, testing/Makefile.in:
-  Added MPI_Init(NULL, NULL) test.
-
-  * configure.in: add some CMPI compiler searches.
-
-  * mpiPi.c, pc_lookup.c, wrappers_special.c:
-  Support for MPI_Init(NULL, NULL) call, which is technically supported in
-  the standard.  Pointed out by MSTI folks.  Just makes "Unknown" app report
-  file and gives addresses for callsites.
-
-2004-06-15  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/sweep-ops-stack.src, testing/sweep-ops.src:
-  Add test string for "main" which appears with Intel 8.0 Fortan compilers.
-
-  * configure.in, util.c:
-  Add support for libunwind stack walk and configuration for
-  Itanium2 platform.
-
-2004-03-18  Chris Chambreau  <chcham@llnl.gov>
-
-  * glob.c: Changed minor version number to 6.
-
-  * mpiPi.c: Changed contact email address to mpip-help.
-
-2004-02-13  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in, configure, configure.in, mpiPi.c, pc_lookup.c:
-  Changes to disable use of GNU binutils
-
-2004-02-12  Chris Chambreau  <chcham@llnl.gov>
-
-  * testing/0-simple.exp, testing/0-simplef.exp, testing/sweep-ops-stack.src, testing/test_template.tcl, testing/0-simple-c++.exp:
-  Modified test files to support mpirun tests for MPICH
-
-2004-02-11  Chris Chambreau  <chcham@llnl.gov>
-
-  * Defs.mak.in: Added -lm for GCC COV support
-
-  * configure, configure.in:
-  Removed AC_INIT mpiPi.h dependency and added package name, version,
-  and address for bug reporting.
-
-  * mpiPi.h:
-  addition of mpiPi.h.in means mpiPi.h doesn't need to be in repository
-
-  * mpiPi.c, mpiPi.h.in, report.c, util.c: COV report modifications
-
-  * Defs.mak.in, configure, configure.in, diag_msgs.c, mpiPi.c, mpiPi.h, mpiPi.h.in, pcontrol.c, report.c, util.c:
-  Initial modifications to handle additions by Jim Brandt, including
-    changing varargs to stdarg
-    adding x86_64 support
-    using consistent mpip timer calls for apptime instead of PMPI_Wtime
-    stackdepth max value configuration option
-    %f vs %g report format option
-
-2004-02-10  Chris Chambreau  <chcham@llnl.gov>
-
-  * doc/UserGuide.html, doc/UserGuide.txt, testing/0-simple.c, testing/11-p2p-mess-size.c, testing/2-pcontrol.c, mpiPi.c, mpiPi.h, pc_lookup.c, util.c:
-  maintenance to commit previous v2.5 modifications
+2006-10-05  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Truncated version number to 3.0.
+	  Updated AIX test information.
+	* Restrictions.txt:
+	  Removed old license. The new license can now be found in source
+	  files and the UserGuides.
+	* Check.mak.in, Defs.mak.in, Makefile.in, Rules.mak, _timers.h,
+	  configure.in, diag_msgs.c, diag_msgs_api.c,
+	  get_fortran_arg.f.in, get_fortran_arg_pxf.f, glob.c,
+	  hash_proto.h, make-wrappers.py, mpi.protos.txt.in, mpiP-API.c,
+	  mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c,
+	  mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
+	  pcontrol.c, report.c, testing/0-simple-c++.C,
+	  testing/0-simple.c, testing/1-hot-potato.c,
+	  testing/12-null-null.c, testing/13-pcontrol-report.c,
+	  testing/14-mpiio.c, testing/15-pcontrol.c, testing/2-pcontrol.c,
+	  testing/3-stacktrace.c, testing/5-medley.c,
+	  testing/6-nonblock.c, testing/7-nonblock-waitall.c,
+	  testing/8-test.c, testing/9-test-mpip-time.c,
+	  testing/bfd-test.c, timers/aix_local.h.in, timers/aix_swclock.h,
+	  timers/crayx1_hw.h, timers/linux_posix.h, timers/sunos-timers.h,
+	  util.c, wrappers_special.c:
+	  Modified RCS Header keyword to subversion Id keyword.
+	* _timers.h, diag_msgs.c, diag_msgs_api.c, doc/README,
+	  get_fortran_arg.f.in, get_fortran_arg_pxf.f, glob.c,
+	  hash_proto.h, mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiP-hash.h,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
+	  pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c,
+	  testing/0-simple-c++.C, testing/0-simple.c, testing/0-simplef.f,
+	  testing/1-hot-potato.c, testing/10-coll-mess-size.c,
+	  testing/11-p2p-mess-size.c, testing/12-null-null.c,
+	  testing/13-pcontrol-report.c, testing/14-mpiio.c,
+	  testing/15-pcontrol.c, testing/16-waitallf.f,
+	  testing/2-pcontrol.c, testing/3-stacktrace.c,
+	  testing/4-demangle.C, testing/5-medley.c, testing/6-nonblock.c,
+	  testing/7-nonblock-waitall.c, testing/8-test.c,
+	  testing/9-test-mpip-time.c, testing/api-test.c,
+	  testing/bfd-test.c, testing/sweep-ops-stack.f,
+	  testing/sweep-ops.f, testing/timer-info.c,
+	  timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h,
+	  timers/linux_posix.h, timers/sunos-timers.h, util.c,
+	  wrappers_special.c:
+	  Changed project URL to point to sourceforge page rather than
+	  LLNL page.
+	* testing/Makefile.in:
+	  Changed copyright information.
+	* get_fortran_arg.f.in, get_fortran_arg_pxf.f:
+	  Corrected license information.
+	* Defs.mak.in, Makefile.in, Rules.mak:
+	  Removed previous copyright info and referenced license.
+
+2006-10-04  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Various documentation updates and corrections.
+	  Removed most LLNL references and switched mail list and web URLs
+	  to sourceforge.
+	* configure, configure.in, mpiPi.c, mpiPi.h.in:
+	  New bug list mail address which is set in configure.in.
+	* doc/UserGuide.html:
+	  Removed LLNL disclaimer. Added SF logo.
+	* doc/UserGuide.html:
+	  Update Documentation Date
+
+2006-10-02  chcham
+
+	* ChangeLog:
+	  3.0 release changes
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Updated with 3.0 release information.
+	* make-wrappers.py:
+	  Added some MPI prototype support for arrays, for example: int
+	  array_of_errcodes[].
+
+2006-09-26  chcham
+
+	* configure, hash_proto.h, mpiP-API.h, mpiP-hash.h,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
+	  testing/10-coll-mess-size.c, testing/14-mpiio.c,
+	  testing/15-pcontrol.c, testing/7-nonblock-waitall.c,
+	  timers/crayx1_hw.h:
+	  Slight GNU indent modifications.
+	* util.c:
+	  Correction to UNICOS stack tracing.
+
+2006-09-16  chcham
+
+	* _timers.h, configure, diag_msgs.c, diag_msgs_api.c,
+	  get_fortran_arg.f.in, glob.c, hash_proto.h, mpiP-API.c,
+	  mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c,
+	  mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
+	  pcontrol.c, report.c, testing/0-simple-c++.C,
+	  testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c,
+	  testing/1-hot-potato.src, testing/10-coll-mess-size.c,
+	  testing/11-p2p-mess-size.c, testing/12-null-null.c,
+	  testing/13-pcontrol-report.c, testing/14-mpiio.c,
+	  testing/15-pcontrol.c, testing/15-pcontrol.src,
+	  testing/16-waitallf.f, testing/16-waitallf.src,
+	  testing/2-pcontrol.c, testing/3-stacktrace.c,
+	  testing/3-stacktrace.src, testing/4-demangle.C,
+	  testing/4-demangle.src, testing/5-medley.c,
+	  testing/6-nonblock.c, testing/7-nonblock-waitall.c,
+	  testing/8-test.c, testing/9-test-mpip-time.c,
+	  testing/api-test.c, testing/bfd-test.c,
+	  testing/sweep-ops-stack.f, testing/sweep-ops-stack.src,
+	  testing/sweep-ops.f, testing/sweep-ops.src,
+	  testing/timer-info.c, timers/aix_local.h.in,
+	  timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h,
+	  timers/sunos-timers.h, util.c, wrappers_special.c:
+	  BSD License insertion and header comment reorg.
+	* testing/verify-timers.c:
+	  Removed test files using outdated timer macros.
+
+2006-08-24  chcham
+
+	* .project:
+	  Remove unnecessary eclipse project file.
+	* Defs.mak.in, Makefile.in, configure, configure.in, mpiP-API.c,
+	  mpiPconfig.h.in, mpiPi.c, pc_lookup.c:
+	  Changed DISABLE_BFD to ENABLE_BFD for clarity.
+
+2006-08-10  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt, glob.c:
+	  Preparation for 3.0 release:
+	  o Version numbers update.
+	  o Documentation update.
+	* mpiPi.c:
+	  Fix for derived datatype generation from Phil Roth.
+	* get_fortran_arg.f.in:
+	  Fix for return value from Phil Roth.
+	* configure, configure.in:
+	  Fix for correct dwarf testing from Phil Roth.
+
+2006-06-28  chcham
+
+	* testing/Makefile.in:
+	  Corrected I/O test append.
+	* Makefile.in, glob.c, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
+	  pcontrol.c, report.c, util.c, wrappers_special.c:
+	  New concise reporting format and related features:
+	  o Generate verbose (default), concise, or both reports.
+	  o Disable callsite detail sections.
+	  o Use Pcontrol to generate either report format or reset
+	  statistics counters.
+	  
+	  Minor change for lint/splint support.
+
+2006-05-22  chcham
+
+	* glob.c:
+	  New release to address callsite numbering problems on x86_64.
+
+2006-05-18  chcham
+
+	* pcontrol.c:
+	  Removed unnecesary debug message.
+	* util.c:
+	  Initialize pc value to pass first pc check.
+	* mpiPi.c, pcontrol.c:
+	  Changes to reset callsite data with MPI_Pcontrol(3) call. Can
+	  be used with
+	  MPI_Pcontrol(2) to generate periodic reports without
+	  accumulative data.
+
+2006-04-13  chcham
+
+	* util.c:
+	  Stop unwinding if PC is NULL
+	* glob.c:
+	  Patch number update
+	* configure, configure.in, testing/Makefile.in,
+	  testing/test_template.tcl:
+	  Changes to avoid testing MPI-IO for 'check' target if MPI-IO
+	  functions not found.
+
+2006-04-12  chcham
+
+	* ChangeLog:
+	  Recent changes.
+	* configure, configure.in, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in,
+	  report.c:
+	  This commit adds substantial reporting changes to address memory
+	  use for
+	  platforms such as Blue Gene.
+	  
+	  The previous reporting mechanism is the default configuration,
+	  but the new low-memory-use approach can be configured with the
+	  --enable-low-mem-report configure flag, which defines
+	  LOW_MEM_REPORT in
+	  mpiPconfig.h.
+	  
+	  Instead of aggregating all process information at a single
+	  process,
+	  process-specific information is printed by allocating
+	  sizeof(callsite_stats_t)*process_count and iterating through
+	  callsites
+	  using PMPI_Gather to collect and then print process-specific
+	  callsite information.
+	  
+	  This results in a fixed amount of memory use which is
+	  independent of the number of
+	  MPI callsites in the application.
+	* glob.c:
+	  Patch version update to reflect changes.
+	* diag_msgs.c:
+	  Make debug messages have consistent debug label DBG.
+	* Makefile.in:
+	  Specify '-gnu' option for indent to override any local
+	  .indent.pro settings.
+
+2006-04-07  chcham
+
+	* mpiPi.c, util.c:
+	  Removed unused variables.
+	* config/testing.exp, lib:
+	  Actual commit of moving dejagnu global config file from lib to
+	  config directory.
+	* Check.mak.in, Defs.mak.in, Makefile.in, get_fortran_arg.f.in,
+	  mpi.protos.txt.in, mpiPi.h.in, testing/Makefile.in,
+	  timers/aix_local.h.in:
+	  o Added configure_input substitution message in configured files.
+	  o Moved dejagnu global file from lib dir into config dir.
+	  o Added install logic to test whether doc and bin dirs need to
+	  be copied.
+
+2006-04-03  chcham
+
+	* ChangeLog:
+	  new changes.
+	* configure, configure.in:
+	  Minor configure error.
+
+2006-03-31  chcham
+
+	* Makefile.in:
+	  When running add_binutils_objs, check whether we are only
+	  configured
+	  for the API library.
+	* Check.mak.in, Makefile.in, configure, configure.in,
+	  testing/Makefile.in, testing/api-test.exp:
+	  o Added api-test test for check target (testing/api-test.exp).
+	  o Configured check target for use with --enable-api-only
+	  configuration.
+	  o Added other phony targets.
+	  o Moved some Makefile conditional logic to configure.
+	  o Reorganized pc_lookup and util rebuilding logic.
+	  o Removed shared library target for AIX.
+	  o Do not remove fortran getarg configure source file, to address
+	  the case
+	  where files are re-configured with config.status.
+
+2006-03-30  chcham
+
+	* ChangeLog:
+	  new changes
+	* configure, glob.c, mpiP-API.h, mpiPi.c, mpiPi_proto.h,
+	  pc_lookup.c, pc_lookup_dwarf.c, report.c, testing/api-test.c,
+	  testing/timer-info.c, util.c:
+	  o Corrected various printing issues with incorrect types.
+	  o Added mpiP_format_address() to consistently format printed
+	  addresses, which
+	  should also be available through the API.
+	  o Corrected field widths when printing addresses instead of
+	  source info.
+	  o Modified api-test and imer-info tests to behave appropriately
+	  when DISABLE_BFD
+	  is set.
+
+2006-03-29  chcham
+
+	* Defs.mak.in, Makefile.in, configure.in, pc_lookup_dwarf.c,
+	  timers/crayx1_hw.h:
+	  Modifications by Phil Roth and Chris Chambreau:
+	  
+	  o address use of libelf/libdwarf
+	  - Have configure check for libs and define DISABLE_BFD
+	  - Move configure substitution to Defs.mak and set DISABLE_BFD
+	  & USE_LIBDWARF
+	  o add files to remove to distclean target
+	  o make no symbol failure warning rather than abort.
+
+2006-03-23  chcham
+
+	* ChangeLog:
+	  new changes
+	* Makefile.in, glob.c:
+	  Hopefully corrected logic concerning when pc_lookup should be
+	  rebuild when
+	  building the API library.
+	* ChangeLog:
+	  Updates.
+	* Defs.mak.in, Makefile.in, configure, configure.in, glob.c,
+	  pc_lookup.c:
+	  o Renamed API library from libmpiP-API.a to libmpiPapi.a to
+	  avoid AIX MPI
+	  compile scripts interpreting '-A' as a flag.
+	  o Added DISABLE_BFD macro to avoid recompiling pc_lookup.c when
+	  BFD is
+	  not used on systems that build a separate demangling library.
+	  o Set API_TARGET once an refer to macro in other cases that
+	  reference the API lib.
+	  o Install taget copies timer include file directory structure.
+	  o Added Cray F77_VENDOR test for X1E support.
+	  o mpiP_find_src_loc returns failure and optionally prints a
+	  debugging message
+	  if the input pc value is NULL, rather than failing an assert.
+
+2006-03-16  chcham
+
+	* ChangeLog:
+	  New commits.
+	* util.c:
+	  Forgot to run indent before last commit.
+	* util.c:
+	  As indentified through Phil Roth's XT3 testing, added a
+	  character length
+	  int argument at the end of the get_fortran_arg argument list to
+	  provide
+	  correct type signature for compilers currently supported.
+
+2006-03-15  chcham
+
+	* configure, glob.c, pc_lookup.c:
+	  Corrected 32-bit AIX Text start lookup error.
+
+2006-03-14  chcham
+
+	* glob.c:
+	  Patch number updated to reflect recent changes.
+	* configure.in, get_fortran_arg.f.in:
+	  Changes to better handle access to fortran command line
+	  arguments.
+
+2006-03-13  chcham
+
+	* testing/sweep-ops-stack.f, testing/sweep-ops.f:
+	  Removed unnecessary semi-colons.
+
+2006-03-09  chcham
+
+	* ChangeLog:
+	  Updated to reflect recent acitivity
+
+2006-03-07  chcham
+
+	* testing/3-stacktrace.src:
+	  New line nu,bers to reflect changes from formatting commit.
+	* configure.in:
+	  Reverting to '.' for default prefix.
+
+2006-03-06  chcham
+
+	* configure.in:
+	  Trying new directory hierarchy for ease of use at LLNL.
+
+2006-03-03  chcham
+
+	* Makefile.in, diag_msgs.c, diag_msgs_api.c, mpiP-API.c,
+	  mpiP-API.h, mpiP-hash.c, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in,
+	  mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c,
+	  report.c, testing/10-coll-mess-size.c,
+	  testing/11-p2p-mess-size.c, testing/13-pcontrol-report.c,
+	  testing/14-mpiio.c, testing/15-pcontrol.c, testing/2-pcontrol.c,
+	  testing/3-stacktrace.c, testing/api-test.c,
+	  testing/timer-info.c, timers/aix_local.h.in,
+	  timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h,
+	  timers/sunos-timers.h, util.c, wrappers_special.c:
+	  Added indent make target and formatted source using GNU indent
+	  defaults.
+
+2006-03-02  chcham
+
+	* Defs.mak.in, Makefile.in, configure, configure.in, glob.c,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, util.c:
+	  Modifications for API lib only configuration and build.
+
+2006-03-01  chcham
+
+	* Makefile.in:
+	  For add_binutils_obj target, also address API lib.
+	* mpiPi.c:
+	  Modified global condition for check whether any records were
+	  collected.
+	  Also corrected return value checking from mergeResults.
+
+2006-02-27  chcham
+
+	* testing/Makefile.in:
+	  Reset CPPFLAGS as this was messing up bgl test compiles.
+	* configure, glob.c:
+	  2.8.6 commit.
+
+2006-02-24  chcham
+
+	* Makefile.in, _timers.h, configure.in, mpiPconfig.h.in:
+	  Support for using PMPI_Wtime for timing
+	* util.c:
+	  Fixed typo.
+	* mpiPi_proto.h:
+	  extern for debug0 function.
+	* diag_msgs.c:
+	  Corrected debug0 message.
+	* mpiPi.c:
+	  Needed P for MPI_Waitall.
+	* mpiPi.c:
+	  Removed lingering memory debugging calls.
+	* diag_msgs_api.c:
+	  Adding debug0 message for API
+	* diag_msgs.c, mpiPi.c:
+	  Added report generation timing and a rank0 debug message.
+	* mpiPi.c, mpiPi.h.in:
+	  Modification to collect_basics to use Irecv and eliminate extra
+	  copy by
+	  using rank_info structure as recv buffer.
+
+2006-02-23  chcham
+
+	* mpiPi.c:
+	  Extract callsite insertion code into function.
+	  Remove rawCallsiteData memory overhead and insert callsite info
+	  in hash
+	  tables as process callsite data is received.
+	* configure.in:
+	  Corrected errors from recent modifications.
+
+2006-02-09  chcham
+
+	* configure, configure.in:
+	  Substantial modifications to correct enable/disable use and use
+	  of AC_HELP_STRING macro.
+	* Defs.mak.in, bin/config.sub, configure, mpiPi.h.in, pc_lookup.c:
+	  Additional modifications from Phil Roth to correctly label
+	  preprocessing macro as HAVE_BFD_BOOLEAN and to add some XT3
+	  support.
+	* configure.in, mpiPconfig.h.in:
+	  Modifications from Phil Roth to correctly label preprocessing
+	  macro as HAVE_BFD_BOOLEAN
+
+2006-01-27  chcham
+
+	* glob.c:
+	  Another patch update to track development.
+	* Makefile.in:
+	  Added API dependency for install target
+
+2006-01-19  chcham
+
+	* mpiP-API.h:
+	  Additional extern for find_src_loc to address compiler warnings.
+	* Makefile.in:
+	  Build API lib by default
+
+2006-01-18  chcham
+
+	* mpiP-API.h:
+	  It looks like _timers.h is the only API dependency. Hopefully
+	  this won't result in problems on obscure platforms.
+	* Rules.mak:
+	  Get rid of any mpiP report files when cleaning.
+
+2005-12-14  chcham
+
+	* pc_lookup.c:
+	  Additional mods for massaging pc values.
+	* timers/aix_local.h.in:
+	  Make sure timer is labelled correctly.
+	* util.c:
+	  Added -X runtime option to specify executable location.
+	* get_fortran_arg.f:
+	  Generated by configure now.
+	* pc_lookup.c:
+	  Calling bfd_close with an unopened file descriptior resulted in
+	  segfaults on AIX.
+
+2005-12-13  chcham
+
+	* mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, report.c:
+	  Added capability to get XCOFF Text start address to calculate the
+	  appropriate address to pass to BFD to get source info. Ideally
+	  this
+	  would be handled by BFD, but I have not investigated this yet.
+	* glob.c:
+	  Increase patch level for local version tracking.
+	* configure.in, timers/aix_local.h, timers/aix_local.h.in:
+	  Added configuration test for AIX monotonically-non-decreasing
+	  timer function
+	  mread_real_time.
+
+2005-12-06  chcham
+
+	* configure, mpiPi.c, mpiPi.h.in, report.c, util.c:
+	  First pass of message threshold reporting.
+	* configure.in, get_fortran_arg.f:
+	  Cleaned up fortran support a bit.
+
+2005-10-28  chcham
+
+	* make-wrappers.py:
+	  Cleaned up what appeared to be old code added by Jeff around
+	  2001 and having since been commented out. I couldn't find any
+	  code that supported the statements generated, so it seemed safe
+	  to get rid of.
+	* make-wrappers.py:
+	  Changed timer rollback failure to issue more information and
+	  discard sample.
+
+2005-07-08  chcham
+
+	* Defs.mak.in:
+	  Do not define MAKE, as it was messing up recursive make settings.
+	* mpiPi_proto.h:
+	  Change return value of open_dwarf_executable.
+
+2005-07-07  chcham
+
+	* mpiPi.h.in:
+	  missed this file in previous commit
+	* mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c:
+	  Added return value checking for lookup open commands. If lookup
+	  fails, report completes with unknown values and addresses.
+	* .project, config/unix.exp, testing/0-simple-c++.exp,
+	  testing/0-simple.exp, testing/0-simplef.exp,
+	  testing/test_template.tcl:
+	  Added capability of setting global test pause time between tests.
+	* configure, configure.in:
+	  Minor changes to ensure Fortran lib set for testing on AIX
+	* Defs.mak.in, configure.in, mpiPconfig.h.in:
+	  Address XLF configuration issues for differences between XLF 9
+	  and previous versions.
+	* configure, configure.in, get_fortran_arg.f.in, util.c:
+	  Changes to support fortran command-line arguments and executable
+	  identification on BG/L.
+
+2005-07-06  chcham
+
+	* mpiPi.c:
+	  Add define to work around DISABLE_BFD build error
+	* glob.c:
+	  Set patch level for next update
+
+2005-06-20  chcham
+
+	* configure, configure.in:
+	  Corrected message format error from previous commit.
+	* configure, configure.in:
+	  Added configuration testing for enable vs disable fortranxlate
+	  option.
+	  Also added check for opaque object translation function/macros.
+	* wrappers_special.c:
+	  Add extra check for valid argv pointer value
+
+2005-05-26  chcham
+
+	* Defs.mak.in, Makefile.in:
+	  Added AIX shared object target support and fixed up clean target
+	  to
+	  remove shared libs and API lib.
+
+2005-05-13  chcham
+
+	* mpiPi.c:
+	  Included changes to use appFullName instead of command-line args,
+	  as Phil Mucci indicated that ScaliMPI munged the arguments such
+	  that
+	  the application is not argv[0].
+
+2005-05-05  chcham
+
+	* make-wrappers.py:
+	  Implemented new fortran opaque object translation approach using
+	  IN/OUT dictionaries to identify the translation required.
+
+2005-04-29  chcham
+
+	* wrappers_special.c:
+	  Removed what appeared to be unnecesary setjmp calls and cleaned
+	  up
+	  symbol specifiers.
+	* report.c:
+	  Switched printfs to mpiPi_msg_warn.
+	* mpiPi.h.in:
+	  Small edit: removed NDEBUG, and reference to outdated
+	  PARENT_FRAME_COUNT
+
+2005-04-25  chcham
+
+	* Makefile.in:
+	  Add shorter API target name.
+	* Makefile.in:
+	  Select appropriate pc_lookup file for API library.
+	* ChangeLog, doc/UserGuide.html, glob.c:
+	  Final Changes for 2.8.2 release.
+
+2005-04-07  chcham
+
+	* Defs.mak.in:
+	  More CFLAGS/FFLAGS and -g coordination. -g should always be
+	  set. FFLAGS will be copied from CFLAGS if it is not set.
+
+2005-04-06  chcham
+
+	* Defs.mak.in:
+	  OPT flag no longer used.
+	* Defs.mak.in, configure, configure.in, testing/Makefile.in,
+	  testing/sweep-ops-stack.f, testing/sweep-ops-stack.src:
+	  Change to use CFLAGS to set library and test compile flags.
+	  Slight modifications to fortran stack test to address segfault
+	  when optimized.
+	* testing/16-waitallf.f:
+	  Use mod instead of modulo.
+
+2005-04-03  chcham
+
+	* testing/16-waitallf.exp:
+	  Environment variable MPIP needs to be reset after test 15
+	* make-wrappers.py, mpi.protos.txt.in:
+	  cleaned out irrelevant wrapper generation warnings and errors.
+
+2005-04-02  chcham
+
+	* configure:
+	  Contains new configure test for MPIR_ToPointer
+	* testing/16-waitallf.exp, testing/16-waitallf.f,
+	  testing/16-waitallf.src, testing/Makefile.in:
+	  Added opaque object Fortran/C translation test.
+	* mpiPi_proto.h:
+	  Redundant MPI declarations seemed unnecessary and prone to
+	  distracting
+	  warning messages.
+	* Makefile.in:
+	  Added additional header file dependencies for thoroughness.
+	* make-wrappers.py:
+	  An extra malloc was messing up fortran opaque object conversion.
+	* configure.in, mpiPconfig.h.in, mpiPi.h.in:
+	  Added configure test to address MPIR_ToPointer problem with
+	  Quadrics MPI.
+	  Also fixed compile warning if no stack trace parameters have
+	  been defined
+	  for the current architechture and libunwind is not being used.
+
+2005-04-01  chcham
+
+	* configure:
+	  Attempt to figure out different function calls between binutils
+	  2.15 and 2.15.96
+	* testing/4-demangle.src:
+	  More flexibility for demangled targets, in this case for GNU
+	  contructors
+	  and destructors
+	* testing/15-pcontrol.c, testing/15-pcontrol.exp,
+	  testing/15-pcontrol.src, testing/Makefile.in,
+	  testing/test_template.tcl:
+	  Added test for profiling activation/deactivation through
+	  MPIP=-o
+	  MPI_Pcontrol(0)
+	  MPIP_Pcontrol(1)
+	* pcontrol.c:
+	  Do not print debug messages unless debug flag is set.
+
+2005-03-31  chcham
+
+	* Makefile.in, diag_msgs_api.c:
+	  Added diag_msgs_api.c and Makefile.in target libmpiP-API.a
+	  to make an API target library that does not profile MPI calls and
+	  does not require that it is linked with an MPI library.
+	* mpiPi_proto.h:
+	  Removed __STDC__ conditional that wreaked havoc on IBM default
+	  MPI compile scripts.
+	* make-wrappers.py:
+	  Second pass at Fortran/C conversion in the make-wrappers script
+	* mpiPconfig.h.in, pc_lookup.c:
+	  Attempt to figure out different function calls between binutils
+	  2.15 and 2.15.96
+	* configure.in:
+	  Corrected functionality to check for binutils 2.15 vs 2.15.96
+	* configure.in:
+	  Make fortran opaque object translation the default.
+	  Fixed slight problem with -mpio.
+	* configure.in:
+	  Attempt to figure out different function calls between binutils
+	  2.15 and 2.15.96
+	* mpiPi.c:
+	  Found an incorrect use of strcmp that was causing all filenames
+	  to be overwritten with [unknown].
+
+2005-03-30  chcham
+
+	* pcontrol.c:
+	  Somehow long ago the line that disables profiling with
+	  MPI_Pcontrol(0) was removed.
+	  This just reinserts that line.
+
+2005-03-08  chcham
+
+	* testing/api-test.c:
+	  Minor message change.
+	* Defs.mak.in, Makefile.in, configure.in:
+	  Added --enable-fortran-xlate configure option. Ideally MPI_Fint
+	  and
+	  MPI_Request sizes would be compared, but this would mean running
+	  an
+	  test...
+	* Defs.mak.in, Makefile.in, make-wrappers.py, mpi.protos.txt.in:
+	  Modifications to handle 64-bit plaforms where MPI_Fint is not
+	  the same size as MPI_Request and other opaque objects.
+	  
+	  This currently appears to be an issue on ia64 and x86_64. An
+	  --xlate
+	  argument is passed to the python wrapper script to add code for
+	  translation
+	  between Fortran and C objects in the wrappers.c file.
+	* mpiPi.h.in:
+	  Remove unused macro.
+	* util.c:
+	  Fix for ensuring appropriate truncation of Linux app name
+
+2005-03-04  chcham
+
+	* mpiPi.c:
+	  Activate appropriate pc lookup routines when using dwarf.
+	  Some error checking for dwarf return values.
+	* Makefile.in:
+	  Slight mod to switch between pc_lookup files
+
+2005-03-03  chcham
+
+	* Rules.mak:
+	  Corrected C target for removal during clean
+
+2005-02-07  chcham
+
+	* ChangeLog:
+	  Modifications for 2.8.1 patch release.
+	* glob.c:
+	  Increase patch level for 2.8.1 release.
+	* util.c:
+	  Corrected use of readlink and added check/abort for malloc.
+	* mpiPi.c:
+	  Changed MPI_INTEGER to MPI_INT to avoid problems with MPICH 1.2
+	  when f77 support is not configured.
+	* Makefile.in:
+	  add test to .PHONY
+
+2005-01-25  chcham
+
+	* ChangeLog:
+	  More commits for 2.8 release.
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Include new Platform doc info for X1, XD1, Altix.
+	* Defs.mak.in, diag_msgs.c, mpiPi.h.in:
+	  Outstanding BG/L issues that have been addressed.
+
+2005-01-12  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Last minute changes to documentation prior to v2.8 release.
+
+2005-01-11  chcham
+
+	* ChangeLog:
+	  Changes up to 2.8 Release.
+	* configure:
+	  2.8 release version
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Updated for 2.8 release.
+	* configure.in, mpi.protos.txt.in, mpiPconfig.h.in:
+	  Make gettimeofday the default Linux timer, but clock_gettime can
+	  be
+	  activated with configure switch.
+	* testing/0-simple-c++.C:
+	  Avoid MPICH2 compile script warning.
+	* configure.in:
+	  clock_gettime suuport and MPICH 2 C++ compile script support
+
+2005-01-06  chcham
+
+	* mpiP-API.c, util.c:
+	  Cleaning with lint.
+	* bin/mpip-insert-src, bin/mpirun-mpip, bin/srun-mpip:
+	  Scripts for replacing address info in report with addr2line
+	  output and
+	  example runtime profiling.
+	* Makefile.in:
+	  Modifications to install target to account for new scripts in
+	  bin.
+	* mpiPi.c:
+	  Do not overwrite existing report files. If a report file
+	  exists, increment
+	  the report count and check until a new filename is generated.
+	* configure.in, mpiPi.c, pc_lookup.c:
+	  Addressed DISABLE_BFD and MPI-I/O configuration issues.
+	* _timers.h:
+	  Phil Roth's support for POSIX clock_gettime for Linux/Altix.
+	* util.c:
+	  Added stdlib.h
+	* mpiPi_proto.h, wrappers_special.c:
+	  Remove unnecessary PC sampling at Init and Finalize.
+	* mpiP-API.c:
+	  additional comment
+	* Defs.mak.in, diag_msgs.c, mpiPi.h.in:
+	  Modifications to support BlueGene/L ppc64 platform.
+
+2004-12-28  chcham
+
+	* linux_posix.h, timers/linux_posix.h:
+	  admin
+	* _timers.h, linux_posix.h:
+	  Phil Roth additions to support linux/posix clock_gettime
+	  initially for Altix.
+
+2004-12-04  chcham
+
+	* configure:
+	  updated.
+	* configure.in, make-wrappers.py, mpiP-API.c, mpiPi.c, mpiPi.h.in,
+	  mpiPi_proto.h, util.c:
+	  Completely re-wrote code to address the differences of the
+	  number of
+	  frames to unwind to get to the calling application function from
+	  libunwind, Tru64 unwind, UNICOS, as well as MPI vs API calls.
+	* testing/test_template.tcl:
+	  Added sleep during test loop to keep some tests from failing.
+	* pc_lookup.c:
+	  Added demangling defines if demangle.h is not available.
+	* report.c:
+	  Addressed Tru64 compile warning.
+	* bin/config.guess, bin/config.sub:
+	  Updated config scripts
+
+2004-12-02  chcham
+
+	* glob.c:
+	  new version numbers
+	* testing/14-mpiio.exp, testing/14-mpiio.src:
+	  more MPI-I/O related files that didn't quite make it into the
+	  distribution for 2.7 (oops!)
+	* mpi.io.protos.txt:
+	  this should have been added before, but I missed it...
+
+2004-11-05  chcham
+
+	* configure.in:
+	  Modification for correct parent frame count
+	* configure, configure.in, report.c:
+	  More minor modifications
+	* testing/Makefile.in:
+	  removed fortran api test
+	* testing/api-test-f.c, testing/api-test.f:
+	  removed api fortran test
+	* util.c:
+	  *** empty log message ***
+	* testing/api-test-f.c, testing/api-test.f:
+	  minor corrections
+
+2004-11-04  chcham
+
+	* mpiPi.h.in:
+	  Do not use asserts by default
+	* Makefile.in:
+	  o Expanded phony targets
+	  o shared lib build and install targets for Linux
+	* configure.in:
+	  o Set default prefix to .
+	  o Use kludge of setting cross_compiling to yes to avoid test
+	  execution
+	  o Added test to identify UNICOS OS for frame depth
+	* _timers.h, report.c:
+	  *** empty log message ***
+	* testing/timer-info.c:
+	  Make use of new TIMER_NAME macro
+	* timers/crayx1_local.h:
+	  Does not appear to be needed
+	* mpiP-API.c:
+	  removed unnecessary version of function mpiP_open_executable
+	* mpiPi.c, util.c:
+	  Made COV reporting the default
+	* timers/aix_local.h, timers/aix_swclock.h, timers/crayx1_hw.h,
+	  timers/sunos-timers.h:
+	  o Cleaned up gettimeofday types
+	  o Added TIMER_NAME macro
+	  o Removed unused cray timer header file
+	  o Changed new cray files to conform to new macro format
+
+2004-10-28  chcham
+
+	* timers/crayx1_hw.h, timers/crayx1_local.h:
+	  Missed Phil's cray timer include files...
+
+2004-10-27  chcham
+
+	* Defs.mak.in, get_fortran_arg.f, util.c:
+	  Slight modifications to allow forcing use of getargs on linux and
+	  support getargs file compatability with Linux and UNICOS.
+	* Makefile.in:
+	  added merged-install target for LLNL site installations.
+
+2004-10-26  chcham
+
+	* timers, timers/aix_local.h, timers/aix_swclock.h,
+	  timers/sunos-timers.h:
+	  *** empty log message ***
+	* Defs.mak.in, Makefile.in, Rules.mak, _timers.h, aix_local.h,
+	  aix_swclock.h, configure, configure.in, get_fortran_arg.f,
+	  get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
+	  pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c,
+	  sunos-timers.h, util.c, wrappers_special.c:
+	  o Cray X1/UNICOS support
+	  o Libdwarf support : note that Intel compilers do not provide
+	  full C++ symbols
+	  o install target
+
+2004-10-22  chcham
+
+	* Makefile.in:
+	  target for generating prototype file.
+	* testing/timer-info.c:
+	  Not so much a test as a utility to report on timer info.
+	* testing/api-test-f.c, testing/api-test.c, testing/api-test.f:
+	  New API tests.
+	* get_fortran_arg.f, mpiPi_proto.h:
+	  This file should no longer be necessary if getting Linux
+	  executable
+	  name from /proc.
+	* timers:
+	  moved files out of this directory for ease of API use.
+	* testing/12-null-null.src, testing/13-pcontrol-report.c,
+	  testing/9-test-mpip-time.c, testing/Makefile.in:
+	  *** empty log message ***
+	* Defs.mak.in, Makefile.in, _timers.h, aix_local.h, aix_swclock.h,
+	  configure, configure.in, hash.c, hash.h, make-wrappers.py,
+	  mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPi.c,
+	  mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pcontrol.c,
+	  sunos-timers.h, util.c, wrappers_special.c:
+	  Added mpiP API : provides stack tracing, address lookup and
+	  timing functionality
+	  1) Added mpiP-API.c and mpiP-API.h.
+	  2) Renamed hash files to avoid API conflict with hash.h.
+	  3) To make compilation with API easier, moved timers include
+	  files to main dir
+	  and removed timers dir.
+	  4) Added mpiP_TIMER typedef for API.
+	  5) API required some additional issues, such as
+	  PARENT_FRAME_COUNT to help
+	  coordinate which stack frames are recorded through the API.
+	  
+	  also other modifications:
+	  
+	  Added binutils-dir flag for easier configuration.
+	  Added bin-type-flag to address issues with 32/64 mixed systems.
+	  Always call demangling on symbols and remove libmpiPdmg on
+	  system where this mak
+	  es sense.
+	  Added makefile targets to merge binutils and libunwind objects
+	  into libmpiP.
+	  Added negative time value checking for all time difference
+	  calculation in wrappe
+	  rs.c.
+	  Added functionality to get executable name from /proc on Linux.
+	  <-- Assumes exec
+	  utable will not be longer than 4096.
+
+2004-10-21  chcham
+
+	* _timers.h, configure, configure.in, make-wrappers.py,
+	  mpiPconfig.h.in:
+	  Added timing checking and gettimeday configuration switch.
+
+2004-09-21  chcham
+
+	* Makefile.in, configure, mpiP-API.c, mpiP-API.h, pc_lookup.c:
+	  Added support for mpiP functionality API.
+	* timers/aix_local.h, timers/aix_swclock.h:
+	  *** empty log message ***
+	* _timers.h, make-wrappers.py, mpiPi.c, mpiPi.h.in, pcontrol.c:
+	  Removed unnecessary timer argument to TIMER macros that was left
+	  over
+	  from AIX Switch Clock support, which is not being supported.
+
+2004-09-14  chcham
+
+	* pc_lookup.c:
+	  Added debugging info if can't BFD fails due to NULL file.
+	* util.c:
+	  Moved mpiPi.h above HAVE_LIBUNWIND pre-processor conditionals so
+	  that
+	  HAVE_LIBUNWIND is actually set!
+	* glob.c, mpiPi.c, mpiPi.h.in, report.c:
+	  Added patch number for release tracking
+	* mpi.protos.txt:
+	  Not necessary to archive, as there is an mpi.protos.txt.in file
+
+2004-08-03  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  slight mod to warn about negative values
+	* doc/INSTALL.txt, doc/README, doc/UserGuide.html,
+	  doc/UserGuide.txt:
+	  Updated doc info for 2.7 release.
+
+2004-07-20  chcham
+
+	* timers/aix_local.h:
+	  Cast secs as double to prevent overflow of int value when
+	  multiplying
+	  with USECS value for long running tests.
+	* _timers.h:
+	  Correct printing of time difference macro
+	* testing/13-pcontrol-report.c:
+	  *** empty log message ***
+	* pcontrol.c:
+	  Modify Pcontrol report generation code to 2 to fit standard
+	  "flush
+	  buffers" functionality.
+
+2004-07-14  chcham
+
+	* configure:
+	  Ready for v2o7 release?
+	* timers/aix_local.h:
+	  *** empty log message ***
+	* configure.in, mpiPconfig.h.in:
+	  Clean up timers and add AIX time check.
+	* util.c:
+	  Only use getarg when building Intel Fortran lib
+	* configure.in:
+	  MPI I/O and getarg configuration changes
+	* Makefile.in:
+	  More Intelv8 Fortran support issues
+
+2004-07-13  chcham
+
+	* testing/4-demangle.src:
+	  *** empty log message ***
+	* configure.in, util.c:
+	  Add PGI support
+	* pc_lookup.c:
+	  Make sure all mpiP output lines prefixed with mpiP:
+
+2004-07-08  chcham
+
+	* testing/1-hot-potato.src, testing/3-stacktrace.src,
+	  testing/sweep-ops-stack.src, testing/sweep-ops.src:
+	  corrected dependence on space-count formatting for pass case
+
+2004-07-07  chcham
+
+	* util.c:
+	  Added option for COV calcultions to getopts
+	* report.c:
+	  Small change to account for 10000+ line source files
+	* Makefile.in:
+	  Correction to Fortran variable
+	* ChangeLog:
+	  Comment for v2.7 release
+
+2004-06-25  chcham
+
+	* glob.c:
+	  Update to 2.7
+
+2004-06-24  chcham
+
+	* configure:
+	  consistency
+	* Defs.mak.in, configure.in, mpiPconfig.h.in:
+	  Configure details: libs, bfd_boolean, MPI I/O message, etc.
+	* mpi.protos.txt.in:
+	  more MPI I/O support
+	* configure, configure.in, mpi.protos.txt, mpiPconfig.h.in,
+	  report.c:
+	  Changes to address configurations that do not provide MPI I/O
+	* configure:
+	  consistency
+	* configure.in:
+	  looks like MPICH mpif77 uses f77 driver, so look for g77 with gcc
+	* configure:
+	  To test against other configure behavior
+	* testing/test_template.tcl:
+	  Increase timeout that caused failure on AIX
+	* report.c:
+	  Address 0-div faults from 0 time values
+	* Makefile.in, configure.in:
+	  More Intel8.0 support issues
+
+2004-06-23  chcham
+
+	* get_fortran_arg.f:
+	  hopefully working change for CVS info
+	* mpiPi_proto.h, pc_lookup.c:
+	  Prototyping and various cleanup
+	* make-wrappers.py, mpi.protos.txt, mpiPi.c, mpiPi.h.in, report.c:
+	  Added MPI I/O support
+	* Makefile.in:
+	  Another mod for Intel8.0 fortran args support
+	* get_fortran_arg.f, util.c:
+	  Added functionality to get fortran args with Intel8.0 compiler
+	* Defs.mak.in, configure.in, mpiPconfig.h.in:
+	  Configure cleanup to use mpiPconfig.h
+	* testing/1-hot-potato.c:
+	  changed header info
+	* testing/13-pcontrol-report.c:
+	  Test for report generation through pcontrol
+	* testing/0-simple-c++.exp, testing/0-simple.exp,
+	  testing/0-simplef.exp, testing/14-mpiio.c, testing/Makefile.in:
+	  Corrected case where close/wait in expect seemed to cause hangs.
+	  Added MPI I/O test
+
+2004-06-19  chcham
+
+	* make-wrappers.py, mpi.protos.txt, mpiPi.c, pcontrol.c:
+	  changes that should fix fortran pcontrol calls and also add the
+	  ability
+	  to call MPI_Pcontrol(-1) to generate an intermediate report.
+	* Defs.mak.in, configure.in:
+	  Better identification of vendor F77 (I hope...)
+
+2004-06-17  chcham
+
+	* testing/0-simple-c++.exp, testing/0-simple.exp,
+	  testing/0-simplef.exp, testing/test_template.tcl:
+	  Added test support for srun
+	* testing/12-null-null.c, testing/12-null-null.exp,
+	  testing/12-null-null.src, testing/Makefile.in:
+	  Added MPI_Init(NULL, NULL) test.
+	* configure.in:
+	  add some CMPI compiler searches.
+	* mpiPi.c, pc_lookup.c, wrappers_special.c:
+	  Support for MPI_Init(NULL, NULL) call, which is technically
+	  supported in
+	  the standard. Pointed out by MSTI folks. Just makes "Unknown"
+	  app report
+	  file and gives addresses for callsites.
+
+2004-06-15  chcham
+
+	* testing/sweep-ops-stack.src, testing/sweep-ops.src:
+	  Add test string for "main" which appears with Intel 8.0 Fortan
+	  compilers.
+	* configure.in, util.c:
+	  Add support for libunwind stack walk and configuration for
+	  Itanium2 platform.
+
+2004-03-18  chcham
+
+	* glob.c:
+	  Changed minor version number to 6.
+	* mpiPi.c:
+	  Changed contact email address to mpip-help.
+
+2004-02-13  chcham
+
+	* Defs.mak.in, configure, configure.in, mpiPi.c, pc_lookup.c:
+	  Changes to disable use of GNU binutils
+
+2004-02-12  chcham
+
+	* testing/0-simple-c++.exp, testing/0-simple.exp,
+	  testing/0-simplef.exp, testing/sweep-ops-stack.src,
+	  testing/test_template.tcl:
+	  Modified test files to support mpirun tests for MPICH
+
+2004-02-11  chcham
+
+	* Defs.mak.in:
+	  Added -lm for GCC COV support
+	* configure, configure.in:
+	  Removed AC_INIT mpiPi.h dependency and added package name,
+	  version,
+	  and address for bug reporting.
+	* mpiPi.h:
+	  addition of mpiPi.h.in means mpiPi.h doesn't need to be in
+	  repository
+	* mpiPi.c, mpiPi.h.in, report.c, util.c:
+	  COV report modifications
+	* Defs.mak.in, configure, configure.in, diag_msgs.c, mpiPi.c,
+	  mpiPi.h, mpiPi.h.in, pcontrol.c, report.c, util.c:
+	  Initial modifications to handle additions by Jim Brandt,
+	  including
+	  changing varargs to stdarg
+	  adding x86_64 support
+	  using consistent mpip timer calls for apptime instead of
+	  PMPI_Wtime
+	  stackdepth max value configuration option
+	  %f vs %g report format option
+
+2004-02-10  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt, mpiPi.c, mpiPi.h,
+	  pc_lookup.c, testing/0-simple.c, testing/11-p2p-mess-size.c,
+	  testing/2-pcontrol.c, util.c:
+	  maintenance to commit previous v2.5 modifications
+
+2003-08-15  chcham
+
+	* ChangeLog:
+	  2.5 Release Notes
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Updates to documentation
+
+2003-08-12  chcham
+
+	* testing/11-p2p-mess-size.c, testing/11-p2p-mess-size.src:
+	  more modifications to the message size testing
+	* testing/11-p2p-mess-size.c:
+	  Completed non-blocking tests
+	* testing/10-coll-mess-size.c, testing/10-coll-mess-size.src,
+	  testing/11-p2p-mess-size.c, testing/11-p2p-mess-size.src:
+	  rest of the message size test files
+	* testing/Makefile.in:
+	  Added 2 message size tests
+	* lib/testing.exp:
+	  removes runtest warnings
+	* testing/4-demangle.src:
+	  Corrected regexps
+	* testing/10-mess-size.c, testing/10-mess-size.exp,
+	  testing/10-mess-size.src:
+	  changed to 2 separate tests
+	* testing/0-simple-c++.exp, testing/0-simple.exp,
+	  testing/0-simplef.exp, testing/10-coll-mess-size.exp,
+	  testing/11-p2p-mess-size.exp, testing/test_template.tcl,
+	  testing/testing.exp:
+	  Corrected (hopefully!) open ptty errors with expect,
+	  added message size report, and corrected some tests.
+	  I believe the testing.exp remove runtest warnings.
+	* wrappers_special.c:
+	  Turn off profiling around PMPI_Init
+	* report.c:
+	  cleaned up address reporting
+	* make-wrappers.py:
+	  Added code to disable profiling around PMPI calls
+
+2003-08-11  chcham
+
+	* report.c:
+	  Protection for 0-div possibility
+
+2003-07-29  chcham
+
+	* Check.mak.in, testing/4-demangle.src:
+	  More dejagnu configuration and multi-platform demangle test
+	  configuration
+	* lib, lib/testing.exp:
+	  more dejagnu infrastructure
+	* testing/0-simple-c++.exp:
+	  simple c++ test
+	* testing/4-demangle.src, testing/Makefile.in:
+	  demangle and C++ test update
+	* testing/4-demangle.C:
+	  demangle test source file
+	* config, config/linux.exp, config/unix.exp:
+	  more dejagnu configuration files
+	* testing/10-mess-size.c, testing/10-mess-size.exp,
+	  testing/10-mess-size.src:
+	  Added message size test, not quite complete yet...
+	* Check.mak.in, Defs.mak.in:
+	  Minor corrections to make sources
+
+2003-07-25  chcham
+
+	* make-wrappers.py, mpiPi.c, mpiPi.h, report.c:
+	  Initial commit for message size reporting
+
+2003-07-22  chcham
+
+	* testing/0-simple.exp, testing/0-simplef.exp,
+	  testing/1-hot-potato.exp, testing/1-hot-potato.src,
+	  testing/3-stacktrace.exp, testing/3-stacktrace.src,
+	  testing/4-demangle.exp, testing/4-demangle.src,
+	  testing/sweep-ops-stack.exp, testing/sweep-ops-stack.src,
+	  testing/sweep-ops.exp, testing/sweep-ops.src,
+	  testing/test_template.tcl:
+	  Adding current files for dejagnu testing.
+	* glob.c:
+	  New version with bug fixes, demangling, and long file/function
+	  support.
+	* Defs.mak.in, configure, configure.in, pc_lookup.c,
+	  testing/Makefile.in:
+	  More changes to incorporate Tru64 demangling support
+	* Defs.mak.in, Makefile.in, configure, configure.in, glob.c,
+	  mpiPdemangle.c, mpiPdemangle.h, mpiPi.c, pc_lookup.c,
+	  testing/Makefile.in, util.c:
+	  Second pass at demangling support, which creates another library
+	  (libmpiPdmg.a)
+	  if the --enable-demangling configure flag is used.
+
+2003-07-21  chcham
+
+	* testing/sweep-ops-stack.f:
+	  Corrected minor initialization bug.
+
+2003-07-19  chcham
+
+	* report.c, util.c:
+	  Commit includes
+	  first pass at demangling support
+	  new files mpiPdemangle.h, mpiPdemangle.c
+	  configuration check for IBM demangle.h include file
+	  new global variable to activate demangling through MPIP
+	  environment var
+	  -C MPIP option activates demangling
+	  removal of unnecessary pc_lookup makefile rule
+	  additional error message suggesting that incorrect library may
+	  be being used
+	  if argv[0] is NULL.
+	  Support for long file/function names in callsite setion of
+	  report
+	* Makefile.in, configure.in, glob.c, mpiPdemangle.c,
+	  mpiPdemangle.h, mpiPi.h, pc_lookup.c:
+	  *** empty log message ***
+
+2003-06-19  chcham
+
+	* report.c:
+	  Formatting change
+
+2003-06-04  chcham
+
+	* mpiPi.h, pc_lookup.c:
+	  Added AIX 64-bit support
+	* mpiPi.c, mpiPi.h, report.c:
+	  Added address reporting in the event that source information is
+	  not available.
+
+2003-05-16  chcham
+
+	* doc/UserGuide.txt:
+	  Added a few more caveats
+	* doc/UserGuide.txt:
+	  More updates and status of optimized code support.
+
+2003-05-15  chcham
+
+	* mpiPi.c:
+	  Added function name check to avoid printing callsite for frames
+	  above main.
+	* util.c:
+	  Changes to subtract from found PC to record the appropriate
+	  addres to
+	  identify the source info for the callsite.
+	* testing/sweep-ops-stack.f:
+	  minor addition: return at ends of subroutines
+
+2003-05-12  chcham
+
+	* configure:
+	  Added check for MPICH compile scripts
+	* testing/Makefile.in:
+	  Added new tests
+	* Defs.mak.in, configure, configure.in:
+	  Configurations to standardize fast flag for the time being and
+	  correct
+	  searched compilers
+	* testing/sweep-ops-stack.f:
+	  Sweep test modified for stack trace test
+	* testing/3-stacktrace.c:
+	  C stack trace test
+
+2003-05-08  chcham
+
+	* glob.c:
+	  Changed minor version from 3 to 4
+	* testing/9-test-mpip-time.c:
+	  Moved MPI_Init call before arg checking to avoid odd behavior
+	  with MPICH
+
+2003-05-07  chcham
+
+	* doc/UserGuide.txt:
+	  Additions for 2.4 release
+
+2003-05-01  chcham
+
+	* configure:
+	  Added back to repository to avoid users running autoconf
+	* Defs.mak.in:
+	  changed GNU lib name from f77 to g77 for clarity
+	* ChangeLog:
+	  Update with 2.1 release changes
+	* Makefile.in:
+	  Update targets:
+	  Default target = lib(s), all = libs+tests, tests=just tests
+	* Defs.mak.in, configure.in:
+	  Created configure test for g77 (grep for gcc), which may be a
+	  little
+	  sketchy, but seemed to work on all the versions I tested.
+	  
+	  Also cleaned up AIX define that was duplicated.
+	* Makefile.in, testing/Makefile.in:
+	  minor flag changes
+	* pc_lookup.c:
+	  Corrected painful problem with boolean/bfd_boolean types that
+	  changed
+	  between version of libbfd. Looks like they are going to stick
+	  with
+	  bfd_boolean. These changes support older (<=2.13) versions.
+
+2003-04-29  chcham
+
+	* testing/Makefile.in:
+	  Added -g for Fortran compiles
+	* report.c:
+	  Added trigraph to avoid FPE on Tru64.
+	* pc_lookup.c:
+	  Added debug message if bfd_find_nearest_line fails.
+	* Makefile.in:
+	  hack? for always generating util.o to avoid conflicts with
+	  defines for
+	  fortran or c libraries.
+	  Also, replaced make with $(MAKE)
+
+2003-04-25  chcham
+
+	* pc_lookup.c:
+	  All boolean values should be handled within bfd.h.
+	  User must make sure an up-yo-date bfd.h is used.
+
+2003-04-23  chcham
+
+	* testing/Makefile.in:
+	  correction to keep from adding -lmpiP to fortran link lines
+	* Check.mak.in, Makefile.in, configure, configure.in:
+	  added initial dejagnu support.
+	* testing/Makefile.in:
+	  Corrected multiple mpiP listing in Fortran case.
+	* util.c:
+	  Added Compaq Fortran argv support, casts for warnings, some
+	  protective measures.
+	* pcontrol.c:
+	  Added MPI_SUCCESS return value to reduce warnings.
+	* mpiPi.c:
+	  Added appname debug message.
+	* pc_lookup.c:
+	  includes defines for booleans and additional debug info.
+	* Makefile.in, testing/Makefile.in:
+	  Corrected distclean target and added sweep-ops fortran test
+	  application.
+	* testing/Makefile:
+	  Not necessary to be in cvs as it is automatically generated.
+	* testing/0-simplef.f:
+	  Corrected mpif.h include syntax
+	* Defs.mak.in, Makefile.in, testing/Makefile.in:
+	  Added support for fortran library on Linux and ability to test
+	  Fortran test programs with configured fortran library.
+
+2003-04-18  chcham
+
+	* testing/Makefile.in:
+	  Removed -g which was resulting in 2 -g flags.
+	* report.c:
+	  Added check if mpi_time is 0 to avoid FPEs on OSF1.
+
+2003-04-14  chcham
+
+	* mpiPi.c, mpiPi_proto.h:
+	  Added failure to not bother with report/hash-lookup if there
+	  isn't anything
+	  to report.
+	* pc_lookup.c:
+	  added bfd lookup debug message
+
+2003-04-11  chcham
+
+	* testing/Makefile:
+	  Changes that were added to address Tru64 port and miscellaneous
+	  corrections.
+	  
+	  This is automatically generated and does not need to be in the
+	  repository.
+	* ChangeLog, Defs.mak.in, Makefile.in, make-wrappers.py, mpiPi.c,
+	  pc_lookup.c, util.c, wrappers_special.c:
+	  Changes that were added to address Tru64 port and miscellaneous
+	  corrections.
+
+2003-04-10  chcham
+
+	* Defs.mak.in, configure, make-wrappers.py, mpiPi.c, mpiPi.h,
+	  util.c, wrappers_special.c:
+	  Changes by Chris Chambreau as initial step at Linux and Tru64
+	  support.
+	* ChangeLog, Defs.mak.in, Makefile.in, Restrictions.txt,
+	  Rules.mak, _timers.h, bin, bin/config.guess, bin/config.sub,
+	  bin/install-sh, configure, configure.in, diag_msgs.c, doc,
+	  doc/INSTALL.txt, doc/PORTING.txt, doc/UserGuide.txt, glob.c,
+	  hash.c, hash.h, hash_proto.h, make-wrappers.py, mpi.protos.txt,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h, mpiPi_proto.h, pc_lookup.c,
+	  pcontrol.c, report.c, testing, testing/0-simple-c++.C,
+	  testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c,
+	  testing/2-pcontrol.c, testing/5-medley.c, testing/6-nonblock.c,
+	  testing/7-nonblock-waitall.c, testing/8-test.c,
+	  testing/9-test-mpip-time.c, testing/Makefile,
+	  testing/Makefile.in, testing/bfd-test.c, testing/sweep-ops.f,
+	  testing/verify-timers.c, timers, timers/aix_local.h,
+	  timers/aix_swclock.h, timers/sunos-timers.h, util.c,
+	  wrappers_special.c:
+	  Initial revision
+
+2003-04-10  
+
+	* branches, tags, .:
+	  New repository initialized by cvs2svn.
 
