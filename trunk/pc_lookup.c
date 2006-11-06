@@ -291,6 +291,7 @@ open_bfd_executable (char *filename)
   char **matching = NULL;
   long storage;
   long symcount;
+  unsigned int size;
 
   if (filename == NULL)
     {
@@ -354,8 +355,11 @@ open_bfd_executable (char *filename)
       bfd_close (abfd);
       return 0;
     }
-  syms = (asymbol **) malloc (storage);
-  symcount = bfd_canonicalize_symtab (abfd, syms);
+
+  symcount = bfd_read_minisymbols (abfd, FALSE, (void *) &syms, &size);
+  if (symcount == 0)
+    symcount =
+      bfd_read_minisymbols (abfd, TRUE /* dynamic */ , (void *) &syms, &size);
 
   if (symcount < 0)
     {
