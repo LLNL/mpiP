@@ -1,64 +1,40 @@
-/* -*- Mode: C; -*- 
+/* -*- C -*- 
+
 
    mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   ----- 
+   -----
 
-   _timers.h -- timer macros
+   timers/bgl_local.h  
 
-   $Id$
+   local BG/L high res timers
+   
+   $Id: bgl_local.h.in 369 2006-10-05 19:21:12 +0000 (Thu, 05 Oct 2006) chcham $
 
 */
 
-#ifndef _MPITI_TIMERS_H
-#define _MPITI_TIMERS_H
+#ifndef _BGL_LOCAL_H
+#define _BGL_LOCAL_H
 
-#define MSECS 1000
-#define USECS 1000000
-#define NSECS 1000000000
+#include <rts.h>
 
-#include <unistd.h>
-#include <sys/time.h>
-typedef double mpiP_TIMER;
+typedef unsigned long long RTS_TS;
+static double seconds_per_cycle = 1.4285714285714285714e-9; /* Assuming 700MHz */
 
-#if (defined(SunOS) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/sunos_local.h"
-
-#elif (defined(AIX) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/aix_local.h"
-
-#elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/crayx1_hw.h"
-
-#elif defined(USE_RTS_GET_TIMEBASE)
-#include "timers/bgl_local.h"
-
-#elif (defined(Linux) && defined(USE_CLOCK_GETTIME) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
-#include "timers/linux_posix.h"
-
-#elif defined(USE_WTIME)
+/* rts_get_timebase returns processor cycles */
 #define mpiPi_TIMER double
-#define mpiPi_TIME double
-#define mpiPi_TIMER_NAME "PMPI_Wtime"
-#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()*USECS))
-#define mpiPi_GETUSECS(timeaddr) (*(timeaddr))
-#define mpiPi_GETTIMEDIFF(end,start) ((*end)-(*start))
-#else
+#define mpiPi_TIMER_INIT(timer_addr) {*(timer_addr) = rts_get_timebase();}
+#define mpiPi_TIME RTS_TS
+#define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIME));}
+#define mpiPi_GETTIME(timeaddr) {(*timeaddr)=rts_get_timebase();}
 
-/* gettimeofday returns microseconds */
-#define mpiPi_TIMER double
-#define mpiPi_TIME struct timeval
-#define mpiPi_TIMER_NAME "gettimeofday"
-#define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIMER));}
-#define mpiPi_GETTIME(timeaddr) gettimeofday(timeaddr,NULL)
-#define mpiPi_GETUSECS(timeaddr) (((mpiPi_TIMER)(timeaddr)->tv_sec)*USECS+((mpiPi_TIMER)(timeaddr)->tv_usec))
-#define mpiPi_PRINTTIME(taddr) printf("Time is %ld sec and %ld usec.\n", (taddr)->tv_sec, (taddr)->tv_usec)
-#define mpiPi_GETTIMEDIFF(end,start) ((mpiP_TIMER)((((mpiPi_TIMER)(end)->tv_sec)*USECS)+(end)->tv_usec)-((((mpiPi_TIMER)(start)->tv_sec)*USECS)+(start)->tv_usec))
+#define mpiPi_GETUSECS(timeaddr) ((*timeaddr)*seconds_per_cycle/USECS)
+
+#define mpiPi_GETTIMEDIFF(end,start) (seconds_per_cycle * ((*end) - (*start)) * USECS)
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
-
-#endif
+#define mpiPi_TIMER_NAME "rts_get_timebase"
 
 #endif
 
@@ -132,4 +108,4 @@ advertising or product endorsement purposes.
 
 */
 
-/* EOF */
+/* eof */

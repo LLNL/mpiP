@@ -45,6 +45,9 @@
 /* Define to use MPI_Wtime for timing */
 #undef USE_WTIME
 
+/* Define to use rts_get_timebase on BG/L for timing */
+#undef USE_RTS_GET_TIMEBASE
+
 /* Distinguish available BFD calls between 2.15 and 2.15.96 */
 #undef HAVE_BFD_GET_SECTION_SIZE
 
