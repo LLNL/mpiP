@@ -884,6 +884,7 @@ Optional Packages:
   --with-gettimeofday     Use gettimeofday for timing.
   --with-wtime            Use MPI_Wtime for timing.
   --with-clock_gettime    Use clock_gettime for timing.
+  --with-rts_get_timebase Use rts_get_timebase for timing on BG/L systems.
 
 Some influential environment variables:
   CC          C compiler command
@@ -1577,6 +1578,18 @@ _ACEOF
 
 fi;
 
+
+# Check whether --with-rts_get_timebase or --without-rts_get_timebase was given.
+if test "${with_rts_get_timebase+set}" = set; then
+  withval="$with_rts_get_timebase"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_RTS_GET_TIMEBASE 1
+_ACEOF
+
+	USE_RTS_GET_TIMEBASE=true
+	echo Using rts_get_timebase for timing.
+
+fi;
 
 #
 #  Enable / Disable specifications
@@ -5297,7 +5310,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5300:" \
+echo "$as_me:5313:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
