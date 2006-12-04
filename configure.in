@@ -85,10 +85,15 @@ AC_ARG_WITH(bin-type-flag,
 )
 AC_SUBST(BIN_TYPE_FLAG)
 
+#
+# Timer options
+#
+TIMER_OPTION=no
 AC_ARG_WITH(gettimeofday,
 	AC_HELP_STRING([--with-gettimeofday], [Use gettimeofday for timing.]),
 	AC_DEFINE(USE_GETTIMEOFDAY)
 	echo Using gettimeofday for timing.
+	TIMER_OPTION=yes
 	,
 )
 
@@ -96,6 +101,7 @@ AC_ARG_WITH(wtime,
 	AC_HELP_STRING([--with-wtime], [Use MPI_Wtime for timing.]),
 	AC_DEFINE(USE_WTIME)
 	echo Using MPI_Wtime for timing.
+	TIMER_OPTION=yes
 	,
 )
 
@@ -104,6 +110,7 @@ AC_ARG_WITH(clock_gettime,
 	AC_DEFINE(USE_CLOCK_GETTIME)
 	USE_CLOCK_GETTIME=true
 	echo Using clock_gettime for timing.
+	TIMER_OPTION=yes
 	,
 )
 
@@ -112,6 +119,7 @@ AC_ARG_WITH(rts_get_timebase,
 	AC_DEFINE(USE_RTS_GET_TIMEBASE)
 	USE_RTS_GET_TIMEBASE=true
 	echo Using rts_get_timebase for timing.
+	TIMER_OPTION=yes
 	,
 )
 
@@ -298,9 +306,18 @@ if test "$ENABLE_API_ONLY" = no ; then
   AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
 fi
 
+
+# use rts_get_timebase (BG/L) by default if it exists
+if test x$TIMER_OPTION = xno ; then
+AC_CHECK_FUNC(rts_get_timebase, AC_DEFINE(USE_RTS_GET_TIMEBASE) USE_RTS_GET_TIMEBASE=true AC_SUBST(USE_RTS_GET_TIMEBASE)
+)
+fi
+
 if test "x$USE_CLOCK_GETTIME" = "xtrue"; then
   AC_CHECK_LIB(rt,clock_gettime)
 fi
+
+
 
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
