@@ -107,6 +107,13 @@ AC_ARG_WITH(clock_gettime,
 	,
 )
 
+AC_ARG_WITH(rts_get_timebase,
+	AC_HELP_STRING([--with-rts_get_timebase], [Use rts_get_timebase for timing on BG/L systems.]),
+	AC_DEFINE(USE_RTS_GET_TIMEBASE)
+	USE_RTS_GET_TIMEBASE=true
+	echo Using rts_get_timebase for timing.
+	,
+)
 
 #
 #  Enable / Disable specifications
