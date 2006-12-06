@@ -1522,8 +1522,6 @@ fi;
 if test "${with_binutils_dir+set}" = set; then
   withval="$with_binutils_dir"
   BINUTILS_DIR=$withval
-	LIBS="${LIBS} -L${BINUTILS_DIR}/lib"
-	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
 	echo Using binutils-dir: $withval
 
 else
@@ -3887,8 +3885,7 @@ _ACEOF
 fi
 
 
-
-echo "$as_me:$LINENO: checking for dcgettext__ in -lintl" >&5
+  echo "$as_me:$LINENO: checking for dcgettext__ in -lintl" >&5
 echo $ECHO_N "checking for dcgettext__ in -lintl... $ECHO_C" >&6
 if test "${ac_cv_lib_intl_dcgettext__+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -3953,15 +3950,11 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_intl_dcgettext__" >&5
 echo "${ECHO_T}$ac_cv_lib_intl_dcgettext__" >&6
 if test $ac_cv_lib_intl_dcgettext__ = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBINTL 1
-_ACEOF
-
-  LIBS="-lintl $LIBS"
-
+  LIBS="$LIBS -lintl"
 fi
+  #libintl required only on some platforms, eg AIX
 
-  echo "$as_me:$LINENO: checking for objalloc_create in -liberty" >&5
+echo "$as_me:$LINENO: checking for objalloc_create in -liberty" >&5
 echo $ECHO_N "checking for objalloc_create in -liberty... $ECHO_C" >&6
 if test "${ac_cv_lib_iberty_objalloc_create+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4026,7 +4019,12 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_iberty_objalloc_create" >&5
 echo "${ECHO_T}$ac_cv_lib_iberty_objalloc_create" >&6
 if test $ac_cv_lib_iberty_objalloc_create = yes; then
-  ENABLE_BFD=no
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBIBERTY 1
+_ACEOF
+
+  LIBS="-liberty $LIBS"
+
 fi
 
   if test "${ac_cv_header_bfd_h+set}" = set; then
@@ -4385,6 +4383,10 @@ fi
 #define ENABLE_BFD 1
 _ACEOF
 
+    if ! test x$BINUTILS_DIR = "xunknown" ; then
+	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
+	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+    fi
   fi
 
 else
@@ -5848,7 +5850,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5851:" \
+echo "$as_me:5853:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
