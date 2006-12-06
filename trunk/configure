@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF PC_LOOKUP_FILE USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP READ_REAL_TIME ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL ENABLE_BFD ENABLE_API_ONLY DEFAULT_TARGS FORTRAN_GETARG_OBJ_FILE TEST_LIST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LDFLAGS CFLAGS FFLAGS BINUTILS_DIR BIN_TYPE_FLAG DISABLE_MPI_IO ENABLE_FORTRAN_XLATE STACKDEPTH USE_LIBDWARF PC_LOOKUP_FILE USE_GETARG DO_DEMANGLE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CC CXX F77 LAUNCH CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP USE_RTS_GET_TIMEBASE USE_RTC ac_ct_F77 F77_SYMBOLS F77_VENDOR MPIPFLIB FORTRAN_FLAG FORTRAN_TARGET FORTRAN_STR_DECL ENABLE_BFD ENABLE_API_ONLY READ_REAL_TIME DEFAULT_TARGS FORTRAN_GETARG_OBJ_FILE TEST_LIST LIBOBJS LTLIBOBJS'
 ac_subst_files='FORTRAN_GETARG HAVE_MPI_IO'
 
 # Initialize some variables set by options.
@@ -884,7 +884,11 @@ Optional Packages:
   --with-gettimeofday     Use gettimeofday for timing.
   --with-wtime            Use MPI_Wtime for timing.
   --with-clock_gettime    Use clock_gettime for timing.
-  --with-rts_get_timebase Use rts_get_timebase for timing on BG/L systems.
+  --with-rts_get_timebase Use rts_get_timebase for timing on BG/L systems
+                          (default).
+  --with-read_real_time   Use read_real_time for timing on AIX systems
+                          (default).
+  --with-rtc              Use _rtc for timing on CRAY X1 systems (default).
 
 Some influential environment variables:
   CC          C compiler command
@@ -1541,6 +1545,10 @@ else
 fi;
 
 
+#
+# Timer options
+#
+TIMER_OPTION=no
 
 # Check whether --with-gettimeofday or --without-gettimeofday was given.
 if test "${with_gettimeofday+set}" = set; then
@@ -1549,7 +1557,8 @@ if test "${with_gettimeofday+set}" = set; then
 #define USE_GETTIMEOFDAY 1
 _ACEOF
 
-	echo Using gettimeofday for timing.
+        USE_GETTIMEOFDAY=true
+	TIMER_OPTION=yes
 
 fi;
 
@@ -1561,7 +1570,7 @@ if test "${with_wtime+set}" = set; then
 #define USE_WTIME 1
 _ACEOF
 
-	echo Using MPI_Wtime for timing.
+	TIMER_OPTION=yes
 
 fi;
 
@@ -1574,7 +1583,7 @@ if test "${with_clock_gettime+set}" = set; then
 _ACEOF
 
 	USE_CLOCK_GETTIME=true
-	echo Using clock_gettime for timing.
+	TIMER_OPTION=yes
 
 fi;
 
@@ -1586,8 +1595,43 @@ if test "${with_rts_get_timebase+set}" = set; then
 #define USE_RTS_GET_TIMEBASE 1
 _ACEOF
 
-	USE_RTS_GET_TIMEBASE=true
-	echo Using rts_get_timebase for timing.
+	USE_RTS_GET_TIMEBASE=yes
+	TIMER_OPTION=yes
+
+else
+  USE_RTS_TIMEBASE=no
+
+fi;
+
+
+# Check whether --with-read_real_time or --without-read_real_time was given.
+if test "${with_read_real_time+set}" = set; then
+  withval="$with_read_real_time"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_READ_REAL_TIME 1
+_ACEOF
+
+	USE_READ_REAL_TIME=yes
+	TIMER_OPTION=yes
+
+else
+  USE_READ_REAL_TIME=no
+
+fi;
+
+
+# Check whether --with-rtc or --without-rtc was given.
+if test "${with_rtc+set}" = set; then
+  withval="$with_rtc"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_RTC 1
+_ACEOF
+
+	USE_RTC=yes
+	TIMER_OPTION=yes
+
+else
+  USE_RTC=no
 
 fi;
 
@@ -1911,7 +1955,7 @@ fi
 
 TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
-  for ac_prog in mpcc_r xlc_r mpicc cmpicc gcc cc icc
+  for ac_prog in mpxlc mpcc_r mpicc cmpicc gcc cc icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3917,8 +3961,7 @@ _ACEOF
 
 fi
 
-
-echo "$as_me:$LINENO: checking for objalloc_create in -liberty" >&5
+  echo "$as_me:$LINENO: checking for objalloc_create in -liberty" >&5
 echo $ECHO_N "checking for objalloc_create in -liberty... $ECHO_C" >&6
 if test "${ac_cv_lib_iberty_objalloc_create+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -3983,12 +4026,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_iberty_objalloc_create" >&5
 echo "${ECHO_T}$ac_cv_lib_iberty_objalloc_create" >&6
 if test $ac_cv_lib_iberty_objalloc_create = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBIBERTY 1
-_ACEOF
-
-  LIBS="-liberty $LIBS"
-
+  ENABLE_BFD=no
 fi
 
   if test "${ac_cv_header_bfd_h+set}" = set; then
@@ -4136,7 +4174,7 @@ if test "${ac_cv_lib_bfd_bfd_openr+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lbfd  $LIBS"
+LIBS="-lbfd -liberty $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4201,9 +4239,11 @@ _ACEOF
 
   LIBS="-lbfd $LIBS"
 
+else
+  ENABLE_BFD=no
 fi
 
-  echo "$as_me:$LINENO: checking whether bfd_get_section_size is declared" >&5
+    echo "$as_me:$LINENO: checking whether bfd_get_section_size is declared" >&5
 echo $ECHO_N "checking whether bfd_get_section_size is declared... $ECHO_C" >&6
 if test "${ac_cv_have_decl_bfd_get_section_size+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4215,7 +4255,6 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include "bfd.h"
-
 
 int
 main ()
@@ -4268,6 +4307,9 @@ _ACEOF
 
 fi
 
+
+else
+  ENABLE_BFD=no
 
 fi
 
@@ -4338,9 +4380,12 @@ _ACEOF
 
 fi
 
-  cat >>confdefs.h <<\_ACEOF
+  if test "x$ENABLE_BFD" = "xyes" ; then
+    cat >>confdefs.h <<\_ACEOF
 #define ENABLE_BFD 1
 _ACEOF
+
+  fi
 
 else
   if test x$USE_LIBDWARF = xyes ; then
@@ -4645,9 +4690,390 @@ fi
 
 fi
 
-if test "x$USE_CLOCK_GETTIME" = "xtrue"; then
+#
+#  Find an appropriate timer function
+#
 
-echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
+TIMER_FOUND=no
+
+# use rts_get_timebase (BG/L) by default if it exists
+if test x$TIMER_FOUND = xno && \
+  (test x$TIMER_OPTION = xno || test x$USE_RTS_GET_TIMEBASE = xyes); then
+echo "$as_me:$LINENO: checking for rts_get_timebase" >&5
+echo $ECHO_N "checking for rts_get_timebase... $ECHO_C" >&6
+if test "${ac_cv_func_rts_get_timebase+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define rts_get_timebase to an innocuous variant, in case <limits.h> declares rts_get_timebase.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define rts_get_timebase innocuous_rts_get_timebase
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char rts_get_timebase (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef rts_get_timebase
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char rts_get_timebase ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_rts_get_timebase) || defined (__stub___rts_get_timebase)
+choke me
+#else
+char (*f) () = rts_get_timebase;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != rts_get_timebase;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_rts_get_timebase=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_rts_get_timebase=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_rts_get_timebase" >&5
+echo "${ECHO_T}$ac_cv_func_rts_get_timebase" >&6
+if test $ac_cv_func_rts_get_timebase = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define USE_RTS_GET_TIMEBASE 1
+_ACEOF
+
+        USE_RTS_GET_TIMEBASE=yes ; TIMER_FOUND=yes ;
+        echo "Using rts_get_timebase timer (assuming 700MHz)."
+
+fi
+
+fi
+
+# use _rtc Cray X1) by default if it exists
+if test x$TIMER_FOUND = xno && \
+  (test x$TIMER_OPTION = xno || test x$USE_RTC = xyes); then
+echo "$as_me:$LINENO: checking whether _rtc is declared" >&5
+echo $ECHO_N "checking whether _rtc is declared... $ECHO_C" >&6
+if test "${ac_cv_have_decl__rtc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <intrinsics.h>
+
+
+int
+main ()
+{
+#ifndef _rtc
+  char *p = (char *) _rtc;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_have_decl__rtc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_have_decl__rtc=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_have_decl__rtc" >&5
+echo "${ECHO_T}$ac_cv_have_decl__rtc" >&6
+if test $ac_cv_have_decl__rtc = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define USE_RTC 1
+_ACEOF
+
+        USE_RTC=yes ; TIMER_FOUND=yes ;
+        echo "Using _rtc timer."
+fi
+
+fi
+
+READ_REAL_TIME=read_real_time
+## On AIX, prefer monotonic mread_real_time, if available
+if test x$TIMER_FOUND = xno && test x$TIMER_OPTION = xno ; then
+  echo "$as_me:$LINENO: checking for mread_real_time" >&5
+echo $ECHO_N "checking for mread_real_time... $ECHO_C" >&6
+if test "${ac_cv_func_mread_real_time+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define mread_real_time to an innocuous variant, in case <limits.h> declares mread_real_time.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define mread_real_time innocuous_mread_real_time
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char mread_real_time (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef mread_real_time
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char mread_real_time ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_mread_real_time) || defined (__stub___mread_real_time)
+choke me
+#else
+char (*f) () = mread_real_time;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != mread_real_time;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_mread_real_time=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_mread_real_time=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_mread_real_time" >&5
+echo "${ECHO_T}$ac_cv_func_mread_real_time" >&6
+if test $ac_cv_func_mread_real_time = yes; then
+  READ_REAL_TIME=mread_real_time TIMER_FOUND=yes
+fi
+
+  if test x$TIMER_FOUND = xno; then
+    echo "$as_me:$LINENO: checking for read_real_time" >&5
+echo $ECHO_N "checking for read_real_time... $ECHO_C" >&6
+if test "${ac_cv_func_read_real_time+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define read_real_time to an innocuous variant, in case <limits.h> declares read_real_time.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define read_real_time innocuous_read_real_time
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char read_real_time (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef read_real_time
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char read_real_time ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_read_real_time) || defined (__stub___read_real_time)
+choke me
+#else
+char (*f) () = read_real_time;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != read_real_time;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_read_real_time=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_read_real_time=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_read_real_time" >&5
+echo "${ECHO_T}$ac_cv_func_read_real_time" >&6
+if test $ac_cv_func_read_real_time = yes; then
+  READ_REAL_TIME=read_real_time TIMER_FOUND=yes
+fi
+
+  fi
+  if test x$TIMER_FOUND = xyes ; then
+    echo "Using $READ_REAL_TIME timer."
+  fi
+fi
+
+# On various Linux use clock_gettime
+if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_CLOCK_GETTIME" = "xtrue") ; then
+  echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
 echo $ECHO_N "checking for clock_gettime in -lrt... $ECHO_C" >&6
 if test "${ac_cv_lib_rt_clock_gettime+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4712,15 +5138,224 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_rt_clock_gettime" >&5
 echo "${ECHO_T}$ac_cv_lib_rt_clock_gettime" >&6
 if test $ac_cv_lib_rt_clock_gettime = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBRT 1
+  USE_CLOCK_GETTIME=true TIMER_FOUND=yes
+        echo "Using clock_gettime timer."
+
+fi
+
+fi
+
+#  If gettimeofday was specified, make sure we can find it
+if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_GETTIMEOFDAY" = "xtrue") ; then
+echo "$as_me:$LINENO: checking for gettimeofday" >&5
+echo $ECHO_N "checking for gettimeofday... $ECHO_C" >&6
+if test "${ac_cv_func_gettimeofday+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define gettimeofday to an innocuous variant, in case <limits.h> declares gettimeofday.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define gettimeofday innocuous_gettimeofday
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char gettimeofday (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef gettimeofday
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char gettimeofday ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_gettimeofday) || defined (__stub___gettimeofday)
+choke me
+#else
+char (*f) () = gettimeofday;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != gettimeofday;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_gettimeofday=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_gettimeofday=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_gettimeofday" >&5
+echo "${ECHO_T}$ac_cv_func_gettimeofday" >&6
+if test $ac_cv_func_gettimeofday = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define USE_GETTIMEOFDAY 1
+_ACEOF
+ USE_GETTIMEOFDAY=true TIMER_FOUND=yes
+  echo "Using gettimeofday timer."
+
+fi
+
+fi
+
+# If no appropriate timers were found, default to MPI_Wtime
+if test x$TIMER_FOUND = xno ; then
+        echo "$as_me:$LINENO: checking for MPI_Wtime" >&5
+echo $ECHO_N "checking for MPI_Wtime... $ECHO_C" >&6
+if test "${ac_cv_func_MPI_Wtime+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define MPI_Wtime to an innocuous variant, in case <limits.h> declares MPI_Wtime.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define MPI_Wtime innocuous_MPI_Wtime
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char MPI_Wtime (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef MPI_Wtime
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char MPI_Wtime ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_MPI_Wtime) || defined (__stub___MPI_Wtime)
+choke me
+#else
+char (*f) () = MPI_Wtime;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != MPI_Wtime;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_MPI_Wtime=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_MPI_Wtime=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_MPI_Wtime" >&5
+echo "${ECHO_T}$ac_cv_func_MPI_Wtime" >&6
+if test $ac_cv_func_MPI_Wtime = yes; then
+  cat >>confdefs.h <<\_ACEOF
+#define USE_WTIME 1
 _ACEOF
 
-  LIBS="-lrt $LIBS"
+          echo "Using MPI_Wtime timer."
 
+else
+  echo Failed to find MPI_Wtime.  Trying to use gettimeofday.; cat >>confdefs.h <<\_ACEOF
+#define USE_GETTIMEOFDAY 1
+_ACEOF
+ USE_GETTIMEOFDAY=true
 fi
 
 fi
+
 
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	if test "${ac_cv_header_libunwind_h+set}" = set; then
@@ -5050,103 +5685,6 @@ else
   HAVE_MPI_IO=/dev/null
 fi
 
-echo "$as_me:$LINENO: checking for mread_real_time" >&5
-echo $ECHO_N "checking for mread_real_time... $ECHO_C" >&6
-if test "${ac_cv_func_mread_real_time+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* Define mread_real_time to an innocuous variant, in case <limits.h> declares mread_real_time.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define mread_real_time innocuous_mread_real_time
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char mread_real_time (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef mread_real_time
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char mread_real_time ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_mread_real_time) || defined (__stub___mread_real_time)
-choke me
-#else
-char (*f) () = mread_real_time;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != mread_real_time;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_mread_real_time=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func_mread_real_time=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_mread_real_time" >&5
-echo "${ECHO_T}$ac_cv_func_mread_real_time" >&6
-if test $ac_cv_func_mread_real_time = yes; then
-  READ_REAL_TIME=mread_real_time
-else
-  READ_REAL_TIME=read_real_time
-fi
-
-
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -5310,7 +5848,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5313:" \
+echo "$as_me:5851:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5685,7 +6223,9 @@ ENABLE_BFD=$ENABLE_BFD
 
 
 
+
                                                                                 ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h"
+
 
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -6290,7 +6830,8 @@ s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
-s,@READ_REAL_TIME@,$READ_REAL_TIME,;t t
+s,@USE_RTS_GET_TIMEBASE@,$USE_RTS_GET_TIMEBASE,;t t
+s,@USE_RTC@,$USE_RTC,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@F77_SYMBOLS@,$F77_SYMBOLS,;t t
 s,@F77_VENDOR@,$F77_VENDOR,;t t
@@ -6300,6 +6841,7 @@ s,@FORTRAN_TARGET@,$FORTRAN_TARGET,;t t
 s,@FORTRAN_STR_DECL@,$FORTRAN_STR_DECL,;t t
 s,@ENABLE_BFD@,$ENABLE_BFD,;t t
 s,@ENABLE_API_ONLY@,$ENABLE_API_ONLY,;t t
+s,@READ_REAL_TIME@,$READ_REAL_TIME,;t t
 s,@DEFAULT_TARGS@,$DEFAULT_TARGS,;t t
 s,@FORTRAN_GETARG_OBJ_FILE@,$FORTRAN_GETARG_OBJ_FILE,;t t
 s,@TEST_LIST@,$TEST_LIST,;t t
