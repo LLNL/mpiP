@@ -68,6 +68,8 @@ AC_ARG_WITH(libs,
 AC_ARG_WITH(binutils-dir,
 	AS_HELP_STRING(--with-binutils-dir,Base directory of binutils installation.),
 	BINUTILS_DIR=$withval
+	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
 	echo Using binutils-dir: $withval
 	,
 	BINUTILS_DIR=unknown
@@ -283,22 +285,21 @@ fi
 
 AC_CHECK_LIB(m,sqrt)
 
+
 if test "x$ENABLE_BFD" = "xyes" ; then
-  AC_CHECK_HEADER(demangle.h, AC_DEFINE(HAVE_DEMANGLE_H))
-  AC_CHECK_LIB(intl,dcgettext__, LIBS="$LIBS -lintl")  #libintl required only on some platforms, eg AIX
-  AC_CHECK_LIB(iberty,objalloc_create)
+  BFD_AUX_LIBS=
+  AC_CHECK_LIB(intl,dcgettext__, BFD_AUX_LIBS="$BFD_AUX_LIBS -lintl")  #libintl required only on some platforms, eg AIX
+  AC_CHECK_LIB(iberty,objalloc_create, BFD_AUX_LIBS="$BFD_AUX_LIBS -liberty")
   AC_CHECK_HEADER(bfd.h,
-    AC_CHECK_LIB(bfd,bfd_openr, , ENABLE_BFD=no, -liberty)
+    AC_CHECK_LIB(bfd,bfd_openr, LIBS="$LIBS -lbfd", ENABLE_BFD=no, $BFD_AUX_LIBS)
     AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), ,[#include "bfd.h"])
     , ENABLE_BFD=no
   )
   AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
   if test "x$ENABLE_BFD" = "xyes" ; then
+    AC_CHECK_HEADER(demangle.h, AC_DEFINE(HAVE_DEMANGLE_H))
+    LIBS="$LIBS $BFD_AUX_LIBS"
     AC_DEFINE(ENABLE_BFD)
-    if ! test x$BINUTILS_DIR = "xunknown" ; then
-	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
-	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
-    fi
   fi
 
 else
