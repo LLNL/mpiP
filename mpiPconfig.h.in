@@ -36,6 +36,9 @@
 /* Define to activate check for negative time values */
 #undef MPIP_CHECK_TIME
 
+/* Define to force use of read_real_time for timing */
+#undef USE_READ_REAL_TIME
+
 /* Define to force use of gettimeofday for timing */
 #undef USE_GETTIMEOFDAY
 
@@ -47,6 +50,9 @@
 
 /* Define to use rts_get_timebase on BG/L for timing */
 #undef USE_RTS_GET_TIMEBASE
+
+/* Define to use _rtc on Cray X1 */
+#undef USE_RTC
 
 /* Distinguish available BFD calls between 2.15 and 2.15.96 */
 #undef HAVE_BFD_GET_SECTION_SIZE
