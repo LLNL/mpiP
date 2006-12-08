@@ -275,7 +275,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:dv")) != EOF);)
+      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:dvlr")) != EOF);)
 	{
 	  switch (c)
 	    {
@@ -425,15 +425,26 @@ mpiPi_getenv ()
 	      mpiPi.print_callsite_detail = 0;
 	      break;
 
+	    case 'l':
+	      /*  Use low-memory use approach using MPI collectives 
+	         for report generation   */
+	      mpiPi.collective_report = 1;
+	      break;
+
+	    case 'r':
+	      /*  Use collector task to aggregate all task data and
+	         generate report   */
+	      mpiPi.collective_report = 0;
+	      break;
+
+
 	    case 'a':
 	    case 'b':
 	    case 'h':
 	    case 'i':
 	    case 'j':
-	    case 'l':
 	    case 'p':
 	    case 'q':
-	    case 'r':
 	    case 'u':
 	    case 'w':
 	    case 'y':

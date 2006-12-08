@@ -113,7 +113,7 @@ AC_ARG_WITH(clock_gettime,
 )
 
 AC_ARG_WITH(rts_get_timebase,
-	AS_HELP_STRING(--with-rts_get_timebase,Use rts_get_timebase for timing on BG/L systems (default).),
+	AS_HELP_STRING(--with-rts_get_timebase,Use rts_get_timebase for timing on BG/L systems (default for BG/L).),
 	AC_DEFINE(USE_RTS_GET_TIMEBASE)
 	USE_RTS_GET_TIMEBASE=yes
 	TIMER_OPTION=yes
@@ -122,7 +122,7 @@ AC_ARG_WITH(rts_get_timebase,
 )
 
 AC_ARG_WITH(read_real_time,
-	AS_HELP_STRING(--with-read_real_time,Use read_real_time for timing on AIX systems (default).),
+	AS_HELP_STRING(--with-read_real_time,Use read_real_time for timing on AIX systems (default for AIX).),
 	AC_DEFINE(USE_READ_REAL_TIME)
 	USE_READ_REAL_TIME=yes
 	TIMER_OPTION=yes
@@ -131,7 +131,7 @@ AC_ARG_WITH(read_real_time,
 )
 
 AC_ARG_WITH(rtc,
-	AS_HELP_STRING(--with-rtc,Use _rtc for timing on CRAY X1 systems (default).),
+	AS_HELP_STRING(--with-rtc,Use _rtc for timing on CRAY X1 systems (default for X1).),
 	AC_DEFINE(USE_RTC)
 	USE_RTC=yes
 	TIMER_OPTION=yes
@@ -156,13 +156,6 @@ AC_ARG_ENABLE(api-only,
 	,
 )
 
-AC_ARG_ENABLE(low-mem-report,
-	AS_HELP_STRING(--enable-low-mem-report,Reduce memory use by only gathering individual process data for each callsite.),
-	if test x"$enableval" = xyes ; then
-                AC_DEFINE(LOW_MEM_REPORT)
-	fi
-	,
-)
 
 if test "$ENABLE_API_ONLY" = no ; then
 
@@ -266,6 +259,14 @@ AC_ARG_ENABLE(check-time,
 	,
 )
 
+AC_ARG_ENABLE(collective-report-default,
+	AS_HELP_STRING(--enable-collective-report-default,Have mpiP default to low-memory-use collective report generation as opposed to collecting all data at a single task (see runtime flags -l and -s).),
+	if test "x$enableval" = xyes ; then
+                AC_DEFINE(COLLECTIVE_REPORT_DEFAULT)
+		echo "Using collective report as default."
+	fi
+	,
+)
 
 AC_PROG_INSTALL
 AC_PROG_RANLIB

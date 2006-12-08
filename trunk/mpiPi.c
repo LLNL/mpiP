@@ -156,6 +156,11 @@ mpiPi_init (char *appName)
   mpiPi.messageCountThreshold = -1;
   mpiPi.report_style = mpiPi_style_verbose;
   mpiPi.print_callsite_detail = 1;
+#ifdef COLLECTIVE_REPORT_DEFAULT
+  mpiPi.collective_report = 1;
+#else
+  mpiPi.collective_report = 0;
+#endif
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -414,65 +419,66 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 
   mpiPi_query_src (p);		/* sets the file/line in p */
 
-#ifndef LOW_MEM_REPORT		/* { */
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
      one src line. We aggregate across rank after this. 
 
-     The LOW_MEM_REPORT reporting approach does not aggregate individual 
+     The collective_report reporting approach does not aggregate individual 
      process callsite information at the collector process.
    */
-  if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
+  if (mpiPi.collective_report == 0)
     {
-      int j;
-      callsite_stats_t *newp = NULL;
-      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
-      bzero (newp, sizeof (callsite_stats_t));
-      newp->op = p->op;
-      newp->rank = p->rank;
-      for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
+      if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
 	{
-	  newp->pc[j] = p->pc[j];
-	  newp->filename[j] = p->filename[j];
-	  newp->functname[j] = p->functname[j];
-	  newp->lineno[j] = p->lineno[j];
-	}
-      newp->csid = p->csid;
-      newp->count = p->count;
-      newp->cumulativeTime = p->cumulativeTime;
-      newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
-      newp->maxDur = p->maxDur;
-      newp->minDur = p->minDur;
-      newp->maxDataSent = p->maxDataSent;
-      newp->minDataSent = p->minDataSent;
-      newp->cumulativeDataSent = p->cumulativeDataSent;
-      newp->maxIO = p->maxIO;
-      newp->minIO = p->minIO;
-      newp->cumulativeIO = p->cumulativeIO;
-      newp->arbitraryMessageCount = p->arbitraryMessageCount;
-      newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
+	  int j;
+	  callsite_stats_t *newp = NULL;
+	  newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
+	  bzero (newp, sizeof (callsite_stats_t));
+	  newp->op = p->op;
+	  newp->rank = p->rank;
+	  for (j = 0; j < MPIP_CALLSITE_STACK_DEPTH; j++)
+	    {
+	      newp->pc[j] = p->pc[j];
+	      newp->filename[j] = p->filename[j];
+	      newp->functname[j] = p->functname[j];
+	      newp->lineno[j] = p->lineno[j];
+	    }
+	  newp->csid = p->csid;
+	  newp->count = p->count;
+	  newp->cumulativeTime = p->cumulativeTime;
+	  newp->cumulativeTimeSquared = p->cumulativeTimeSquared;
+	  newp->maxDur = p->maxDur;
+	  newp->minDur = p->minDur;
+	  newp->maxDataSent = p->maxDataSent;
+	  newp->minDataSent = p->minDataSent;
+	  newp->cumulativeDataSent = p->cumulativeDataSent;
+	  newp->maxIO = p->maxIO;
+	  newp->minIO = p->minIO;
+	  newp->cumulativeIO = p->cumulativeIO;
+	  newp->arbitraryMessageCount = p->arbitraryMessageCount;
+	  newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
-      /* insert new record into global */
-      h_insert (mpiPi.global_callsite_stats, newp);
+	  /* insert new record into global */
+	  h_insert (mpiPi.global_callsite_stats, newp);
+	}
+      else
+	{
+	  csp->count += p->count;
+	  csp->cumulativeTime += p->cumulativeTime;
+	  assert (csp->cumulativeTime >= 0);
+	  csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
+	  assert (csp->cumulativeTimeSquared >= 0);
+	  csp->maxDur = max (csp->maxDur, p->maxDur);
+	  csp->minDur = min (csp->minDur, p->minDur);
+	  csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
+	  csp->minDataSent = min (csp->minDataSent, p->minDataSent);
+	  csp->cumulativeDataSent += p->cumulativeDataSent;
+	  csp->maxIO = max (csp->maxIO, p->maxIO);
+	  csp->minIO = min (csp->minIO, p->minIO);
+	  csp->cumulativeIO += p->cumulativeIO;
+	  csp->arbitraryMessageCount += p->arbitraryMessageCount;
+	}
     }
-  else
-    {
-      csp->count += p->count;
-      csp->cumulativeTime += p->cumulativeTime;
-      assert (csp->cumulativeTime >= 0);
-      csp->cumulativeTimeSquared += p->cumulativeTimeSquared;
-      assert (csp->cumulativeTimeSquared >= 0);
-      csp->maxDur = max (csp->maxDur, p->maxDur);
-      csp->minDur = min (csp->minDur, p->minDur);
-      csp->maxDataSent = max (csp->maxDataSent, p->maxDataSent);
-      csp->minDataSent = min (csp->minDataSent, p->minDataSent);
-      csp->cumulativeDataSent += p->cumulativeDataSent;
-      csp->maxIO = max (csp->maxIO, p->maxIO);
-      csp->minIO = min (csp->minIO, p->minIO);
-      csp->cumulativeIO += p->cumulativeIO;
-      csp->arbitraryMessageCount += p->arbitraryMessageCount;
-    }
-#endif /* } ifndef LOW_MEM_REPORT */
 
   /* Collect aggregate callsite summary information indpendent of rank. */
   if (NULL == h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
@@ -688,11 +694,10 @@ mpiPi_mergeResults ()
     }
   if (mpiPi.rank == mpiPi.collectorRank && retval == 1)
     {
-#ifndef LOW_MEM_REPORT
-      mpiPi_msg_debug
-	("MEMORY : Allocated for global_callsite_stats     : %13ld\n",
-	 h_count (mpiPi.global_callsite_stats) * sizeof (callsite_stats_t));
-#endif
+      if (mpiPi.collective_report == 0)
+	mpiPi_msg_debug
+	  ("MEMORY : Allocated for global_callsite_stats     : %13ld\n",
+	   h_count (mpiPi.global_callsite_stats) * sizeof (callsite_stats_t));
       mpiPi_msg_debug
 	("MEMORY : Allocated for global_callsite_stats_agg : %13ld\n",
 	 h_count (mpiPi.global_callsite_stats_agg) *
