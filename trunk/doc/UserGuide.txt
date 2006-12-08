@@ -1,10 +1,9 @@
 
-   SourceForge.net Logo 
 
                  mpiP: Lightweight, Scalable MPI Profiling
 
-                                Version 3.0
-                              02 October 2006
+                                Version 3.1
+                              08 December 2006
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                               Chris Chambreau
@@ -19,7 +18,7 @@ Contents
           + New Features
      * Using mpiP (summary)
           + Supported Platforms
-     * Building mpiP
+     * Configuring and Building mpiP
           + Linking Examples
      * Run-time Configuration
      * mpiP Output
@@ -225,7 +224,7 @@ mpiP:
 
             ____________________________________________________
 
-Building mpiP
+Configuring and Building mpiP
 
   Configuring mpiP
 
@@ -251,12 +250,13 @@ Building mpiP
    --disable-mpi-io Disable MPI-I/O reporting. Useful for generating an mpiP
    library without MPI I/O for MPI implementations such as Quadrics MPI that
    has a separate MPI I/O library.
-   --enable-low-mem-report Report data is aggregated on a per-callsite basis By
-   default,  mpiP  aggregates  all process data at a single process which
-   generates the report.  Enabling this feature causes mpiP report generation
-   to be done by only aggregating callsite data for the current callsite being
-   reported.  This dramatically reduces the memory requirements for large runs
-   of applications that make many MPI calls.
+   --enable-collective-report-default  Report  data  is  aggregated  on a
+   per-callsite basis By default, mpiP aggregates all process data at a single
+   process which generates the report.  Enabling this feature causes mpiP
+   report generation to default to aggregating callsite data only for each
+   individual callsite being reported.  This dramatically reduces the memory
+   requirements for large runs of applications that make many MPI calls.  See
+   run-time flags -l and -r to modify report generation behavior.
    Stack Trace Options
    --enable-stackdepth=[depth] Specify maximum stacktrace depth (default is 8).
    Stacktraces  with  larger  than  8 levels are sometime useful for some
@@ -383,9 +383,12 @@ Run-time Configuration of mpiP
    -f dir Record output file in directory <dir>. .
    -g Enable mpiP debug mode. disabled
    -k n Sets callsite stack traceback depth to <n>. 1
+   -l  Use less memory to generate the report by using MPI collectives to
+   generate callsite information on a callsite-by-callsite basis.
    -n Do not truncate full pathname of filename in callsites.
    -o Disable profiling at initialization. Application must enable profiling
    with MPI_Pcontrol().
+   -r Generate the report by aggregating data at a single task. default
    -s n Set hash table size to <n>. 256
    -t x Set print threshold for report, where <x> is the MPI percentage of time
    for each callsite. 0.0
@@ -938,5 +941,5 @@ How to add MPI calls to profile
 
    For further information please send mail to mpip-help@lists.sourceforge.net.
 
-   Last modified on October 2nd, 2006.
+   Last modified on December 8th, 2006.
    UCRL-CODE-223450

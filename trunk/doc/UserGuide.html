@@ -40,9 +40,9 @@ width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
 
-<p align="center">Version 3.0<br>
+<p align="center">Version 3.1<br>
 
-02 October 2006 <br>
+08 December 2006 <br>
 
 <br>
 
@@ -83,7 +83,7 @@ Chris Chambreau <br>
 
   </li>
 
-  <li><a href="#Building">Building mpiP</a>
+  <li><a href="#Building">Configuring and Building mpiP</a>
     <ul>
 
       <li><a href="#Linking_Examples">Linking Examples</a></li>
@@ -525,7 +525,7 @@ to missing socket module.</td>
 <p class="sectionreturn"><a href="#top">Top</a></p>
 
 <hr width="75%">
-<h2><a name="Building">Building mpiP</a></h2>
+<h2><a name="Building">Configuring and Building mpiP</a></h2>
 
 <h3>Configuring mpiP</h3>
 
@@ -598,16 +598,16 @@ are provided for the following options:</p>
 
     <tr>
 
-      <td>--enable-low-mem-report</td>
+      <td>--enable-collective-report-default</td>
 
       <td>Report data is aggregated on a per-callsite basis</td>
 
       <td>By default, mpiP aggregates all process data at a single process
       which generates the report. &nbsp;Enabling this feature causes mpiP
-      report generation to be done by only aggregating callsite data for the
-      current callsite being reported. &nbsp;This dramatically reduces the
+      report generation to default to aggregating callsite data only for each
+      individual callsite being reported. &nbsp;This dramatically reduces the
       memory requirements for large runs of applications that make many MPI
-      calls.</td>
+      calls. &nbsp;See run-time flags -l and -r to modify report generation behavior.</td>
 
     </tr>
 
@@ -1167,6 +1167,16 @@ process-specific detail.</td>
 
     <tr>
 
+      <td class="commandline">-l</td>
+
+      <td>Use less memory to generate the report by using MPI collectives to generate callsite information on a callsite-by-callsite basis.</td>
+
+      <td align="center">&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
       <td class="commandline">-n</td>
 
       <td>Do not truncate full pathname of filename in callsites.</td>
@@ -1183,6 +1193,16 @@ process-specific detail.</td>
       profiling with MPI_Pcontrol().</td>
 
       <td align="center">&nbsp;</td>
+
+    </tr>
+
+    <tr>
+
+      <td class="commandline">-r</td>
+
+      <td>Generate the report by aggregating data at a single task.</td>
+
+      <td align="center">default</td>
 
     </tr>
 
@@ -2258,7 +2278,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on October 2nd, 2006.<br>
+<p class="pageinfo"> Last modified on December 8th, 2006.<br>
 
 UCRL-CODE-223450</p>
 
