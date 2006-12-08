@@ -1,3 +1,30 @@
+2006-12-06  chcham
+
+	* ., configure, configure.in, mpiPconfig.h.in:
+	  configure.in updated with autoupdate.
+	  Timer configurations modified to try to find and verify
+	  appropiate timer for specific platforms.
+	  Additional timer options.
+
+2006-12-04  chcham
+
+	* configure.in:
+	  Use rts_get_timebase on BG/L by default.
+	* _timers.h, configure, configure.in, mpiPconfig.h.in,
+	  timers/bgl_local.h:
+	  Added rts_get_timebase timer for BG/L use.
+
+2006-11-06  chcham
+
+	* glob.c, pc_lookup.c:
+	  Updated BFD source lookup symbol loading to be consistent with
+	  binutils addr2line successful lookup.
+
+2006-10-06  chcham
+
+	* ChangeLog, glob.c:
+	  Administrative updates for 3.0.1 release.
+
 2006-10-05  chcham
 
 	* doc/UserGuide.html, doc/UserGuide.txt:
