@@ -858,8 +858,6 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-api-only       Only build the API library.
-  --enable-low-mem-report Reduce memory use by only gathering individual
-                          process data for each callsite.
   --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
@@ -869,6 +867,10 @@ Optional Features:
   --enable-getarg         Use getarg to get fortran command line args.
   --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
   --enable-check-time     Enable AIX check for negative time values.
+  --enable-collective-report-default
+                          Have mpiP default to low-memory-use collective
+                          report generation as opposed to collecting all data
+                          at a single task (see runtime flags -l and -s).
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -885,10 +887,11 @@ Optional Packages:
   --with-wtime            Use MPI_Wtime for timing.
   --with-clock_gettime    Use clock_gettime for timing.
   --with-rts_get_timebase Use rts_get_timebase for timing on BG/L systems
-                          (default).
+                          (default for BG/L).
   --with-read_real_time   Use read_real_time for timing on AIX systems
-                          (default).
-  --with-rtc              Use _rtc for timing on CRAY X1 systems (default).
+                          (default for AIX).
+  --with-rtc              Use _rtc for timing on CRAY X1 systems (default for
+                          X1).
 
 Some influential environment variables:
   CC          C compiler command
@@ -1656,17 +1659,6 @@ _ACEOF
 
 fi;
 
-# Check whether --enable-low-mem-report or --disable-low-mem-report was given.
-if test "${enable_low_mem_report+set}" = set; then
-  enableval="$enable_low_mem_report"
-  if test x"$enableval" = xyes ; then
-                cat >>confdefs.h <<\_ACEOF
-#define LOW_MEM_REPORT 1
-_ACEOF
-
-	fi
-
-fi;
 
 if test "$ENABLE_API_ONLY" = no ; then
 
@@ -1793,6 +1785,18 @@ _ACEOF
 
 fi;
 
+# Check whether --enable-collective-report-default or --disable-collective-report-default was given.
+if test "${enable_collective_report_default+set}" = set; then
+  enableval="$enable_collective_report_default"
+  if test "x$enableval" = xyes ; then
+                cat >>confdefs.h <<\_ACEOF
+#define COLLECTIVE_REPORT_DEFAULT 1
+_ACEOF
+
+		echo "Using collective report as default."
+	fi
+
+fi;
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -5839,7 +5843,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5842:" \
+echo "$as_me:5846:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

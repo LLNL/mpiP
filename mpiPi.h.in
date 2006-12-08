@@ -188,6 +188,7 @@ typedef struct _mpiPi_t
   enum mpiPi_report_style
   { mpiPi_style_verbose, mpiPi_style_concise, mpiPi_style_both } report_style;
   int print_callsite_detail;
+  int collective_report;
 }
 mpiPi_t;
 
