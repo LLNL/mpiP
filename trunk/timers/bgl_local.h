@@ -21,7 +21,7 @@
 #include <rts.h>
 
 typedef unsigned long long RTS_TS;
-static double seconds_per_cycle = 1.4285714285714285714e-9; /* Assuming 700MHz */
+static double seconds_per_cycle = 1.4285714285714285714e-9;	/* Assuming 700MHz */
 
 /* rts_get_timebase returns processor cycles */
 #define mpiPi_TIMER double
