@@ -319,6 +319,9 @@ mpiPi_print_report_header (FILE * fp)
   print_intro_line (fp, "Collector PID", "%d", mpiPi.procID);
 
   print_intro_line (fp, "Final Output Dir", "%s", mpiPi.outputDir);
+  print_intro_line (fp, "Report generation", "%s",
+		    mpiPi.collective_report ==
+		    0 ? "Single collector task" : "Collective");
 }
 
 void
@@ -2224,20 +2227,22 @@ mpiPi_profile_print_concise (FILE * fp)
 
       mpiPi_print_callsites (fp);
 
-#ifndef LOW_MEM_REPORT
-      if (mpiPi.print_callsite_detail)
+      if (mpiPi.collective_report == 0)
 	{
-	  mpiPi_print_concise_callsite_time_info (fp);
-	  mpiPi_print_concise_callsite_sent_info (fp);
-	  mpiPi_print_concise_callsite_io_info (fp);
+	  if (mpiPi.print_callsite_detail)
+	    {
+	      mpiPi_print_concise_callsite_time_info (fp);
+	      mpiPi_print_concise_callsite_sent_info (fp);
+	      mpiPi_print_concise_callsite_io_info (fp);
+	    }
 	}
-#endif
     }
-#ifdef LOW_MEM_REPORT
-  mpiPi_coll_print_concise_callsite_time_info (fp);
-  mpiPi_coll_print_concise_callsite_sent_info (fp);
-  mpiPi_coll_print_concise_callsite_io_info (fp);
-#endif
+  if (mpiPi.collective_report == 1)
+    {
+      mpiPi_coll_print_concise_callsite_time_info (fp);
+      mpiPi_coll_print_concise_callsite_sent_info (fp);
+      mpiPi_coll_print_concise_callsite_io_info (fp);
+    }
 }
 
 void
@@ -2259,30 +2264,32 @@ mpiPi_profile_print_verbose (FILE * fp)
 
   if (mpiPi.print_callsite_detail)
     {
-#ifdef LOW_MEM_REPORT		/* { */
-      mpiPi_msg_debug0
-	("Using LOW_MEM_REPORT collective process reporting routines\n");
-      mpiPi_msg_debug0
-	("MEMORY : LOW_MEM_REPORT memory allocation :        %13ld\n",
-	 sizeof (callsite_stats_t) * mpiPi.size);
-
-      mpiPi_coll_print_all_callsite_time_info (fp);
-      mpiPi_coll_print_all_callsite_sent_info (fp);
-      mpiPi_coll_print_all_callsite_io_info (fp);
-
-#else /* LOW_MEM_REPORT } { */
-
-      if (mpiPi.collectorRank == mpiPi.rank)
+      if (mpiPi.collective_report == 1)
 	{
-	  mpiPi_msg_debug
-	    ("Using standard process reporting routines aggregating data at process rank %d\n",
-	     mpiPi.collectorRank);
+	  mpiPi_msg_debug0 ("Using collective process reporting routines\n");
+	  mpiPi_msg_debug0
+	    ("MEMORY : collective reporting memory allocation :        %13ld\n",
+	     sizeof (callsite_stats_t) * mpiPi.size);
 
-	  mpiPi_print_all_callsite_time_info (fp);
-	  mpiPi_print_all_callsite_sent_info (fp);
-	  mpiPi_print_all_callsite_io_info (fp);
+	  mpiPi_coll_print_all_callsite_time_info (fp);
+	  mpiPi_coll_print_all_callsite_sent_info (fp);
+	  mpiPi_coll_print_all_callsite_io_info (fp);
 	}
-#endif /* LOW_MEM_REPORT } */
+      else
+	{
+
+
+	  if (mpiPi.collectorRank == mpiPi.rank)
+	    {
+	      mpiPi_msg_debug
+		("Using standard process reporting routines aggregating data at process rank %d\n",
+		 mpiPi.collectorRank);
+
+	      mpiPi_print_all_callsite_time_info (fp);
+	      mpiPi_print_all_callsite_sent_info (fp);
+	      mpiPi_print_all_callsite_io_info (fp);
+	    }
+	}
     }
 
 }
