@@ -3,7 +3,7 @@
                  mpiP: Lightweight, Scalable MPI Profiling
 
                                 Version 3.1
-                              08 December 2006
+                              04 January 2007
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                               Chris Chambreau
@@ -80,7 +80,17 @@ Introduction
      * Jim Brandt (Sandia National Laboratories)
      * Philip Roth (Oak Ridge National Laboratory)
 
-  New Features with v3.0
+  New Features with v3.1
+
+   Release v3.1 addresses the following issues:
+     * Configure defaults to the optimal platform timer, but the timer can be
+       specified with configure options.
+     * Support for rts_get_timebase on BG/L.
+     * Runtime flags can be used to specify that report generation be done by a
+       single collector process (default) or by using a small fixed amount of
+       memory and MPI collectives. The single collector process approach tends
+       to be faster while the low-memory approach is useful for systems where
+       memory availability may be a concern.
 
    Release v3.0 addresses the following issues:
      * New reporting formats with summary statistics ( See runtime options 'c'
@@ -393,6 +403,7 @@ Run-time Configuration of mpiP
    -t x Set print threshold for report, where <x> is the MPI percentage of time
    for each callsite. 0.0
    -v Generates both concise and verbose report output.
+   -x exe Specify the full path to the executable.
 
    For example, to set the callsite stack walking depth to 2 and the report
    print threshold to 10%, you simply need to define the mpiP string in your
@@ -941,5 +952,5 @@ How to add MPI calls to profile
 
    For further information please send mail to mpip-help@lists.sourceforge.net.
 
-   Last modified on December 8th, 2006.
+   Last modified on January 4th, 2007.
    UCRL-CODE-223450
