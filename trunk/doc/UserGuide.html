@@ -42,7 +42,7 @@ Profiling</a></h1>
 
 <p align="center">Version 3.1<br>
 
-08 December 2006 <br>
+04 January 2007 <br>
 
 <br>
 
@@ -173,7 +173,22 @@ order):</p>
 
 </ul>
 
-<h3><a name="New_Features">New Features with v3.0</a></h3>
+<h3><a name="New_Features">New Features with v3.1</a></h3>
+
+<p>Release v3.1 addresses the following issues:
+</p>
+
+<ul>
+
+  <li>Configure defaults to the optimal platform timer, but the timer can be
+  specified with configure options.</li>
+
+  <li>Support for rts_get_timebase on BG/L.</li>
+  <li>Runtime flags can be used to specify that report generation be done by a single collector process (default) or by using a small fixed amount of memory and MPI collectives. The single collector process approach tends to be faster while the low-memory approach is useful for systems where memory availability may be a concern.</li>
+
+</ul>
+
+<p></p>
 
 <p>Release v3.0 addresses the following issues:
 </p>
@@ -1238,6 +1253,16 @@ for each callsite.</td>
 
     </tr>
 
+    <tr>
+
+      <td class="commandline">-x exe</td>
+
+      <td>Specify the full path to the executable.</td>
+
+      <td>&nbsp</td>
+
+    </tr>
+
   </tbody>
 </table>
 
@@ -2278,7 +2303,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on December 8th, 2006.<br>
+<p class="pageinfo"> Last modified on January 4th, 2007.<br>
 
 UCRL-CODE-223450</p>
 
