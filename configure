@@ -5133,7 +5133,10 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_rt_clock_gettime" >&5
 echo "${ECHO_T}$ac_cv_lib_rt_clock_gettime" >&6
 if test $ac_cv_lib_rt_clock_gettime = yes; then
-  USE_CLOCK_GETTIME=true TIMER_FOUND=yes
+  cat >>confdefs.h <<\_ACEOF
+#define USE_CLOCK_GETTIME 1
+_ACEOF
+ USE_CLOCK_GETTIME=true TIMER_FOUND=yes
         echo "Using clock_gettime timer."
 
 fi
@@ -5843,7 +5846,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5846:" \
+echo "$as_me:5849:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

@@ -367,7 +367,7 @@ fi
 
 # On various Linux use clock_gettime
 if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_CLOCK_GETTIME" = "xtrue") ; then
-  AC_CHECK_LIB(rt,clock_gettime, USE_CLOCK_GETTIME=true TIMER_FOUND=yes
+  AC_CHECK_LIB(rt,clock_gettime, AC_DEFINE(USE_CLOCK_GETTIME) USE_CLOCK_GETTIME=true TIMER_FOUND=yes LIBS="$LIBS -lrt"
         echo "Using clock_gettime timer." 
   )
 fi
