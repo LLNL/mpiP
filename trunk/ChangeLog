@@ -1,5 +1,36 @@
+2007-01-04  chcham
+
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  UserGuide updates for 3.1 release.
+	* configure, configure.in:
+	  Make sure USE_CLOCKGETTIME is defined.
+
+2006-12-08  chcham
+
+	* ChangeLog, doc/UserGuide.html, doc/UserGuide.txt, glob.c:
+	  Version number and documentation update for 3.1.0 release.
+	* configure, configure.in, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in,
+	  report.c, util.c:
+	  Modifications to allow run-time determination of report
+	  generation approach:
+	  o -l forces collective report generation
+	  o -s forces single collector task report generation
+	  o default behavior is single collector, but can be modified
+	  through configure
+	  
+	  Also made minor changes to configure help info describing
+	  platform-specific default timers.
+	* timers/bgl_local.h:
+	  Minor indent formatting change.
+
 2006-12-06  chcham
 
+	* configure, configure.in:
+	  Corrected BFD configure tests to result in appropriate CFLAGS
+	  and LIBS settings.
+	* configure, configure.in:
+	  Clean up binutils lib checking and BINUTILS_DIR lib path, if
+	  provided.
 	* ., configure, configure.in, mpiPconfig.h.in:
 	  configure.in updated with autoupdate.
 	  Timer configurations modified to try to find and verify
