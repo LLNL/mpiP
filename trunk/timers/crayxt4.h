@@ -1,70 +1,42 @@
-/* -*- Mode: C; -*- 
+/* -*- C -*- 
 
    mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   ----- 
+   -----
 
-   _timers.h -- timer macros
+   crayxt4.h -- local high res timers
 
-   $Id$
+   $Id: $
 
 */
+#ifndef _CRAYXT4_LOCAL_H
+#define _CRAYXT4_LOCAL_H
 
-#ifndef _MPITI_TIMERS_H
-#define _MPITI_TIMERS_H
+/* without this #include, the code will compile but dclock() always
+   returns the same value during a run
+*/
+#include <catamount/dclock.h>
 
-#define MSECS 1000
-#define USECS 1000000
-#define NSECS 1000000000
-
-#include <unistd.h>
-#include <sys/time.h>
-typedef double mpiP_TIMER;
-
-#if (defined(SunOS) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/sunos_local.h"
-
-#elif (defined(AIX) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/aix_local.h"
-
-#elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
-#include "timers/crayx1_hw.h"
-
-#elif (defined(Catamount) && ! defined(USE_GETTIMEOFDAY) && ! defined(USE_WTIME))
-#include "timers/crayxt4.h"
-
-#elif defined(USE_RTS_GET_TIMEBASE)
-#include "timers/bgl_local.h"
-
-#elif (defined(Linux) && defined(USE_CLOCK_GETTIME) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
-#include "timers/linux_posix.h"
-
-#elif defined(USE_WTIME)
 #define mpiPi_TIMER double
 #define mpiPi_TIME double
-#define mpiPi_TIMER_NAME "PMPI_Wtime"
-#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()*USECS))
-#define mpiPi_GETUSECS(timeaddr) (*(timeaddr))
-#define mpiPi_GETTIMEDIFF(end,start) ((*end)-(*start))
-#else
+#define mpiPi_TIMER_NAME "dclock"
 
-/* gettimeofday returns microseconds */
-#define mpiPi_TIMER double
-#define mpiPi_TIME struct timeval
-#define mpiPi_TIMER_NAME "gettimeofday"
-#define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIMER));}
-#define mpiPi_GETTIME(timeaddr) gettimeofday(timeaddr,NULL)
-#define mpiPi_GETUSECS(timeaddr) (((mpiPi_TIMER)(timeaddr)->tv_sec)*USECS+((mpiPi_TIMER)(timeaddr)->tv_usec))
-#define mpiPi_PRINTTIME(taddr) printf("Time is %ld sec and %ld usec.\n", (taddr)->tv_sec, (taddr)->tv_usec)
-#define mpiPi_GETTIMEDIFF(end,start) ((mpiP_TIMER)((((mpiPi_TIMER)(end)->tv_sec)*USECS)+(end)->tv_usec)-((((mpiPi_TIMER)(start)->tv_sec)*USECS)+(start)->tv_usec))
-#define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
+/* #define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIMER));} */
 
-#endif
+/* mpiPi_GETTIME uses dclock, which returns a value in seconds */
+#define mpiPi_GETTIME(timeaddr)   {(*timeaddr)=dclock();}
 
-#endif
+#define mpiPi_GETUSECS(timeaddr)  ((*timeaddr)*1000000)
 
+#define mpiPi_PRINTTIME(taddr) printf("Time is %lf usec.\n", mpiPi_GETUSECS(taddr))
+
+#define mpiPi_GETTIMEDIFF(end,start) (((*end)-(*start))*1000000)
+
+#define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %lf usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
+
+#endif /* _CRAYXT4_LOCAL_H */
 
 /* 
 
@@ -134,5 +106,3 @@ advertising or product endorsement purposes.
 </license>
 
 */
-
-/* EOF */
