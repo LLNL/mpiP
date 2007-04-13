@@ -166,7 +166,27 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   return frame_count;
 }
 
-#else /* not OSF1 */
+#elif defined(mips) && defined(__GNUC__)
+  /* on the MIPS we use gcc's predefined macro to get a single level
+   * of stack backtrace
+   */
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+{
+  mpiPi_msg_debug("Using saved address on this MIPS arch (max traceback=1)\n");
+  if (max_back == 0) return 0;
+
+  /* For MIPS under GNUC, we can only handle a traceback upto one level */
+  if (max_back > 1) {
+    mpiPi_msg_warn("We only support a single level of stack backtrace on MIPS currently\n"
+	           "Using the a traceback of 1, instead\n");
+  }
+  pc_array[0] = (void *) ((char *)saved_ret_addr - 1);
+  pc_array[1] = '\0';
+  return 1;
+}
+
+#else /* not OSF1 and not MIPS+GCC */
 
 int
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
@@ -241,8 +261,8 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   return frame_count;
 }
-#endif
-#endif
+#endif  /* OSF1 */
+#endif  /* libunwind */
 
 void
 mpiPi_getenv ()
