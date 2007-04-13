@@ -246,6 +246,20 @@ extern void *MPIR_ToPointer (int idx);
 #define FramePC(fp) ((void*)(((void**)fp)[1]))
 #define NextFP(fp) ((void*)((void**)fp)[0])
 
+/* MIPS+GCC */
+/* We don't use the macros on the mips and instead
+ * use gcc's __builtin_return_address(0) intrinsic
+ * to get a single level of stack backtrace. The
+ * value is saved in saved_ret_addr variable each time
+ * setjmp is called.
+ */
+#elif defined(mips) && defined(__GNUC__)
+#define ParentFP(jb) (0)
+#define FramePC(fp) (0)
+#define NextFP(fp) (0)
+extern void* saved_ret_addr;
+
+
 /*  undefined  */
 #else
 #if ! defined(HAVE_LIBUNWIND)

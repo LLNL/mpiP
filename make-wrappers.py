@@ -717,6 +717,7 @@ def GenerateLookup():
 ###
 def CreateWrapper(funct, olist):
     global fdict
+    global operatingSystem
 
     if fdict[funct].nowrapper:
 	return
@@ -847,7 +848,12 @@ def CreateWrapper(funct, olist):
     olist.append(decl)
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
-    olist.append("setjmp (jbuf);\n")
+    olist.append("setjmp (jbuf);\n\n")
+    if ( operatingSystem == 'mips' ) :
+      olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
+      olist.append("#if defined(mips) && defined (__GNUC__)\n")
+      olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
+      olist.append("#endif\n\n")
     olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
     for i in fdict[funct].paramConciseList:
 	if (fdict[funct].paramDict[i].pointerLevel == 0) \
@@ -970,6 +976,12 @@ def CreateWrapper(funct, olist):
 	    olist.extend(fdict[funct].wrapperPreList)
 
     olist.append("setjmp (jbuf);\n\n")
+
+    if ( operatingSystem == 'mips' ) :
+      olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
+      olist.append("#if defined(mips) && defined (__GNUC__)\n")
+      olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
+      olist.append("#endif\n\n")
 
     #  Allocate any arrays used for translation
     for i in range(len(xlateVarNames)) :
@@ -1095,6 +1107,7 @@ def CreateWrapper(funct, olist):
 def GenerateWrappers():
     global flist
     global fdict
+    global operatingSystem
 
     print "-----*----- Generating profiling wrappers"
     cwd = os.getcwd()
@@ -1106,6 +1119,14 @@ def GenerateWrappers():
     olist.append("#include \"symbols.h\"\n")
     olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
+####
+#### Handle MIPS+GCC specially by creating a variable to save the return address
+####
+    if ( operatingSystem == 'mips' ) :
+      olist.append("#if defined(mips) && defined(__GNUC__)\n")
+      olist.append("  void* saved_ret_addr;\n")
+      olist.append("#endif\n\n")
+
     for funct in flist:
 	CreateWrapper(funct, olist)
     olist.append("\n")
@@ -1152,8 +1173,9 @@ def main():
     global flist
     global f77symbol
     global doOpaqueXlate
+    global operatingSystem
 
-    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate'])
+    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'os='])
 
     print "MPI Wrapper Generator ($Revision$)"
     #print "opts=",opts
@@ -1161,12 +1183,15 @@ def main():
 
     f77symbol = 'symbol'
     doOpaqueXlate = False
+    operatingSystem = 'unknown'
     
     for o, a in opts:
         if o == '--f77symbol':
             f77symbol = a
         if o == '--xlate':
             doOpaqueXlate = True
+        if o == '--os':
+            operatingSystem = a
             
 
     ##### Load the input file
