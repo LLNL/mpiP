@@ -366,14 +366,14 @@ if test x$TIMER_FOUND = xno && test x$TIMER_OPTION = xno ; then
   fi
 fi
 
-# On various Linux use clock_gettime
-if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_CLOCK_GETTIME" = "xtrue") ; then
+# If specified, try to use clock_gettime
+if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xtrue" ; then
   AC_CHECK_LIB(rt,clock_gettime, AC_DEFINE(USE_CLOCK_GETTIME) USE_CLOCK_GETTIME=true TIMER_FOUND=yes LIBS="$LIBS -lrt"
         echo "Using clock_gettime timer." 
   )
 fi
 
-#  If gettimeofday was specified, make sure we can find it
+#  If none of the above are specified or found, use gettimeofday
 if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_GETTIMEOFDAY" = "xtrue") ; then
 AC_CHECK_FUNC(gettimeofday, AC_DEFINE(USE_GETTIMEOFDAY) USE_GETTIMEOFDAY=true TIMER_FOUND=yes
   echo "Using gettimeofday timer."
@@ -564,7 +564,6 @@ AC_SUBST(READ_REAL_TIME)
 AC_SUBST(DEFAULT_TARGS)
 AC_SUBST(FORTRAN_GETARG_OBJ_FILE)
 AC_SUBST(TEST_LIST)
-AC_SUBST(AR)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(FORTRAN_GETARG)
 

@@ -1449,8 +1449,6 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-CPPFLAGS=
-LDFLAGS=
 
 cross_compiling=yes
 echo
@@ -1957,6 +1955,9 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+if test "x$AR" = "x"; then
+   AR=ar
+fi
 TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
   for ac_prog in mpxlc mpcc_r mpicc cmpicc gcc cc icc
@@ -5066,8 +5067,8 @@ fi
   fi
 fi
 
-# On various Linux use clock_gettime
-if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_CLOCK_GETTIME" = "xtrue") ; then
+# If specified, try to use clock_gettime
+if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xtrue" ; then
   echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
 echo $ECHO_N "checking for clock_gettime in -lrt... $ECHO_C" >&6
 if test "${ac_cv_lib_rt_clock_gettime+set}" = set; then
@@ -5136,14 +5137,14 @@ if test $ac_cv_lib_rt_clock_gettime = yes; then
   cat >>confdefs.h <<\_ACEOF
 #define USE_CLOCK_GETTIME 1
 _ACEOF
- USE_CLOCK_GETTIME=true TIMER_FOUND=yes
+ USE_CLOCK_GETTIME=true TIMER_FOUND=yes LIBS="$LIBS -lrt"
         echo "Using clock_gettime timer."
 
 fi
 
 fi
 
-#  If gettimeofday was specified, make sure we can find it
+#  If none of the above are specified or found, use gettimeofday
 if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_GETTIMEOFDAY" = "xtrue") ; then
 echo "$as_me:$LINENO: checking for gettimeofday" >&5
 echo $ECHO_N "checking for gettimeofday... $ECHO_C" >&6
@@ -5846,7 +5847,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5849:" \
+echo "$as_me:5850:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
