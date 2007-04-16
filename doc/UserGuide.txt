@@ -2,8 +2,8 @@
 
                  mpiP: Lightweight, Scalable MPI Profiling
 
-                                Version 3.1
-                              04 January 2007
+                               Version 3.1.1
+                               16 April 2007
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                               Chris Chambreau
@@ -79,8 +79,14 @@ Introduction
      * Mike Campbell (UIUC)
      * Jim Brandt (Sandia National Laboratories)
      * Philip Roth (Oak Ridge National Laboratory)
+     * Tushar Mohan (SiCortex)
 
-  New Features with v3.1
+  New Features with v3.1.1
+
+   Release v3.1.1 addresses the following issues:
+     * Revert to gettimeofday as default Linux timer.
+     * MIPS64-Linux stack walking support.
+     * Catamount dclock timer support.
 
    Release v3.1 addresses the following issues:
      * Configure defaults to the optimal platform timer, but the timer can be
@@ -99,48 +105,6 @@ Introduction
        flag --use-low-mem-report ).
      * MPI_Pcontrol calls can reset statistics, generate multiple reports per
        run, and generate reports in various formats.
-
-   Release v2.8.2 addresses the following issues:
-     * Document EM64T/ia64 libunwind requirement.
-     * Set compile flags with CFLAGS and FFLAGS.
-     * API  library  should  work  as  stand-alone library now, target is
-       libmpiP-API.a.
-     * mpiP wrappers now translate fortran opaque objects, but can be disabled
-       with --disable-fortran-xlate.
-     * Changes to support differences between binutils 2.15 versions.
-     * API can be used with libelf/dwarf.
-     * Corrected MPI_Pcontrol(0) call to deactivate profiling.
-
-   Release v2.8 corrects some outstanding issues and provides the following new
-   features:
-     * An API (see mpiP-API.c and mpiP-API.h) is available through the mpiP
-       library for the following functionality:
-          + stackwalking
-          + address-to-source translation
-          + symbol demangling
-          + timing routines
-          + accessing the name of the executable
-     * New platform and compiler support, including IBM ppc64-BG/L, Cray X1 &
-       XD1, SGI Altix, and PGI compilers.
-     * Scripts are provided to use addr2line to translate report addresses to
-       source information and demonstrate runtime profiling insertion.
-     * A make install target has been implemented.
-     * The   standard  report  filename  format  is  now  [executable  or
-       "Unknown"].[process  count].[rank 0 PID].[report index].mpiP. When
-       generating reports, mpiP will not overwrite existing report files. The
-       report index will be incremented until a unique filename is found. The
-       report index is also incremented if multiple reports are generated
-       within a single run.
-     * The  default  Linux  timer is gettimeofday. Either gettimeofday or
-       clock_gettime can be specified as the timer routine used by mpiP with a
-       configure option.
-     * To avoid attempting to run tests during configure, cross_compiling is
-       set.
-     * COV calculation is now the default. It can be disabled with the "-c"
-       environment variable option.
-     * Previous Linux Fortran/C/C++ libraries have been merged into a single
-       library.
-     * Greater configuration flexibility. See configure --help.
 
             ____________________________________________________
 
@@ -207,7 +171,7 @@ mpiP:
    IBM Power4/5 AIX 5.3 VA C 7.0
    VA Fortran 9.1 PE 4.2 2.16.1 Binutils currently requires that applications
    are linked with the -bnoobjreorder linker flag.
-   Cray XT3 Catamount 1.4.32
+   Cray XT3/XT4 Catamount 1.4.32
 
    PGI 6.1-4 C/C/Fortran, from Cray PrgEnv-pgi module version 1.4.32
 
@@ -231,6 +195,7 @@ mpiP:
    --disable-demangle --enable-getarg --with-cc=cc --with-cxx=CC --with-f77=ftn
    Python on an alternative system may be needed to "make wrappers.c", due to
    missing socket module.
+   MIPS64-Linux
 
             ____________________________________________________
 
@@ -287,8 +252,9 @@ Configuring and Building mpiP
    --with-wtime Use MPI_Wtime for timing Use the MPI_Wtime call for timing
    instead of the default platform timer.
    --with-clock_gettime Use clock_gettime for timing. Use the clock_gettime
-   high-resolution per-process timer for timing instead of the default platform
-   timer.
+   monotonic timer for timing instead of the default platform timer.
+   --with-dclock Use Catamount dclock for timing. Use the dclock timer for
+   timing on Catamount systems instead of the default platform timer.
    --enable-check-time Enable AIX check for negative time values. Activate IBM
    timing debugging code.
    Fortran-related Options
@@ -952,5 +918,5 @@ How to add MPI calls to profile
 
    For further information please send mail to mpip-help@lists.sourceforge.net.
 
-   Last modified on January 4th, 2007.
+   Last modified on April 16th, 2007.
    UCRL-CODE-223450

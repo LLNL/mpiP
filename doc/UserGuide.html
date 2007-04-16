@@ -40,9 +40,9 @@ width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
 
-<p align="center">Version 3.1<br>
+<p align="center">Version 3.1.1<br>
 
-04 January 2007 <br>
+16 April 2007 <br>
 
 <br>
 
@@ -171,9 +171,22 @@ order):</p>
 
   <li>Philip Roth (Oak Ridge National Laboratory)</li>
 
+  <li>Tushar Mohan (SiCortex)</li>
+
 </ul>
 
-<h3><a name="New_Features">New Features with v3.1</a></h3>
+<h3><a name="New_Features">New Features with v3.1.1</a></h3>
+
+<p>Release v3.1.1 addresses the following issues:
+</p>
+
+<ul>
+
+  <li>Revert to gettimeofday as default Linux timer.</li>
+  <li>MIPS64-Linux stack walking support.</li>
+  <li>Catamount dclock timer support.</li>
+
+</ul>
 
 <p>Release v3.1 addresses the following issues:
 </p>
@@ -208,87 +221,6 @@ reports per run, and generate reports in various formats.</li>
 
 <p></p>
 
-<p>Release v2.8.2 addresses the following issues:
-</p>
-
-<ul>
-
-  <li>Document EM64T/ia64 libunwind requirement.</li>
-
-  <li>Set compile flags with CFLAGS and FFLAGS.</li>
-
-  <li>API library should work as stand-alone library now, target
-is libmpiP-API.a.</li>
-
-  <li>mpiP wrappers now translate fortran opaque objects, but can
-be disabled with --disable-fortran-xlate.</li>
-
-  <li>Changes to support differences between binutils 2.15
-versions.</li>
-
-  <li>API can be used with libelf/dwarf.</li>
-
-  <li>Corrected MPI_Pcontrol(0) call to deactivate profiling.</li>
-
-</ul>
-
-<p></p>
-
-<p>Release v2.8 corrects some outstanding issues and provides the following new
-features:</p>
-
-<ul>
-
-  <li>An API (see mpiP-API.c and mpiP-API.h) is available through
-the mpiP library for the following functionality:
-    <ul>
-
-      <li>stackwalking</li>
-
-      <li>address-to-source translation</li>
-
-      <li>symbol demangling</li>
-
-      <li>timing routines</li>
-
-      <li>accessing the name of the executable</li>
-
-    </ul>
-
-  </li>
-
-  <li>New platform and compiler support, including IBM
-ppc64-BG/L, Cray X1 &amp; XD1, SGI Altix, and PGI compilers.</li>
-
-  <li>Scripts are provided to use addr2line to translate report
-addresses
-to source information and demonstrate runtime profiling insertion.</li>
-
-  <li>A make install target has been implemented.</li>
-
-  <li>The standard report filename format is now [executable or
-"Unknown"].[process count].[rank 0 PID].[report index].mpiP. When
-generating reports, mpiP will not overwrite existing report files. The
-report index will be incremented until a unique filename is found. The
-report index is also incremented if multiple reports are generated
-within a single run.</li>
-
-  <li>The default Linux timer is gettimeofday. Either gettimeofday or
-  clock_gettime can be specified as the timer routine used by mpiP with a
-  configure option.</li>
-
-  <li>To avoid attempting to run tests during configure,
-cross_compiling is set.</li>
-
-  <li>COV calculation is now the default. It can be disabled with
-the "-c" environment variable option.</li>
-
-  <li>Previous Linux Fortran/C/C++ libraries have been merged
-into a single library.</li>
-
-  <li>Greater configuration flexibility. See configure --help.</li>
-
-</ul>
 
 <p class="sectionreturn"><a href="#top">Top</a></p>
 
@@ -454,7 +386,7 @@ linker flag.</td>
 
     <tr>
 
-      <td>Cray XT3</td>
+      <td>Cray XT3/XT4</td>
 
       <td>Catamount 1.4.32</td>
 
@@ -530,6 +462,21 @@ to missing socket module.</td>
 
     </tr>
 
+    <tr>
+
+      <td>MIPS64-Linux</td>
+
+      <td> &nbsp; </td>
+
+      <td> &nbsp; </td>
+
+      <td> &nbsp; </td>
+
+      <td> &nbsp; </td>
+
+      <td> &nbsp; </td>
+
+    </tr>
     <tr>
 
     </tr>
@@ -716,8 +663,17 @@ default platform timer.</td>
 
       <td>Use clock_gettime for timing.</td>
 
-      <td>Use the clock_gettime high-resolution per-process timer
-for timing instead of the default platform timer.</td>
+      <td>Use the clock_gettime monotonic timer for timing instead of the default platform timer.</td>
+
+    </tr>
+
+    <tr>
+
+      <td>--with-dclock</td>
+
+      <td>Use Catamount dclock for timing.</td>
+
+      <td>Use the dclock timer for timing on Catamount systems instead of the default platform timer.</td>
 
     </tr>
 
@@ -2303,7 +2259,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on January 4th, 2007.<br>
+<p class="pageinfo"> Last modified on April 16th, 2007.<br>
 
 UCRL-CODE-223450</p>
 
