@@ -1,5 +1,13 @@
 2007-04-16  chcham
 
+	* record_stack.c:
+	  Id keyword correction.
+	* record_stack.c:
+	  Added svn keywords.
+	* record_stack.c:
+	  Added svn Id keyword.
+	* ChangeLog, glob.c:
+	  Update for 3.1.1 release.
 	* ., Makefile.in, record_stack.c, util.c:
 	  Moved mpiPi_RecordTraceBack functions to record_stack.c for
 	  clarity.
