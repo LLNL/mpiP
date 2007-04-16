@@ -13,7 +13,7 @@
 
 #ifndef lint
 static char *svnid =
-  "$Id: $";
+  "$Id$";
 #endif
 
 #include <setjmp.h>
