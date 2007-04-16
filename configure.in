@@ -105,7 +105,7 @@ AC_ARG_WITH(wtime,
 AC_ARG_WITH(clock_gettime,
 	AS_HELP_STRING(--with-clock_gettime,Use clock_gettime for timing.),
 	AC_DEFINE(USE_CLOCK_GETTIME)
-	USE_CLOCK_GETTIME=true
+	USE_CLOCK_GETTIME=yes
 	TIMER_OPTION=yes
 	,
 )
@@ -136,6 +136,16 @@ AC_ARG_WITH(rtc,
 	,
         USE_RTC=no
 )
+
+AC_ARG_WITH(dclock,
+	AS_HELP_STRING(--with-dclock,Use Catamount dclock for timing.),
+	AC_DEFINE(USE_DCLOCK)
+	USE_DCLOCK=yes
+	TIMER_OPTION=yes
+	,
+        USE_DCLOCK=no
+)
+
 
 #
 #  Enable / Disable specifications
@@ -367,10 +377,16 @@ if test x$TIMER_FOUND = xno && test x$TIMER_OPTION = xno ; then
 fi
 
 # If specified, try to use clock_gettime
-if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xtrue" ; then
+if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xyes" ; then
   AC_CHECK_LIB(rt,clock_gettime, AC_DEFINE(USE_CLOCK_GETTIME) USE_CLOCK_GETTIME=true TIMER_FOUND=yes LIBS="$LIBS -lrt"
         echo "Using clock_gettime timer." 
   )
+fi
+
+# If specified, use dclock
+if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
+  AC_DEFINE(USE_DCLOCK) TIMER_FOUND=yes 
+  echo "Using dclock timer." 
 fi
 
 #  If none of the above are specified or found, use gettimeofday

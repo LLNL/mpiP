@@ -32,7 +32,7 @@ typedef double mpiP_TIMER;
 #elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
 #include "timers/crayx1_hw.h"
 
-#elif (defined(Catamount) && ! defined(USE_GETTIMEOFDAY) && ! defined(USE_WTIME))
+#elif (defined(Catamount) && defined(USE_DCLOCK))
 #include "timers/crayxt4.h"
 
 #elif defined(USE_RTS_GET_TIMEBASE)

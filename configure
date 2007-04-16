@@ -892,6 +892,7 @@ Optional Packages:
                           (default for AIX).
   --with-rtc              Use _rtc for timing on CRAY X1 systems (default for
                           X1).
+  --with-dclock           Use Catamount dclock for timing.
 
 Some influential environment variables:
   CC          C compiler command
@@ -1583,7 +1584,7 @@ if test "${with_clock_gettime+set}" = set; then
 #define USE_CLOCK_GETTIME 1
 _ACEOF
 
-	USE_CLOCK_GETTIME=true
+	USE_CLOCK_GETTIME=yes
 	TIMER_OPTION=yes
 
 fi;
@@ -1635,6 +1636,23 @@ else
   USE_RTC=no
 
 fi;
+
+
+# Check whether --with-dclock or --without-dclock was given.
+if test "${with_dclock+set}" = set; then
+  withval="$with_dclock"
+  cat >>confdefs.h <<\_ACEOF
+#define USE_DCLOCK 1
+_ACEOF
+
+	USE_DCLOCK=yes
+	TIMER_OPTION=yes
+
+else
+  USE_DCLOCK=no
+
+fi;
+
 
 #
 #  Enable / Disable specifications
@@ -5068,7 +5086,7 @@ fi
 fi
 
 # If specified, try to use clock_gettime
-if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xtrue" ; then
+if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xyes" ; then
   echo "$as_me:$LINENO: checking for clock_gettime in -lrt" >&5
 echo $ECHO_N "checking for clock_gettime in -lrt... $ECHO_C" >&6
 if test "${ac_cv_lib_rt_clock_gettime+set}" = set; then
@@ -5142,6 +5160,15 @@ _ACEOF
 
 fi
 
+fi
+
+# If specified, use dclock
+if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
+  cat >>confdefs.h <<\_ACEOF
+#define USE_DCLOCK 1
+_ACEOF
+ TIMER_FOUND=yes
+  echo "Using dclock timer."
 fi
 
 #  If none of the above are specified or found, use gettimeofday
@@ -5847,7 +5874,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5850:" \
+echo "$as_me:5877:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
