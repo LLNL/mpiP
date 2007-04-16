@@ -1,5 +1,37 @@
+2007-04-16  chcham
+
+	* ., Makefile.in, record_stack.c, util.c:
+	  Moved mpiPi_RecordTraceBack functions to record_stack.c for
+	  clarity.
+	* _timers.h, configure, configure.in, mpiPconfig.h.in:
+	  Added --with-dclock configure flag to specify use of dclock with
+	  Catamount.
+
+2007-04-13  chcham
+
+	* Makefile.in, make-wrappers.py, mpiPi.h.in, util.c:
+	  SiCortex/MIPS stack walking support commit.
+	* configure, configure.in, timers/linux_posix.h:
+	  Remove clock_gettime and configure default and use gettimeofday
+	  instead.
+	  Changed clock_gettime clock to CLOCK_MONOTONIC.
+	* configure.in:
+	  Remove CPPFLAGS and LDFLAGS init to "".
+	  Add default AR value.
+
+2007-01-24  rothpc
+
+	* _timers.h, timers/crayxt4.h:
+	  Added support for dclock timer on Cray XT3/XT4 instead of
+	  MPI_Wtime or
+	  gettimeofday. XT3/XT4 users should not pass --with-wtime or
+	  --with-gettimeofday
+	  when configuring.
+
 2007-01-04  chcham
 
+	* ChangeLog:
+	  3.1 ChangeLog commit.
 	* doc/UserGuide.html, doc/UserGuide.txt:
 	  UserGuide updates for 3.1 release.
 	* configure, configure.in:
