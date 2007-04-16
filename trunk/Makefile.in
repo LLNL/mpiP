@@ -37,6 +37,7 @@ SRCS =	diag_msgs.c \
 	report.c \
 	pcontrol.c \
 	mpiP-API.c \
+	record_stack.c \
 	${PC_LOOKUP_FILE}
 
 API_SRCS =	diag_msgs_api.c \
@@ -44,6 +45,7 @@ API_SRCS =	diag_msgs_api.c \
 	glob.c \
 	mpiPi.c \
 	util.c \
+	record_stack.c \
 	mpiP-API.c \
 	${PC_LOOKUP_FILE}
 
