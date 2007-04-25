@@ -191,7 +191,7 @@ ifeq ($(ENABLE_FORTRAN_XLATE), yes)
 endif
 
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
-	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --os=$(OS) --f77symbol $(F77_SYMBOLS) $^
+	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
 ifeq ($(ENABLE_API_ONLY), no)
 ${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h _timers.h
