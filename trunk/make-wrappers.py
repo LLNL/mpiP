@@ -717,7 +717,7 @@ def GenerateLookup():
 ###
 def CreateWrapper(funct, olist):
     global fdict
-    global operatingSystem
+    global arch
 
     if fdict[funct].nowrapper:
 	return
@@ -849,7 +849,7 @@ def CreateWrapper(funct, olist):
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
     olist.append("setjmp (jbuf);\n\n")
-    if ( operatingSystem == 'mips' ) :
+    if ( 'mips' in arch ) :
       olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
       olist.append("#if defined(mips) && defined (__GNUC__)\n")
       olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
@@ -977,7 +977,7 @@ def CreateWrapper(funct, olist):
 
     olist.append("setjmp (jbuf);\n\n")
 
-    if ( operatingSystem == 'mips' ) :
+    if ( 'mips' in arch ) :
       olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
       olist.append("#if defined(mips) && defined (__GNUC__)\n")
       olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
@@ -1107,7 +1107,7 @@ def CreateWrapper(funct, olist):
 def GenerateWrappers():
     global flist
     global fdict
-    global operatingSystem
+    global arch
 
     print "-----*----- Generating profiling wrappers"
     cwd = os.getcwd()
@@ -1122,7 +1122,7 @@ def GenerateWrappers():
 ####
 #### Handle MIPS+GCC specially by creating a variable to save the return address
 ####
-    if ( operatingSystem == 'mips' ) :
+    if ( 'mips' in arch  ) :
       olist.append("#if defined(mips) && defined(__GNUC__)\n")
       olist.append("  void* saved_ret_addr;\n")
       olist.append("#endif\n\n")
@@ -1173,9 +1173,9 @@ def main():
     global flist
     global f77symbol
     global doOpaqueXlate
-    global operatingSystem
+    global arch
 
-    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'os='])
+    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch='])
 
     print "MPI Wrapper Generator ($Revision$)"
     #print "opts=",opts
@@ -1183,15 +1183,15 @@ def main():
 
     f77symbol = 'symbol'
     doOpaqueXlate = False
-    operatingSystem = 'unknown'
+    arch = 'unknown'
     
     for o, a in opts:
         if o == '--f77symbol':
             f77symbol = a
         if o == '--xlate':
             doOpaqueXlate = True
-        if o == '--os':
-            operatingSystem = a
+        if o == '--arch':
+            arch = a
             
 
     ##### Load the input file
