@@ -33,7 +33,7 @@ typedef double mpiP_TIMER;
 #include "timers/crayx1_hw.h"
 
 #elif (defined(Catamount) && defined(USE_DCLOCK))
-#include "timers/crayxt4.h"
+#include "timers/crayxt.h"
 
 #elif defined(USE_RTS_GET_TIMEBASE)
 #include "timers/bgl_local.h"
