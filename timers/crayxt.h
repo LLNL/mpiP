@@ -6,13 +6,13 @@
 
    -----
 
-   crayxt4.h -- local high res timers
+   crayxt.h -- local high res timers
 
    $Id: $
 
 */
-#ifndef _CRAYXT4_LOCAL_H
-#define _CRAYXT4_LOCAL_H
+#ifndef _CRAYXT_LOCAL_H
+#define _CRAYXT_LOCAL_H
 
 /* without this #include, the code will compile but dclock() always
    returns the same value during a run
@@ -36,7 +36,7 @@
 
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %lf usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
 
-#endif /* _CRAYXT4_LOCAL_H */
+#endif /* _CRAYXT_LOCAL_H */
 
 /* 
 
