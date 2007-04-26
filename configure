@@ -706,6 +706,7 @@ READ_REAL_TIME
 DEFAULT_TARGS
 FORTRAN_GETARG_OBJ_FILE
 TEST_LIST
+slibdir
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files='FORTRAN_GETARG
@@ -6790,6 +6791,11 @@ ENABLE_BFD=$ENABLE_BFD
 
 
 
+if test "x${slibdir}" = x ; then
+  slibdir=$libdir
+fi
+
+
 ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h"
 
 
@@ -7488,11 +7494,12 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+slibdir!$slibdir$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 2; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 3; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
