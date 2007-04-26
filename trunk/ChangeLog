@@ -1,5 +1,39 @@
+2007-04-26  chcham
+
+	* mpip_timers, mpip_timers/aix_local.h.in,
+	  mpip_timers/aix_swclock.h, mpip_timers/bgl_local.h,
+	  mpip_timers/crayx1_hw.h, mpip_timers/crayxt.h,
+	  mpip_timers/linux_posix.h, mpip_timers/sunos-timers.h:
+	  Additional commit to change timer include file and directory
+	  names to make more sense if installed in common location.
+	* Makefile.in, _timers.h, configure, configure.in, mpiP-API.h,
+	  mpiPi.h.in, mpip_timers.h, timers:
+	  Changed timer include file and directory names to make more
+	  sense if installed in common location.
+	* Makefile.in, configure, configure.in:
+	  o Added greater install flexibility in Makefile.in by adding
+	  autoconf-determined directories.
+	  o Changed 'install' target to only install lib and doc files.
+	  Other targets install-api, install-bin, and install-all provide
+	  additional install functionality.
+	  o Now requires autoconf 2.61.
+	* mpiPi.h.in, record_stack.c:
+	  Minor formatting changes from indent.
+
+2007-04-25  chcham
+
+	* Makefile.in, make-wrappers.py:
+	  Change make-wrappers.py argument from 'os' to 'arch' to reflect
+	  use.
+	* _timers.h, timers/crayxt.h, timers/crayxt4.h:
+	  Renamed timers/crayxt4.h to crayxt.h at Phil's suggestion.
+
 2007-04-16  chcham
 
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  3.1.1 release updates.
+	* ChangeLog:
+	  Update for 3.1.1 release.
 	* record_stack.c:
 	  Id keyword correction.
 	* record_stack.c:
