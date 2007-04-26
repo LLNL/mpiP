@@ -3,7 +3,7 @@
                  mpiP: Lightweight, Scalable MPI Profiling
 
                                Version 3.1.1
-                               16 April 2007
+                               26 April 2007
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                               Chris Chambreau
@@ -87,6 +87,11 @@ Introduction
      * Revert to gettimeofday as default Linux timer.
      * MIPS64-Linux stack walking support.
      * Catamount dclock timer support.
+     * Greater install flexibility:
+          + 'install' target only installs lib and doc files.
+          + 'install-api',  'install-bin',  'install-all' targets provide
+            additional install functionality.
+          + New 'uninstall' target.
 
    Release v3.1 addresses the following issues:
      * Configure defaults to the optimal platform timer, but the timer can be
@@ -918,5 +923,5 @@ How to add MPI calls to profile
 
    For further information please send mail to mpip-help@lists.sourceforge.net.
 
-   Last modified on April 16th, 2007.
+   Last modified on April 26th, 2007.
    UCRL-CODE-223450
