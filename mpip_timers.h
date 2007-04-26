@@ -1,100 +1,67 @@
-/* -*- C -*- 
-
+/* -*- Mode: C; -*- 
 
    mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   -----
+   ----- 
 
-   @configure_input@
+   mpip_timers.h -- timer macros
 
-   local aix high res timers
-   
    $Id$
 
 */
 
-#ifndef _AIX_LOCAL_H
-#define _AIX_LOCAL_H
+#ifndef _MPITI_TIMERS_H
+#define _MPITI_TIMERS_H
 
-/* read_real_time returns nanoseconds */
+#define MSECS 1000
+#define USECS 1000000
+#define NSECS 1000000000
+
+#include <unistd.h>
+#include <sys/time.h>
+typedef double mpiP_TIMER;
+
+#if (defined(SunOS) && ! defined(USE_GETTIMEOFDAY))
+#include "mpip_timers/sunos_local.h"
+
+#elif (defined(AIX) && ! defined(USE_GETTIMEOFDAY))
+#include "mpip_timers/aix_local.h"
+
+#elif (defined(UNICOS_mp) && ! defined(USE_GETTIMEOFDAY))
+#include "mpip_timers/crayx1_hw.h"
+
+#elif (defined(Catamount) && defined(USE_DCLOCK))
+#include "mpip_timers/crayxt.h"
+
+#elif defined(USE_RTS_GET_TIMEBASE)
+#include "mpip_timers/bgl_local.h"
+
+#elif (defined(Linux) && defined(USE_CLOCK_GETTIME) && defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0))
+#include "mpip_timers/linux_posix.h"
+
+#elif defined(USE_WTIME)
 #define mpiPi_TIMER double
-#define mpiPi_TIMER_INIT(timer_addr) {*(timer_addr) = 0;}
-#define mpiPi_TIME timebasestruct_t
-#define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIME));}
-#define mpiPi_GETTIME(timeaddr) {@READ_REAL_TIME@(timeaddr,TIMEBASE_SZ);}
+#define mpiPi_TIME double
+#define mpiPi_TIMER_NAME "PMPI_Wtime"
+#define mpiPi_GETTIME(timeaddr) (*(timeaddr) = (PMPI_Wtime()*USECS))
+#define mpiPi_GETUSECS(timeaddr) (*(timeaddr))
+#define mpiPi_GETTIMEDIFF(end,start) ((*end)-(*start))
+#else
 
-extern void mpiPi_msg_warn (char *fmt, ...);
-
-static double
-_aix_cnvt_read_real_time (mpiPi_TIME * sample)
-{
-  time_base_to_time (sample, TIMEBASE_SZ);
-  return ((double) sample->tb_high * USECS) +
-    ((double) sample->tb_low / 1000);
-}
-
-#define mpiPi_GETUSECS(timeaddr) _aix_cnvt_read_real_time(timeaddr)
-
-
-static double
-_aix_cnvt_read_real_time_diff (mpiPi_TIME * end, mpiPi_TIME * start)
-{
-  int secs, nsecs;
-  double delta_usecs;
-
-#if defined(MPIP_CHECK_TIME)
-  mpiPi_TIME save_start, save_end;
-
-  if (1)
-    {
-      save_start.tb_high = start->tb_high;
-      save_start.tb_low = start->tb_low;
-      save_end.tb_high = end->tb_high;
-      save_end.tb_low = end->tb_low;
-    }
-#endif
-
-  time_base_to_time (start, TIMEBASE_SZ);
-  time_base_to_time (end, TIMEBASE_SZ);
-
-  secs = end->tb_high - start->tb_high;
-  nsecs = end->tb_low - start->tb_low;
-
-  if (nsecs < 0)
-    {
-      secs--;
-      nsecs += 1000000000;
-    }
-
-  delta_usecs = ((double) secs * USECS) + ((double) nsecs / 1000);
-
-#if defined(MPIP_CHECK_TIME)
-
-  if (delta_usecs < 0)
-    {
-      mpiPi_msg_warn ("Found negative time value.\n");
-      mpiPi_msg_warn ("       delta_usecs is %f\n", delta_usecs);
-      mpiPi_msg_warn ("             nsecs is %d\n", nsecs);
-      mpiPi_msg_warn ("              secs is %d\n", secs);
-      mpiPi_msg_warn ("save_start.tb_high is %u\n", save_start.tb_high);
-      mpiPi_msg_warn (" save_start.tb_low is %u\n", save_start.tb_low);
-      mpiPi_msg_warn ("  save_end.tb_high is %u\n", save_end.tb_high);
-      mpiPi_msg_warn ("   save_end.tb_low is %u\n", save_end.tb_low);
-      mpiPi_msg_warn ("    start->tb_high is %u\n", start->tb_high);
-      mpiPi_msg_warn ("     start->tb_low is %u\n", start->tb_low);
-      mpiPi_msg_warn ("      end->tb_high is %u\n", end->tb_high);
-      mpiPi_msg_warn ("       end->tb_low is %u\n", end->tb_low);
-    }
-#endif
-
-  return delta_usecs;
-}
-
-#define mpiPi_GETTIMEDIFF(end,start) _aix_cnvt_read_real_time_diff(end,start)
+/* gettimeofday returns microseconds */
+#define mpiPi_TIMER double
+#define mpiPi_TIME struct timeval
+#define mpiPi_TIMER_NAME "gettimeofday"
+#define mpiPi_ASNTIME(lhs,rhs) {bcopy(rhs, lhs, sizeof(mpiPi_TIMER));}
+#define mpiPi_GETTIME(timeaddr) gettimeofday(timeaddr,NULL)
+#define mpiPi_GETUSECS(timeaddr) (((mpiPi_TIMER)(timeaddr)->tv_sec)*USECS+((mpiPi_TIMER)(timeaddr)->tv_usec))
+#define mpiPi_PRINTTIME(taddr) printf("Time is %ld sec and %ld usec.\n", (taddr)->tv_sec, (taddr)->tv_usec)
+#define mpiPi_GETTIMEDIFF(end,start) ((mpiP_TIMER)((((mpiPi_TIMER)(end)->tv_sec)*USECS)+(end)->tv_usec)-((((mpiPi_TIMER)(start)->tv_sec)*USECS)+(start)->tv_usec))
 #define mpiPi_PRINTTIMEDIFF(end,start) {printf("Time diff is %ld usecs.\n",mpiPi_GETTIMEDIFF(end,start));}
-#define mpiPi_TIMER_NAME "@READ_REAL_TIME@"
+
+#endif
 
 #endif
 
@@ -168,4 +135,4 @@ advertising or product endorsement purposes.
 
 */
 
-/* eof */
+/* EOF */
