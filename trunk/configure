@@ -6790,7 +6790,7 @@ ENABLE_BFD=$ENABLE_BFD
 
 
 
-ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f timers/aix_local.h"
+ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h"
 
 
 
@@ -7281,7 +7281,7 @@ do
     "mpiPi.h") CONFIG_FILES="$CONFIG_FILES mpiPi.h" ;;
     "mpi.protos.txt") CONFIG_FILES="$CONFIG_FILES mpi.protos.txt" ;;
     "get_fortran_arg.f") CONFIG_FILES="$CONFIG_FILES get_fortran_arg.f" ;;
-    "timers/aix_local.h") CONFIG_FILES="$CONFIG_FILES timers/aix_local.h" ;;
+    "mpip_timers/aix_local.h") CONFIG_FILES="$CONFIG_FILES mpip_timers/aix_local.h" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

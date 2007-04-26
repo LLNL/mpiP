@@ -200,9 +200,9 @@ wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
 ifeq ($(ENABLE_API_ONLY), no)
-${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h _timers.h
+${OBJS}: mpiPconfig.h mpiPi.h mpiPi_def.h mpiPi_proto.h symbols.h mpip_timers.h
 else
-${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h _timers.h
+${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h mpip_timers.h
 endif
 
 install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} 
@@ -215,10 +215,10 @@ install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	fi
 
 install-api: API
-	mkdir -p ${libdir} ${includedir}/timers 
+	mkdir -p ${libdir} ${includedir}/mpip_timers 
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
-	${INSTALL} mpiP-API.h _timers.h ${includedir}
-	${INSTALL} timers/*h ${includedir}/timers
+	${INSTALL} mpiP-API.h mpip_timers.h ${includedir}
+	${INSTALL} mpip_timers/*h ${includedir}/mpip_timers
 
 install-bin:
 	mkdir -p ${bindir}
@@ -240,7 +240,7 @@ uninstall:
 	if test "x${SHARED_FORTRAN_TARGET}" != "x" && test -e ${slibdir}/${SHARED_FORTRAN_TARGET} ; then rm -f ${slibdir}/${SHARED_FORTRAN_TARGET} ; fi ; \
 	if test "x${SHARED_DEMANGLE_TARGET}" != "x" && test -e ${slibdir}/${SHARED_DEMANGLE_TARGET} ; then rm -f ${slibdir}/${SHARED_DEMANGLE_TARGET} ; fi ; \
 	rm -rf ${docdir} ; \
-	echo Not attempting to remove mpiP include files _timers.h and timers directory. ; \
+	rm -rf ${includedir}/mpip_timers.h ${includedir}/mpip_timers ; \
 	rm -f ${includedir}/mpiP-API.h ; \
 	fi
 
@@ -262,11 +262,11 @@ lint: ${SRCS}
 	${LINT} -Dlint -I. ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f timers/aix_local.h
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f mpip_timers/aix_local.h
 
 include Check.mak
 
 indent:
-	indent -gnu *.c *.h *.h.in testing/*.c timers/*.h timers/*.h.in
+	indent -gnu *.c *.h *.h.in testing/*.c mpip_timers/*.h mpip_timers/*.h.in
 
 ##### EOF
