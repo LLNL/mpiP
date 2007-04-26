@@ -5,18 +5,24 @@
 
 srcdir=@srcdir@
 prefix=@prefix@
-libdir=${prefix}/lib
+exec_prefix=@exec_prefix@
+libdir=@libdir@
 includedir=@includedir@
-docdir=${prefix}/doc
-slibdir=${prefix}/slib
-bindir=${prefix}/bin
+slibdir=@libdir@
+bindir=@bindir@
+datarootdir=@datarootdir@
+datadir=@datadir@
 VPATH = ${srcdir}
+
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+docdir=@docdir@
 
 include Defs.mak
 
-.PHONY: default all install clean api API shared proto merged-install \
-  cleanobjs test add_binutils_objs add_libunwind_objs TAGS cleanobjs distclean \
-  lint indent proto
+.PHONY: default all clean api API shared proto cleanobjs test \
+        add_binutils_objs add_libunwind_objs TAGS cleanobjs distclean \
+        lint indent proto install merged-install install-api install-bin \
+        install-all
 
 default: @DEFAULT_TARGS@
 
@@ -199,29 +205,44 @@ else
 ${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h _timers.h
 endif
 
-install::
-	mkdir -p ${libdir} ${includedir}/timers ${docdir} ${bindir}
-	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
-	  ${INSTALL} doc/*txt doc/*html doc/README ${docdir} ; \
-	  ${INSTALL} bin/*mpip* ${bindir} ; \
-	fi
-
-ifeq ($(ENABLE_API_ONLY), no)
-install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} API
+install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} 
+	mkdir -p ${libdir} ${docdir}
 	${INSTALL} ${C_TARGET} ${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${libdir}/${FORTRAN_TARGET} ; fi
+	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
+	  ${INSTALL} doc/*txt doc/*html doc/README ${docdir} ; \
+	fi
+
+install-api: API
+	mkdir -p ${libdir} ${includedir}/timers 
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
 	${INSTALL} mpiP-API.h _timers.h ${includedir}
 	${INSTALL} timers/*h ${includedir}/timers
-else
-install:: API
-	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${libdir}/${API_TARGET} ; fi
-	${INSTALL} mpiP-API.h _timers.h ${includedir}
-	${INSTALL} timers/*h ${includedir}/timers
-endif
+
+install-bin:
+	mkdir -p ${bindir}
+	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
+	  ${INSTALL} bin/*mpip* ${bindir} ; \
+	fi
+
+install-all: install install-api install-bin 
 
 merged-install: add_binutils_objs add_libunwind_objs install
+
+uninstall:
+	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
+	rm -f ${bindir}/mpip-insert-src ${bindir}/mpirun-mpip ${bindir}/srun-mpip ; \
+	rm -f ${libdir}/${C_TARGET} ; \
+	if test "x${DEMANGLE_TARGET}" != "x" ; then rm -f ${libdir}/${DEMANGLE_TARGET} ; fi ; \
+	if test "x${FORTRAN_TARGET}" != "x" ; then rm -f ${libdir}/${FORTRAN_TARGET} ; fi ; \
+	if test "x${SHARED_C_TARGET}" != "x" && test -e ${slibdir}/${SHARED_C_TARGET} ; then rm -f ${slibdir}/${SHARED_C_TARGET} ; fi ; \
+	if test "x${SHARED_FORTRAN_TARGET}" != "x" && test -e ${slibdir}/${SHARED_FORTRAN_TARGET} ; then rm -f ${slibdir}/${SHARED_FORTRAN_TARGET} ; fi ; \
+	if test "x${SHARED_DEMANGLE_TARGET}" != "x" && test -e ${slibdir}/${SHARED_DEMANGLE_TARGET} ; then rm -f ${slibdir}/${SHARED_DEMANGLE_TARGET} ; fi ; \
+	rm -rf ${docdir} ; \
+	echo Not attempting to remove mpiP include files _timers.h and timers directory. ; \
+	rm -f ${includedir}/mpiP-API.h ; \
+	fi
 
 proto:
 	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed -e '/find_address/d' -e '/Dwarf/d' > mpiPi_proto.h
