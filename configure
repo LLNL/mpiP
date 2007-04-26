@@ -2452,9 +2452,7 @@ yes:)
 { echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
 whose name does not start with the host triplet.  If you think this
 configuration is useful to you, please write to autoconf@gnu.org." >&5
-echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
-whose name does not start with the host triplet.  If you think this
-configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+}
 ac_tool_warned=yes ;;
 esac
     RANLIB=$ac_ct_RANLIB
