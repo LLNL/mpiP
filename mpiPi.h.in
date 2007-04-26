@@ -35,7 +35,7 @@
 
 #include "mpiP-hash.h"
 
-#include "_timers.h"
+#include "mpip_timers.h"
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
 #define MPIP_CALLSITE_STACK_DEPTH_MAX @STACKDEPTH@
