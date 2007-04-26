@@ -257,7 +257,7 @@ extern void *MPIR_ToPointer (int idx);
 #define ParentFP(jb) (0)
 #define FramePC(fp) (0)
 #define NextFP(fp) (0)
-extern void* saved_ret_addr;
+extern void *saved_ret_addr;
 
 
 /*  undefined  */
