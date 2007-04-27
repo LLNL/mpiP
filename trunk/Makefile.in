@@ -171,7 +171,7 @@ add_binutils_objs:
 add_libunwind_objs:
 	-mkdir mpip_temp_obj_dir
 	cd mpip_temp_obj_dir ; \
-	ar -x ${BIN_TYPE_FLAG} /usr/lib/libunwind.a ; \
+	ar -x ${BIN_TYPE_FLAG} @LIBUNWIND_LOC@ ; \
 	ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
 	if [ "${FORTRAN_TARGET}" ]; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
