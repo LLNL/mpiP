@@ -1,5 +1,24 @@
+2007-04-27  chcham
+
+	* Makefile.in:
+	  Additional changes to support library merging targtets, given
+	  multiple objects with the same name in libunwind.
+	* Makefile.in, configure, configure.in:
+	  Configure flag to specify location of libunwind for merging
+	  convenience.
+
 2007-04-26  chcham
 
+	* Makefile.in:
+	  Correctly substitute slibdir during configuration.
+	* configure, configure.in:
+	  Minor configure changes.
+	* configure, configure.in:
+	  Slight changes for LLNL convenience to allow separate shared lib
+	  dir, as specified with env variable slibdir. If not defined,
+	  shared lib go in libdir.
+	* ChangeLog, doc/UserGuide.html, doc/UserGuide.txt:
+	  Release doc and changelog updates.
 	* mpip_timers, mpip_timers/aix_local.h.in,
 	  mpip_timers/aix_swclock.h, mpip_timers/bgl_local.h,
 	  mpip_timers/crayx1_hw.h, mpip_timers/crayxt.h,
