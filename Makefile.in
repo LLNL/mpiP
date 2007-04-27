@@ -12,6 +12,7 @@ slibdir=@slibdir@
 bindir=@bindir@
 datarootdir=@datarootdir@
 datadir=@datadir@
+libunwind_loc=@LIBUNWIND_LOC@
 VPATH = ${srcdir}
 
 PACKAGE_TARNAME=@PACKAGE_TARNAME@
@@ -165,18 +166,30 @@ add_binutils_objs:
 	    ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi ; \
 	fi ; \
 	if [ "x${API_TARGET}" != "x" ]; then \
-	  ar -q ${BIN_TYPE_FLAG} ../${API_TARGET} *.o ; fi ; 
+	  ar -q ${BIN_TYPE_FLAG} ../${API_TARGET} *.o ; fi ; \
+	cd .. ; \
 	rm -rf mpip_temp_obj_dir
 
 add_libunwind_objs:
 	-mkdir mpip_temp_obj_dir
 	cd mpip_temp_obj_dir ; \
-	ar -x ${BIN_TYPE_FLAG} @LIBUNWIND_LOC@ ; \
-	ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
+	cp ${libunwind_loc} ./${C_TARGET} ; \
+	ar x ../${C_TARGET} ; \
+	ar -q ${BIN_TYPE_FLAG} ./${C_TARGET} ./*.o ; \
+	mv ./${C_TARGET} .. ; \
 	if [ "${FORTRAN_TARGET}" ]; then \
-	  ar -q ${BIN_TYPE_FLAG} ../${FORTRAN_TARGET} *.o ; fi ; \
+	  rm *.o ; \
+	  cp ${libunwind_loc} ./${FORTRAN_TARGET} ; \
+	  ar x ../${FORTRAN_TARGET} ; \
+	  ar -q ${BIN_TYPE_FLAG} ./${FORTRAN_TARGET} ./*.o ; \
+	  mv ./${FORTRAN_TARGET} .. ; fi ; \
 	if [ "${DEMANGLE_TARGET}" ]; then \
-	  ar -q ${BIN_TYPE_FLAG} ../${DEMANGLE_TARGET} *.o ; fi
+	  rm *.o ; \
+	  cp ${libunwind_loc} ./${DEMANGLE_TARGET} ; \
+	  ar x ../${DEMANGLE_TARGET} ; \
+	  ar -q ${BIN_TYPE_FLAG} ./${DEMANGLE_TARGET} ./*.o ; \
+	  mv ./${DEMANGLE_TARGET} .. ; fi ; \
+	cd .. ; \
 	rm -rf mpip_temp_obj_dir
 
 TAGS: ${SRCS}
