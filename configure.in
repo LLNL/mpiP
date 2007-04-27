@@ -74,6 +74,15 @@ AC_ARG_WITH(binutils-dir,
 )
 AC_SUBST(BINUTILS_DIR)
 
+AC_ARG_WITH(libunwind,
+	AS_HELP_STRING(--with-libunwind,Specify location of libunwind to merge.),
+	LIBUNWIND_LOC=$withval
+	echo Using libunwind: $withval
+	,
+	LIBUNWIND_LOC=/usr/lib/libunwind.a
+)
+AC_SUBST(LIBUNWIND_LOC)
+
 AC_ARG_WITH(bin-type-flag,
 	AS_HELP_STRING(--with-bin-type-flag,Binary format for AIX ar operations.),
 	BIN_TYPE_FLAG=$withval
