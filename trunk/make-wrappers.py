@@ -732,7 +732,10 @@ def CreateWrapper(funct, olist):
     #####
 
     ##### funct decl
-    olist.append("\nstatic int mpiPif_" + funct + "( jmp_buf * base_jbuf, " )
+    if ( 'mips' in arch ) :
+        olist.append("\nstatic int mpiPif_" + funct + "( void **base_jbuf, " )
+    else :
+        olist.append("\nstatic int mpiPif_" + funct + "( jmp_buf * base_jbuf, " )
     # add parameters
     for i in fdict[funct].paramConciseList:
 
@@ -836,25 +839,26 @@ def CreateWrapper(funct, olist):
     olist.append("}" + " /* " + funct + " */\n\n")
 
 
-    decl =    "\n" \
-	   + "int rc;\n" \
-	   + "jmp_buf jbuf;\n"
+    if ( 'mips' in arch ) :
+    	decl =    "\nint rc;\n"
+    else :
+	decl =    "\nint rc;\njmp_buf jbuf;\n"
     
 
     #####
     ##### C wrapper
     #####
     olist.append("\n\nextern " + fdict[funct].protoline + "{" )
-    olist.append(decl)
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
-    olist.append("setjmp (jbuf);\n\n")
+    olist.append(decl)
     if ( 'mips' in arch ) :
-      olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
-      olist.append("#if defined(mips) && defined (__GNUC__)\n")
-      olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
-      olist.append("#endif\n\n")
-    olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
+      olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
+      olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )
+    else :
+      olist.append("setjmp (jbuf);\n\n")
+      olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
+
     for i in fdict[funct].paramConciseList:
 	if (fdict[funct].paramDict[i].pointerLevel == 0) \
 	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
@@ -975,13 +979,10 @@ def CreateWrapper(funct, olist):
     if fdict[funct].wrapperPreList:
 	    olist.extend(fdict[funct].wrapperPreList)
 
-    olist.append("setjmp (jbuf);\n\n")
-
     if ( 'mips' in arch ) :
-      olist.append("/* For MIPS+GCC we get a single level of stack backtrace using an intrinsic */\n")
-      olist.append("#if defined(mips) && defined (__GNUC__)\n")
-      olist.append("  saved_ret_addr = __builtin_return_address(0);\n")
-      olist.append("#endif\n\n")
+      olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
+    else :
+      olist.append("setjmp (jbuf);\n\n")
 
     #  Allocate any arrays used for translation
     for i in range(len(xlateVarNames)) :
@@ -1034,7 +1035,10 @@ def CreateWrapper(funct, olist):
             xlateDone = 1
             
     #  Start generating call to C/Fortran common mpiP wrapper function        
-    olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )    
+    if ( 'mips' in arch ) :
+        olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )    
+    else :
+        olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )    
     argname = ""
 
     #  Iterate through mpiP wrapper function arguments, replacing argument with C version where appropriate
@@ -1119,13 +1123,6 @@ def GenerateWrappers():
     olist.append("#include \"symbols.h\"\n")
     olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
-####
-#### Handle MIPS+GCC specially by creating a variable to save the return address
-####
-    if ( 'mips' in arch  ) :
-      olist.append("#if defined(mips) && defined(__GNUC__)\n")
-      olist.append("  void* saved_ret_addr;\n")
-      olist.append("#endif\n\n")
 
     for funct in flist:
 	CreateWrapper(funct, olist)

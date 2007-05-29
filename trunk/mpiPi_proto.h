@@ -62,7 +62,11 @@ extern void mpiPi_profile_print (FILE * fp, int report_style);
 extern void mpiPi_profile_print_verbose (FILE * fp);
 extern void mpiPi_profile_print_concise (FILE * fp);
 extern char *GetBaseAppName (char *rawName);
+#if defined(mips)
+extern int mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back);
+#else
 extern int mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back);
+#endif
 extern void mpiPi_getenv (void);
 extern char *getProcExeLink (void);
 extern void getProcCmdLine (int *ac, char **av);
