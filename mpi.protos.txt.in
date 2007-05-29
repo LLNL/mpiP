@@ -219,6 +219,11 @@ directives
 	nowrapper
 directives
 
+int MPI_Init_thread ( int *argc, char ***argv, int required, int *provided )
+directives
+	nowrapper
+directives
+
 int MPI_Initialized ( int *flag )
 directives
 	nowrapper

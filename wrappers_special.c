@@ -100,6 +100,85 @@ F77_MPI_INIT (int *ierr)
 }
 
 
+/* ----- INIT_thread -------------------------------------------------- */
+
+static int
+_MPI_Init_thread (int *argc, char ***argv, int required, int *provided)
+{
+  int rc = 0;
+  int enabledStatus;
+
+  enabledStatus = mpiPi.enabled;
+  mpiPi.enabled = 0;
+
+  rc = PMPI_Init_thread (argc, argv, required, provided);
+
+  mpiPi.enabled = enabledStatus;
+
+#if defined(Linux) && ! defined(ppc64)
+  mpiPi.appFullName = getProcExeLink ();
+  mpiPi_msg_debug ("appFullName is %s\n", mpiPi.appFullName);
+  mpiPi_init (GetBaseAppName (mpiPi.appFullName));
+#else
+  if (argv != NULL && *argv != NULL && **argv != NULL)
+    {
+      mpiPi_init (GetBaseAppName (**argv));
+      mpiPi.appFullName = strdup (**argv);
+    }
+  else
+    {
+      mpiPi_init ("Unknown");
+      mpiPi_msg_debug ("argv is NULL\n");
+    }
+#endif
+
+  return rc;
+}
+
+extern int
+MPI_Init_thread (int *argc, char ***argv, int required, int *provided)
+{
+  int rc = 0;
+
+  mpiPi.toolname = "mpiP";
+
+  rc = _MPI_Init_thread (argc, argv, required, provided);
+
+  if (argc != NULL && argv != NULL)
+    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
+  else
+    {
+#ifdef Linux
+      getProcCmdLine (&(mpiPi.ac), mpiPi.av);
+#else
+      mpiPi.ac = 0;
+#endif
+    }
+
+  return rc;
+}
+
+extern void
+F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
+{
+  int rc = 0;
+  char **tmp_argv;
+
+  mpiPi.toolname = "mpiP";
+#ifdef Linux
+  getProcCmdLine (&(mpiPi.ac), mpiPi.av);
+#else
+  mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, 32);
+#endif
+
+  tmp_argv = mpiPi.av;
+  rc = _MPI_Init_thread (&(mpiPi.ac), (char ***) &tmp_argv, *required, provided);
+  *ierr = rc;
+
+  return;
+}
+
+
 /* ----- FINALIZE -------------------------------------------------- */
 
 static int
