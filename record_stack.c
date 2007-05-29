@@ -144,22 +144,10 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
    * of stack backtrace
    */
 int
-mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back)
 {
-  mpiPi_msg_debug
-    ("Using saved address on this MIPS arch (max traceback=1)\n");
-  if (max_back == 0)
-    return 0;
-
-  /* For MIPS under GNUC, we can only handle a traceback upto one level */
-  if (max_back > 1)
-    {
-      mpiPi_msg_warn
-	("We only support a single level of stack backtrace on MIPS currently\n"
-	 "Using the a traceback of 1, instead\n");
-    }
-  pc_array[0] = (void *) ((char *) saved_ret_addr - 1);
-  pc_array[1] = '\0';
+  pc_array[0] = (void *) ((char *) pc - 1);
+  pc_array[1] = NULL ;
   return 1;
 }
 
