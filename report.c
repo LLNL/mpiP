@@ -11,8 +11,7 @@
 */
 
 #ifndef lint
-static char *svnid =
-  "$Id$";
+static char *svnid = "$Id$";
 #endif
 
 #include <math.h>
@@ -820,7 +819,7 @@ mpiPi_print_concise_callsite_time_info (FILE * fp)
   qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
   callsite_stats =
     (mpiPi_callsite_summary_t *) malloc (sizeof (mpiPi_callsite_summary_t) *
-					 callsite_src_id_cache->size);
+					 callsite_src_id_cache->count);
 
   if (callsite_stats == NULL)
     {
@@ -841,6 +840,12 @@ mpiPi_print_concise_callsite_time_info (FILE * fp)
       {
 	if (i != 0 && (av[i]->csid != av[i - 1]->csid))
 	  {
+	    if (csidx >= callsite_src_id_cache->count)
+	      {
+		mpiPi_msg_warn
+		  ("Concise callsite time report encountered index out of bounds.\n");
+		return;
+	      }
 	    callsite_stats[csidx].name =
 	      &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]);
 	    callsite_stats[csidx].site = av[i - 1]->csid;
@@ -1021,7 +1026,7 @@ mpiPi_print_concise_callsite_sent_info (FILE * fp)
   qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
   callsite_stats =
     (mpiPi_callsite_summary_t *) malloc (sizeof (mpiPi_callsite_summary_t) *
-					 callsite_src_id_cache->size);
+					 callsite_src_id_cache->count);
 
   if (callsite_stats == NULL)
     {
@@ -1044,6 +1049,12 @@ mpiPi_print_concise_callsite_sent_info (FILE * fp)
 	  {
 	    if (sCumulative > 0)
 	      {
+		if (csidx >= callsite_src_id_cache->count)
+		  {
+		    mpiPi_msg_warn
+		      ("Concise callsite sent report encountered index out of bounds.\n");
+		    return;
+		  }
 		callsite_stats[csidx].name =
 		  &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]);
 		callsite_stats[csidx].site = av[i - 1]->csid;
@@ -1233,7 +1244,7 @@ mpiPi_print_concise_callsite_io_info (FILE * fp)
       qsort (av, ac, sizeof (void *), callsite_sort_by_name_id_rank);
       callsite_stats =
 	(mpiPi_callsite_summary_t *) malloc (sizeof (mpiPi_callsite_summary_t)
-					     * callsite_src_id_cache->size);
+					     * callsite_src_id_cache->count);
 
       if (callsite_stats == NULL)
 	{
@@ -1256,6 +1267,12 @@ mpiPi_print_concise_callsite_io_info (FILE * fp)
 	      {
 		if (sCumulative > 0)
 		  {
+		    if (csidx >= callsite_src_id_cache->count)
+		      {
+			mpiPi_msg_warn
+			  ("Concise callsite i/o report encountered index out of bounds.\n");
+			return;
+		      }
 		    callsite_stats[csidx].name =
 		      &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]);
 		    callsite_stats[csidx].site = av[i - 1]->csid;
