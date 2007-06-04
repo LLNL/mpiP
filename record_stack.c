@@ -147,7 +147,6 @@ int
 mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back)
 {
   pc_array[0] = (void *) ((char *) pc - 1);
-  pc_array[1] = NULL ;
   return 1;
 }
 
