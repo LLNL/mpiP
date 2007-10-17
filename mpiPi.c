@@ -11,8 +11,7 @@
  */
 
 #ifndef lint
-static char *svnid =
-  "$Id$";
+static char *svnid = "$Id$";
 #endif
 
 #include <string.h>
@@ -262,8 +261,8 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 	}
       else
 	{
-	  mpiPi_msg_warn ("Unsuccessful Source lookup for [%s]\n",
-			  mpiP_format_address (pc, addr_buf));
+	  mpiPi_msg_debug ("Unsuccessful Source lookup for [%s]\n",
+			   mpiP_format_address (pc, addr_buf));
 	  csp->filename = strdup ("[unknown]");
 	  csp->functname = strdup ("[unknown]");
 	  csp->line = 0;
