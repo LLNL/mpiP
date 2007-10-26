@@ -222,6 +222,7 @@ AC_ARG_ENABLE(fortranxlate,
 )
 AC_SUBST(ENABLE_FORTRAN_XLATE)
 
+ENABLE_FORTRAN_WEAK_SYMS=no
 AC_ARG_ENABLE(fortranweak,
         AS_HELP_STRING(--enable-fortranweak,Generate weak symbols for additional Fortran symbol name styles.),
         if test "$enable_fortranweak" = "no" ; then
@@ -229,13 +230,13 @@ AC_ARG_ENABLE(fortranweak,
                   echo Generation of additional weak FORTRAN symbol names has been disabled.
         else
                 ENABLE_FORTRAN_WEAK_SYMS=yes
+                AC_DEFINE(ENABLE_FORTRAN_WEAK_SYMS)
                 echo Generation of additional weak FORTRAN symbol names has been enabled.
         fi
         ,
-        ENABLE_FORTRAN_WEAK_SYMS=yes
+        ENABLE_FORTRAN_WEAK_SYMS=no
 )
 AC_SUBST(ENABLE_FORTRAN_WEAK_SYMS)
-AC_DEFINE(ENABLE_FORTRAN_WEAK_SYMS)
 
 AC_ARG_ENABLE(stackdepth,
 	AS_HELP_STRING(--enable-stackdepth,Specify maximum stacktrace depth (default is 8).),
