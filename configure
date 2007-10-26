@@ -2221,6 +2221,7 @@ fi
 
 
 
+ENABLE_FORTRAN_WEAK_SYMS=no
 # Check whether --enable-fortranweak was given.
 if test "${enable_fortranweak+set}" = set; then
   enableval=$enable_fortranweak; if test "$enable_fortranweak" = "no" ; then
@@ -2228,18 +2229,18 @@ if test "${enable_fortranweak+set}" = set; then
                   echo Generation of additional weak FORTRAN symbol names has been disabled.
         else
                 ENABLE_FORTRAN_WEAK_SYMS=yes
+                cat >>confdefs.h <<\_ACEOF
+#define ENABLE_FORTRAN_WEAK_SYMS 1
+_ACEOF
+
                 echo Generation of additional weak FORTRAN symbol names has been enabled.
         fi
 
 else
-  ENABLE_FORTRAN_WEAK_SYMS=yes
+  ENABLE_FORTRAN_WEAK_SYMS=no
 
 fi
 
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_FORTRAN_WEAK_SYMS 1
-_ACEOF
 
 
 # Check whether --enable-stackdepth was given.
