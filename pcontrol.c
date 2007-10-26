@@ -18,6 +18,9 @@ static char *svnid =
 #include <float.h>
 #include "mpiPi.h"
 #include "symbols.h"
+#ifdef ENABLE_FORTRAN_WEAK_SYMS
+#include "weak-symbols-pcontrol.h"
+#endif
 
 void
 mpiPi_reset_callsite_data ()

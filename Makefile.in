@@ -209,6 +209,12 @@ ifeq ($(ENABLE_FORTRAN_XLATE), yes)
   MAKE_WRAPPERS_ARGS += --xlate
 endif
 
+ENABLE_FORTRAN_WEAK_SYMS = @ENABLE_FORTRAN_WEAK_SYMS@
+ifeq ($(ENABLE_FORTRAN_WEAK_SYMS), yes)
+  MAKE_WRAPPERS_ARGS += --weak
+endif
+
+
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
@@ -275,7 +281,7 @@ lint: ${SRCS}
 	${LINT} -Dlint -I. ${CFLAGS} ${CPPFLAGS} ${MPIINC} -c ${SRCS}
 
 distclean: clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f mpip_timers/aix_local.h
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak
 
 include Check.mak
 
