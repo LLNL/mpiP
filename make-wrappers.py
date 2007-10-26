@@ -1112,6 +1112,7 @@ def GenerateWrappers():
     global flist
     global fdict
     global arch
+    global doWeakSymbols
 
     print "-----*----- Generating profiling wrappers"
     cwd = os.getcwd()
@@ -1121,6 +1122,9 @@ def GenerateWrappers():
     olist = StandardFileHeader(sname)
     olist.append("#include \"mpiPi.h\"\n")
     olist.append("#include \"symbols.h\"\n")
+    if doWeakSymbols == True :
+      olist.append("#include \"weak-symbols.h\"\n")
+      
     olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
 
@@ -1131,6 +1135,68 @@ def GenerateWrappers():
     olist.append("/* eof */\n")
     g.writelines(olist)
     g.close()
+
+
+def GetFortranSymbol(fsymtp, fsym) :
+        ofsym = ""
+
+        if fsymtp == 'symbol':
+                        ofsym = string.lower(fsym)
+        elif fsymtp == 'symbol_':
+                        ofsym = string.lower(fsym) + "_"
+        elif fsymtp == 'symbol__':
+                        ofsym = string.lower(fsym) + "__"
+        elif fsymtp == 'SYMBOL':
+                        ofsym = string.upper(fsym)
+        elif fsymtp == 'SYMBOL_':
+                        ofsym = string.upper(fsym) + "_"
+        elif fsymtp == 'SYMBOL__':
+                        ofsym = string.upper(fsym) + "__"
+
+        return ofsym
+
+
+def GenerateWeakSymbols():
+    global flist
+    global f77symbol
+
+    #
+    # Generate Weak Symbols
+    #
+
+    cwd = os.getcwd()
+    os.chdir(cwd)
+    sname = cwd + "/weak-symbols.h"
+    g = open(sname, "w")
+
+    sname = cwd + "/weak-symbols-special.h"
+    s = open(sname, "w")
+
+    sname = cwd + "/weak-symbols-pcontrol.h"
+    p = open(sname, "w")
+        
+    fmlist = ['symbol', 'symbol_', 'symbol__', 'SYMBOL', 'SYMBOL_', 'SYMBOL__' ]
+    if f77symbol in fmlist :
+      fmlist.remove(f77symbol)
+			
+    symflist = copy.deepcopy(flist)
+
+    for funct in symflist:
+      dfunc = GetFortranSymbol(f77symbol, funct)
+    	
+      for mt in fmlist:
+        wfunc = GetFortranSymbol(mt, funct)
+        if funct in [ 'MPI_Init', 'MPI_Init_thread', 'MPI_Finalize'] :  
+          s.write("#pragma weak " + wfunc + " = " + dfunc + "\n")
+        elif 'Pcontrol' in funct :
+          p.write("#pragma weak " + wfunc + " = " + dfunc + "\n")
+        elif fdict[funct].nowrapper == 0 :
+          g.write("#pragma weak " + wfunc + " = " + dfunc + "\n")
+
+    g.close()
+    p.close()
+    s.close()
+
 
 def GenerateSymbolDefs():
     global flist
@@ -1171,8 +1237,9 @@ def main():
     global f77symbol
     global doOpaqueXlate
     global arch
+    global doWeakSymbols
 
-    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch='])
+    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch=', 'weak'])
 
     print "MPI Wrapper Generator ($Revision$)"
     #print "opts=",opts
@@ -1180,6 +1247,7 @@ def main():
 
     f77symbol = 'symbol'
     doOpaqueXlate = False
+    doWeakSymbols = False
     arch = 'unknown'
     
     for o, a in opts:
@@ -1187,6 +1255,8 @@ def main():
             f77symbol = a
         if o == '--xlate':
             doOpaqueXlate = True
+        if o == '--weak':
+            doWeakSymbols = True
         if o == '--arch':
             arch = a
             
@@ -1204,6 +1274,8 @@ def main():
     GenerateStructureFile()
     GenerateWrappers()
     GenerateSymbolDefs()
+    if doWeakSymbols == True :
+      GenerateWeakSymbols()
     GenerateLookup()
 
 

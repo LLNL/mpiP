@@ -672,6 +672,7 @@ LIBUNWIND_LOC
 BIN_TYPE_FLAG
 DISABLE_MPI_IO
 ENABLE_FORTRAN_XLATE
+ENABLE_FORTRAN_WEAK_SYMS
 STACKDEPTH
 USE_LIBDWARF
 PC_LOOKUP_FILE
@@ -1303,6 +1304,8 @@ Optional Features:
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-fortranxlate  Disable translation of Fortran opaque objects.
+  --enable-fortranweak    Generate weak symbols for additional Fortran symbol
+                          name styles.
   --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
   --enable-dwarf          Use DWARF library for source lookup.
   --enable-getarg         Use getarg to get fortran command line args.
@@ -2218,6 +2221,27 @@ fi
 
 
 
+# Check whether --enable-fortranweak was given.
+if test "${enable_fortranweak+set}" = set; then
+  enableval=$enable_fortranweak; if test "$enable_fortranweak" = "no" ; then
+                ENABLE_FORTRAN_WEAK_SYMS=no
+                  echo Generation of additional weak FORTRAN symbol names has been disabled.
+        else
+                ENABLE_FORTRAN_WEAK_SYMS=yes
+                echo Generation of additional weak FORTRAN symbol names has been enabled.
+        fi
+
+else
+  ENABLE_FORTRAN_WEAK_SYMS=yes
+
+fi
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_FORTRAN_WEAK_SYMS 1
+_ACEOF
+
+
 # Check whether --enable-stackdepth was given.
 if test "${enable_stackdepth+set}" = set; then
   enableval=$enable_stackdepth; STACKDEPTH=$enableval
@@ -2467,7 +2491,9 @@ yes:)
 { echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
 whose name does not start with the host triplet.  If you think this
 configuration is useful to you, please write to autoconf@gnu.org." >&5
-}
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
 ac_tool_warned=yes ;;
 esac
     RANLIB=$ac_ct_RANLIB
@@ -7424,6 +7450,7 @@ LIBUNWIND_LOC!$LIBUNWIND_LOC$ac_delim
 BIN_TYPE_FLAG!$BIN_TYPE_FLAG$ac_delim
 DISABLE_MPI_IO!$DISABLE_MPI_IO$ac_delim
 ENABLE_FORTRAN_XLATE!$ENABLE_FORTRAN_XLATE$ac_delim
+ENABLE_FORTRAN_WEAK_SYMS!$ENABLE_FORTRAN_WEAK_SYMS$ac_delim
 STACKDEPTH!$STACKDEPTH$ac_delim
 USE_LIBDWARF!$USE_LIBDWARF$ac_delim
 PC_LOOKUP_FILE!$PC_LOOKUP_FILE$ac_delim
@@ -7457,7 +7484,6 @@ ENABLE_BFD!$ENABLE_BFD$ac_delim
 ENABLE_API_ONLY!$ENABLE_API_ONLY$ac_delim
 READ_REAL_TIME!$READ_REAL_TIME$ac_delim
 DEFAULT_TARGS!$DEFAULT_TARGS$ac_delim
-FORTRAN_GETARG_OBJ_FILE!$FORTRAN_GETARG_OBJ_FILE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 91; then
@@ -7507,13 +7533,14 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+FORTRAN_GETARG_OBJ_FILE!$FORTRAN_GETARG_OBJ_FILE$ac_delim
 TEST_LIST!$TEST_LIST$ac_delim
 slibdir!$slibdir$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 4; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 5; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
