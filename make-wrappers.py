@@ -338,6 +338,12 @@ opaqueOutArgDict = {
   ("MPI_Waitsome", "array_of_requests"):"MPI_Request"
 }
 
+incrementIndexDict = {
+  ("MPI_Testany"): ("*index", 1), 
+  ("MPI_Testsome"): ("array_of_indices", "*count"),
+  ("MPI_Waitany"): ("*index", 1), 
+  ("MPI_Waitsome"): ("array_of_indices", "*count") 
+  }
 
 
 
@@ -916,10 +922,9 @@ def CreateWrapper(funct, olist):
     freelist = []
     
     #  Iterate through the arguments for this function
+    opaqueFound = 0
     for i in fdict[funct].paramConciseList:
-        xlateDone = 0
-        opaqueFound = 0
-        
+    
         if ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype in xlateTargetTypes ) :
             
             #  Verify that there is a Dictionary entry for translating this argument
@@ -994,7 +999,9 @@ def CreateWrapper(funct, olist):
         if ( fdict[funct].paramConciseList.count("count") > 1 ):
             print "*** Multiple arrays in 1 function!!!!\n";
             
-        if ( "count" in fdict[funct].paramConciseList ):
+        if ( "incount" in fdict[funct].paramConciseList ):
+            countVar = "incount";
+        elif ( "count" in fdict[funct].paramConciseList ):
             countVar = "count";
         else:
             countVar = "max_integers"
@@ -1070,6 +1077,9 @@ def CreateWrapper(funct, olist):
     olist.append("*ierr = (MPI_Fint)rc;\n")
 
     #  Generate post-call translation code if necessary
+    xlateCode = []
+    xlateDone = 0
+    
     for i in range(len(xlateVarNames)) :
         
         xlateVarName = xlateVarNames[i]
@@ -1087,14 +1097,28 @@ def CreateWrapper(funct, olist):
 
             #  Generate array or scalar translation code
             if ( xlateVarName.count("array") > 0 ):
-                olist.append("{\n  int i; \n")
-                olist.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
-                olist.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
-                olist.append("  }\n}\n")
+                xlateCode.append("{\n  int i; \n")
+                xlateCode.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
+                xlateCode.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
+                xlateCode.append("  }\n}\n")
             else:
-                olist.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
+                xlateCode.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
                 
             xlateDone = 1
+            
+    #  If appropriate, increment any output indices
+    if incrementIndexDict.has_key(funct) :
+      if  incrementIndexDict[funct][1] == 1 :
+        xlateCode.append("if ( " + incrementIndexDict[funct][0] + " >= 0 ) (" + incrementIndexDict[funct][0] + ")++;\n")
+      else:
+        xlateCode.append("{ int i; for ( i = 0; i < " + incrementIndexDict[funct][1] + "; i++)  " \
+          + incrementIndexDict[funct][0] + "[i]++;}\n")
+
+    if xlateDone == 1 :
+      olist.append("if ( rc == MPI_SUCCESS ) { \n")
+      #print " xlateCode is ", xlateCode
+      olist.extend(xlateCode)
+      olist.append("}\n")
                 
     #  Free allocated arrays
     for freeSym in freelist:
@@ -1102,8 +1126,8 @@ def CreateWrapper(funct, olist):
                 
     olist.append("return;\n" + "}" + " /* " + string.lower(funct) + " */\n")
 
-    if ( opaqueFound == 1 and xlateDone == 0 ):
-        print "Function " + funct + " not translated!\n"
+    #if ( opaqueFound == 1 and xlateDone == 0 ):
+    #    print "Function " + funct + " not translated!\n"
         
     print "   Wrapped " + funct
 
