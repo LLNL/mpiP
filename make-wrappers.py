@@ -338,16 +338,17 @@ opaqueOutArgDict = {
   ("MPI_Waitsome", "array_of_requests"):"MPI_Request"
 }
 
-incrementIndexDict = {
+incrementFortranIndexDict = {
   ("MPI_Testany"): ("*index", 1), 
   ("MPI_Testsome"): ("array_of_indices", "*count"),
   ("MPI_Waitany"): ("*index", 1), 
   ("MPI_Waitsome"): ("array_of_indices", "*count") 
   }
 
-
-
-
+xlateFortranArrayExceptions = {
+  ("MPI_Testany", "array_of_requests"): ("index"), 
+  ("MPI_Waitany", "array_of_requests"): ("index") 
+}
 
 
 class VarDesc:
@@ -1096,7 +1097,11 @@ def CreateWrapper(funct, olist):
                 xlateFuncType = xlateType
 
             #  Generate array or scalar translation code
-            if ( xlateVarName.count("array") > 0 ):
+            if ( xlateFortranArrayExceptions.has_key((funct, xlateVarName)) ) :
+              xlateCode.append(xlateVarName + "[*" + xlateFortranArrayExceptions[(funct,xlateVarName)] + \
+              "] = " + xlateFuncType + "_c2f(c_" + xlateVarName + \
+              "[*" + xlateFortranArrayExceptions[(funct, xlateVarName)] + "]);\n")
+            elif ( xlateVarName.count("array") > 0 ):
                 xlateCode.append("{\n  int i; \n")
                 xlateCode.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
                 xlateCode.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
@@ -1107,12 +1112,12 @@ def CreateWrapper(funct, olist):
             xlateDone = 1
             
     #  If appropriate, increment any output indices
-    if incrementIndexDict.has_key(funct) :
-      if  incrementIndexDict[funct][1] == 1 :
-        xlateCode.append("if ( " + incrementIndexDict[funct][0] + " >= 0 ) (" + incrementIndexDict[funct][0] + ")++;\n")
+    if incrementFortranIndexDict.has_key(funct) :
+      if  incrementFortranIndexDict[funct][1] == 1 :
+        xlateCode.append("if ( " + incrementFortranIndexDict[funct][0] + " >= 0 ) (" + incrementFortranIndexDict[funct][0] + ")++;\n")
       else:
-        xlateCode.append("{ int i; for ( i = 0; i < " + incrementIndexDict[funct][1] + "; i++)  " \
-          + incrementIndexDict[funct][0] + "[i]++;}\n")
+        xlateCode.append("{ int i; for ( i = 0; i < " + incrementFortranIndexDict[funct][1] + "; i++)  " \
+          + incrementFortranIndexDict[funct][0] + "[i]++;}\n")
 
     if xlateDone == 1 :
       olist.append("if ( rc == MPI_SUCCESS ) { \n")
