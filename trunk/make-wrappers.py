@@ -679,7 +679,7 @@ def GenerateStructureFile():
 
 
 ###
-### Generate a lookup table where mpiT can grab variables and function pointers.
+### Generate a lookup table where mpiP can grab variables and function pointers.
 ###
 def GenerateLookup():
     global flist
@@ -808,16 +808,19 @@ def CreateWrapper(funct, olist):
 
     olist.append("mpiPi.enabled = enabledState;\n")
     olist.append("if (mpiPi.enabled) {\n")
-    olist.append("\n" \
-		 + "mpiPi_GETTIME (&end);\n" \
+    olist.append("\n" 
+		 + "mpiPi_GETTIME (&end);\n" 
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
 
     if fdict[funct].sendCountPname != "":
         olist.append( "\n" 
+                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { " 
                       + "PMPI_Type_size(*" + fdict[funct].sendTypePname + ", " 
                       + "&tsize);\n" 
                       + "messSize = (double)(tsize * *"
-                      +  fdict[funct].sendCountPname + ");\n")
+                      +  fdict[funct].sendCountPname + ");}\n"
+                      + "else { mpiPi_msg_warn(\"MPI_DATATYPE_NULL encountered.  MPI_IN_PLACE not supported.\\n\");\n"
+                      + "mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n")
                   
     if fdict[funct].ioCountPname != "":
         olist.append( "\n" 
