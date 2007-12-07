@@ -28,7 +28,8 @@ c
       subroutine runtest(rank, size)
       integer rank, size
       include 'mpif.h'
-      integer info,res,ierr,i,tag,istatus
+      integer info,res,ierr,i,tag
+      integer istatus(MPI_STATUS_SIZE)
       integer sarray(100)
       integer rarray(100)
 
