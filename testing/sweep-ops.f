@@ -16,7 +16,8 @@ c      include mpif.h
 
       include 'mpif.h'
 
-      integer info,size,rank,res,ierr,i,tag,istatus
+      integer info,size,rank,res,ierr,i,tag
+      integer istatus(MPI_STATUS_SIZE)
       integer sarray(100)
       integer rarray(100)
 
