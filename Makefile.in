@@ -142,9 +142,9 @@ install::
 clean::
 	rm -f ${SHARED_C_TARGET}
 
-${SHARED_C_TARGET}: CFLAGS += -fpic
+${SHARED_C_TARGET}: CFLAGS += -fpic -DPIC
 ${SHARED_C_TARGET}: cleanobjs ${OBJS}
-	${CC} -shared -o $@ ${OBJS}
+	${CC} -shared -o $@ ${OBJS} ${LIBS}
 
 endif
 
