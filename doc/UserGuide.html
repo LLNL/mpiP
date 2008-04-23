@@ -40,9 +40,9 @@ width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
 
-<p align="center">Version 3.1.1<br>
+<p align="center">Version 3.1.2<br>
 
-26 April 2007 <br>
+23 April 2008 <br>
 
 <br>
 
@@ -144,7 +144,7 @@ to contribute and receive mpiP use and status information.</p>
 
 <p> To learn more about performance analysis with mpiP, see Vetter, J.S. and
 M.O.  McCracken, "<a
-href="http://www.llnl.gov/CASC/people/vetter/vetter_pubs.html">Statistical
+href="http://mpip.sourceforge.net/statistical-scalability-analysis-of.pdf">Statistical
 Scalability Analysis of Communication Operations in Distributed
 Applications</a>," Proc. ACM SIGPLAN Symp. on Principles and Practice of
 Parallel Programming (PPOPP), 2001.  </p>
@@ -173,9 +173,23 @@ order):</p>
 
   <li>Tushar Mohan (SiCortex)</li>
 
+  <li>Philip Mucci (SiCortex)</li>
+
 </ul>
 
-<h3><a name="New_Features">New Features with v3.1.1</a></h3>
+<h3><a name="New_Features">New Features with v3.1.2</a></h3>
+
+<p>Release v3.1.2 addresses the following issues:
+</p>
+
+<ul>
+
+  <li>Better MPI support for Init_thread, Testany, Testsome, Waitany, and Waitsome.</li>
+  <li>Improved support for MIPS64-Linux.</li>
+  <li>Added option to configure for generating weak Fortran symbols in the case of multiple Fortran mangling schemes in the application object files (--enable-fortranweak).</li>
+  <li>Addressed various outstanding issues (see ChangeLog for more details).</li>
+
+</ul>
 
 <p>Release v3.1.1 addresses the following issues:
 </p>
@@ -362,11 +376,24 @@ was succesfully run and any requirements for that platform.</p>
 
       <td>Quadrics MPI 1.24-48</td>
 
-      <td>2.17</td>
+      <td rowspan="2">2.17</td>
 
-      <td>The use of HP's <a
-      href="http://www.hpl.hp.com/research/linux/libunwind/">libunwind</a> is
-      required on this platform.</td>
+      <td rowspan="2">The use of <a
+      href="http://www.nongnu.org/libunwind/">libunwind</a> is
+      required on these platforms.</td>
+
+    </tr>
+    <tr>
+
+      <td>x86_64-Linux</td>
+
+      <td> 2.6.18 CHAOS Kernel</td>
+
+      <td>Intel 9.1<br>
+
+          PGI 7.0</td>
+
+      <td>MVAPICH 0.9.7</td>
 
     </tr>
 
@@ -719,6 +746,15 @@ line for Fortran apllications.</td>
       <td>Opaque object translation is not necessary on some
 platforms, but necessary for Fortran applications on some 64-bit
 platforms.</td>
+
+    </tr>
+    <tr>
+
+      <td>--enable-fortranweak</td>
+
+      <td>Generate weak symbols for additional Fortran symbol name styles.</td>
+
+      <td>If application objects have been created from compilers with different Fortran symbol name styles, it may be necessary to generate weak symbols to capture all MPI calls.</td>
 
     </tr>
 
@@ -2265,7 +2301,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on April 26th, 2007.<br>
+<p class="pageinfo"> Last modified on April 23th, 2008.<br>
 
 UCRL-CODE-223450</p>
 
