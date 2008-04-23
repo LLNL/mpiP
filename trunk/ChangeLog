@@ -1,5 +1,76 @@
+2008-04-23  chcham
+
+	* Makefile.in:
+	  Use LIBS when creating shread lib.
+
+2008-02-22  chcham
+
+	* Makefile.in:
+	  Added DESTDIR prefix to install* and uninstall targets.
+
+2007-12-07  chcham
+
+	* testing/sweep-ops-stack.f, testing/sweep-ops.f:
+	  Patch from Phil Mucci to make tests independent of MPI_Status
+	  size.
+
+2007-11-05  chcham
+
+	* make-wrappers.py:
+	  Added MPI_DATATYPE_NULL check when calculating datatype size.
+
+2007-10-29  chcham
+
+	* make-wrappers.py:
+	  Additional modifications to correct Fortran function wrapping.
+	* glob.c, make-wrappers.py:
+	  Updated make-wrappers to handle Testany, Testsome, Waitany, and
+	  Waitsome Fortran input and output counts correctly.
+	  Also tracking with new version number for remote testing.
+
+2007-10-26  chcham
+
+	* configure, configure.in:
+	  Corrections to --enable-fortranweak flag.
+	* Makefile.in, configure, configure.in, make-wrappers.py,
+	  mpiPconfig.h.in, pcontrol.c, wrappers_special.c:
+	  Added a configure flag to generate weak Fortran mangled MPI
+	  symbols for compatibility with objects using different mangling
+	  schemes (for example, objects built with different compilers.)
+
+2007-10-17  chcham
+
+	* mpiPi.c:
+	  Change unsuccessful source lookup message to debug message
+	  instead of warning.
+
+2007-06-04  chcham
+
+	* record_stack.c:
+	  Small mips correction as per Phil Mucci.
+
+2007-05-30  chcham
+
+	* report.c:
+	  Size concise report summary arrays based on count of hash table
+	  entries rather than hash buckets.
+
+2007-05-29  chcham
+
+	* mpi.protos.txt.in, wrappers_special.c:
+	  MPI_Init_thread support added. Not to imply that mpiP is
+	  thread-safe, but for
+	  benchmarks or applications, such as the Intel MPI Benchmarks
+	  (3.0), that use MPI_Init_thread
+	  without actually making MPI calls with multiple threads
+	* make-wrappers.py, mpiPi_proto.h, record_stack.c:
+	  linux-mips64 modifications to address coredumps related to stack
+	  information.
+
 2007-04-27  chcham
 
+	* ChangeLog:
+	  Hopefully final 3.1.1 ChangeLog update.
 	* Makefile.in:
 	  Additional changes to support library merging targtets, given
 	  multiple objects with the same name in libunwind.
@@ -27,8 +98,8 @@
 	  names to make more sense if installed in common location.
 	* Makefile.in, _timers.h, configure, configure.in, mpiP-API.h,
 	  mpiPi.h.in, mpip_timers.h, timers:
-	  Changed timer include file and directory names to make more
-	  sense if installed in common location.
+	  Changed timer include file and directory names to make more sense
+	  if installed in common location.
 	* Makefile.in, configure, configure.in:
 	  o Added greater install flexibility in Makefile.in by adding
 	  autoconf-determined directories.
@@ -119,8 +190,8 @@
 2006-12-06  chcham
 
 	* configure, configure.in:
-	  Corrected BFD configure tests to result in appropriate CFLAGS
-	  and LIBS settings.
+	  Corrected BFD configure tests to result in appropriate CFLAGS and
+	  LIBS settings.
 	* configure, configure.in:
 	  Clean up binutils lib checking and BINUTILS_DIR lib path, if
 	  provided.
@@ -158,43 +229,41 @@
 	  Removed old license. The new license can now be found in source
 	  files and the UserGuides.
 	* Check.mak.in, Defs.mak.in, Makefile.in, Rules.mak, _timers.h,
-	  configure.in, diag_msgs.c, diag_msgs_api.c,
-	  get_fortran_arg.f.in, get_fortran_arg_pxf.f, glob.c,
-	  hash_proto.h, make-wrappers.py, mpi.protos.txt.in, mpiP-API.c,
-	  mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c,
-	  mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
-	  pcontrol.c, report.c, testing/0-simple-c++.C,
-	  testing/0-simple.c, testing/1-hot-potato.c,
-	  testing/12-null-null.c, testing/13-pcontrol-report.c,
-	  testing/14-mpiio.c, testing/15-pcontrol.c, testing/2-pcontrol.c,
-	  testing/3-stacktrace.c, testing/5-medley.c,
-	  testing/6-nonblock.c, testing/7-nonblock-waitall.c,
-	  testing/8-test.c, testing/9-test-mpip-time.c,
-	  testing/bfd-test.c, timers/aix_local.h.in, timers/aix_swclock.h,
-	  timers/crayx1_hw.h, timers/linux_posix.h, timers/sunos-timers.h,
-	  util.c, wrappers_special.c:
+	  configure.in, diag_msgs.c, diag_msgs_api.c, get_fortran_arg.f.in,
+	  get_fortran_arg_pxf.f, glob.c, hash_proto.h, make-wrappers.py,
+	  mpi.protos.txt.in, mpiP-API.c, mpiP-API.h, mpiP-hash.c,
+	  mpiP-hash.h, mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
+	  pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c,
+	  testing/0-simple-c++.C, testing/0-simple.c,
+	  testing/1-hot-potato.c, testing/12-null-null.c,
+	  testing/13-pcontrol-report.c, testing/14-mpiio.c,
+	  testing/15-pcontrol.c, testing/2-pcontrol.c,
+	  testing/3-stacktrace.c, testing/5-medley.c, testing/6-nonblock.c,
+	  testing/7-nonblock-waitall.c, testing/8-test.c,
+	  testing/9-test-mpip-time.c, testing/bfd-test.c,
+	  timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h,
+	  timers/linux_posix.h, timers/sunos-timers.h, util.c,
+	  wrappers_special.c:
 	  Modified RCS Header keyword to subversion Id keyword.
 	* _timers.h, diag_msgs.c, diag_msgs_api.c, doc/README,
 	  get_fortran_arg.f.in, get_fortran_arg_pxf.f, glob.c,
 	  hash_proto.h, mpiP-API.c, mpiP-API.h, mpiP-hash.c, mpiP-hash.h,
-	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
-	  pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c,
-	  testing/0-simple-c++.C, testing/0-simple.c, testing/0-simplef.f,
-	  testing/1-hot-potato.c, testing/10-coll-mess-size.c,
-	  testing/11-p2p-mess-size.c, testing/12-null-null.c,
-	  testing/13-pcontrol-report.c, testing/14-mpiio.c,
-	  testing/15-pcontrol.c, testing/16-waitallf.f,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c,
+	  pc_lookup_dwarf.c, pcontrol.c, report.c, testing/0-simple-c++.C,
+	  testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c,
+	  testing/10-coll-mess-size.c, testing/11-p2p-mess-size.c,
+	  testing/12-null-null.c, testing/13-pcontrol-report.c,
+	  testing/14-mpiio.c, testing/15-pcontrol.c, testing/16-waitallf.f,
 	  testing/2-pcontrol.c, testing/3-stacktrace.c,
 	  testing/4-demangle.C, testing/5-medley.c, testing/6-nonblock.c,
 	  testing/7-nonblock-waitall.c, testing/8-test.c,
 	  testing/9-test-mpip-time.c, testing/api-test.c,
 	  testing/bfd-test.c, testing/sweep-ops-stack.f,
-	  testing/sweep-ops.f, testing/timer-info.c,
-	  timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h,
-	  timers/linux_posix.h, timers/sunos-timers.h, util.c,
-	  wrappers_special.c:
-	  Changed project URL to point to sourceforge page rather than
-	  LLNL page.
+	  testing/sweep-ops.f, testing/timer-info.c, timers/aix_local.h.in,
+	  timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h,
+	  timers/sunos-timers.h, util.c, wrappers_special.c:
+	  Changed project URL to point to sourceforge page rather than LLNL
+	  page.
 	* testing/Makefile.in:
 	  Changed copyright information.
 	* get_fortran_arg.f.in, get_fortran_arg_pxf.f:
@@ -242,8 +311,8 @@
 	  get_fortran_arg.f.in, glob.c, hash_proto.h, mpiP-API.c,
 	  mpiP-API.h, mpiP-hash.c, mpiP-hash.h, mpiPconfig.h.in, mpiPi.c,
 	  mpiPi.h.in, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
-	  pcontrol.c, report.c, testing/0-simple-c++.C,
-	  testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c,
+	  pcontrol.c, report.c, testing/0-simple-c++.C, testing/0-simple.c,
+	  testing/0-simplef.f, testing/1-hot-potato.c,
 	  testing/1-hot-potato.src, testing/10-coll-mess-size.c,
 	  testing/11-p2p-mess-size.c, testing/12-null-null.c,
 	  testing/13-pcontrol-report.c, testing/14-mpiio.c,
@@ -251,15 +320,15 @@
 	  testing/16-waitallf.f, testing/16-waitallf.src,
 	  testing/2-pcontrol.c, testing/3-stacktrace.c,
 	  testing/3-stacktrace.src, testing/4-demangle.C,
-	  testing/4-demangle.src, testing/5-medley.c,
-	  testing/6-nonblock.c, testing/7-nonblock-waitall.c,
-	  testing/8-test.c, testing/9-test-mpip-time.c,
-	  testing/api-test.c, testing/bfd-test.c,
-	  testing/sweep-ops-stack.f, testing/sweep-ops-stack.src,
-	  testing/sweep-ops.f, testing/sweep-ops.src,
-	  testing/timer-info.c, timers/aix_local.h.in,
-	  timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h,
-	  timers/sunos-timers.h, util.c, wrappers_special.c:
+	  testing/4-demangle.src, testing/5-medley.c, testing/6-nonblock.c,
+	  testing/7-nonblock-waitall.c, testing/8-test.c,
+	  testing/9-test-mpip-time.c, testing/api-test.c,
+	  testing/bfd-test.c, testing/sweep-ops-stack.f,
+	  testing/sweep-ops-stack.src, testing/sweep-ops.f,
+	  testing/sweep-ops.src, testing/timer-info.c,
+	  timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h,
+	  timers/linux_posix.h, timers/sunos-timers.h, util.c,
+	  wrappers_special.c:
 	  BSD License insertion and header comment reorg.
 	* testing/verify-timers.c:
 	  Removed test files using outdated timer macros.
@@ -311,10 +380,10 @@
 	* util.c:
 	  Initialize pc value to pass first pc check.
 	* mpiPi.c, pcontrol.c:
-	  Changes to reset callsite data with MPI_Pcontrol(3) call. Can
-	  be used with
-	  MPI_Pcontrol(2) to generate periodic reports without
-	  accumulative data.
+	  Changes to reset callsite data with MPI_Pcontrol(3) call. Can be
+	  used with
+	  MPI_Pcontrol(2) to generate periodic reports without accumulative
+	  data.
 
 2006-04-13  chcham
 
@@ -351,8 +420,8 @@
 	  using PMPI_Gather to collect and then print process-specific
 	  callsite information.
 	  
-	  This results in a fixed amount of memory use which is
-	  independent of the number of
+	  This results in a fixed amount of memory use which is independent
+	  of the number of
 	  MPI callsites in the application.
 	* glob.c:
 	  Patch version update to reflect changes.
@@ -374,8 +443,8 @@
 	  timers/aix_local.h.in:
 	  o Added configure_input substitution message in configured files.
 	  o Moved dejagnu global file from lib dir into config dir.
-	  o Added install logic to test whether doc and bin dirs need to
-	  be copied.
+	  o Added install logic to test whether doc and bin dirs need to be
+	  copied.
 
 2006-04-03  chcham
 
@@ -428,8 +497,8 @@
 	  
 	  o address use of libelf/libdwarf
 	  - Have configure check for libs and define DISABLE_BFD
-	  - Move configure substitution to Defs.mak and set DISABLE_BFD
-	  & USE_LIBDWARF
+	  - Move configure substitution to Defs.mak and set DISABLE_BFD &
+	  USE_LIBDWARF
 	  o add files to remove to distclean target
 	  o make no symbol failure warning rather than abort.
 
@@ -445,8 +514,8 @@
 	  Updates.
 	* Defs.mak.in, Makefile.in, configure, configure.in, glob.c,
 	  pc_lookup.c:
-	  o Renamed API library from libmpiP-API.a to libmpiPapi.a to
-	  avoid AIX MPI
+	  o Renamed API library from libmpiP-API.a to libmpiPapi.a to avoid
+	  AIX MPI
 	  compile scripts interpreting '-A' as a flag.
 	  o Added DISABLE_BFD macro to avoid recompiling pc_lookup.c when
 	  BFD is
@@ -466,8 +535,8 @@
 	* util.c:
 	  Forgot to run indent before last commit.
 	* util.c:
-	  As indentified through Phil Roth's XT3 testing, added a
-	  character length
+	  As indentified through Phil Roth's XT3 testing, added a character
+	  length
 	  int argument at the end of the get_fortran_arg argument list to
 	  provide
 	  correct type signature for compilers currently supported.
@@ -515,10 +584,10 @@
 	  report.c, testing/10-coll-mess-size.c,
 	  testing/11-p2p-mess-size.c, testing/13-pcontrol-report.c,
 	  testing/14-mpiio.c, testing/15-pcontrol.c, testing/2-pcontrol.c,
-	  testing/3-stacktrace.c, testing/api-test.c,
-	  testing/timer-info.c, timers/aix_local.h.in,
-	  timers/aix_swclock.h, timers/crayx1_hw.h, timers/linux_posix.h,
-	  timers/sunos-timers.h, util.c, wrappers_special.c:
+	  testing/3-stacktrace.c, testing/api-test.c, testing/timer-info.c,
+	  timers/aix_local.h.in, timers/aix_swclock.h, timers/crayx1_hw.h,
+	  timers/linux_posix.h, timers/sunos-timers.h, util.c,
+	  wrappers_special.c:
 	  Added indent make target and formatted source using GNU indent
 	  defaults.
 
@@ -650,10 +719,10 @@
 2005-10-28  chcham
 
 	* make-wrappers.py:
-	  Cleaned up what appeared to be old code added by Jeff around
-	  2001 and having since been commented out. I couldn't find any
-	  code that supported the statements generated, so it seemed safe
-	  to get rid of.
+	  Cleaned up what appeared to be old code added by Jeff around 2001
+	  and having since been commented out. I couldn't find any code
+	  that supported the statements generated, so it seemed safe to get
+	  rid of.
 	* make-wrappers.py:
 	  Changed timer rollback failure to issue more information and
 	  discard sample.
@@ -788,8 +857,8 @@
 	* configure.in, mpiPconfig.h.in, mpiPi.h.in:
 	  Added configure test to address MPIR_ToPointer problem with
 	  Quadrics MPI.
-	  Also fixed compile warning if no stack trace parameters have
-	  been defined
+	  Also fixed compile warning if no stack trace parameters have been
+	  defined
 	  for the current architechture and libunwind is not being used.
 
 2005-04-01  chcham
@@ -938,8 +1007,8 @@
 	  Modifications to install target to account for new scripts in
 	  bin.
 	* mpiPi.c:
-	  Do not overwrite existing report files. If a report file
-	  exists, increment
+	  Do not overwrite existing report files. If a report file exists,
+	  increment
 	  the report count and check until a new filename is generated.
 	* configure.in, mpiPi.c, pc_lookup.c:
 	  Addressed DISABLE_BFD and MPI-I/O configuration issues.
@@ -968,8 +1037,8 @@
 	  updated.
 	* configure.in, make-wrappers.py, mpiP-API.c, mpiPi.c, mpiPi.h.in,
 	  mpiPi_proto.h, util.c:
-	  Completely re-wrote code to address the differences of the
-	  number of
+	  Completely re-wrote code to address the differences of the number
+	  of
 	  frames to unwind to get to the calling application function from
 	  libunwind, Tru64 unwind, UNICOS, as well as MPI vs API calls.
 	* testing/test_template.tcl:
@@ -1056,9 +1125,9 @@
 	* Defs.mak.in, Makefile.in, Rules.mak, _timers.h, aix_local.h,
 	  aix_swclock.h, configure, configure.in, get_fortran_arg.f,
 	  get_fortran_arg_pxf.f, make-wrappers.py, mpiP-API.c, mpiP-API.h,
-	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h,
-	  pc_lookup.c, pc_lookup_dwarf.c, pcontrol.c, report.c,
-	  sunos-timers.h, util.c, wrappers_special.c:
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, mpiPi_proto.h, pc_lookup.c,
+	  pc_lookup_dwarf.c, pcontrol.c, report.c, sunos-timers.h, util.c,
+	  wrappers_special.c:
 	  o Cray X1/UNICOS support
 	  o Libdwarf support : note that Intel compilers do not provide
 	  full C++ symbols
@@ -1102,8 +1171,8 @@
 	  
 	  Added binutils-dir flag for easier configuration.
 	  Added bin-type-flag to address issues with 32/64 mixed systems.
-	  Always call demangling on symbols and remove libmpiPdmg on
-	  system where this mak
+	  Always call demangling on symbols and remove libmpiPdmg on system
+	  where this mak
 	  es sense.
 	  Added makefile targets to merge binutils and libunwind objects
 	  into libmpiP.
@@ -1282,8 +1351,8 @@
 	* mpiPi.c, pc_lookup.c, wrappers_special.c:
 	  Support for MPI_Init(NULL, NULL) call, which is technically
 	  supported in
-	  the standard. Pointed out by MSTI folks. Just makes "Unknown"
-	  app report
+	  the standard. Pointed out by MSTI folks. Just makes "Unknown" app
+	  report
 	  file and gives addresses for callsites.
 
 2004-06-15  chcham
@@ -1454,11 +1523,10 @@
 	  environment var
 	  -C MPIP option activates demangling
 	  removal of unnecessary pc_lookup makefile rule
-	  additional error message suggesting that incorrect library may
-	  be being used
+	  additional error message suggesting that incorrect library may be
+	  being used
 	  if argv[0] is NULL.
-	  Support for long file/function names in callsite setion of
-	  report
+	  Support for long file/function names in callsite setion of report
 	* Makefile.in, configure.in, glob.c, mpiPdemangle.c,
 	  mpiPdemangle.h, mpiPi.h, pc_lookup.c:
 	  *** empty log message ***
@@ -1632,14 +1700,14 @@
 	  util.c, wrappers_special.c:
 	  Changes by Chris Chambreau as initial step at Linux and Tru64
 	  support.
-	* ChangeLog, Defs.mak.in, Makefile.in, Restrictions.txt,
-	  Rules.mak, _timers.h, bin, bin/config.guess, bin/config.sub,
-	  bin/install-sh, configure, configure.in, diag_msgs.c, doc,
-	  doc/INSTALL.txt, doc/PORTING.txt, doc/UserGuide.txt, glob.c,
-	  hash.c, hash.h, hash_proto.h, make-wrappers.py, mpi.protos.txt,
-	  mpiPconfig.h.in, mpiPi.c, mpiPi.h, mpiPi_proto.h, pc_lookup.c,
-	  pcontrol.c, report.c, testing, testing/0-simple-c++.C,
-	  testing/0-simple.c, testing/0-simplef.f, testing/1-hot-potato.c,
+	* ChangeLog, Defs.mak.in, Makefile.in, Restrictions.txt, Rules.mak,
+	  _timers.h, bin, bin/config.guess, bin/config.sub, bin/install-sh,
+	  configure, configure.in, diag_msgs.c, doc, doc/INSTALL.txt,
+	  doc/PORTING.txt, doc/UserGuide.txt, glob.c, hash.c, hash.h,
+	  hash_proto.h, make-wrappers.py, mpi.protos.txt, mpiPconfig.h.in,
+	  mpiPi.c, mpiPi.h, mpiPi_proto.h, pc_lookup.c, pcontrol.c,
+	  report.c, testing, testing/0-simple-c++.C, testing/0-simple.c,
+	  testing/0-simplef.f, testing/1-hot-potato.c,
 	  testing/2-pcontrol.c, testing/5-medley.c, testing/6-nonblock.c,
 	  testing/7-nonblock-waitall.c, testing/8-test.c,
 	  testing/9-test-mpip-time.c, testing/Makefile,
@@ -1651,6 +1719,6 @@
 
 2003-04-10  
 
-	* branches, tags, .:
+	* .:
 	  New repository initialized by cvs2svn.
 
