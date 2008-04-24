@@ -136,7 +136,7 @@ SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
 shared: ${SHARED_C_TARGET}
 install::
 	if [ -x ${SHARED_C_TARGET} ] ; then \
-	  mkdir -p ${slibdir} ; \
+	  mkdir -p ${DESTDIR}${slibdir} ; \
 	  ${INSTALL} ${SHARED_C_TARGET} ${DESTDIR}${slibdir} ; \
 	fi
 clean::
@@ -229,21 +229,17 @@ install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET}
 	${INSTALL} ${C_TARGET} ${DESTDIR}${libdir}/${C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${DESTDIR}${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${DESTDIR}${libdir}/${FORTRAN_TARGET} ; fi
-	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
-	  ${INSTALL} doc/*txt doc/*html doc/README ${DESTDIR}${docdir} ; \
-	fi
+	${INSTALL} doc/*txt doc/*html doc/README ${DESTDIR}${docdir} ; \
 
 install-api: API
-	mkdir -p ${libdir} ${includedir}/mpip_timers 
+	mkdir -p ${DESTDIR}${libdir} ${DESTDIR}${includedir}/mpip_timers 
 	if test "x${API_TARGET}" != "x" ; then ${INSTALL} ${API_TARGET} ${DESTDIR}${libdir}/${API_TARGET} ; fi
 	${INSTALL} mpiP-API.h mpip_timers.h ${DESTDIR}${includedir}
 	${INSTALL} mpip_timers/*h ${DESTDIR}${includedir}/mpip_timers
 
 install-bin:
-	mkdir -p ${bindir}
-	if [ ${prefix} != `pwd` -a ${prefix} != "." ] ; then \
-	  ${INSTALL} bin/*mpip* ${DESTDIR}${bindir} ; \
-	fi
+	mkdir -p ${DESTDIR}${bindir}
+	${INSTALL} bin/*mpip* ${DESTDIR}${bindir} ; \
 
 install-all: install install-api install-bin 
 
