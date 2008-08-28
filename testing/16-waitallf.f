@@ -11,7 +11,7 @@ c
       include "mpif.h"
 
       integer  ierr, wsize, rank, starg, rtarg
-      integer  istat(1)
+      integer  istat(2)
       integer req(2)
       real*8 sendbuf, recvbuf
 
@@ -32,7 +32,7 @@ c
       CALL MPI_ISEND(sendbuf,1,MPI_DOUBLE_PRECISION,
      1    starg,1,MPI_COMM_WORLD,req(2),ierr)
 
-      CALL MPI_WAITALL(2,req,istat(1),ierr)
+      CALL MPI_WAITALL(2,req,istat,ierr)
 
       CALL MPI_FINALIZE(ierr)
       print *, 'rank ', rank, ' returned from FINALIZE'
