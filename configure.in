@@ -430,7 +430,15 @@ fi
 
 
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
-	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind")
+	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind",
+	if test x$build_cpu = xx86_64 ; then
+	  echo
+	  echo "  mpiP on x86_64 platforms requires libunwind."
+	  echo "  Please install libunwind and, if necessary, configure mpiP with appropriate CFLAGS and LDFLAGS settings."
+	  echo
+	  exit 1
+	fi
+	)
 fi
 
 if test "$ENABLE_API_ONLY" = no && test "$DISABLE_MPI_IO" = no ; then
