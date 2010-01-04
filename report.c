@@ -1369,10 +1369,6 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
   double sCumulative = 0;
   int malloc_check = 1;
 
-#ifndef HAVE_MPI_IO
-  return;
-#endif
-
   /* Gather global callsite information at collectorRank and print header */
   if (mpiPi.rank == mpiPi.collectorRank)
     {
