@@ -95,6 +95,10 @@ noDefineList = [
 
 opaqueInArgDict = { 
   ("MPI_Abort", "comm"):"MPI_Comm",
+  ("MPI_Accumulate", "origin_datatype"):"MPI_Datatype",
+  ("MPI_Accumulate", "target_datatype"):"MPI_Datatype",
+  ("MPI_Accumulate", "op"):"MPI_Op",
+  ("MPI_Accumulate", "win"):"MPI_Win",
   ("MPI_Allgather", "comm"):"MPI_Comm",
   ("MPI_Allgather", "recvtype"):"MPI_Datatype",
   ("MPI_Allgather", "sendtype"):"MPI_Datatype",
@@ -172,6 +176,9 @@ opaqueInArgDict = {
   ("MPI_Gatherv", "comm"):"MPI_Comm",
   ("MPI_Gatherv", "recvtype"):"MPI_Datatype",
   ("MPI_Gatherv", "sendtype"):"MPI_Datatype",
+  ("MPI_Get", "origin_datatype"):"MPI_Datatype",
+  ("MPI_Get", "target_datatype"):"MPI_Datatype",
+  ("MPI_Get", "win"):"MPI_Win",
   ("MPI_Get_count", "datatype"):"MPI_Datatype",
   ("MPI_Get_elements", "datatype"):"MPI_Datatype",
   ("MPI_Graph_create", "comm_old"):"MPI_Comm",
@@ -216,6 +223,9 @@ opaqueInArgDict = {
   ("MPI_Pack_size", "comm"):"MPI_Comm",
   ("MPI_Pack_size", "datatype"):"MPI_Datatype",
   ("MPI_Probe", "comm"):"MPI_Comm",
+  ("MPI_Put", "origin_datatype"):"MPI_Datatype",
+  ("MPI_Put", "target_datatype"):"MPI_Datatype",
+  ("MPI_Put", "win"):"MPI_Win",
   ("MPI_Recv", "comm"):"MPI_Comm",
   ("MPI_Recv", "datatype"):"MPI_Datatype",
   ("MPI_Recv_init", "comm"):"MPI_Comm",
@@ -281,6 +291,22 @@ opaqueInArgDict = {
   ("MPI_Waitall", "array_of_requests"):"MPI_Request",
   ("MPI_Waitany", "array_of_requests"):"MPI_Request",
   ("MPI_Waitsome", "array_of_requests"):"MPI_Request",
+  ("MPI_Win_complete", "win"):"MPI_Win",
+  ("MPI_Win_create", "info"):"MPI_Info",
+  ("MPI_Win_create", "comm"):"MPI_Comm",
+  ("MPI_Win_create", "win"):"MPI_Win",
+  ("MPI_Win_fence", "win"):"MPI_Win",
+  ("MPI_Win_free", "win"):"MPI_Win",
+  ("MPI_Win_get_group", "win"):"MPI_Win",
+  ("MPI_Win_get_group", "group"):"MPI_Group",
+  ("MPI_Win_lock", "win"):"MPI_Win",
+  ("MPI_Win_post", "group"):"MPI_Group",
+  ("MPI_Win_post", "win"):"MPI_Win",
+  ("MPI_Win_start", "group"):"MPI_Group",
+  ("MPI_Win_start", "win"):"MPI_Win",
+  ("MPI_Win_test", "win"):"MPI_Win",
+  ("MPI_Win_unlock", "win"):"MPI_Win",
+  ("MPI_Win_wait", "win"):"MPI_Win"
 }
 
 opaqueOutArgDict = { 
@@ -572,8 +598,6 @@ def ReadInputFile(f):
 	    paramList = map(string.strip,string.split(paramstr,","))
 	    #    print cnt, "-->", name,  paramList
 	    fdict[name] = fdecl(name, fcounter, retype, paramList,line)
-	    if name not in noDefineList:
-	      fcounter = fcounter + 1
 	    ParamDictUpdate(name)
 	    lastFunction = name
 	    if verbose:
@@ -618,6 +642,11 @@ def ReadInputFile(f):
 
     flist = fdict.keys()
     flist.sort()
+    fcounter = baseID
+    for f in flist :
+      fdict[f].id = fcounter
+      if f not in noDefineList:
+        fcounter = fcounter + 1
     print "-----*----- Parsing completed: ", len(fdict), " functions found."
 
 
