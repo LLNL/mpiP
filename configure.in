@@ -334,7 +334,7 @@ if test "x$ENABLE_BFD" = "xyes" ; then
   )
   AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
   if test "x$ENABLE_BFD" = "xyes" ; then
-    AC_CHECK_HEADER(demangle.h, AC_DEFINE(HAVE_DEMANGLE_H))
+    AC_CHECK_HEADER(demangle.h, [AC_DEFINE(HAVE_DEMANGLE_H) if test "x$DO_DEMANGLE" = xfalse ; then DO_DEMANGLE=GNU ; fi])
     LIBS="$LIBS $BFD_AUX_LIBS"
     AC_DEFINE(ENABLE_BFD)
   fi
