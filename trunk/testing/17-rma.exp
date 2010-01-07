@@ -1,0 +1,17 @@
+
+##  Test-specific information
+#
+
+set test_title "17-rma-exe: verify all targeted RMA calls are interposed"
+set test "17-rma.exe"
+set test_targ "./testing/$test"
+set procs 2
+set source_check_file "testing/17-rma.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+

@@ -188,6 +188,20 @@ AC_ARG_ENABLE(mpi-io,
 AC_SUBST(DISABLE_MPI_IO)
 fi
 
+if test x"$ENABLE_API_ONLY" = xno ; then
+
+DISABLE_MPI_RMA=no
+AC_ARG_ENABLE(mpi-rma,
+	AS_HELP_STRING(--disable-mpi-rma,[Disable MPI RMA reporting.]),
+	if test x"$enableval" = xno ; then
+		DISABLE_MPI_RMA=yes
+		echo Profiling of MPI RMA has been disabled.
+	fi
+	,
+)
+AC_SUBST(DISABLE_MPI_RMA)
+fi
+
 ENABLE_BFD=yes
 AC_ARG_ENABLE(bfd,
 	AS_HELP_STRING(--disable-bfd,Do not use GNU binutils libbfd for source lookup.),
@@ -455,6 +469,17 @@ else
   HAVE_MPI_IO=/dev/null
 fi
 
+if test "$ENABLE_API_ONLY" = no && test "$DISABLE_MPI_RMA" = no ; then
+AC_CHECK_FUNC(MPI_Win_fence,
+              AC_DEFINE(HAVE_MPI_RMA) HAVE_MPI_RMA=mpi.rma.protos.txt,
+                AC_MSG_RESULT([MPI RMA symbols not found.  MPI RMA reporting deactivated.])
+                HAVE_MPI_RMA=/dev/null
+                DISABLE_MPI_RMA=yes 
+)
+else
+  HAVE_MPI_RMA=/dev/null
+fi
+
 
 
 if test "$ENABLE_API_ONLY" = no ; then
@@ -615,6 +640,7 @@ AC_SUBST(DEFAULT_TARGS)
 AC_SUBST(FORTRAN_GETARG_OBJ_FILE)
 AC_SUBST(TEST_LIST)
 AC_SUBST_FILE(HAVE_MPI_IO)
+AC_SUBST_FILE(HAVE_MPI_RMA)
 AC_SUBST_FILE(FORTRAN_GETARG)
 
 if test "x${slibdir}" = x ; then

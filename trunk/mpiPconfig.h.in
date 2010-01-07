@@ -27,8 +27,11 @@
 /* Define if using libunwind */
 #undef HAVE_LIBUNWIND
 
-/* Define if MPI I/O function are present */
+/* Define if MPI I/O functions are present */
 #undef HAVE_MPI_IO
+
+/* Define if MPI RMA functions are present */
+#undef HAVE_MPI_RMA
 
 /* Define if bfd_boolean not defined */
 #undef HAVE_BFD_BOOLEAN
