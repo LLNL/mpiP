@@ -9,7 +9,9 @@ VPATH = $(srcdir)
 
 include ../Defs.mak
 
-CFLAGS	+= -I..
+#  Specify compile flags to ensure debugging symbols and no optimization
+CFLAGS	= -g -I..
+FFLAGS  = -g
 LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
