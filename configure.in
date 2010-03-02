@@ -428,13 +428,6 @@ if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
   echo "Using dclock timer." 
 fi
 
-#  If none of the above are specified or found, use gettimeofday
-if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_GETTIMEOFDAY" = "xtrue") ; then
-AC_CHECK_FUNC(gettimeofday, AC_DEFINE(USE_GETTIMEOFDAY) USE_GETTIMEOFDAY=true TIMER_FOUND=yes
-  echo "Using gettimeofday timer."
-  )
-fi
-
 # If no appropriate timers were found, default to MPI_Wtime
 if test x$TIMER_FOUND = xno ; then
         AC_CHECK_FUNC(MPI_Wtime, AC_DEFINE(USE_WTIME)
