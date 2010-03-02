@@ -594,6 +594,8 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 slibdir
+USE_SETJMP
+USE_BACKTRACE
 TEST_LIST
 FORTRAN_GETARG_OBJ_FILE
 DEFAULT_TARGS
@@ -715,6 +717,7 @@ enable_mpi_io
 enable_mpi_rma
 enable_bfd
 enable_libunwind
+enable_setjmp
 enable_fortranxlate
 enable_fortranweak
 enable_stackdepth
@@ -1355,6 +1358,8 @@ Optional Features:
   --disable-mpi-rma       Disable MPI RMA reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
+  --enable-setjmp         Use setjmp instead of glic backtrace() to generate
+                          stack traces.
   --disable-fortranxlate  Disable translation of Fortran opaque objects.
   --enable-fortranweak    Generate weak symbols for additional Fortran symbol
                           name styles.
@@ -2717,6 +2722,19 @@ if test "${enable_libunwind+set}" = set; then :
   enableval=$enable_libunwind; if test x"$enableval" = xno ; then
 		DISABLE_LIBUNWIND=yes
 		echo Use of libunwind has been disabled
+	fi
+
+fi
+
+
+USE_SETJMP=no
+# Check whether --enable-setjmp was given.
+if test "${enable_setjmp+set}" = set; then :
+  enableval=$enable_setjmp; if test x"$enableval" = xyes ; then
+		USE_SETJMP=yes
+    $as_echo "#define USE_SETJMP 1" >>confdefs.h
+
+		echo Setjmp will be used to generate stack traces.
 	fi
 
 fi
@@ -5041,18 +5059,6 @@ if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
   echo "Using dclock timer."
 fi
 
-#  If none of the above are specified or found, use gettimeofday
-if test x$TIMER_FOUND = xno && (test x$TIMER_OPTION = xno || test "x$USE_GETTIMEOFDAY" = "xtrue") ; then
-ac_fn_c_check_func "$LINENO" "gettimeofday" "ac_cv_func_gettimeofday"
-if test "x$ac_cv_func_gettimeofday" = x""yes; then :
-  $as_echo "#define USE_GETTIMEOFDAY 1" >>confdefs.h
- USE_GETTIMEOFDAY=true TIMER_FOUND=yes
-  echo "Using gettimeofday timer."
-
-fi
-
-fi
-
 # If no appropriate timers were found, default to MPI_Wtime
 if test x$TIMER_FOUND = xno ; then
         ac_fn_c_check_func "$LINENO" "MPI_Wtime" "ac_cv_func_MPI_Wtime"
@@ -5069,11 +5075,14 @@ fi
 fi
 
 
+#  Not using AC_CHECK_LIB for libunwind as libunwnd API uses macros in libunwind.h to
+#  access platform-specific functions.
+HAVE_LIBUNWIND=no
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	ac_fn_c_check_header_mongrel "$LINENO" "libunwind.h" "ac_cv_header_libunwind_h" "$ac_includes_default"
 if test "x$ac_cv_header_libunwind_h" = x""yes; then :
   $as_echo "#define HAVE_LIBUNWIND 1" >>confdefs.h
- LIBS="$LIBS -lunwind"
+ LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes
 else
    if test x$build_cpu = xx86_64 ; then
 	  echo
@@ -5086,6 +5095,52 @@ else
 
 fi
 
+
+fi
+
+if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for backtrace in -lc" >&5
+$as_echo_n "checking for backtrace in -lc... " >&6; }
+if test "${ac_cv_lib_c_backtrace+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char backtrace ();
+int
+main ()
+{
+return backtrace ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_c_backtrace=yes
+else
+  ac_cv_lib_c_backtrace=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_c_backtrace" >&5
+$as_echo "$ac_cv_lib_c_backtrace" >&6; }
+if test "x$ac_cv_lib_c_backtrace" = x""yes; then :
+  $as_echo "#define USE_BACKTRACE 1" >>confdefs.h
+
+else
+  USE_SETJMP=yes
+fi
 
 fi
 
@@ -5591,6 +5646,8 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 ENABLE_BFD=$ENABLE_BFD
+
+
 
 
 
