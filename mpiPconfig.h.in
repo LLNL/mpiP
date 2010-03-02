@@ -75,6 +75,12 @@
 /* Determine whether to include weak symbol include files */
 #undef ENABLE_FORTRAN_WEAK_SYMS
 
+/* Use glibc backtrace for stack trace */
+#undef USE_BACKTRACE
+
+/* Use setjmp to get stack pointer for naive stack unwinding */
+#undef USE_SETJMP
+
 #endif /* _CONFIG_H */
 
 /* 

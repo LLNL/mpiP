@@ -222,6 +222,17 @@ AC_ARG_ENABLE(libunwind,
 	,
 )
 
+USE_SETJMP=no
+AC_ARG_ENABLE(setjmp,
+	AS_HELP_STRING(--enable-setjmp,Use setjmp instead of glic backtrace() to generate stack traces.),
+	if test x"$enableval" = xyes ; then
+		USE_SETJMP=yes
+    AC_DEFINE(USE_SETJMP)
+		echo Setjmp will be used to generate stack traces.
+	fi
+	,
+)
+
 AC_ARG_ENABLE(fortranxlate,
 	AS_HELP_STRING(--disable-fortranxlate,Disable translation of Fortran opaque objects.),
 	if test "$enable_fortranxlate" = "no" ; then
@@ -436,8 +447,11 @@ if test x$TIMER_FOUND = xno ; then
 fi
 
 
+#  Not using AC_CHECK_LIB for libunwind as libunwnd API uses macros in libunwind.h to
+#  access platform-specific functions.
+HAVE_LIBUNWIND=no
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
-	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind",
+	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes, 
 	[ if test x$build_cpu = xx86_64 ; then
 	  echo
 	  echo "  mpiP on x86_64 platforms requires libunwind."
@@ -447,6 +461,10 @@ if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	  exit 1
 	fi ]
 	)
+fi
+
+if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then 
+  AC_CHECK_LIB(c,backtrace, AC_DEFINE(USE_BACKTRACE),USE_SETJMP=yes)
 fi
 
 if test "$ENABLE_API_ONLY" = no && test "$DISABLE_MPI_IO" = no ; then
@@ -632,6 +650,8 @@ AC_SUBST(READ_REAL_TIME)
 AC_SUBST(DEFAULT_TARGS)
 AC_SUBST(FORTRAN_GETARG_OBJ_FILE)
 AC_SUBST(TEST_LIST)
+AC_SUBST(USE_BACKTRACE)
+AC_SUBST(USE_SETJMP)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(HAVE_MPI_RMA)
 AC_SUBST_FILE(FORTRAN_GETARG)
