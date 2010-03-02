@@ -18,6 +18,7 @@ static char *svnid = "$Id$";
 #include <setjmp.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mpiPi.h"
 
@@ -94,9 +95,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   return frame_count;
 }
 
-#else /* not LIBUNWIND */
-
-#ifdef OSF1
+#elif defined(OSF1)
 
 int
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
@@ -150,7 +149,35 @@ mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back)
   return 1;
 }
 
-#else /* not OSF1 and not MIPS+GCC */
+#elif defined(USE_BACKTRACE)
+
+#include <execinfo.h>
+
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
+{
+  int frame_count;
+  int internal_frames = 3;
+  int max_back;
+  void **cp;
+
+  max_back = report_back + internal_frames;
+
+  if ( max_back > MPIP_CALLSITE_STACK_DEPTH_MAX )
+    max_back = MPIP_CALLSITE_STACK_DEPTH_MAX-1;
+
+  frame_count = backtrace (pc_array, max_back);
+
+  memmove(pc_array, &(pc_array[internal_frames]), (frame_count-internal_frames)*sizeof(void*));
+  pc_array[frame_count-internal_frames] = NULL;
+
+  for ( cp = pc_array; cp != NULL && *cp != NULL; cp++ )
+    *cp = *cp - sizeof(cp);
+
+  return frame_count-internal_frames;
+}
+
+#elif defined(USE_SETJMP)
 
 int
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
@@ -225,8 +252,15 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   return frame_count;
 }
-#endif /* OSF1 */
-#endif /* libunwind */
+#else /* Could not identify stack tracing mechanism */
+
+int
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
+{
+  mpiPi_abort("Failed to configure appropriate stack tracing mechanism.");
+}
+#endif
+
 
 
 /* 

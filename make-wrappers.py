@@ -895,7 +895,8 @@ def CreateWrapper(funct, olist):
       olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
       olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )
     else :
-      olist.append("setjmp (jbuf);\n\n")
+      if ( useSetJmp == True ) :
+        olist.append("setjmp (jbuf);\n\n")
       olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
 
     for i in fdict[funct].paramConciseList:
@@ -1020,7 +1021,8 @@ def CreateWrapper(funct, olist):
     if ( 'mips' in arch ) :
       olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
     else :
-      olist.append("setjmp (jbuf);\n\n")
+      if ( useSetJmp == True ) :
+        olist.append("setjmp (jbuf);\n\n")
 
     #  Allocate any arrays used for translation
     for i in range(len(xlateVarNames)) :
@@ -1299,8 +1301,9 @@ def main():
     global doOpaqueXlate
     global arch
     global doWeakSymbols
+    global useSetJmp
 
-    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch=', 'weak'])
+    opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch=', 'weak', 'usesetjmp'])
 
     print "MPI Wrapper Generator ($Revision$)"
     #print "opts=",opts
@@ -1309,6 +1312,7 @@ def main():
     f77symbol = 'symbol'
     doOpaqueXlate = False
     doWeakSymbols = False
+    useSetJmp = False
     arch = 'unknown'
     
     for o, a in opts:
@@ -1320,6 +1324,8 @@ def main():
             doWeakSymbols = True
         if o == '--arch':
             arch = a
+        if o == '--usesetjmp':
+            useSetJmp = True
             
 
     ##### Load the input file
