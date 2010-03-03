@@ -52,7 +52,6 @@ ifneq ($(ENABLE_API_ONLY),yes)
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
-EXES += $(API_SRCS:.c=.exe)
 else
 EXES = $(API_SRCS:.c=.exe)
 endif
