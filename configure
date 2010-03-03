@@ -633,8 +633,8 @@ USE_LIBDWARF
 STACKDEPTH
 ENABLE_FORTRAN_WEAK_SYMS
 ENABLE_FORTRAN_XLATE
-DISABLE_MPI_RMA
-DISABLE_MPI_IO
+ENABLE_MPI_RMA
+ENABLE_MPI_IO
 BIN_TYPE_FLAG
 LIBUNWIND_LOC
 BINUTILS_DIR
@@ -2677,11 +2677,11 @@ fi
 
 if test "$ENABLE_API_ONLY" = no ; then
 
-DISABLE_MPI_IO=no
+ENABLE_MPI_IO=yes
 # Check whether --enable-mpi-io was given.
 if test "${enable_mpi_io+set}" = set; then :
   enableval=$enable_mpi_io; if test x"$enableval" = xno ; then
-		DISABLE_MPI_IO=yes
+		ENABLE_MPI_IO=no
 		echo Profiling of MPI I/O has been disabled.
 	fi
 
@@ -2692,11 +2692,11 @@ fi
 
 if test x"$ENABLE_API_ONLY" = xno ; then
 
-DISABLE_MPI_RMA=no
+ENABLE_MPI_RMA=yes
 # Check whether --enable-mpi-rma was given.
 if test "${enable_mpi_rma+set}" = set; then :
   enableval=$enable_mpi_rma; if test x"$enableval" = xno ; then
-		DISABLE_MPI_RMA=yes
+		ENABLE_MPI_RMA=no
 		echo Profiling of MPI RMA has been disabled.
 	fi
 
@@ -4165,6 +4165,7 @@ _ACEOF
 fi
 
 
+SOURCE_LOOKUP=none
 
 if test "x$ENABLE_BFD" = "xyes" ; then
   BFD_AUX_LIBS=
@@ -4735,7 +4736,7 @@ if test "x$ac_cv_have_decl_bfd_get_section_size" = x""yes; then :
   $as_echo "#define HAVE_BFD_GET_SECTION_SIZE 1" >>confdefs.h
 
 fi
-
+ SOURCE_LOOKUP=bfd
 
 else
   ENABLE_BFD=no
@@ -4859,6 +4860,7 @@ fi
       $as_echo "#define USE_LIBDWARF 1" >>confdefs.h
 
       echo " found libelf/libdwarf"
+      SOURCE_LOOKUP=libelf/libdwarf
     else
       echo " $ELFDWARF_ERR Not using libelf/libdwarf"
     fi
@@ -4955,6 +4957,7 @@ fi
 #
 
 TIMER_FOUND=no
+TIMER_NAME=none
 
 # use rts_get_timebase (BG/L) by default if it exists
 if test x$TIMER_FOUND = xno && \
@@ -4963,8 +4966,7 @@ ac_fn_c_check_func "$LINENO" "rts_get_timebase" "ac_cv_func_rts_get_timebase"
 if test "x$ac_cv_func_rts_get_timebase" = x""yes; then :
   $as_echo "#define USE_RTS_GET_TIMEBASE 1" >>confdefs.h
 
-        USE_RTS_GET_TIMEBASE=yes ; TIMER_FOUND=yes ;
-        echo "Using rts_get_timebase timer (assuming 700MHz)."
+        USE_RTS_GET_TIMEBASE=yes ; TIMER_FOUND=yes ; TIMER_NAME="rts_get_timebase (assuming 700MHz)" ;
 
 fi
 
@@ -4979,8 +4981,8 @@ ac_fn_c_check_decl "$LINENO" "_rtc" "ac_cv_have_decl__rtc" "#include <intrinsics
 if test "x$ac_cv_have_decl__rtc" = x""yes; then :
   $as_echo "#define USE_RTC 1" >>confdefs.h
 
-        USE_RTC=yes ; TIMER_FOUND=yes ;
-        echo "Using _rtc timer."
+        USE_RTC=yes ; TIMER_FOUND=yes ; TIMER_NAME=_rtc ;
+
 fi
 
 fi
@@ -5001,7 +5003,7 @@ fi
 
   fi
   if test x$TIMER_FOUND = xyes ; then
-    echo "Using $READ_REAL_TIME timer."
+    TIMER_NAME=$READ_REAL_TIME
   fi
 fi
 
@@ -5045,8 +5047,7 @@ fi
 $as_echo "$ac_cv_lib_rt_clock_gettime" >&6; }
 if test "x$ac_cv_lib_rt_clock_gettime" = x""yes; then :
   $as_echo "#define USE_CLOCK_GETTIME 1" >>confdefs.h
- USE_CLOCK_GETTIME=true TIMER_FOUND=yes LIBS="$LIBS -lrt"
-        echo "Using clock_gettime timer."
+ USE_CLOCK_GETTIME=true TIMER_FOUND=yes TIMER_NAME=clock_gettime LIBS="$LIBS -lrt"
 
 fi
 
@@ -5055,8 +5056,7 @@ fi
 # If specified, use dclock
 if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
   $as_echo "#define USE_DCLOCK 1" >>confdefs.h
- TIMER_FOUND=yes
-  echo "Using dclock timer."
+ TIMER_FOUND=yes TIMER_NAME=dclock
 fi
 
 # If no appropriate timers were found, default to MPI_Wtime
@@ -5064,8 +5064,7 @@ if test x$TIMER_FOUND = xno ; then
         ac_fn_c_check_func "$LINENO" "MPI_Wtime" "ac_cv_func_MPI_Wtime"
 if test "x$ac_cv_func_MPI_Wtime" = x""yes; then :
   $as_echo "#define USE_WTIME 1" >>confdefs.h
-
-          echo "Using MPI_Wtime timer."
+ TIMER_NAME=MPI_Wtime
 
 else
   echo Failed to find MPI_Wtime.  Trying to use gettimeofday.; $as_echo "#define USE_GETTIMEOFDAY 1" >>confdefs.h
@@ -5075,6 +5074,8 @@ fi
 fi
 
 
+UNWIND_WITH=internal
+
 #  Not using AC_CHECK_LIB for libunwind as libunwnd API uses macros in libunwind.h to
 #  access platform-specific functions.
 HAVE_LIBUNWIND=no
@@ -5082,7 +5083,7 @@ if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	ac_fn_c_check_header_mongrel "$LINENO" "libunwind.h" "ac_cv_header_libunwind_h" "$ac_includes_default"
 if test "x$ac_cv_header_libunwind_h" = x""yes; then :
   $as_echo "#define HAVE_LIBUNWIND 1" >>confdefs.h
- LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes
+ LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes UNWIND_WITH=libunwind
 else
    if test x$build_cpu = xx86_64 ; then
 	  echo
@@ -5137,14 +5138,14 @@ fi
 $as_echo "$ac_cv_lib_c_backtrace" >&6; }
 if test "x$ac_cv_lib_c_backtrace" = x""yes; then :
   $as_echo "#define USE_BACKTRACE 1" >>confdefs.h
-
+ UNWIND_WITH=glibc-backtrace
 else
   USE_SETJMP=yes
 fi
 
 fi
 
-if test "$ENABLE_API_ONLY" = no && test "$DISABLE_MPI_IO" = no ; then
+if test "$ENABLE_API_ONLY" = no && test "$ENABLE_MPI_IO" = yes ; then
 ac_fn_c_check_func "$LINENO" "MPI_File_open" "ac_cv_func_MPI_File_open"
 if test "x$ac_cv_func_MPI_File_open" = x""yes; then :
   $as_echo "#define HAVE_MPI_IO 1" >>confdefs.h
@@ -5193,7 +5194,7 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI I/O symbols not found.  MPI I/O reporting deactivated." >&5
 $as_echo "MPI I/O symbols not found.  MPI I/O reporting deactivated." >&6; }
                 HAVE_MPI_IO=/dev/null
-                DISABLE_MPI_IO=yes
+                ENABLE_MPI_IO=no
 fi
 
 
@@ -5203,7 +5204,7 @@ else
   HAVE_MPI_IO=/dev/null
 fi
 
-if test "x$ENABLE_API_ONLY" = xno && test "x$DISABLE_MPI_RMA" = xno ; then
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_RMA" = xyes ; then
 ac_fn_c_check_func "$LINENO" "MPI_Win_fence" "ac_cv_func_MPI_Win_fence"
 if test "x$ac_cv_func_MPI_Win_fence" = x""yes; then :
   $as_echo "#define HAVE_MPI_RMA 1" >>confdefs.h
@@ -5212,7 +5213,7 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI RMA symbols not found.  MPI RMA reporting deactivated." >&5
 $as_echo "MPI RMA symbols not found.  MPI RMA reporting deactivated." >&6; }
                 HAVE_MPI_RMA=/dev/null
-                DISABLE_MPI_RMA=yes
+                ENABLE_MPI_RMA=no
 
 fi
 
@@ -6895,3 +6896,21 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
+#
+#  Print out Summary of configuration
+#
+
+echo
+echo "********************************************************************************"
+echo "  mpiP Configuration Summary"
+echo
+echo "  C compiler               : ${CC}"
+echo "  Fortran compiler         : ${F77}"
+echo
+echo "  Timer                    : ${TIMER_NAME}"
+echo "  Stack Unwinding          : ${UNWIND_WITH}"
+echo "  Address to Source Lookup : ${SOURCE_LOOKUP}"
+echo
+echo "  MPI-I/O support          : ${ENABLE_MPI_IO}"
+echo "  MPI-RMA support          : ${ENABLE_MPI_RMA}"
+echo "********************************************************************************"
