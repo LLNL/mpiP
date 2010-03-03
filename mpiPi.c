@@ -137,6 +137,7 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_time = 0.0;
   mpiPi.global_mpi_size = 0.0;
   mpiPi.global_mpi_io = 0.0;
+  mpiPi.global_mpi_rma = 0.0;
   mpiPi.global_mpi_msize_threshold_count = 0;
   mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
@@ -454,6 +455,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 	  newp->maxIO = p->maxIO;
 	  newp->minIO = p->minIO;
 	  newp->cumulativeIO = p->cumulativeIO;
+	  newp->cumulativeRMA = p->cumulativeRMA;
 	  newp->arbitraryMessageCount = p->arbitraryMessageCount;
 	  newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
 
@@ -475,6 +477,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 	  csp->maxIO = max (csp->maxIO, p->maxIO);
 	  csp->minIO = min (csp->minIO, p->minIO);
 	  csp->cumulativeIO += p->cumulativeIO;
+	  csp->cumulativeRMA += p->cumulativeRMA;
 	  csp->arbitraryMessageCount += p->arbitraryMessageCount;
 	}
     }
@@ -505,6 +508,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
       newp->minDataSent = p->minDataSent;
       newp->cumulativeDataSent = p->cumulativeDataSent;
       newp->cumulativeIO = p->cumulativeIO;
+      newp->cumulativeRMA = p->cumulativeRMA;
       newp->maxIO = p->maxIO;
       newp->minIO = p->minIO;
       newp->cookie = MPIP_CALLSITE_STATS_COOKIE;
@@ -534,6 +538,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
       csp->maxIO = max (csp->maxIO, p->maxIO);
       csp->minIO = min (csp->minIO, p->minIO);
       csp->cumulativeIO += p->cumulativeIO;
+      csp->cumulativeRMA += p->cumulativeRMA;
 
       if (mpiPi.calcCOV)
 	{
@@ -549,6 +554,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
   assert (mpiPi.global_mpi_time >= 0);
   mpiPi.global_mpi_size += p->cumulativeDataSent;
   mpiPi.global_mpi_io += p->cumulativeIO;
+  mpiPi.global_mpi_rma += p->cumulativeRMA;
   if (p->cumulativeTime > 0)
     mpiPi.global_time_callsite_count++;
 
@@ -946,7 +952,7 @@ mpiPi_finalize ()
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
-			     double dur, double sendSize, double ioSize)
+			     double dur, double sendSize, double ioSize, double rmaSize)
 {
   int i;
   callsite_stats_t *csp = NULL;
@@ -995,6 +1001,7 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   csp->minDur = min (csp->minDur, dur);
   csp->cumulativeDataSent += sendSize;
   csp->cumulativeIO += ioSize;
+  csp->cumulativeRMA += rmaSize;
 
   csp->maxDataSent = max (csp->maxDataSent, sendSize);
   csp->minDataSent = min (csp->minDataSent, sendSize);
@@ -1002,6 +1009,8 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   csp->maxIO = max (csp->maxIO, ioSize);
   csp->minIO = min (csp->minIO, ioSize);
 
+  csp->maxRMA = max (csp->maxRMA, rmaSize);
+  csp->minRMA = min (csp->minRMA, rmaSize);
 
   if (mpiPi.messageCountThreshold > -1
       && sendSize >= (double) mpiPi.messageCountThreshold)

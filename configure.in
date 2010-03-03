@@ -480,7 +480,7 @@ else
   HAVE_MPI_IO=/dev/null
 fi
 
-if test "$ENABLE_API_ONLY" = no && test "$DISABLE_MPI_RMA" = no ; then
+if test "x$ENABLE_API_ONLY" = xno && test "x$DISABLE_MPI_RMA" = xno ; then
 AC_CHECK_FUNC(MPI_Win_fence,
               AC_DEFINE(HAVE_MPI_RMA) HAVE_MPI_RMA=mpi.rma.protos.txt,
                 AC_MSG_RESULT([MPI RMA symbols not found.  MPI RMA reporting deactivated.])
