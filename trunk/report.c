@@ -2574,8 +2574,8 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
 			{
 			  sCount += task_data[j].count;
 			  sCumulative += task_data[j].cumulativeIO;
-			  sMax = max (task_data[j].maxDataSent, sMax);
-			  sMin = min (task_data[j].minDataSent, sMin);
+			  sMax = max (task_data[j].maxIO, sMax);
+			  sMin = min (task_data[j].minIO, sMin);
 
 			  fprintf (fp,
 				   mpiP_Report_Formats
