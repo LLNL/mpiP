@@ -105,7 +105,7 @@ mpiPdemangle (const char *mangledSym)
 #endif
 
 
-void
+static void
 find_address_in_section (abfd, section, data)
      bfd *abfd;
      asection *section;
@@ -416,7 +416,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 #include <aouthdr.h>
 #include <scnhdr.h>
 
-unsigned long long
+static unsigned long long
 mpiPi_get_text_start (char *filename)
 {
   int fh;

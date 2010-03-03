@@ -265,7 +265,7 @@ print_intro_line (FILE * fp, char *name, char *fmt, ...)
 }
 
 
-double
+static double
 calc_COV (double *data, int dataSize)
 {
   int idx;
@@ -298,7 +298,7 @@ calc_COV (double *data, int dataSize)
 }
 
 
-void
+static void
 mpiPi_print_report_header (FILE * fp)
 {
   int i;
@@ -341,7 +341,7 @@ mpiPi_print_report_header (FILE * fp)
 		    0 ? "Single collector task" : "Collective");
 }
 
-void
+static void
 mpiPi_print_task_assignment (FILE * fp)
 {
   int i;
@@ -353,7 +353,7 @@ mpiPi_print_task_assignment (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_verbose_task_info (FILE * fp)
 {
   int i;
@@ -399,7 +399,7 @@ mpiPi_print_verbose_task_info (FILE * fp)
 	   mpiPi.global_app_time : 0);
 }
 
-void
+static void
 mpiPi_print_concise_task_info (FILE * fp)
 {
   double min_app_time = DBL_MAX, min_mpi_time = DBL_MAX;
@@ -485,7 +485,7 @@ mpiPi_print_concise_task_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_print_callsites (FILE * fp)
 {
   int i, ac;
@@ -565,7 +565,7 @@ mpiPi_print_callsites (FILE * fp)
   free (av);
 }
 
-void
+static void
 mpiPi_print_top_time_sites (FILE * fp)
 {
   int i, ac;
@@ -632,7 +632,7 @@ mpiPi_print_top_time_sites (FILE * fp)
   free (av);
 }
 
-void
+static void
 mpiPi_print_top_sent_sites (FILE * fp)
 {
   int i, ac;
@@ -679,7 +679,7 @@ mpiPi_print_top_sent_sites (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_top_io_sites (FILE * fp)
 {
   int i, ac;
@@ -720,7 +720,7 @@ mpiPi_print_top_io_sites (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_top_rma_sites (FILE * fp)
 {
   int i, ac;
@@ -761,7 +761,7 @@ mpiPi_print_top_rma_sites (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_all_callsite_time_info (FILE * fp)
 {
   int i, ac;
@@ -847,7 +847,7 @@ mpiPi_print_all_callsite_time_info (FILE * fp)
   free (av);
 }
 
-int
+static int
 callsite_stats_sort_by_cumulative (mpiPi_callsite_summary_t * cs1,
 				   mpiPi_callsite_summary_t * cs2)
 {
@@ -862,7 +862,7 @@ callsite_stats_sort_by_cumulative (mpiPi_callsite_summary_t * cs1,
   return 0;
 }
 
-void
+static void
 mpiPi_print_concise_callsite_time_info (FILE * fp)
 {
   int i, ac, csidx = 0;
@@ -974,7 +974,7 @@ mpiPi_print_concise_callsite_time_info (FILE * fp)
   free (callsite_stats);
 }
 
-void
+static void
 mpiPi_print_callsite_sent_info (FILE * fp)
 {
   if (mpiPi.report_style == mpiPi_style_verbose)
@@ -984,7 +984,7 @@ mpiPi_print_callsite_sent_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_print_all_callsite_sent_info (FILE * fp)
   /*  Print Sent Data Section  */
 {
@@ -1069,7 +1069,7 @@ mpiPi_print_all_callsite_sent_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_print_concise_callsite_sent_info (FILE * fp)
 {
   int i, ac, csidx = 0;
@@ -1196,7 +1196,7 @@ mpiPi_print_concise_callsite_sent_info (FILE * fp)
   free (callsite_stats);
 }
 
-void
+static void
 mpiPi_print_all_callsite_io_info (FILE * fp)
 {
   int i, ac;
@@ -1281,7 +1281,7 @@ mpiPi_print_all_callsite_io_info (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_all_callsite_rma_info (FILE * fp)
 {
   int i, ac;
@@ -1367,7 +1367,7 @@ mpiPi_print_all_callsite_rma_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_print_concise_callsite_io_info (FILE * fp)
 {
   int i, ac, csidx = 0;
@@ -1499,7 +1499,7 @@ mpiPi_print_concise_callsite_io_info (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_print_concise_callsite_rma_info (FILE * fp)
 {
   int i, ac, csidx = 0;
@@ -1631,7 +1631,7 @@ mpiPi_print_concise_callsite_rma_info (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 {
   int i, j, ac;
@@ -1781,7 +1781,7 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_coll_print_concise_callsite_time_info (FILE * fp)
 {
   int i, ac;
@@ -1899,7 +1899,7 @@ mpiPi_coll_print_concise_callsite_time_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_coll_print_concise_callsite_sent_info (FILE * fp)
 {
   int ci, i, ac, callsite_count;
@@ -2032,7 +2032,7 @@ mpiPi_coll_print_concise_callsite_sent_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_coll_print_concise_callsite_io_info (FILE * fp)
 {
   int ci, i, ac, callsite_count;
@@ -2169,7 +2169,7 @@ mpiPi_coll_print_concise_callsite_io_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_coll_print_concise_callsite_rma_info (FILE * fp)
 {
   int ci, i, ac, callsite_count;
@@ -2304,7 +2304,7 @@ mpiPi_coll_print_concise_callsite_rma_info (FILE * fp)
 
 
 
-void
+static void
 mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 {
   int i, j, ac;
@@ -2460,7 +2460,7 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_coll_print_all_callsite_io_info (FILE * fp)
 {
   int i, j, ac;
@@ -2617,7 +2617,7 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
 }
 
 
-void
+static void
 mpiPi_coll_print_all_callsite_rma_info (FILE * fp)
 {
   int i, j, ac;
@@ -2791,7 +2791,7 @@ mpiPi_profile_print (FILE * fp, int report_style)
 }
 
 
-void
+static void
 mpiPi_profile_print_concise (FILE * fp)
 {
   if (mpiPi.collectorRank == mpiPi.rank)
@@ -2826,7 +2826,7 @@ mpiPi_profile_print_concise (FILE * fp)
     }
 }
 
-void
+static void
 mpiPi_profile_print_verbose (FILE * fp)
 {
   if (mpiPi.collectorRank == mpiPi.rank)
