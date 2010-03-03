@@ -2530,7 +2530,7 @@ if test "${with_binutils_dir+set}" = set; then :
 	echo Using binutils-dir: $withval
 
 else
-  BINUTILS_DIR=unknown
+  BINUTILS_DIR=/usr
 
 fi
 
