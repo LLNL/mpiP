@@ -27,6 +27,61 @@ static char *svnid = "$Id$";
 
 #define icmp(a,b) (((a)<(b))?(-1):(((a)>(b))?(1):(0)))
 
+/*  Structure used to track callsite statistics for the detail
+ *  sections of the concise report.
+ *  */
+typedef struct _mpiPi_callsite_stats
+{
+  char *name;
+  int site;
+  long long count;
+  double max;
+  double min;
+  double cumulative;
+  int max_rnk;
+  int min_rnk;
+} mpiPi_callsite_summary_t;
+
+static void print_section_heading(FILE *fp, char *str);
+static int callsite_src_id_cache_sort_by_id(const void *a, const void *b);
+static int callsite_sort_by_cumulative_time(const void *a, const void *b);
+static int callsite_sort_by_cumulative_size(const void *a, const void *b);
+static int callsite_sort_by_cumulative_io(const void *a, const void *b);
+static int callsite_sort_by_cumulative_rma(const void *a, const void *b);
+static int callsite_sort_by_name_id_rank(const void *a, const void *b);
+static void print_intro_line(FILE *fp, char *name, char *fmt, ...);
+static double calc_COV(double *data, int dataSize);
+static void mpiPi_print_report_header(FILE *fp);
+static void mpiPi_print_task_assignment(FILE *fp);
+static void mpiPi_print_verbose_task_info(FILE *fp);
+static void mpiPi_print_concise_task_info(FILE *fp);
+static void mpiPi_print_callsites(FILE *fp);
+static void mpiPi_print_top_time_sites(FILE *fp);
+static void mpiPi_print_top_sent_sites(FILE *fp);
+static void mpiPi_print_top_io_sites(FILE *fp);
+static void mpiPi_print_top_rma_sites(FILE *fp);
+static void mpiPi_print_all_callsite_time_info(FILE *fp);
+static int callsite_stats_sort_by_cumulative(mpiPi_callsite_summary_t *cs1, mpiPi_callsite_summary_t *cs2);
+static void mpiPi_print_concise_callsite_time_info(FILE *fp);
+static void mpiPi_print_callsite_sent_info(FILE *fp);
+static void mpiPi_print_all_callsite_sent_info(FILE *fp);
+static void mpiPi_print_concise_callsite_sent_info(FILE *fp);
+static void mpiPi_print_all_callsite_io_info(FILE *fp);
+static void mpiPi_print_all_callsite_rma_info(FILE *fp);
+static void mpiPi_print_concise_callsite_io_info(FILE *fp);
+static void mpiPi_print_concise_callsite_rma_info(FILE *fp);
+static void mpiPi_coll_print_all_callsite_time_info(FILE *fp);
+static void mpiPi_coll_print_concise_callsite_time_info(FILE *fp);
+static void mpiPi_coll_print_concise_callsite_sent_info(FILE *fp);
+static void mpiPi_coll_print_concise_callsite_io_info(FILE *fp);
+static void mpiPi_coll_print_concise_callsite_rma_info(FILE *fp);
+static void mpiPi_coll_print_all_callsite_sent_info(FILE *fp);
+static void mpiPi_coll_print_all_callsite_io_info(FILE *fp);
+static void mpiPi_coll_print_all_callsite_rma_info(FILE *fp);
+extern void mpiPi_profile_print(FILE *fp, int report_style);
+static void mpiPi_profile_print_concise(FILE *fp);
+static void mpiPi_profile_print_verbose(FILE *fp);
+
 static char *mpiP_Report_Formats[][2] = {
   {
    /*  MPIP_MPI_TIME_FMT  */
@@ -86,21 +141,6 @@ static char *mpiP_Report_Formats[][2] = {
    "%-17s %4d %7lld %9.4g %9.4g %9.4g %6d %6d\n",
    "%-17s %4d %7lld %9.4f %9.4f %9.4f %6d %6d\n"}
 };
-
-/*  Structure used to track callsite statistics for the detail
- *  sections of the concise report.
- *  */
-typedef struct _mpiPi_callsite_stats
-{
-  char *name;
-  int site;
-  long long count;
-  double max;
-  double min;
-  double cumulative;
-  int max_rnk;
-  int min_rnk;
-} mpiPi_callsite_summary_t;
 
 static void
 print_section_heading (FILE * fp, char *str)
