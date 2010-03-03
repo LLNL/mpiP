@@ -28,7 +28,7 @@ mpiPi_callsite_stats_pc_hashkey (const void *p)
   MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp);
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
-      res ^= (unsigned) csp->pc[i];
+      res ^= (unsigned)(long) csp->pc[i];
     }
   return 52271 ^ csp->op ^ res ^ csp->rank;
 }
