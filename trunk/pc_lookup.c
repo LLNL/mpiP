@@ -149,10 +149,14 @@ find_address_in_section (abfd, section, data)
 
   if (local_pc < vma)
     {
-      mpiPi_msg_debug
-	("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
-	 mpiP_format_address ((void *) local_pc, addr_buf1),
-	 mpiP_format_address ((void *) vma, addr_buf2));
+      if ( mpiPi_debug == 1 )
+      {
+        sprintf_vma(addr_buf1, local_pc);
+        sprintf_vma(addr_buf2, vma);
+        mpiPi_msg_debug
+          ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n", 
+           addr_buf1, addr_buf2);
+      }
       return;
     }
 
@@ -170,11 +174,14 @@ find_address_in_section (abfd, section, data)
 
   if (local_pc >= vma + size)
     {
-      mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
-		       mpiP_format_address ((void *) local_pc, addr_buf1),
-		       mpiP_format_address ((void *) vma, addr_buf2),
-		       mpiP_format_address ((void *) (vma + size),
-					    addr_buf3));
+      if (mpiPi_debug == 1)
+        {
+          sprintf_vma(addr_buf1, local_pc);
+          sprintf_vma(addr_buf2, vma);
+          sprintf_vma(addr_buf3, (vma+size));
+          mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
+              addr_buf1, addr_buf2, addr_buf3);
+        }
       return;
     }
 
@@ -182,22 +189,26 @@ find_address_in_section (abfd, section, data)
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
 				 &filename, &functionname, &line);
 
-  if (!found)
+  if (!found && mpiPi_debug == 1)
     {
+      sprintf_vma(addr_buf1, local_pc);
+      sprintf_vma(addr_buf2, vma);
+      sprintf_vma(addr_buf3, (vma+size));
       mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
-		       mpiP_format_address ((void *) local_pc, addr_buf1),
-		       mpiP_format_address ((void *) vma, addr_buf2),
-		       mpiP_format_address ((void *) (vma + size),
-					    addr_buf3));
+		       addr_buf1, addr_buf2, addr_buf3);
     }
 
-  mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
-		   mpiP_format_address ((void *) local_pc, addr_buf1),
-		   mpiP_format_address ((void *) vma, addr_buf2),
-		   mpiP_format_address ((void *) (vma + size), addr_buf3));
+  if ( mpiPi_debug == 1 )
+  {
+    sprintf_vma(addr_buf1, local_pc);
+    sprintf_vma(addr_buf2, vma);
+    sprintf_vma(addr_buf3, (vma+size));
+    mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
+        addr_buf1, addr_buf2, addr_buf3);
 
-  mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
-		   filename, functionname, line);
+    mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
+        filename, functionname, line);
+  }
 }
 
 
