@@ -60,8 +60,11 @@ typedef struct _callsite_stats
   double minDataSent;
   double maxIO;
   double minIO;
+  double maxRMA;
+  double minRMA;
   double cumulativeDataSent;
   double cumulativeIO;
+  double cumulativeRMA;
   long long arbitraryMessageCount;
   double *siteData;
   int siteDataIdx;
@@ -162,6 +165,7 @@ typedef struct _mpiPi_t
   double global_mpi_time;
   double global_mpi_size;
   double global_mpi_io;
+  double global_mpi_rma;
   long long global_mpi_msize_threshold_count;
   long long global_mpi_sent_count;
   long long global_time_callsite_count;

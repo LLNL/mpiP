@@ -89,6 +89,16 @@ ioParamDict = {
     ( "MPI_File_write_at", "datatype"):2
     }
 
+rmaParamDict = {
+
+    ( "MPI_Accumulate", "target_count"):1,
+    ( "MPI_Accumulate", "target_datatype"):2,
+    ( "MPI_Get", "origin_count"):1,
+    ( "MPI_Get", "origin_datatype"):2,
+    ( "MPI_Put", "origin_count"):1,
+    ( "MPI_Put", "origin_datatype"):2
+    }
+
 noDefineList = [
     "MPI_Pcontrol"
     ]
@@ -407,6 +417,8 @@ class fdecl:
         self.recvTypePname = ""
         self.ioCountPname = ""
         self.ioTypePname = ""
+        self.rmaCountPname = ""
+        self.rmaTypePname = ""
 
 class xlateEntry:
     def __init__ (self,mpiType,varName):
@@ -486,6 +498,7 @@ def ParamDictUpdate(fname):
     global fdict
     global messParamDict
     global ioParamDict
+    global rmaParamDict
     for p in fdict[fname].paramList:
 	## check for pointers, arrays
 	pname = "NULL"
@@ -539,6 +552,14 @@ def ParamDictUpdate(fname):
                 fdict[fname].ioCountPname = pname
             elif paramMessType == 2:
                 fdict[fname].ioTypePname = pname
+            
+        #  Identify and assign rma size parameters
+        if rmaParamDict.has_key((fname,pname)):
+            paramMessType = rmaParamDict[(fname,pname)]
+            if paramMessType == 1:
+                fdict[fname].rmaCountPname = pname
+            elif paramMessType == 2:
+                fdict[fname].rmaTypePname = pname
             
 	if (fdict[fname].paramDict[pname].pointerLevel == 0) \
 	   and (fdict[fname].paramDict[pname].arrayLevel == 0) \
@@ -800,7 +821,7 @@ def CreateWrapper(funct, olist):
     olist.append(")")
     # start wrapper code
     olist.append("{")
-    olist.append( "int rc, enabledState; double dur; int tsize; double messSize = 0.; double ioSize = 0.; \nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
+    olist.append( "int rc, enabledState; double dur; int tsize; double messSize = 0.; double ioSize = 0.; double rmaSize =0.;\nmpiPi_TIME start, end;\nvoid *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
 
     olist.append("\nif (mpiPi.enabled) {\n")
     if fdict[funct].wrapperPreList:
@@ -857,6 +878,13 @@ def CreateWrapper(funct, olist):
                       + "&tsize);\n" 
                       + "ioSize = (double)(tsize * *"
                       +  fdict[funct].ioCountPname + ");\n")
+
+    if fdict[funct].rmaCountPname != "":
+        olist.append( "\n" 
+                      + "PMPI_Type_size(*" + fdict[funct].rmaTypePname + ", " 
+                      + "&tsize);\n" 
+                      + "rmaSize = (double)(tsize * *"
+                      +  fdict[funct].rmaCountPname + ");\n")
     
     olist.append("\n" \
 		 + "if ( dur < 0 )\n"
@@ -867,7 +895,8 @@ def CreateWrapper(funct, olist):
                   + "call_stack, "
                   + "dur, "
                   + "(double)messSize,"
-                  + "(double)ioSize"
+                  + "(double)ioSize,"
+                  + "(double)rmaSize"
                   + ");\n" )
 
     # end of enabled check

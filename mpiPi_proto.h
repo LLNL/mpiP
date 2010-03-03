@@ -49,7 +49,7 @@ extern void mpiPi_generateReport (int report_style);
 extern void mpiPi_finalize (void);
 extern void mpiPi_update_callsite_stats (unsigned op, unsigned rank,
 					 void **pc, double dur,
-					 double sendSize, double ioSize);
+					 double sendSize, double ioSize, double rmaSize);
 extern char *mpiPdemangle (const char *mangledSym);
 extern int mpiP_find_src_loc (void *i_addr_hex, char **o_file_str,
 			      int *o_lineno, char **o_funct_str);
@@ -74,16 +74,33 @@ extern void mpiPi_copy_args (int *ac, char **av, int av_len);
 extern void mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc,
 				   char **argv);
 extern unsigned long long mpiPi_get_text_start (char *filename);
-extern void mpiPi_print_callsite_time_info (FILE * fp);
-extern void mpiPi_print_all_callsite_time_info (FILE * fp);
-extern void mpiPi_print_concise_callsite_time_info (FILE * fp);
-extern void mpiPi_print_callsite_sent_info (FILE * fp);
-extern void mpiPi_print_all_callsite_sent_info (FILE * fp);
-extern void mpiPi_print_concise_callsite_sent_info (FILE * fp);
-extern void mpiPi_print_task_info (FILE * fp, int report_style);
-extern void mpiPi_print_verbose_task_info (FILE * fp);
-extern void mpiPi_print_concise_task_info (FILE * fp);
 
+extern void mpiPi_print_report_header(FILE *fp);
+extern void mpiPi_print_task_assignment(FILE *fp);
+extern void mpiPi_print_verbose_task_info(FILE *fp);
+extern void mpiPi_print_concise_task_info(FILE *fp);
+extern void mpiPi_print_callsites(FILE *fp);
+extern void mpiPi_print_top_time_sites(FILE *fp);
+extern void mpiPi_print_top_sent_sites(FILE *fp);
+extern void mpiPi_print_top_io_sites(FILE *fp);
+extern void mpiPi_print_top_rma_sites(FILE *fp);
+extern void mpiPi_print_all_callsite_time_info(FILE *fp);
+extern void mpiPi_print_concise_callsite_time_info(FILE *fp);
+extern void mpiPi_print_callsite_sent_info(FILE *fp);
+extern void mpiPi_print_all_callsite_sent_info(FILE *fp);
+extern void mpiPi_print_concise_callsite_sent_info(FILE *fp);
+extern void mpiPi_print_all_callsite_io_info(FILE *fp);
+extern void mpiPi_print_all_callsite_rma_info(FILE *fp);
+extern void mpiPi_print_concise_callsite_io_info(FILE *fp);
+extern void mpiPi_print_concise_callsite_rma_info(FILE *fp);
+extern void mpiPi_coll_print_all_callsite_time_info(FILE *fp);
+extern void mpiPi_coll_print_concise_callsite_time_info(FILE *fp);
+extern void mpiPi_coll_print_concise_callsite_sent_info(FILE *fp);
+extern void mpiPi_coll_print_concise_callsite_io_info(FILE *fp);
+extern void mpiPi_coll_print_concise_callsite_rma_info(FILE *fp);
+extern void mpiPi_coll_print_all_callsite_sent_info(FILE *fp);
+extern void mpiPi_coll_print_all_callsite_io_info(FILE *fp);
+extern void mpiPi_coll_print_all_callsite_rma_info(FILE *fp);
 
 /*
   
