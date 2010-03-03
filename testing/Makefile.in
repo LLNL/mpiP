@@ -3,8 +3,8 @@
 # @configure_input@
 
 srcdir=@srcdir@
-exclude_mpi_io_tests=@DISABLE_MPI_IO@
-exclude_mpi_rma_tests=@DISABLE_MPI_RMA@
+include_mpi_io_tests=@ENABLE_MPI_IO@
+include_mpi_rma_tests=@ENABLE_MPI_RMA@
 VPATH = $(srcdir)
 
 include ../Defs.mak
@@ -37,11 +37,11 @@ CSRCS =	0-simple.c \
 	15-pcontrol.c \
 	timer-info.c
 
-ifeq (${exclude_mpi_io_tests},no)
+ifeq (${include_mpi_io_tests},yes)
 CSRCS += 14-mpiio.c
 endif
 
-ifeq (${exclude_mpi_rma_tests},no)
+ifeq (${include_mpi_rma_tests},yes)
 CSRCS += 17-rma.c
 endif
 
