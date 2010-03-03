@@ -152,12 +152,24 @@ endif
 clean :: 
 	rm -f ${API_OBJS}
 
+ifeq (${ARCH}, x86_64)
+BINUTILS_LIB_DIR=lib64
+else
+BINUTILS_LIB_DIR=lib
+endif
+
+BFD_LIBS = libbfd.a libiberty.a
+ifeq (${OS}, AIX)
+BFD_LIBS := ${BFD_LIBS} libintl.a
+endif
+
 add_binutils_objs:
+	-rm -rf mpip_temp_obj_dir
 	-mkdir mpip_temp_obj_dir
 	cd mpip_temp_obj_dir; \
-	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libbfd.a ; \
-	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libiberty.a ; \
-	ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/lib/libintl.a ; \
+	for lib in ${BFD_LIBS} ; do \
+	   ar -x ${BIN_TYPE_FLAG} ${BINUTILS_DIR}/${BINUTILS_LIB_DIR}/$${lib} ; \
+	done ; \
 	if [ "x$(ENABLE_API_ONLY)" = "xno" ] ; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${C_TARGET} *.o ; \
 	  if [ "x${FORTRAN_TARGET}" != "x" ]; then \
@@ -168,7 +180,7 @@ add_binutils_objs:
 	if [ "x${API_TARGET}" != "x" ]; then \
 	  ar -q ${BIN_TYPE_FLAG} ../${API_TARGET} *.o ; fi ; \
 	cd .. ; \
-	rm -rf mpip_temp_obj_dir
+rm -rf mpip_temp_obj_dir
 
 add_libunwind_objs:
 	-mkdir mpip_temp_obj_dir

@@ -70,7 +70,7 @@ AC_ARG_WITH(binutils-dir,
 	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
 	echo Using binutils-dir: $withval
 	,
-	BINUTILS_DIR=unknown
+	BINUTILS_DIR=/usr
 )
 AC_SUBST(BINUTILS_DIR)
 
