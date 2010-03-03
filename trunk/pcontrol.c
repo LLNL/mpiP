@@ -64,6 +64,7 @@ mpiPi_reset_callsite_data ()
   mpiPi.global_mpi_time = 0;
   mpiPi.global_mpi_size = 0;
   mpiPi.global_mpi_io = 0;
+  mpiPi.global_mpi_rma = 0;
   mpiPi.global_mpi_msize_threshold_count = 0;
   mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
