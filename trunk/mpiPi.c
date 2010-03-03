@@ -201,7 +201,7 @@ callsite_pc_cache_entry_t;
 
 h_t *callsite_pc_cache = NULL;
 
-int
+static int
 callsite_pc_cache_comparator (const void *p1, const void *p2)
 {
   callsite_pc_cache_entry_t *cs1 = (callsite_pc_cache_entry_t *) p1;
@@ -218,7 +218,7 @@ callsite_pc_cache_comparator (const void *p1, const void *p2)
   return 0;
 }
 
-int
+static int
 callsite_pc_cache_hashkey (const void *p1)
 {
   callsite_pc_cache_entry_t *cs1 = (callsite_pc_cache_entry_t *) p1;
@@ -290,7 +290,7 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
 h_t *callsite_src_id_cache = NULL;
 int callsite_src_id_counter = 1;
 
-int
+static int
 callsite_src_id_cache_comparator (const void *p1, const void *p2)
 {
   int i;
@@ -327,7 +327,7 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   return 0;
 }
 
-int
+static int
 callsite_src_id_cache_hashkey (const void *p1)
 {
   int i, j;
@@ -570,7 +570,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 
 #ifndef ENABLE_API_ONLY		/* { */
 
-int
+static int
 mpiPi_mergeResults ()
 {
   int ac;
@@ -732,7 +732,7 @@ mpiPi_mergeResults ()
 }
 
 
-void
+static void
 mpiPi_publishResults (int report_style)
 {
   FILE *fp = NULL;
@@ -778,7 +778,7 @@ mpiPi_publishResults (int report_style)
  * mpiPi_collect_basics() - all tasks send their basic info to the
  * collectorRank.
  */
-void
+static void
 mpiPi_collect_basics ()
 {
   int i = 0;
