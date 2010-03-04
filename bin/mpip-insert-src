@@ -95,7 +95,7 @@ while (<REPORT>)
     {
       $call = "";
     }
-    printf ( "%3d%4d %-16s%5d %-24s %-20s\n", $id, $lev,
+    printf ( "%3d%4d %-19s%5d %-24s %-20s\n", $id, $lev,
              $source{$addr}->{file}, $source{$addr}->{line},
              $source{$addr}->{func}, $call ) ;
   }

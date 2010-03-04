@@ -335,7 +335,7 @@ TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
   AC_CHECK_PROGS(CC, mpxlc mpixlc mpcc_r mpicc cmpicc gcc cc icc, mpicc)
   AC_CHECK_PROGS(CXX, mpCC_r mpixlcxx xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpiCC)
-  AC_CHECK_PROGS(F77, mpxlf_r mpixlf77 xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc, mpif77)
+  AC_CHECK_PROGS(F77, mpxlf_r mpixlf77 mpxlf mpif77 cmpifc xlf f77 g77 pgf77 fort ifc, mpif77)
   AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
 else
   AC_CHECK_PROGS(CC, xlc gcc cc icc, mpicc)
