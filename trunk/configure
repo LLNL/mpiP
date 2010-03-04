@@ -1572,6 +1572,45 @@ fi
 
 } # ac_fn_c_try_link
 
+# ac_fn_c_check_decl LINENO SYMBOL VAR
+# ------------------------------------
+# Tests whether SYMBOL is declared, setting cache variable VAR accordingly.
+ac_fn_c_check_decl ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $2 is declared" >&5
+$as_echo_n "checking whether $2 is declared... " >&6; }
+if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+#ifndef $2
+  (void) $2;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
+
+} # ac_fn_c_check_decl
+
 # ac_fn_c_try_cpp LINENO
 # ----------------------
 # Try to preprocess conftest.$ac_ext, and return whether this succeeded.
@@ -3045,7 +3084,7 @@ if test "x$AR" = "x"; then
 fi
 TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
-  for ac_prog in mpxlc mpcc_r mpicc cmpicc gcc cc icc
+  for ac_prog in mpxlc mpixlc mpcc_r mpicc cmpicc gcc cc icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3088,7 +3127,7 @@ fi
 done
 test -n "$CC" || CC="mpicc"
 
-  for ac_prog in mpCC_r xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc
+  for ac_prog in mpCC_r mpixlcxx xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3131,7 +3170,7 @@ fi
 done
 test -n "$CXX" || CXX="mpiCC"
 
-  for ac_prog in mpxlf_r xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc
+  for ac_prog in mpxlf_r mpixlf77 xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3218,7 +3257,7 @@ done
 test -n "$LAUNCH" || LAUNCH="mpirun"
 
 else
-  for ac_prog in gcc cc icc
+  for ac_prog in xlc gcc cc icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3261,7 +3300,7 @@ fi
 done
 test -n "$CC" || CC="mpicc"
 
-  for ac_prog in c++ g++ CC cxx icc
+  for ac_prog in xlC c++ g++ CC cxx icc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3304,7 +3343,7 @@ fi
 done
 test -n "$CXX" || CXX="mpiCC"
 
-  for ac_prog in f77 g77 pgf77 fort ifc
+  for ac_prog in xlf f77 g77 pgf77 fort ifc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4165,7 +4204,20 @@ _ACEOF
 fi
 
 
+#  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
+#  would be within the bfd tests, making AC_CHECK_DECL undefined if not
+#  checking for bfd.
+ac_fn_c_check_decl "$LINENO" "MPI_Init" "ac_cv_have_decl_MPI_Init" "#include \"mpi.h\"
+"
+if test "x$ac_cv_have_decl_MPI_Init" = x""yes; then :
+
+else
+  as_fn_error "\"Failed to find declaration for MPI_Init!\"" "$LINENO" 5
+fi
+
+
 SOURCE_LOOKUP=none
+
 
 if test "x$ENABLE_BFD" = "xyes" ; then
   BFD_AUX_LIBS=
@@ -4691,46 +4743,7 @@ else
   ENABLE_BFD=no
 fi
 
-
-# ac_fn_c_check_decl LINENO SYMBOL VAR
-# ------------------------------------
-# Tests whether SYMBOL is declared, setting cache variable VAR accordingly.
-ac_fn_c_check_decl ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $2 is declared" >&5
-$as_echo_n "checking whether $2 is declared... " >&6; }
-if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-#ifndef $2
-  (void) $2;
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
-
-} # ac_fn_c_check_decl
-ac_fn_c_check_decl "$LINENO" "bfd_get_section_size" "ac_cv_have_decl_bfd_get_section_size" "#include \"bfd.h\"
+    ac_fn_c_check_decl "$LINENO" "bfd_get_section_size" "ac_cv_have_decl_bfd_get_section_size" "#include \"bfd.h\"
 "
 if test "x$ac_cv_have_decl_bfd_get_section_size" = x""yes; then :
   $as_echo "#define HAVE_BFD_GET_SECTION_SIZE 1" >>confdefs.h
@@ -4972,11 +4985,10 @@ fi
 
 fi
 
-# use _rtc Cray X1) by default if it exists
+# use _rtc (Cray X1) by default if it exists
 if test x$TIMER_FOUND = xno && \
   (test x$TIMER_OPTION = xno || test x$USE_RTC = xyes); then
 ac_fn_c_check_decl "$LINENO" "_rtc" "ac_cv_have_decl__rtc" "#include <intrinsics.h>
-
 "
 if test "x$ac_cv_have_decl__rtc" = x""yes; then :
   $as_echo "#define USE_RTC 1" >>confdefs.h

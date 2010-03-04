@@ -333,21 +333,27 @@ if test "x$AR" = "x"; then
 fi
 TEST_LIST=
 if test "$ENABLE_API_ONLY" = no ; then
-  AC_CHECK_PROGS(CC, mpxlc mpcc_r mpicc cmpicc gcc cc icc, mpicc)
-  AC_CHECK_PROGS(CXX, mpCC_r xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpiCC)
-  AC_CHECK_PROGS(F77, mpxlf_r xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc, mpif77)
+  AC_CHECK_PROGS(CC, mpxlc mpixlc mpcc_r mpicc cmpicc gcc cc icc, mpicc)
+  AC_CHECK_PROGS(CXX, mpCC_r mpixlcxx xlC_r mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpiCC)
+  AC_CHECK_PROGS(F77, mpxlf_r mpixlf77 xlf_r mpif77 cmpifc f77 g77 pgf77 fort ifc, mpif77)
   AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
 else
-  AC_CHECK_PROGS(CC, gcc cc icc, mpicc)
-  AC_CHECK_PROGS(CXX, c++ g++ CC cxx icc, mpiCC)
-  AC_CHECK_PROGS(F77, f77 g77 pgf77 fort ifc, mpif77)
+  AC_CHECK_PROGS(CC, xlc gcc cc icc, mpicc)
+  AC_CHECK_PROGS(CXX, xlC c++ g++ CC cxx icc, mpiCC)
+  AC_CHECK_PROGS(F77, xlf f77 g77 pgf77 fort ifc, mpif77)
   LAUNCH="\\\"\\\""
   TEST_LIST="api-test.exp"
 fi
 
 AC_CHECK_LIB(m,sqrt)
 
+#  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
+#  would be within the bfd tests, making AC_CHECK_DECL undefined if not
+#  checking for bfd.
+AC_CHECK_DECL(MPI_Init,,AC_MSG_ERROR(["Failed to find declaration for MPI_Init!"]),[#include "mpi.h"])
+
 SOURCE_LOOKUP=none
+
 
 if test "x$ENABLE_BFD" = "xyes" ; then
   BFD_AUX_LIBS=
@@ -407,13 +413,12 @@ AC_CHECK_FUNC(rts_get_timebase, AC_DEFINE(USE_RTS_GET_TIMEBASE)
         )
 fi
 
-# use _rtc Cray X1) by default if it exists
+# use _rtc (Cray X1) by default if it exists
 if test x$TIMER_FOUND = xno && \
   (test x$TIMER_OPTION = xno || test x$USE_RTC = xyes); then
 AC_CHECK_DECL(_rtc, AC_DEFINE(USE_RTC) 
         USE_RTC=yes ; TIMER_FOUND=yes ; TIMER_NAME=_rtc ; AC_SUBST(USE_RTC)
-        , , [#include <intrinsics.h>]
-        )
+        , , [#include <intrinsics.h>])
 fi
 
 READ_REAL_TIME=read_real_time
