@@ -11,8 +11,7 @@
  */
 
 #ifndef lint
-static char *svnid =
-  "$Id$";
+static char *svnid = "$Id$";
 #endif
 
 #if defined(DEMANGLE_GNU)
@@ -149,14 +148,14 @@ find_address_in_section (abfd, section, data)
 
   if (local_pc < vma)
     {
-      if ( mpiPi_debug == 1 )
-      {
-        sprintf_vma(addr_buf1, local_pc);
-        sprintf_vma(addr_buf2, vma);
-        mpiPi_msg_debug
-          ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n", 
-           addr_buf1, addr_buf2);
-      }
+      if (mpiPi_debug == 1)
+	{
+	  sprintf_vma (addr_buf1, local_pc);
+	  sprintf_vma (addr_buf2, vma);
+	  mpiPi_msg_debug
+	    ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
+	     addr_buf1, addr_buf2);
+	}
       return;
     }
 
@@ -175,13 +174,13 @@ find_address_in_section (abfd, section, data)
   if (local_pc >= vma + size)
     {
       if (mpiPi_debug == 1)
-        {
-          sprintf_vma(addr_buf1, local_pc);
-          sprintf_vma(addr_buf2, vma);
-          sprintf_vma(addr_buf3, (vma+size));
-          mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
-              addr_buf1, addr_buf2, addr_buf3);
-        }
+	{
+	  sprintf_vma (addr_buf1, local_pc);
+	  sprintf_vma (addr_buf2, vma);
+	  sprintf_vma (addr_buf3, (vma + size));
+	  mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
+			   addr_buf1, addr_buf2, addr_buf3);
+	}
       return;
     }
 
@@ -191,24 +190,24 @@ find_address_in_section (abfd, section, data)
 
   if (!found && mpiPi_debug == 1)
     {
-      sprintf_vma(addr_buf1, local_pc);
-      sprintf_vma(addr_buf2, vma);
-      sprintf_vma(addr_buf3, (vma+size));
+      sprintf_vma (addr_buf1, local_pc);
+      sprintf_vma (addr_buf2, vma);
+      sprintf_vma (addr_buf3, (vma + size));
       mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
 		       addr_buf1, addr_buf2, addr_buf3);
     }
 
-  if ( mpiPi_debug == 1 )
-  {
-    sprintf_vma(addr_buf1, local_pc);
-    sprintf_vma(addr_buf2, vma);
-    sprintf_vma(addr_buf3, (vma+size));
-    mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
-        addr_buf1, addr_buf2, addr_buf3);
+  if (mpiPi_debug == 1)
+    {
+      sprintf_vma (addr_buf1, local_pc);
+      sprintf_vma (addr_buf2, vma);
+      sprintf_vma (addr_buf3, (vma + size));
+      mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
+		       addr_buf1, addr_buf2, addr_buf3);
 
-    mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
-        filename, functionname, line);
-  }
+      mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
+		       filename, functionname, line);
+    }
 }
 
 

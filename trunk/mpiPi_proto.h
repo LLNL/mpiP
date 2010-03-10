@@ -42,7 +42,8 @@ extern void mpiPi_generateReport (int report_style);
 extern void mpiPi_finalize (void);
 extern void mpiPi_update_callsite_stats (unsigned op, unsigned rank,
 					 void **pc, double dur,
-					 double sendSize, double ioSize, double rmaSize);
+					 double sendSize, double ioSize,
+					 double rmaSize);
 extern char *mpiPdemangle (const char *mangledSym);
 extern int mpiP_find_src_loc (void *i_addr_hex, char **o_file_str,
 			      int *o_lineno, char **o_funct_str);
@@ -68,7 +69,8 @@ extern unsigned long long mpiPi_get_text_start (char *filename);
 #ifdef NEED_MREAD_REAL_TIME_DECL
 #include <sys/systemcfg.h>
 #include <sys/time.h>
-extern int mread_real_time(timebasestruct_t *t, size_t size_of_timebasestruct_t);
+extern int mread_real_time (timebasestruct_t * t,
+			    size_t size_of_timebasestruct_t);
 #endif
 
 /*

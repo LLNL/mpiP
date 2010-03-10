@@ -11,8 +11,7 @@
  */
 
 #ifndef lint
-static char *svnid =
-  "$Id$";
+static char *svnid = "$Id$";
 #endif
 
 #include <string.h>
@@ -88,8 +87,8 @@ mpiPi_getenv ()
 	    case 'f':
 	      mpiPi.outputDir = optarg;
 	      if (mpiPi.rank == 0)
-		mpiPi_msg
-		  ("Set the output directory to [%s].\n", mpiPi.outputDir);
+		mpiPi_msg ("Set the output directory to [%s].\n",
+			   mpiPi.outputDir);
 	      break;
 
 	    case 'g':
