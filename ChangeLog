@@ -1,5 +1,111 @@
+2010-03-10  chcham
+
+	* Makefile.in, diag_msgs.c, diag_msgs_api.c, glob.c, mpiP-hash.c,
+	  mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
+	  pcontrol.c, record_stack.c, report.c, util.c, wrappers_special.c:
+	  Pre-release pass with indent.
+	* mpiPi.c, util.c:
+	  Add ',' as MPIP delimiter, other minor changes.
+	* configure, configure.in, mpiPconfig.h.in, mpiPi_proto.h:
+	  Handle using AIX mread_real_time even if declaration is missing
+	  in system files.
+	* bin/srun-mpip:
+	  Runtime insertion script simplified based on LLNL system testing.
+	* doc/README, doc/UserGuide.html, doc/UserGuide.txt:
+	  Documentation updates for 3.2 release.
+
+2010-03-04  chcham
+
+	* bin/mpip-insert-src, configure, configure.in:
+	  More compiler configuration and mpip-insert-src format
+	  correction.
+	* configure, configure.in:
+	  Update compilers for BG/P. Correct AC_CHECK_DECL definition issue
+	  within bfd check.
+
+2010-03-03  chcham
+
+	* Makefile.in, configure, configure.in:
+	  Update add_binutils_obj make target for x86_64.
+	* mpiPi.c:
+	  Address type conversion size mismatch warning message.
+	* mpiPi_proto.h, report.c:
+	  Ironed out some overlooked issues with the previous function
+	  scope commit.
+	* mpiPi.c, pc_lookup.c, report.c:
+	  Added 'static' to various file-specific functions.
+	* report.c:
+	  Corrected reference to message volume variables in IO report.
+	* testing/Makefile.in:
+	  Only do API when building for API lib.
+	* pc_lookup.c, util.c:
+	  Changed code to remove pointer printing related warning messages.
+	* configure, configure.in, testing/Makefile.in:
+	  Added configuration summary message to hopefully make it easier
+	  to debug configuration issues.
+	* configure, configure.in, make-wrappers.py, mpiPi.c, mpiPi.h.in,
+	  mpiPi_proto.h, pcontrol.c, report.c:
+	  Additional RMA support, including separate origin volume report
+	  section and top 20 RMA section.
+
+2010-03-02  chcham
+
+	* Makefile.in, configure, configure.in, make-wrappers.py,
+	  mpiPconfig.h.in, record_stack.c:
+	  Added support for glibc backtrace() if libunwind is not
+	  available.
+	* configure.in:
+	  Correct default to MPI_Wtime instead of gettimeofday.
+
+2010-03-01  chcham
+
+	* testing/Makefile.in:
+	  Corrections to expected report output to match source info.
+
+2010-01-07  chcham
+
+	* configure, configure.in, glob.c, make-wrappers.py,
+	  mpi.protos.txt.in, mpi.rma.protos.txt, mpiPconfig.h.in,
+	  testing/17-rma.c, testing/17-rma.exp, testing/17-rma.src,
+	  testing/Makefile.in:
+	  o Added timing reporting for MPI RMA calls and RMA test.
+	  o Modified wrapper generator to handle an unordered prototype
+	  input file.
+	  o Updated version to 3.2.
+	* configure.in:
+	  Corrected demangle configure testing.
+	* testing/16-waitallf.src, testing/sweep-ops-stack.src,
+	  testing/sweep-ops.src:
+	  Corrected expected line number reporting.
+
+2010-01-04  chcham
+
+	* configure.in:
+	  Added M4 quotes for libunwind-x86_64 dependency that was being
+	  truncated.
+	* report.c:
+	  Removed early return in callsite report generation if no MPI-I/O.
+
+2009-05-20  chcham
+
+	* configure.in:
+	  Fail configure if libunwind not found on x86_64. Can override
+	  with --disable-libunwind.
+
+2008-08-28  chcham
+
+	* testing/16-waitallf.f:
+	  Increased size of istat array to match number of operations.
+
+2008-04-24  chcham
+
+	* Makefile.in:
+	  Corrected DESTDIR issues.
+
 2008-04-23  chcham
 
+	* ChangeLog, doc/UserGuide.html, doc/UserGuide.txt, glob.c:
+	  Updates for 3.1.2 release.
 	* Makefile.in:
 	  Use LIBS when creating shread lib.
 
