@@ -28,7 +28,7 @@ mpiPi_callsite_stats_pc_hashkey (const void *p)
   MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp);
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
-      res ^= (unsigned)(long) csp->pc[i];
+      res ^= (unsigned) (long) csp->pc[i];
     }
   return 52271 ^ csp->op ^ res ^ csp->rank;
 }
@@ -857,8 +857,8 @@ mpiPi_collect_basics ()
       strcpy (mti.hostname, mpiPi.hostname);
       mti.app_time = app_time;
       mti.rank = mpiPi.rank;
-      PMPI_Send (&mti, 1, mti_type, mpiPi.collectorRank,
-		 mpiPi.tag, mpiPi.comm);
+      PMPI_Send (&mti, 1, mti_type, mpiPi.collectorRank, mpiPi.tag,
+		 mpiPi.comm);
     }
 
   PMPI_Type_free (&mti_type);
@@ -952,7 +952,8 @@ mpiPi_finalize ()
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
-			     double dur, double sendSize, double ioSize, double rmaSize)
+			     double dur, double sendSize, double ioSize,
+			     double rmaSize)
 {
   int i;
   callsite_stats_t *csp = NULL;
