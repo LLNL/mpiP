@@ -40,9 +40,9 @@ width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
 
-<p align="center">Version 3.1.2<br>
+<p align="center">Version 3.2<br>
 
-23 April 2008 <br>
+12 March 2010 <br>
 
 <br>
 
@@ -112,6 +112,7 @@ Chris Chambreau <br>
 Size Information</a></li>
 
   <li><a href="#IO_Routines">List of I/O Routines</a></li>
+  <li><a href="#RMA_Routines">List of RMA Routines</a></li>
 
   <li><a href="#Adding_Calls">How to add MPI calls to profile</a></li>
 
@@ -130,10 +131,11 @@ report generation, typically at the end of the experiment, to merge results
 from all of the tasks into one output file.  </p>
 
 <p> We have tested mpiP on a variety of C/C++/Fortran applications from 2 to
-4096 processes, including a 3584-process run on ASCI Q and a 4096-process run
-on ASCI White. Please send your comments, questions, and ideas for enhancements
-to <a
-href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.
+65536 processes, including an 8000-process run on the LLNL dawn BG/P system and a 
+65536-process run on the LLNL BG/L system.  </p>
+
+<p>Please send your comments, questions, and ideas for enhancements
+to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.
 To receive mail regarding new mpiP releases, please subscribe to
 mpip-announce@lists.sourceforge.net (send e-mail with body "subscribe"
 to <a
@@ -175,9 +177,20 @@ order):</p>
 
   <li>Philip Mucci (SiCortex)</li>
 
+  <li>Karl Schulz (Texas Advanced Computing Center)</li>
 </ul>
 
-<h3><a name="New_Features">New Features with v3.1.2</a></h3>
+<h3><a name="New_Features">New Features with Release 3.2</a></h3>
+
+<p>Release v3.2 addresses the following issues:
+</p>
+
+<ul>
+
+  <li>Support for MPI RMA functions.</li>
+  <li>Support for glibc backtrace.</li>
+  <li>Default to MPI_Wtime if platform-specific timers are not found.</li>
+</ul>
 
 <p>Release v3.1.2 addresses the following issues:
 </p>
@@ -208,38 +221,7 @@ order):</p>
 
 </ul>
 
-<p>Release v3.1 addresses the following issues:
-</p>
-
-<ul>
-
-  <li>Configure defaults to the optimal platform timer, but the timer can be
-  specified with configure options.</li>
-
-  <li>Support for rts_get_timebase on BG/L.</li>
-  <li>Runtime flags can be used to specify that report generation be done by a single collector process (default) or by using a small fixed amount of memory and MPI collectives. The single collector process approach tends to be faster while the low-memory approach is useful for systems where memory availability may be a concern.</li>
-
-</ul>
-
-<p></p>
-
-<p>Release v3.0 addresses the following issues:
-</p>
-
-<ul>
-
-  <li>New reporting formats with summary statistics ( See runtime
-options 'c' and 'v' ).</li>
-
-  <li>New reporting algorithms to reduce memory requirements (
-See configure flag --use-low-mem-report ).</li>
-
-  <li>MPI_Pcontrol calls can reset statistics, generate multiple
-reports per run, and generate reports in various formats.</li>
-
-</ul>
-
-<p></p>
+<p>For more information, please see the ChangeLog in the distribution.</p>
 
 
 <p class="sectionreturn"><a href="#top">Top</a></p>
@@ -254,27 +236,26 @@ to include the '-g' option. This is important if you want mpiP to decode the PC
 to a source code filename and line number automatically. mpiP will work without
 <span class="commandline">-g</span>, but mileage may vary.</p>
 
-<p> To compile a simple program on LLNL AIX, you need to add the following
-libraries to your compile/link line:</p>
+<p> To compile a simple program on an LLNL x86_64-linux system where libunwind 
+is installed, add the following libraries to your link command:</p>
 
 <blockquote>
   <p><span class="commandline">-L${mpiP_root}/lib
--lmpiP -lbfd -liberty -lintl -lm</span></p>
+-lmpiP -lm  -lbfd  -liberty -lunwind</span></p>
 
 </blockquote>
 
-<p>For example, the new mpiP link line becomes</p>
+<p>For example, the new mpiP link command becomes</p>
 
 <blockquote>
-  <p class="commandline">$ mpcc -g -O mpi-foo.c -o mpi-foo.exe
-  -L${mpiP_root}/lib -lmpiP -lbfd -liberty -lintl -lm</p>
+  <p class="commandline">$ mpicc -g 1-hot-potato.o -o 1-hot-potato.exe  -L${mpiP_root}/lib -lmpiP -lm  -lbfd  -liberty -lunwind </p>
 
 </blockquote>
 
 <p>from</p>
 
 <blockquote>
-  <p class="commandline">$ mpcc -O mpi-foo.c -o mpi-foo.exe</p>
+  <p class="commandline">$ mpicc -g 1-hot-potato.o -o 1-hot-potato.exe </p>
 
 </blockquote>
 
@@ -290,11 +271,11 @@ the header and trailer in standard out.</p>
   <p class="commandline">
 <pre>
 mpiP:
-mpiP: mpiP V3.0.0 (Build Oct  4 2006/12:40:28)
+mpiP: mpiP: mpiP V3.2.0 (Build Mar 10 2010/13:27:39)
 mpiP: Direct questions and errors to mpip-help@lists.sourceforge.net
 mpiP:
 mpiP:
-mpiP: Storing mpiP output in [./9-test-mpip-time.exe.2.12390.1.mpiP].
+mpiP: Storing mpiP output in [./1-hot-potato.exe.2.27872.1.mpiP].
 mpiP:
 </pre>
 </p>
@@ -307,7 +288,7 @@ them to this directory is safe.</p>
 
 <h3><a name="Supported">Supported Platforms</a></h3>
 
-<p>The 3.0 release of mpiP has been tested on several Linux,&nbsp;AIX, UNICOS
+<p>mpiP has been tested on several Linux,&nbsp;AIX, UNICOS
 and IBM BG/L systems. Please contact us with bug reports or questions regarding
 these platforms. Note that mpiP will not work with MPICH 1.1 nor with the IBM
 signal-based MPI library (libmpi.a, as opposed to the thread-based
@@ -378,9 +359,9 @@ was succesfully run and any requirements for that platform.</p>
 
       <td rowspan="2">2.17</td>
 
-      <td rowspan="2">The use of <a
-      href="http://www.nongnu.org/libunwind/">libunwind</a> is
-      required on these platforms.</td>
+      <td >The use of <a
+      href="http://savannah.nongnu.org/projects/libunwind/">libunwind</a> is
+      required on this platform.</td>
 
     </tr>
     <tr>
@@ -395,6 +376,7 @@ was succesfully run and any requirements for that platform.</p>
 
       <td>MVAPICH 0.9.7</td>
 
+      <td> &nbsp; </td>
     </tr>
 
     <tr>
@@ -495,25 +477,6 @@ to missing socket module.</td>
 
     </tr>
 
-    <tr>
-
-      <td>MIPS64-Linux</td>
-
-      <td> &nbsp; </td>
-
-      <td> &nbsp; </td>
-
-      <td> &nbsp; </td>
-
-      <td> &nbsp; </td>
-
-      <td> &nbsp; </td>
-
-    </tr>
-    <tr>
-
-    </tr>
-
   </tbody>
 </table>
 
@@ -528,7 +491,7 @@ to missing socket module.</td>
 href="http://sources.redhat.com/binutils">binutils</a> installation for source
 lookup and demangling features. Alternatively, <a
 href="http://directory.fsf.org/libs/misc/libelf.html">libelf</a> and <a
-href="http://reality.sgi.com/davea/">libdwarf</a> can be used for source
+href="http://reality.sgiweb.org/davea/dwarf.html">libdwarf</a> can be used for source
 lookup. The binutils installation location may need to be specified with either
 the <span class="commandline">--with-binutils-dir</span> option or with the
 <span class="commandline">--with-include</span> and <span
@@ -917,7 +880,7 @@ sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
 
       <td class="commandline">mpiicc -g 1-hot-potato.c -o
 1-hot-potato.exe -L/usr/local/tools/mpiP/lib
--lmpiP -lbfd -liberty-lm -lmpio</td>
+-lmpiP -lbfd -liberty -lm -lmpio</td>
 
     </tr>
 
@@ -1007,42 +970,6 @@ sweep-ops.exe -L/usr/local/tools/mpiP/lib
 
     <tr>
 
-      <td rowspan="3" align="center">Tru64</td>
-
-      <td rowspan="3" align="center">Compaq</td>
-
-      <td>C</td>
-
-      <td class="commandline">cc -g -I/usr/lib/mpi/include
-1-hot-potato.c -o 1-hot-potato.exe
--L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lm -lmpi
--lpmpi -lexc</td>
-
-    </tr>
-
-    <tr>
-
-      <td>C++</td>
-
-      <td class="commandline">cxx -g 4-demangle.C -o
-4-demangle.exe -L/usr/local/tools/mpiP/lib
--lmpiPdmg -lbfd -liberty -lintl -lm -lmpi -lpmpi -lexc -lmld</td>
-
-    </tr>
-
-    <tr>
-
-      <td>Fortran</td>
-
-      <td class="commandline">f77 -g
--I/usr/lib/mpi/include sweep-ops.f -o sweep-ops.exe
--L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lintl -lm -lmpi
--lpmpi -lexc</td>
-
-    </tr>
-
-    <tr>
-
       <td>Cray X1</td>
 
       <td>Cray</td>
@@ -1088,16 +1015,13 @@ sweep-ops.exe -L/usr/local/tools/mpiP/lib
 
 <ul>
 
-  <li>On BG/L machines, the script mpip-insert-src can be used from a login
-  node to translate addresses in the mpiP report to source information.</li>
-
-  <li>On Tru64, the exception library flag (<span class="commandline">-lexc</span>)
-must be added to the link command. </li>
+  <li>If source lookup is failing during report generation, the script mpip-insert-src 
+  can be used from a login node to translate addresses in the mpiP report to source information.</li>
 
   <li>Source lookup for callsites may fail with certain versions of binutils.
   If you are running into trouble, you may want to download a recent snapshot
   from <a
-  href="ftp://sources.redhat.com/pub/binutils/snapshots">ftp://sources.redhat.com/pub/binutils/snapshots</a>.</li>
+  href="ftp://ftp.gnu.org/gnu/binutils/">ftp://ftp.gnu.org/gnu/binutils/</a>.</li>
 
 </ul>
 
@@ -1108,8 +1032,9 @@ must be added to the link command. </li>
 Configuration of mpiP</a></h2>
 
 <p>mpiP has several configurable parameters that a user can set via the
-environment variable MPIP. The setting for MPIP looks like command-line
-parameters: "-t 10 -k 2". Currently, mpiP has several configurable
+environment variable MPIP. Setting MPIP is done like command-line
+parameters: "-t 10 -k 2". Additionally, a comma can be used to delimit
+multiple parameters, as in "-t10,-k2". Currently, mpiP has several configurable
 parameters.</p>
 
 <table border="1" cellpadding="3" cellspacing="0" width="90%">
@@ -1132,6 +1057,16 @@ parameters.</p>
 
       <td>Generate concise version of report, omitting callsite
 process-specific detail.</td>
+
+      <td align="center">&nbsp</td>
+
+    </tr>
+
+    <tr>
+
+      <td class="commandline">-d</td>
+
+      <td>Suppress printing of callsite detail sections.</td>
 
       <td align="center">&nbsp</td>
 
@@ -1266,9 +1201,11 @@ for each callsite.</td>
 
 <p>For example, to set the callsite stack walking depth to 2 and the report
 print threshold to 10%, you simply need to define the mpiP string in your
-environment:</p>
+environment, as in any of the following examples:</p>
 
-<p class="commandline">$ export MPIP="-t 10.0 -k 2"</p>
+<p class="commandline">$ export MPIP="-t 10.0 -k 2" (bash)</p>
+<p class="commandline">$ export MPIP=-t10.0,-k2 (bash)</p>
+<p class="commandline">$ setenv MPIP "-t 10.0 -k 2" (csh)</p>
 
 <p> mpiP prints a message at initialization if it successfully finds this MPIP
 variable.</p>
@@ -1810,7 +1747,7 @@ mpi library.</li>
 
   <li>We have encountered occaisional negative report values on Linux and AIX
   systems. We will continue to investigate this issue, but it is possible that
-  this behavior may be experienced with mpiP v2.8.</li>
+  this behavior may be experienced with mpiP.</li>
 
 </ul>
 
@@ -2026,7 +1963,30 @@ MPI_Waitall<br>
 
 MPI_Waitany<br>
 
-MPI_Waitsome</p>
+MPI_Waitsome<br>
+
+MPI_Win_complete <br>
+
+MPI_Win_create <br>
+
+MPI_Win_fence <br>
+
+MPI_Win_free <br>
+
+MPI_Win_get_group <br>
+
+MPI_Win_lock <br>
+
+MPI_Win_post <br>
+
+MPI_Win_start <br>
+
+MPI_Win_test <br>
+
+MPI_Win_unlock <br>
+
+MPI_Win_wait <br>
+</p>
 
 <p class="sectionreturn"><a href="#top">Top</a></p>
 
@@ -2100,6 +2060,21 @@ MPI_File_write<br>
 MPI_File_write_all<br>
 
 MPI_File_write_at<br>
+
+</p>
+
+<p class="sectionreturn"><a href="#top">Top</a></p>
+
+<hr width="75%">
+<h2><a name="RMA_Routines">MPI Routines For Which mpiP Gathers RMA Origin Data</a></h2>
+
+<p>
+
+MPI_Accumulate <br>
+
+MPI_Get <br>
+
+MPI_Put <br>
 
 </p>
 
@@ -2301,7 +2276,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on April 23th, 2008.<br>
+<p class="pageinfo"> Last modified on March 12th, 2010.<br>
 
 UCRL-CODE-223450</p>
 
