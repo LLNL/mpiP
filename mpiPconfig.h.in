@@ -81,6 +81,9 @@
 /* Use setjmp to get stack pointer for naive stack unwinding */
 #undef USE_SETJMP
 
+/* Add mread_real_time declaration if needed. */
+#undef NEED_MREAD_REAL_TIME_DECL
+
 #endif /* _CONFIG_H */
 
 /* 
