@@ -425,7 +425,10 @@ READ_REAL_TIME=read_real_time
 ## On AIX, prefer monotonic mread_real_time, if available
 if test x$TIMER_FOUND = xno && test x$TIMER_OPTION = xno ; then
   AC_CHECK_FUNC(mread_real_time, READ_REAL_TIME=mread_real_time TIMER_FOUND=yes)
-  if test x$TIMER_FOUND = xno; then
+  if test x$TIMER_FOUND = xyes; then
+    #  In AIX 5.3, finding mread_real_time in libc, but not in header files.
+    AC_CHECK_DECL(mread_real_time, ,AC_DEFINE(NEED_MREAD_REAL_TIME_DECL),[#include <sys/systemcfg.h>] [#include <sys/time.h>])
+  else
     AC_CHECK_FUNC(read_real_time, READ_REAL_TIME=read_real_time TIMER_FOUND=yes)
   fi
   if test x$TIMER_FOUND = xyes ; then
