@@ -175,7 +175,8 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
 #endif
 
   tmp_argv = mpiPi.av;
-  rc = _MPI_Init_thread (&(mpiPi.ac), (char ***) &tmp_argv, *required, provided);
+  rc =
+    _MPI_Init_thread (&(mpiPi.ac), (char ***) &tmp_argv, *required, provided);
   *ierr = rc;
 
   return;

@@ -930,8 +930,8 @@ open_dwarf_executable (char *fileName)
 						     NULL);
 
 	      if ((lineNoStatus == DW_DLV_OK) &&
-		  (lineAddrStatus == DW_DLV_OK) &&
-		  (lineSrcFileStatus == DW_DLV_OK))
+		  (lineAddrStatus == DW_DLV_OK)
+		  && (lineSrcFileStatus == DW_DLV_OK))
 		{
 		  int saveCurrentEntry = 0;	/* bool */
 
@@ -964,8 +964,8 @@ open_dwarf_executable (char *fileName)
 		  if (saveCurrentEntry)
 		    {
 		      /* save the mapping entry */
-		      AddrToSourceMap_Add (lineAddress,
-					   lineSourceFile, lineNumber);
+		      AddrToSourceMap_Add (lineAddress, lineSourceFile,
+					   lineNumber);
 		    }
 		}
 

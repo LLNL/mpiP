@@ -298,6 +298,6 @@ distclean: clean
 include Check.mak
 
 indent:
-	indent -gnu *.c *.h *.h.in testing/*.c mpip_timers/*.h mpip_timers/*.h.in
+	indent -gnu *.c *.h *.h.in mpip_timers/*.h mpip_timers/*.h.in
 
 ##### EOF

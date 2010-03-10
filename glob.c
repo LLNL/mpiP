@@ -11,8 +11,7 @@
  */
 
 #ifndef lint
-static char *svnid =
-  "$Id$";
+static char *svnid = "$Id$";
 #endif
 
 #include "mpiPi.h"

@@ -42,45 +42,46 @@ typedef struct _mpiPi_callsite_stats
   int min_rnk;
 } mpiPi_callsite_summary_t;
 
-static void print_section_heading(FILE *fp, char *str);
-static int callsite_src_id_cache_sort_by_id(const void *a, const void *b);
-static int callsite_sort_by_cumulative_time(const void *a, const void *b);
-static int callsite_sort_by_cumulative_size(const void *a, const void *b);
-static int callsite_sort_by_cumulative_io(const void *a, const void *b);
-static int callsite_sort_by_cumulative_rma(const void *a, const void *b);
-static int callsite_sort_by_name_id_rank(const void *a, const void *b);
-static void print_intro_line(FILE *fp, char *name, char *fmt, ...);
-static double calc_COV(double *data, int dataSize);
-static void mpiPi_print_report_header(FILE *fp);
-static void mpiPi_print_task_assignment(FILE *fp);
-static void mpiPi_print_verbose_task_info(FILE *fp);
-static void mpiPi_print_concise_task_info(FILE *fp);
-static void mpiPi_print_callsites(FILE *fp);
-static void mpiPi_print_top_time_sites(FILE *fp);
-static void mpiPi_print_top_sent_sites(FILE *fp);
-static void mpiPi_print_top_io_sites(FILE *fp);
-static void mpiPi_print_top_rma_sites(FILE *fp);
-static void mpiPi_print_all_callsite_time_info(FILE *fp);
-static int callsite_stats_sort_by_cumulative(mpiPi_callsite_summary_t *cs1, mpiPi_callsite_summary_t *cs2);
-static void mpiPi_print_concise_callsite_time_info(FILE *fp);
-static void mpiPi_print_callsite_sent_info(FILE *fp);
-static void mpiPi_print_all_callsite_sent_info(FILE *fp);
-static void mpiPi_print_concise_callsite_sent_info(FILE *fp);
-static void mpiPi_print_all_callsite_io_info(FILE *fp);
-static void mpiPi_print_all_callsite_rma_info(FILE *fp);
-static void mpiPi_print_concise_callsite_io_info(FILE *fp);
-static void mpiPi_print_concise_callsite_rma_info(FILE *fp);
-static void mpiPi_coll_print_all_callsite_time_info(FILE *fp);
-static void mpiPi_coll_print_concise_callsite_time_info(FILE *fp);
-static void mpiPi_coll_print_concise_callsite_sent_info(FILE *fp);
-static void mpiPi_coll_print_concise_callsite_io_info(FILE *fp);
-static void mpiPi_coll_print_concise_callsite_rma_info(FILE *fp);
-static void mpiPi_coll_print_all_callsite_sent_info(FILE *fp);
-static void mpiPi_coll_print_all_callsite_io_info(FILE *fp);
-static void mpiPi_coll_print_all_callsite_rma_info(FILE *fp);
-extern void mpiPi_profile_print(FILE *fp, int report_style);
-static void mpiPi_profile_print_concise(FILE *fp);
-static void mpiPi_profile_print_verbose(FILE *fp);
+static void print_section_heading (FILE * fp, char *str);
+static int callsite_src_id_cache_sort_by_id (const void *a, const void *b);
+static int callsite_sort_by_cumulative_time (const void *a, const void *b);
+static int callsite_sort_by_cumulative_size (const void *a, const void *b);
+static int callsite_sort_by_cumulative_io (const void *a, const void *b);
+static int callsite_sort_by_cumulative_rma (const void *a, const void *b);
+static int callsite_sort_by_name_id_rank (const void *a, const void *b);
+static void print_intro_line (FILE * fp, char *name, char *fmt, ...);
+static double calc_COV (double *data, int dataSize);
+static void mpiPi_print_report_header (FILE * fp);
+static void mpiPi_print_task_assignment (FILE * fp);
+static void mpiPi_print_verbose_task_info (FILE * fp);
+static void mpiPi_print_concise_task_info (FILE * fp);
+static void mpiPi_print_callsites (FILE * fp);
+static void mpiPi_print_top_time_sites (FILE * fp);
+static void mpiPi_print_top_sent_sites (FILE * fp);
+static void mpiPi_print_top_io_sites (FILE * fp);
+static void mpiPi_print_top_rma_sites (FILE * fp);
+static void mpiPi_print_all_callsite_time_info (FILE * fp);
+static int callsite_stats_sort_by_cumulative (mpiPi_callsite_summary_t * cs1,
+					      mpiPi_callsite_summary_t * cs2);
+static void mpiPi_print_concise_callsite_time_info (FILE * fp);
+static void mpiPi_print_callsite_sent_info (FILE * fp);
+static void mpiPi_print_all_callsite_sent_info (FILE * fp);
+static void mpiPi_print_concise_callsite_sent_info (FILE * fp);
+static void mpiPi_print_all_callsite_io_info (FILE * fp);
+static void mpiPi_print_all_callsite_rma_info (FILE * fp);
+static void mpiPi_print_concise_callsite_io_info (FILE * fp);
+static void mpiPi_print_concise_callsite_rma_info (FILE * fp);
+static void mpiPi_coll_print_all_callsite_time_info (FILE * fp);
+static void mpiPi_coll_print_concise_callsite_time_info (FILE * fp);
+static void mpiPi_coll_print_concise_callsite_sent_info (FILE * fp);
+static void mpiPi_coll_print_concise_callsite_io_info (FILE * fp);
+static void mpiPi_coll_print_concise_callsite_rma_info (FILE * fp);
+static void mpiPi_coll_print_all_callsite_sent_info (FILE * fp);
+static void mpiPi_coll_print_all_callsite_io_info (FILE * fp);
+static void mpiPi_coll_print_all_callsite_rma_info (FILE * fp);
+extern void mpiPi_profile_print (FILE * fp, int report_style);
+static void mpiPi_profile_print_concise (FILE * fp);
+static void mpiPi_profile_print_verbose (FILE * fp);
 
 static char *mpiP_Report_Formats[][2] = {
   {
@@ -431,8 +432,7 @@ mpiPi_print_verbose_task_info (FILE * fp)
 	       mpiPi.global_task_info[i].mpi_time / 1e6, ratio);
     }
   fprintf (fp,
-	   mpiP_Report_Formats[MPIP_MPI_TIME_SUMMARY_FMT][mpiPi.
-							  reportFormat],
+	   mpiP_Report_Formats[MPIP_MPI_TIME_SUMMARY_FMT][mpiPi.reportFormat],
 	   mpiPi.global_app_time, mpiPi.global_mpi_time / 1e6,
 	   mpiPi.global_app_time >
 	   0 ? (100.0 * mpiPi.global_mpi_time / 1e6) /
@@ -642,8 +642,8 @@ mpiPi_print_top_time_sites (FILE * fp)
 	      timeCOV = calc_COV (av[i]->siteData, av[i]->siteDataIdx);
 
 	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_AGGREGATE_COV_TIME_FMT][mpiPi.
-									reportFormat],
+		       mpiP_Report_Formats[MPIP_AGGREGATE_COV_TIME_FMT]
+		       [mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->cumulativeTime / 1000.0,
 		       100.0 * av[i]->cumulativeTime /
@@ -655,8 +655,8 @@ mpiPi_print_top_time_sites (FILE * fp)
 	  else
 	    {
 	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT][mpiPi.
-								    reportFormat],
+		       mpiP_Report_Formats[MPIP_AGGREGATE_TIME_FMT]
+		       [mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->cumulativeTime / 1000.0,
 		       mpiPi.global_app_time >
@@ -697,8 +697,8 @@ mpiPi_print_top_sent_sites (FILE * fp)
 	  if (av[i]->cumulativeDataSent > 0)
 	    {
 	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_AGGREGATE_MESS_FMT][mpiPi.
-								    reportFormat],
+		       mpiP_Report_Formats[MPIP_AGGREGATE_MESS_FMT]
+		       [mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->count, av[i]->cumulativeDataSent,
 		       av[i]->cumulativeDataSent / av[i]->count,
@@ -747,8 +747,8 @@ mpiPi_print_top_io_sites (FILE * fp)
 	  if (av[i]->cumulativeIO > 0)
 	    {
 	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_AGGREGATE_IO_FMT][mpiPi.
-								  reportFormat],
+		       mpiP_Report_Formats[MPIP_AGGREGATE_IO_FMT]
+		       [mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->count, av[i]->cumulativeIO,
 		       av[i]->cumulativeIO / av[i]->count,
@@ -788,8 +788,8 @@ mpiPi_print_top_rma_sites (FILE * fp)
 	  if (av[i]->cumulativeRMA > 0)
 	    {
 	      fprintf (fp,
-		       mpiP_Report_Formats[MPIP_AGGREGATE_IO_FMT][mpiPi.
-								  reportFormat],
+		       mpiP_Report_Formats[MPIP_AGGREGATE_IO_FMT]
+		       [mpiPi.reportFormat],
 		       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		       av[i]->csid, av[i]->count, av[i]->cumulativeRMA,
 		       av[i]->cumulativeRMA / av[i]->count,
@@ -859,8 +859,8 @@ mpiPi_print_all_callsite_time_info (FILE * fp)
 	    >= mpiPi.reportPrintThreshold)
 	  {
 	    fprintf (fp,
-		     mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT][mpiPi.
-								      reportFormat],
+		     mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT]
+		     [mpiPi.reportFormat],
 		     &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
 		     av[i]->csid, av[i]->rank, av[i]->count,
 		     av[i]->maxDur / 1000.0,
@@ -873,8 +873,8 @@ mpiPi_print_all_callsite_time_info (FILE * fp)
 	  }
       }
     fprintf (fp,
-	     mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT][mpiPi.
-								 reportFormat],
+	     mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT]
+	     [mpiPi.reportFormat],
 	     &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
 	     av[i - 1]->csid, "*", sCount, sMax / 1000.0,
 	     sCumulative / (sCount * 1000.0), sMin / 1000.0,
@@ -1000,16 +1000,14 @@ mpiPi_print_concise_callsite_time_info (FILE * fp)
   for (i = 0; i <= csidx; i++)
     {
       fprintf (fp,
-	       mpiP_Report_Formats[MPIP_CALLSITE_TIME_CONCISE_FMT][mpiPi.
-								   reportFormat],
-	       callsite_stats[i].name,
-	       callsite_stats[i].site,
-	       callsite_stats[i].count,
+	       mpiP_Report_Formats[MPIP_CALLSITE_TIME_CONCISE_FMT]
+	       [mpiPi.reportFormat], callsite_stats[i].name,
+	       callsite_stats[i].site, callsite_stats[i].count,
 	       callsite_stats[i].max / 1000.0,
 	       callsite_stats[i].cumulative / (callsite_stats[i].count *
 					       1000),
-	       callsite_stats[i].min / 1000.0,
-	       callsite_stats[i].max_rnk, callsite_stats[i].min_rnk);
+	       callsite_stats[i].min / 1000.0, callsite_stats[i].max_rnk,
+	       callsite_stats[i].min_rnk);
     }
   free (callsite_stats);
 }
@@ -1060,8 +1058,8 @@ mpiPi_print_all_callsite_sent_info (FILE * fp)
 		fprintf (fp,
 			 mpiP_Report_Formats[MPIP_CALLSITE_MESS_SUMMARY_FMT]
 			 [mpiPi.reportFormat],
-			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].
-			   name[4]), av[i - 1]->csid, "*", sCount, sMax,
+			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+			 av[i - 1]->csid, "*", sCount, sMax,
 			 sCumulative / sCount, sMin, sCumulative);
 
 		sCount = 0;
@@ -1222,15 +1220,13 @@ mpiPi_print_concise_callsite_sent_info (FILE * fp)
       for (i = 0; i <= csidx; i++)
 	{
 	  fprintf (fp,
-		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT][mpiPi.
-								       reportFormat],
-		   callsite_stats[i].name,
-		   callsite_stats[i].site,
-		   callsite_stats[i].count,
+		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT]
+		   [mpiPi.reportFormat], callsite_stats[i].name,
+		   callsite_stats[i].site, callsite_stats[i].count,
 		   callsite_stats[i].max,
 		   callsite_stats[i].cumulative / callsite_stats[i].count,
-		   callsite_stats[i].min,
-		   callsite_stats[i].max_rnk, callsite_stats[i].min_rnk);
+		   callsite_stats[i].min, callsite_stats[i].max_rnk,
+		   callsite_stats[i].min_rnk);
 	}
     }
   free (callsite_stats);
@@ -1274,8 +1270,8 @@ mpiPi_print_all_callsite_io_info (FILE * fp)
 		fprintf (fp,
 			 mpiP_Report_Formats[MPIP_CALLSITE_IO_SUMMARY_FMT]
 			 [mpiPi.reportFormat],
-			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].
-			   name[4]), av[i - 1]->csid, "*", sCount, sMax,
+			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+			 av[i - 1]->csid, "*", sCount, sMax,
 			 sCumulative / sCount, sMin, sCumulative);
 
 		sCount = 0;
@@ -1359,8 +1355,8 @@ mpiPi_print_all_callsite_rma_info (FILE * fp)
 		fprintf (fp,
 			 mpiP_Report_Formats[MPIP_CALLSITE_IO_SUMMARY_FMT]
 			 [mpiPi.reportFormat],
-			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].
-			   name[4]), av[i - 1]->csid, "*", sCount, sMax,
+			 &(mpiPi.lookup[av[i - 1]->op - mpiPi_BASE].name[4]),
+			 av[i - 1]->csid, "*", sCount, sMax,
 			 sCumulative / sCount, sMin, sCumulative);
 
 		sCount = 0;
@@ -1780,18 +1776,20 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 		  fprintf (fp,
 			   mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT]
 			   [mpiPi.reportFormat],
-			   &(mpiPi.lookup[task_stats->op - mpiPi_BASE].
-			     name[4]), av[i]->csid, task_data[j].rank,
-			   task_data[j].count, task_data[j].maxDur / 1000.0,
+			   &(mpiPi.
+			     lookup[task_stats->op - mpiPi_BASE].name[4]),
+			   av[i]->csid, task_data[j].rank, task_data[j].count,
+			   task_data[j].maxDur / 1000.0,
 			   task_data[j].cumulativeTime / (task_data[j].count *
 							  1000.0),
 			   task_data[j].minDur / 1000.0,
 			   100.0 * task_data[j].cumulativeTime /
-			   (mpiPi.global_task_info[task_data[j].rank].
-			    app_time * 1e6),
+			   (mpiPi.
+			    global_task_info[task_data[j].rank].app_time *
+			    1e6),
 			   100.0 * task_data[j].cumulativeTime /
-			   mpiPi.global_task_info[task_data[j].rank].
-			   mpi_time);
+			   mpiPi.global_task_info[task_data[j].
+						  rank].mpi_time);
 		}
 	    }
 	  if (sCount > 0)
@@ -1799,8 +1797,9 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 	      fprintf (fp,
 		       mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT]
 		       [mpiPi.reportFormat],
-		       &(mpiPi.lookup[task_data[j - 1].op - mpiPi_BASE].
-			 name[4]), av[i]->csid, "*", sCount, sMax / 1000.0,
+		       &(mpiPi.
+			 lookup[task_data[j - 1].op - mpiPi_BASE].name[4]),
+		       av[i]->csid, "*", sCount, sMax / 1000.0,
 		       sCumulative / (sCount * 1000.0), sMin / 1000.0,
 		       mpiPi.global_app_time >
 		       0 ? 100.0 * sCumulative / (mpiPi.global_app_time *
@@ -1923,12 +1922,10 @@ mpiPi_coll_print_concise_callsite_time_info (FILE * fp)
       if (mpiPi.rank == mpiPi.collectorRank)
 	{
 	  fprintf (fp,
-		   mpiP_Report_Formats[MPIP_CALLSITE_TIME_CONCISE_FMT][mpiPi.
-								       reportFormat],
+		   mpiP_Report_Formats[MPIP_CALLSITE_TIME_CONCISE_FMT]
+		   [mpiPi.reportFormat],
 		   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]),
-		   av[i]->csid,
-		   tot_tasks,
-		   max_time.val / 1000.0,
+		   av[i]->csid, tot_tasks, max_time.val / 1000.0,
 		   tot_time / (tot_tasks * 1000), min_time.val / 1000.0,
 		   max_time.rank, min_time.rank);
 	}
@@ -2056,14 +2053,12 @@ mpiPi_coll_print_concise_callsite_sent_info (FILE * fp)
       if (mpiPi.rank == mpiPi.collectorRank)
 	{
 	  fprintf (fp,
-		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT][mpiPi.
-								       reportFormat],
+		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT]
+		   [mpiPi.reportFormat],
 		   &(mpiPi.lookup[av[ci]->op - mpiPi_BASE].name[4]),
-		   av[ci]->csid,
-		   tot_tasks,
-		   max_sent.val,
-		   tot_sent / tot_tasks, min_sent.val,
-		   max_sent.rank, min_sent.rank);
+		   av[ci]->csid, tot_tasks, max_sent.val,
+		   tot_sent / tot_tasks, min_sent.val, max_sent.rank,
+		   min_sent.rank);
 	}
     }
 
@@ -2194,13 +2189,11 @@ mpiPi_coll_print_concise_callsite_io_info (FILE * fp)
       if (mpiPi.rank == mpiPi.collectorRank)
 	{
 	  fprintf (fp,
-		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT][mpiPi.
-								       reportFormat],
+		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT]
+		   [mpiPi.reportFormat],
 		   &(mpiPi.lookup[av[ci]->op - mpiPi_BASE].name[4]),
-		   av[ci]->csid,
-		   tot_tasks,
-		   max_io.val,
-		   tot_io / tot_tasks, min_io.val, max_io.rank, min_io.rank);
+		   av[ci]->csid, tot_tasks, max_io.val, tot_io / tot_tasks,
+		   min_io.val, max_io.rank, min_io.rank);
 	}
     }
 
@@ -2327,14 +2320,12 @@ mpiPi_coll_print_concise_callsite_rma_info (FILE * fp)
       if (mpiPi.rank == mpiPi.collectorRank)
 	{
 	  fprintf (fp,
-		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT][mpiPi.
-								       reportFormat],
+		   mpiP_Report_Formats[MPIP_CALLSITE_MESS_CONCISE_FMT]
+		   [mpiPi.reportFormat],
 		   &(mpiPi.lookup[av[ci]->op - mpiPi_BASE].name[4]),
-		   av[ci]->csid,
-		   tot_tasks,
-		   max_sent.val,
-		   tot_sent / tot_tasks, min_sent.val,
-		   max_sent.rank, min_sent.rank);
+		   av[ci]->csid, tot_tasks, max_sent.val,
+		   tot_sent / tot_tasks, min_sent.val, max_sent.rank,
+		   min_sent.rank);
 	}
     }
 
@@ -2462,10 +2453,11 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 
 			  fprintf (fp,
 				   mpiP_Report_Formats
-				   [MPIP_CALLSITE_MESS_RANK_FMT][mpiPi.
-								 reportFormat],
-				   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].
-				     name[4]), av[i]->csid, task_data[j].rank,
+				   [MPIP_CALLSITE_MESS_RANK_FMT]
+				   [mpiPi.reportFormat],
+				   &(mpiPi.
+				     lookup[av[i]->op - mpiPi_BASE].name[4]),
+				   av[i]->csid, task_data[j].rank,
 				   task_data[j].count,
 				   task_data[j].maxDataSent,
 				   task_data[j].cumulativeDataSent /
@@ -2479,13 +2471,12 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 		    {
 		      fprintf (fp,
 			       mpiP_Report_Formats
-			       [MPIP_CALLSITE_MESS_SUMMARY_FMT][mpiPi.
-								reportFormat],
+			       [MPIP_CALLSITE_MESS_SUMMARY_FMT]
+			       [mpiPi.reportFormat],
 			       &(mpiPi.
-				 lookup[av[i]->op -
-					mpiPi_BASE].name[4]), av[i]->csid,
-			       "*", sCount, sMax, sCumulative / sCount, sMin,
-			       sCumulative);
+				 lookup[av[i]->op - mpiPi_BASE].name[4]),
+			       av[i]->csid, "*", sCount, sMax,
+			       sCumulative / sCount, sMin, sCumulative);
 		    }
 		  fprintf (fp, "\n");
 		}
@@ -2619,13 +2610,12 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
 
 			  fprintf (fp,
 				   mpiP_Report_Formats
-				   [MPIP_CALLSITE_IO_RANK_FMT][mpiPi.
-							       reportFormat],
-				   &(mpiPi.
-				     lookup[task_data[j].op -
-					    mpiPi_BASE].name[4]), av[i]->csid,
-				   task_data[j].rank, task_data[j].count,
-				   task_data[j].maxIO,
+				   [MPIP_CALLSITE_IO_RANK_FMT]
+				   [mpiPi.reportFormat],
+				   &(mpiPi.lookup
+				     [task_data[j].op - mpiPi_BASE].name[4]),
+				   av[i]->csid, task_data[j].rank,
+				   task_data[j].count, task_data[j].maxIO,
 				   task_data[j].cumulativeIO /
 				   task_data[j].count, task_data[j].minIO,
 				   task_data[j].cumulativeIO);
@@ -2635,13 +2625,12 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
 		    {
 		      fprintf (fp,
 			       mpiP_Report_Formats
-			       [MPIP_CALLSITE_IO_SUMMARY_FMT][mpiPi.
-							      reportFormat],
-			       &(mpiPi.
-				 lookup[task_data[j - 1].op -
-					mpiPi_BASE].name[4]), av[i]->csid,
-			       "*", sCount, sMax, sCumulative / sCount, sMin,
-			       sCumulative);
+			       [MPIP_CALLSITE_IO_SUMMARY_FMT]
+			       [mpiPi.reportFormat],
+			       &(mpiPi.lookup
+				 [task_data[j - 1].op - mpiPi_BASE].name[4]),
+			       av[i]->csid, "*", sCount, sMax,
+			       sCumulative / sCount, sMin, sCumulative);
 		    }
 		  fprintf (fp, "\n");
 		}
@@ -2773,13 +2762,12 @@ mpiPi_coll_print_all_callsite_rma_info (FILE * fp)
 
 			  fprintf (fp,
 				   mpiP_Report_Formats
-				   [MPIP_CALLSITE_IO_RANK_FMT][mpiPi.
-							       reportFormat],
-				   &(mpiPi.
-				     lookup[task_data[j].op -
-					    mpiPi_BASE].name[4]), av[i]->csid,
-				   task_data[j].rank, task_data[j].count,
-				   task_data[j].maxRMA,
+				   [MPIP_CALLSITE_IO_RANK_FMT]
+				   [mpiPi.reportFormat],
+				   &(mpiPi.lookup
+				     [task_data[j].op - mpiPi_BASE].name[4]),
+				   av[i]->csid, task_data[j].rank,
+				   task_data[j].count, task_data[j].maxRMA,
 				   task_data[j].cumulativeRMA /
 				   task_data[j].count, task_data[j].minRMA,
 				   task_data[j].cumulativeRMA);
@@ -2789,13 +2777,12 @@ mpiPi_coll_print_all_callsite_rma_info (FILE * fp)
 		    {
 		      fprintf (fp,
 			       mpiP_Report_Formats
-			       [MPIP_CALLSITE_IO_SUMMARY_FMT][mpiPi.
-							      reportFormat],
-			       &(mpiPi.
-				 lookup[task_data[j - 1].op -
-					mpiPi_BASE].name[4]), av[i]->csid,
-			       "*", sCount, sMax, sCumulative / sCount, sMin,
-			       sCumulative);
+			       [MPIP_CALLSITE_IO_SUMMARY_FMT]
+			       [mpiPi.reportFormat],
+			       &(mpiPi.lookup
+				 [task_data[j - 1].op - mpiPi_BASE].name[4]),
+			       av[i]->csid, "*", sCount, sMax,
+			       sCumulative / sCount, sMin, sCumulative);
 		    }
 		  fprintf (fp, "\n");
 		}
