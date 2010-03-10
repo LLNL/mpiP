@@ -67,7 +67,7 @@ mpiPi_getenv ()
       extern char *optarg;
       int ac = 0;
       char *av[64];
-      char *sep = " \t";
+      char *sep = " \t,";
 
       if (mpiPi.rank == 0)
 	mpiPi_msg ("Found MPIP environment variable [%s]\n", ep);
@@ -81,7 +81,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cngf:b:s:k:t:oem:x:dvlr")) != EOF);)
+      for (; ((c = getopt (ac, av, "cdef:gk:lm:nors:t:vx:")) != EOF);)
 	{
 	  switch (c)
 	    {
