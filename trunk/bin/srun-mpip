@@ -16,9 +16,9 @@
 #  and compiler.
 
 
-MPIP_LIB_DIR=/usr/local/tools/mpiP/slib
+MPIP_SLIB_DIR=/usr/local/tools/mpiP/lib
 
-export LD_PRELOAD=${MPIP_LIB_DIR}/libmpiP.so:/usr/lib/mpi/mpi_intel/lib/libpmpi.so:${MPIP_LIB_DIR}/libbfd.so:${MPIP_LIB_DIR}/libiberty.so:/usr/lib/mpi/lib/libpmpio.so.1.0
+export LD_PRELOAD=${MPIP_SLIB_DIR}/libmpiP.so
 
 
 srun "$@"
