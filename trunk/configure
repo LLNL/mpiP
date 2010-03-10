@@ -5007,7 +5007,18 @@ if test "x$ac_cv_func_mread_real_time" = x""yes; then :
   READ_REAL_TIME=mread_real_time TIMER_FOUND=yes
 fi
 
-  if test x$TIMER_FOUND = xno; then
+  if test x$TIMER_FOUND = xyes; then
+    #  In AIX 5.3, finding mread_real_time in libc, but not in header files.
+    ac_fn_c_check_decl "$LINENO" "mread_real_time" "ac_cv_have_decl_mread_real_time" "#include <sys/systemcfg.h> #include <sys/time.h>
+"
+if test "x$ac_cv_have_decl_mread_real_time" = x""yes; then :
+
+else
+  $as_echo "#define NEED_MREAD_REAL_TIME_DECL 1" >>confdefs.h
+
+fi
+
+  else
     ac_fn_c_check_func "$LINENO" "read_real_time" "ac_cv_func_read_real_time"
 if test "x$ac_cv_func_read_real_time" = x""yes; then :
   READ_REAL_TIME=read_real_time TIMER_FOUND=yes
@@ -5666,6 +5677,8 @@ ENABLE_BFD=$ENABLE_BFD
 
 
 
+
+$as_echo "#define USE_SETJMP 1" >>confdefs.h
 
 
 
