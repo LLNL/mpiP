@@ -1,5 +1,17 @@
+2010-04-01  chcham
+
+	* bin/srun-mpip:
+	  Updated to account for LD_PRELOADing ignoring exe RPATH.
+	* configure:
+	  Make configure consistent.
+	* mpiPi.c:
+	  Add message suggesting use of -x runtime flag if the executable
+	  cannot be opened.
+
 2010-03-10  chcham
 
+	* ChangeLog:
+	  Updated ChangeLog for 3.2 release.
 	* Makefile.in, diag_msgs.c, diag_msgs_api.c, glob.c, mpiP-hash.c,
 	  mpiPi.c, mpiPi_proto.h, pc_lookup.c, pc_lookup_dwarf.c,
 	  pcontrol.c, record_stack.c, report.c, util.c, wrappers_special.c:
