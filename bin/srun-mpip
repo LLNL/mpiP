@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 #  srun-mpip
 #
@@ -6,8 +6,8 @@
 #
 #  If the application has been linked against an SO MPI library and 
 #  SO versions of libmpiP, libbfd, and libiberty are available, this
-#  script should preload libmpiP such that MPI routines are profiled
-#  and an mpiP report is generated.
+#  script should preload libmpiP.so (generated with 'make shared')
+#  such that MPI routines are profiled and an mpiP report is generated.
 #
 #  This script is a wrapper for srun  The use of "srun" to run a
 #  parallel job can be replaced with "srun-mpip".  
@@ -15,11 +15,44 @@
 #  You may need to preload other objects based on your MPI implementation
 #  and compiler.
 
+# Top-level mpiP install directory
+MPIP_DIR=/usr/local/tools/mpip
 
-MPIP_SLIB_DIR=/usr/local/tools/mpiP/lib
+#  ADDTL_RT_LIBS objects must be separated by a colon
+ADDTL_RT_LIBS="/usr/lib64/libunwind.so"
 
-export LD_PRELOAD=${MPIP_SLIB_DIR}/libmpiP.so
+#set -x
 
+#  Get the RPATH paths from the executable to add to LD_LIBRARY_PATH in the
+#  event that using LD_PRELOAD interferes with using RPATH values.
+
+EXE_RPATHS=
+#  Search through command-line arguments for executables
+for iarg in $@ ; do
+
+  FULL_PATH=`which $iarg 2> /dev/null`
+
+  if test $? -eq 0 ; then  # Found an executable
+
+    #  Check executable for RPATH section
+    objdump -p ${FULL_PATH} | grep RPATH > /dev/null 2>&1
+
+    if test $? -eq 0 ; then # Found RPATH section
+      EXE_RPATHS=${EXE_RPATHS:+${EXE_RPATHS}:}`objdump -p ${FULL_PATH} | grep RPATH | cut -d' ' -f10`
+    fi
+  fi
+done
+#echo :${EXE_RPATHS}:
+
+
+#  Set LD_LIBRARY_PATH to find executable shared objects
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${EXE_RPATHS}
+
+#  Set LD_PRELOAD to preload mpiP library and other libs used by mpiP
+export LD_PRELOAD=\
+${LD_PRELOAD:+${LD_PRELOAD}:}${MPIP_DIR}/lib/libmpiP.so${ADDTL_RT_LIBS:+:${ADDTL_RT_LIBS}}
+
+#export LD_DEBUG=libs
 
 srun "$@"
 
