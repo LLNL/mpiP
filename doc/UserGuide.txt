@@ -87,7 +87,7 @@ Introduction
      * Philip Mucci (SiCortex)
      * Karl Schulz (Texas Advanced Computing Center)
 
-  New Features with Release 3.2
+  New Features with Release 3.2.1
 
    Release v3.2.1 addresses the following issue:
      * Improved support for SLURM run-time instrumentation.
