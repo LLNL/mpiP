@@ -1,8 +1,8 @@
 
                   mpiP: Lightweight, Scalable MPI Profiling
 
-                                 Version 3.2
-                                12 March 2010
+                                Version 3.2.1
+                                01 April 2010
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                                Chris Chambreau
@@ -88,6 +88,9 @@ Introduction
      * Karl Schulz (Texas Advanced Computing Center)
 
   New Features with Release 3.2
+
+   Release v3.2.1 addresses the following issue:
+     * Improved support for SLURM run-time instrumentation.
 
    Release v3.2 addresses the following issues:
      * Support for MPI RMA functions.
@@ -971,5 +974,5 @@ How to add MPI calls to profile
    For further information please send mail to
    mpip-help@lists.sourceforge.net.
 
-   Last modified on March 12th, 2010.
+   Last modified on April 1st, 2010.
    UCRL-CODE-223450
