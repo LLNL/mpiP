@@ -161,6 +161,7 @@ mpiPi_init (char *appName)
 #else
   mpiPi.collective_report = 0;
 #endif
+  mpiPi.disable_finalize_report = 0;
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
@@ -930,7 +931,8 @@ mpiPi_generateReport (int report_style)
 void
 mpiPi_finalize ()
 {
-  mpiPi_generateReport (mpiPi.report_style);
+  if ( mpiPi.disable_finalize_report == 0 )
+    mpiPi_generateReport (mpiPi.report_style);
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
