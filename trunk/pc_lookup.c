@@ -39,7 +39,7 @@ static const char *filename;
 static const char *functionname;
 static unsigned int line;
 static bfd *abfd = NULL;
-static bfd* open_bfd_object (char *filename);
+static bfd *open_bfd_object (char *filename);
 
 /*  BFD boolean and bfd_boolean types have changed through versions.
     It looks like bfd_boolean will be preferred.                     */
@@ -222,56 +222,63 @@ find_address_in_section (abfd, section, data)
 *******************************************************************************/
 
 /*  Used with twalk to print SO tree entries  */
-static void mpiPi_print_so_node_info(const void *so_node, VISIT which, int depth)
+static void
+mpiPi_print_so_node_info (const void *so_node, VISIT which, int depth)
 {
   so_info_t *cso;
 
-  if ( (so_info_t**)so_node == NULL ) 
+  if ((so_info_t **) so_node == NULL)
     return;
   else
-    cso = *(so_info_t**)so_node;
+    cso = *(so_info_t **) so_node;
 
-  switch(which) {
-  case preorder:
-    break;
-  case postorder:
-    printf("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
-    break;
-  case endorder:
-    break;
-  case leaf:
-    printf("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
-    break;
-  }
+  switch (which)
+    {
+    case preorder:
+      break;
+    case postorder:
+      printf ("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+      break;
+    case endorder:
+      break;
+    case leaf:
+      printf ("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+      break;
+    }
 }
 
 
 /*  Print SO tree entries  */
-static void mpiPi_print_sos()
+static void
+mpiPi_print_sos ()
 {
-  if ( mpiPi.so_info == NULL )
-    mpiPi_msg_warn("Cannot print SOs as mpiPi.so_info is NULL\n");
+  if (mpiPi.so_info == NULL)
+    mpiPi_msg_warn ("Cannot print SOs as mpiPi.so_info is NULL\n");
   else
-    twalk(mpiPi.so_info, mpiPi_print_so_node_info);
+    twalk (mpiPi.so_info, mpiPi_print_so_node_info);
 }
 
- 
+
 /*  For insertin into and searching SO tree  */
-static int mpiPi_so_info_compare(const void* n1, const void* n2)
+static int
+mpiPi_so_info_compare (const void *n1, const void *n2)
 {
-  so_info_t *sn1 = (so_info_t *)n1, *sn2 = (so_info_t *)n2;
+  so_info_t *sn1 = (so_info_t *) n1, *sn2 = (so_info_t *) n2;
 
   /* mpiPi_msg_debug("comparing sn1->lvma %p to sn2->lvma %p\n", sn1->lvma, sn2->lvma); */
 
-  if ( sn1->lvma < sn2->lvma ) return -1;
-  if ( sn1->lvma > sn2->uvma ) return 1;
+  if (sn1->lvma < sn2->lvma)
+    return -1;
+  if (sn1->lvma > sn2->uvma)
+    return 1;
 
   return 0;
 }
 
 
 /*  Load map info for SOs  */
-static int mpiPi_parse_maps()
+static int
+mpiPi_parse_maps ()
 {
   char fbuf[64];
   FILE *fh;
@@ -281,69 +288,70 @@ static int mpiPi_parse_maps()
   size_t inbufsize;
   char *delim = " \n";
 
-  snprintf(fbuf, 64, "/proc/%d/maps", (int)getpid());
+  snprintf (fbuf, 64, "/proc/%d/maps", (int) getpid ());
 
-  fh = fopen(fbuf, "r");
+  fh = fopen (fbuf, "r");
 
-  while ( getline(&inbuf, &inbufsize, fh) != -1 )
+  while (getline (&inbuf, &inbufsize, fh) != -1)
     {
       /* sanity check input buffer */
-      if ( inbuf == NULL )
-        return 0;
+      if (inbuf == NULL)
+	return 0;
 
-      mpiPi_msg_debug("maps getline is %s\n", inbuf);
+      mpiPi_msg_debug ("maps getline is %s\n", inbuf);
 
       /* scan address range */
-      if ( sscanf(inbuf, "%llx-%llx", &lvma, &uvma) < 2 )
-        return 0;
+      if (sscanf (inbuf, "%llx-%llx", &lvma, &uvma) < 2)
+	return 0;
 
-      mpiPi_msg_debug("Parsed range as %lx - %lx\n", lvma, uvma);
+      mpiPi_msg_debug ("Parsed range as %lx - %lx\n", lvma, uvma);
 
       /* get pointer to address range */
-      tokptr = strtok(inbuf, delim);
+      tokptr = strtok (inbuf, delim);
 
       /* get pointer to permissions */
-      tokptr = strtok(NULL, delim);
+      tokptr = strtok (NULL, delim);
 
       /* Check for text segment */
-      if ( tokptr == NULL || tokptr[0] != 'r' || tokptr[2] != 'x' )
-        continue;
+      if (tokptr == NULL || tokptr[0] != 'r' || tokptr[2] != 'x')
+	continue;
 
       /* get pointer to offset */
-      tokptr = strtok(NULL, delim);
+      tokptr = strtok (NULL, delim);
 
       /* get pointer to device */
-      tokptr = strtok(NULL, delim);
+      tokptr = strtok (NULL, delim);
 
       /* get pointer to inode */
-      tokptr = strtok(NULL, delim);
+      tokptr = strtok (NULL, delim);
 
       /* get pointer to file */
-      fpath = strtok(NULL, delim);
+      fpath = strtok (NULL, delim);
 
       /* Process file info */
-      if ( fpath == NULL || fpath[0] != '/')
-        continue;
+      if (fpath == NULL || fpath[0] != '/')
+	continue;
       mpiPi_msg_debug ("maps fpath is %s\n", fpath);
 
       /* copy info into structure */
-      cso = (so_info_t*)malloc(sizeof(so_info_t));
-      if ( cso == NULL )
-        return 0;
+      cso = (so_info_t *) malloc (sizeof (so_info_t));
+      if (cso == NULL)
+	return 0;
       cso->lvma = lvma;
       cso->uvma = uvma;
-      cso->fpath = strdup(fpath);
+      cso->fpath = strdup (fpath);
       cso->bfd = NULL;
-      if ( tsearch(cso, (void**)&(mpiPi.so_info), mpiPi_so_info_compare) != NULL )
-        mpiPi.so_count++;
+      if (tsearch (cso, (void **) &(mpiPi.so_info), mpiPi_so_info_compare) !=
+	  NULL)
+	mpiPi.so_count++;
     }
 
-  fclose(fh);
+  fclose (fh);
 
-  free(inbuf);
+  free (inbuf);
 
-  if ( mpiPi_debug )
-    mpiPi_print_sos();
+  if (mpiPi_debug)
+    mpiPi_print_sos ();
 
   return 1;
 }
@@ -384,90 +392,95 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   if (!found)
     {
 #ifdef SO_LOOKUP
-        {
-          so_info_t cso, *fso;
+      {
+	so_info_t cso, *fso;
 
-          if ( mpiPi.so_info == NULL )
-            if ( mpiPi_parse_maps() == 0 )
-              {
-                mpiPi_msg_debug("Failed to parse SO maps.\n");
-                return 1;
-              }
+	if (mpiPi.so_info == NULL)
+	  if (mpiPi_parse_maps () == 0)
+	    {
+	      mpiPi_msg_debug ("Failed to parse SO maps.\n");
+	      return 1;
+	    }
 
-          cso.lvma = (void*)i_addr_hex;
+	cso.lvma = (void *) i_addr_hex;
 
-          fso = *(so_info_t**)tfind((void*)&cso, (void**)&(mpiPi.so_info), mpiPi_so_info_compare);
+	fso =
+	  *(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
+				 mpiPi_so_info_compare);
 
-          if ( fso != NULL )
-            {
-              if ( fso->bfd == NULL )
-                {
-                  mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
-                  fso->bfd = (bfd*)open_bfd_object(fso->fpath);
-                }
+	if (fso != NULL)
+	  {
+	    if (fso->bfd == NULL)
+	      {
+		mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
+		fso->bfd = (bfd *) open_bfd_object (fso->fpath);
+	      }
 
-              pc = (char*)i_addr_hex - (char*)fso->lvma;
-              mpiPi_msg_debug("Calling bfd_map_over_sections with new bfd for %p\n", pc);
+	    pc = (char *) i_addr_hex - (char *) fso->lvma;
+	    mpiPi_msg_debug
+	      ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
 
-              found = FALSE;
+	    found = FALSE;
 
-              mpiPi_msg_debug("fso->bfd->sections is %p\n", ((bfd*)(fso->bfd))->sections);
-              bfd_map_over_sections (fso->bfd, find_address_in_section, (PTR) NULL);
-            }
+	    mpiPi_msg_debug ("fso->bfd->sections is %p\n",
+			     ((bfd *) (fso->bfd))->sections);
+	    bfd_map_over_sections (fso->bfd, find_address_in_section,
+				   (PTR) NULL);
+	  }
 
-        }
+      }
 #endif /* #ifdef SO_LOOKUP */
 
-      if ( found == 0 )
-        return 1;
+      if (found == 0)
+	return 1;
 
       /* determine the function name */
       if (functionname == NULL || *functionname == '\0')
-        {
-          *o_funct_str = strdup ("[unknown]");
-        }
+	{
+	  *o_funct_str = strdup ("[unknown]");
+	}
       else
-        {
-          char *res = NULL;
+	{
+	  char *res = NULL;
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-          res = mpiPdemangle (functionname);
+	  res = mpiPdemangle (functionname);
 #endif
-          if (res == NULL)
-            {
-              *o_funct_str = strdup (functionname);
-            }
-          else
-            {
-              *o_funct_str = res;
-            }
+	  if (res == NULL)
+	    {
+	      *o_funct_str = strdup (functionname);
+	    }
+	  else
+	    {
+	      *o_funct_str = res;
+	    }
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
-                           *o_funct_str);
+	  mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
+			   *o_funct_str);
 #endif
-        } 
+	}
       /* set the filename and line no */
       if (mpiPi.baseNames == 0 && filename != NULL)
-        {
-          char *h;
-          h = strrchr (filename, '/');
-          if (h != NULL)
-            filename = h + 1;
-        }
+	{
+	  char *h;
+	  h = strrchr (filename, '/');
+	  if (h != NULL)
+	    filename = h + 1;
+	}
 
       *o_lineno = line;
       *o_file_str = strdup (filename ? filename : "[unknown]");
 
       mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
-                       *o_funct_str);
+		       *o_funct_str);
     }
 
   return 0;
 }
 
 
-static bfd*
+static bfd *
 open_bfd_object (char *filename)
 {
   char *target = NULL;
@@ -476,7 +489,7 @@ open_bfd_object (char *filename)
   long symcount;
   unsigned int size;
   static int bfd_initialized = 0;
-  bfd * new_bfd;
+  bfd *new_bfd;
 
   if (filename == NULL)
     {
@@ -494,7 +507,7 @@ open_bfd_object (char *filename)
   mpiPi.text_start = mpiPi_get_text_start (filename);
 #endif
 
-  if ( ! bfd_initialized )
+  if (!bfd_initialized)
     {
       bfd_init ();
       bfd_initialized = 1;
@@ -549,7 +562,8 @@ open_bfd_object (char *filename)
   symcount = bfd_read_minisymbols (new_bfd, FALSE, (void *) &syms, &size);
   if (symcount == 0)
     symcount =
-      bfd_read_minisymbols (new_bfd, TRUE /* dynamic */ , (void *) &syms, &size);
+      bfd_read_minisymbols (new_bfd, TRUE /* dynamic */ , (void *) &syms,
+			    &size);
 
   if (symcount < 0)
     {
@@ -562,17 +576,18 @@ open_bfd_object (char *filename)
       mpiPi_msg_debug ("\n");
       mpiPi_msg_debug ("found %d symbols in file [%s]\n", symcount, filename);
     }
- 
+
   return new_bfd;
 }
 
 int
 open_bfd_executable (char *filename)
 {
-  abfd = open_bfd_object(filename);
-  if ( abfd == NULL )
+  abfd = open_bfd_object (filename);
+  if (abfd == NULL)
     return 0;
-  else return 1; 
+  else
+    return 1;
 }
 
 void
