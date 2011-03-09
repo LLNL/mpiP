@@ -500,7 +500,20 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
+SO_LOOKUP=no
+#  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
+AC_MSG_CHECKING(/proc/self/maps)
+if test -r /proc/self/maps ; then
+  AC_MSG_RESULT([yes])
+  SO_LOOKUP=yes
+else
+  AC_MSG_RESULT([no])
+fi
 
+#  SO lookup code uses getline, assumes ought to be available if we are using libbfd
+if test "x$SO_LOOKUP" = xyes ; then
+  AC_CHECK_FUNC(getline, AC_DEFINE(SO_LOOKUP), AC_MSG_RESULT([getline not found so SO lookup is disabled.]))
+fi
 
 if test "$ENABLE_API_ONLY" = no ; then
 

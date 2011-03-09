@@ -29,6 +29,9 @@ static char *svnid = "$Id$";
 #ifdef ENABLE_BFD
 #ifndef CEXTRACT
 #include "bfd.h"
+#ifdef SO_LOOKUP
+#include <search.h>
+#endif
 #endif
 static asymbol **syms;
 static bfd_vma pc;
@@ -36,6 +39,7 @@ static const char *filename;
 static const char *functionname;
 static unsigned int line;
 static bfd *abfd = NULL;
+static bfd* open_bfd_object (char *filename);
 
 /*  BFD boolean and bfd_boolean types have changed through versions.
     It looks like bfd_boolean will be preferred.                     */
@@ -211,6 +215,140 @@ find_address_in_section (abfd, section, data)
 }
 
 
+#ifdef SO_LOOKUP
+/*******************************************************************************
+  The following functions support source code lookup for shared objects
+   with SO info stored in a tree. 
+*******************************************************************************/
+
+/*  Used with twalk to print SO tree entries  */
+static void mpiPi_print_so_node_info(const void *so_node, VISIT which, int depth)
+{
+  so_info_t *cso;
+
+  if ( (so_info_t**)so_node == NULL ) 
+    return;
+  else
+    cso = *(so_info_t**)so_node;
+
+  switch(which) {
+  case preorder:
+    break;
+  case postorder:
+    printf("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+    break;
+  case endorder:
+    break;
+  case leaf:
+    printf("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+    break;
+  }
+}
+
+
+/*  Print SO tree entries  */
+static void mpiPi_print_sos()
+{
+  if ( mpiPi.so_info == NULL )
+    mpiPi_msg_warn("Cannot print SOs as mpiPi.so_info is NULL\n");
+  else
+    twalk(mpiPi.so_info, mpiPi_print_so_node_info);
+}
+
+ 
+/*  For insertin into and searching SO tree  */
+static int mpiPi_so_info_compare(const void* n1, const void* n2)
+{
+  so_info_t *sn1 = (so_info_t *)n1, *sn2 = (so_info_t *)n2;
+
+  /* mpiPi_msg_debug("comparing sn1->lvma %p to sn2->lvma %p\n", sn1->lvma, sn2->lvma); */
+
+  if ( sn1->lvma < sn2->lvma ) return -1;
+  if ( sn1->lvma > sn2->uvma ) return 1;
+
+  return 0;
+}
+
+
+/*  Load map info for SOs  */
+static int mpiPi_parse_maps()
+{
+  char fbuf[64];
+  FILE *fh;
+  void *lvma, *uvma;
+  char *fpath, *inbuf = NULL, *tokptr;
+  so_info_t *cso;
+  size_t inbufsize;
+  char *delim = " \n";
+
+  snprintf(fbuf, 64, "/proc/%d/maps", (int)getpid());
+
+  fh = fopen(fbuf, "r");
+
+  while ( getline(&inbuf, &inbufsize, fh) != -1 )
+    {
+      /* sanity check input buffer */
+      if ( inbuf == NULL )
+        return 0;
+
+      mpiPi_msg_debug("maps getline is %s\n", inbuf);
+
+      /* scan address range */
+      if ( sscanf(inbuf, "%llx-%llx", &lvma, &uvma) < 2 )
+        return 0;
+
+      mpiPi_msg_debug("Parsed range as %lx - %lx\n", lvma, uvma);
+
+      /* get pointer to address range */
+      tokptr = strtok(inbuf, delim);
+
+      /* get pointer to permissions */
+      tokptr = strtok(NULL, delim);
+
+      /* Check for text segment */
+      if ( tokptr == NULL || tokptr[0] != 'r' || tokptr[2] != 'x' )
+        continue;
+
+      /* get pointer to offset */
+      tokptr = strtok(NULL, delim);
+
+      /* get pointer to device */
+      tokptr = strtok(NULL, delim);
+
+      /* get pointer to inode */
+      tokptr = strtok(NULL, delim);
+
+      /* get pointer to file */
+      fpath = strtok(NULL, delim);
+
+      /* Process file info */
+      if ( fpath == NULL || fpath[0] != '/')
+        continue;
+      mpiPi_msg_debug ("maps fpath is %s\n", fpath);
+
+      /* copy info into structure */
+      cso = (so_info_t*)malloc(sizeof(so_info_t));
+      if ( cso == NULL )
+        return 0;
+      cso->lvma = lvma;
+      cso->uvma = uvma;
+      cso->fpath = strdup(fpath);
+      cso->bfd = NULL;
+      if ( tsearch(cso, (void**)&(mpiPi.so_info), mpiPi_so_info_compare) != NULL )
+        mpiPi.so_count++;
+    }
+
+  fclose(fh);
+
+  free(inbuf);
+
+  if ( mpiPi_debug )
+    mpiPi_print_sos();
+
+  return 1;
+}
+#endif /* ifdef SO_LOOKUP  */
+
 int
 mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 		   char **o_funct_str)
@@ -225,6 +363,9 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       return 1;
     }
 
+  /* Do initial source lookup check on executable file.
+   * TODO: optimize lookup: should SO objects be checked first?
+   */
   if (abfd == NULL)
     {
       mpiPi_msg_debug
@@ -232,83 +373,117 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       return 1;
     }
 
+  mpiPi_msg_debug ("Caliper 1\n");
   sprintf (buf, "%s", mpiP_format_address (i_addr_hex, addr_buf));
   pc = bfd_scan_vma (buf, NULL, 16);
 
-  /* jsv hack - trim high bit off of address */
-  /*  pc &= !0x10000000; */
   found = FALSE;
 
   bfd_map_over_sections (abfd, find_address_in_section, (PTR) NULL);
 
   if (!found)
     {
-      mpiPi_msg_debug ("returning not found in mpiP_find_src_loc\n");
-      return 1;
-    }
-  else
-    {
+#ifdef SO_LOOKUP
+        {
+          so_info_t cso, *fso;
+
+          if ( mpiPi.so_info == NULL )
+            if ( mpiPi_parse_maps() == 0 )
+              {
+                mpiPi_msg_debug("Failed to parse SO maps.\n");
+                return 1;
+              }
+
+          cso.lvma = (void*)i_addr_hex;
+
+          fso = *(so_info_t**)tfind((void*)&cso, (void**)&(mpiPi.so_info), mpiPi_so_info_compare);
+
+          if ( fso != NULL )
+            {
+              if ( fso->bfd == NULL )
+                {
+                  mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
+                  fso->bfd = (bfd*)open_bfd_object(fso->fpath);
+                }
+
+              pc = (char*)i_addr_hex - (char*)fso->lvma;
+              mpiPi_msg_debug("Calling bfd_map_over_sections with new bfd for %p\n", pc);
+
+              found = FALSE;
+
+              mpiPi_msg_debug("fso->bfd->sections is %p\n", ((bfd*)(fso->bfd))->sections);
+              bfd_map_over_sections (fso->bfd, find_address_in_section, (PTR) NULL);
+            }
+
+        }
+#endif /* #ifdef SO_LOOKUP */
+
+      if ( found == 0 )
+        return 1;
+
       /* determine the function name */
       if (functionname == NULL || *functionname == '\0')
-	{
-	  *o_funct_str = strdup ("[unknown]");
-	}
+        {
+          *o_funct_str = strdup ("[unknown]");
+        }
       else
-	{
-	  char *res = NULL;
+        {
+          char *res = NULL;
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-	  res = mpiPdemangle (functionname);
+          res = mpiPdemangle (functionname);
 #endif
-	  if (res == NULL)
-	    {
-	      *o_funct_str = strdup (functionname);
-	    }
-	  else
-	    {
-	      *o_funct_str = res;
-	    }
+          if (res == NULL)
+            {
+              *o_funct_str = strdup (functionname);
+            }
+          else
+            {
+              *o_funct_str = res;
+            }
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-	  mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
-			   *o_funct_str);
+          mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
+                           *o_funct_str);
 #endif
-	}
-
+        } 
       /* set the filename and line no */
       if (mpiPi.baseNames == 0 && filename != NULL)
-	{
-	  char *h;
-	  h = strrchr (filename, '/');
-	  if (h != NULL)
-	    filename = h + 1;
-	}
+        {
+          char *h;
+          h = strrchr (filename, '/');
+          if (h != NULL)
+            filename = h + 1;
+        }
 
       *o_lineno = line;
       *o_file_str = strdup (filename ? filename : "[unknown]");
 
       mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
-		       *o_funct_str);
+                       *o_funct_str);
     }
+
   return 0;
 }
 
 
-int
-open_bfd_executable (char *filename)
+static bfd*
+open_bfd_object (char *filename)
 {
   char *target = NULL;
   char **matching = NULL;
   long storage;
   long symcount;
   unsigned int size;
+  static int bfd_initialized = 0;
+  bfd * new_bfd;
 
   if (filename == NULL)
     {
-      mpiPi_msg_warn ("Executable filename is NULL!\n");
+      mpiPi_msg_warn ("BFD Object filename is NULL!\n");
       mpiPi_msg_warn
 	("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
-      return 0;
+      return NULL;
     }
 
 #ifdef AIX
@@ -319,22 +494,28 @@ open_bfd_executable (char *filename)
   mpiPi.text_start = mpiPi_get_text_start (filename);
 #endif
 
-  bfd_init ();
-  /* set_default_bfd_target (); */
-  mpiPi_msg_debug ("opening filename %s\n", filename);
-  abfd = bfd_openr (filename, target);
-  if (abfd == NULL)
+  if ( ! bfd_initialized )
     {
-      mpiPi_msg_warn ("could not open filename %s", filename);
-      return 0;
+      bfd_init ();
+      bfd_initialized = 1;
     }
-  if (bfd_check_format (abfd, bfd_archive))
+
+  /* set_default_bfd_target (); */
+
+  mpiPi_msg_debug ("opening filename %s\n", filename);
+  new_bfd = bfd_openr (filename, target);
+  if (new_bfd == NULL)
+    {
+      mpiPi_msg_warn ("BFD could not open filename %s", filename);
+      return NULL;
+    }
+  if (bfd_check_format (new_bfd, bfd_archive))
     {
       mpiPi_msg_warn ("can not get addresses from archive");
-      bfd_close (abfd);
-      return 0;
+      bfd_close (new_bfd);
+      return NULL;
     }
-  if (!bfd_check_format_matches (abfd, bfd_object, &matching))
+  if (!bfd_check_format_matches (new_bfd, bfd_object, &matching))
     {
       char *curr_match;
       if (matching != NULL)
@@ -343,47 +524,62 @@ open_bfd_executable (char *filename)
 	    mpiPi_msg_debug ("found matching type %s\n", curr_match);
 	  free (matching);
 	}
-      mpiPi_msg_warn ("matching failed");
-      bfd_close (abfd);
-      return 0;
+      mpiPi_msg_warn ("BFD format matching failed");
+      bfd_close (new_bfd);
+      return NULL;
     }
 
-#if 1
-  if ((bfd_get_file_flags (abfd) & HAS_SYMS) == 0)
+  if ((bfd_get_file_flags (new_bfd) & HAS_SYMS) == 0)
     {
       mpiPi_msg_warn ("No symbols in the executable\n");
-      bfd_close (abfd);
-      return 0;
+      bfd_close (new_bfd);
+      return NULL;
     }
-#endif
+
   /* TODO: move this to the begining of the process so that the user
      knows before the application begins */
-  storage = bfd_get_symtab_upper_bound (abfd);
+  storage = bfd_get_symtab_upper_bound (new_bfd);
   if (storage < 0)
     {
       mpiPi_msg_warn ("storage < 0");
-      bfd_close (abfd);
-      return 0;
+      bfd_close (new_bfd);
+      return NULL;
     }
 
-  symcount = bfd_read_minisymbols (abfd, FALSE, (void *) &syms, &size);
+  symcount = bfd_read_minisymbols (new_bfd, FALSE, (void *) &syms, &size);
   if (symcount == 0)
     symcount =
-      bfd_read_minisymbols (abfd, TRUE /* dynamic */ , (void *) &syms, &size);
+      bfd_read_minisymbols (new_bfd, TRUE /* dynamic */ , (void *) &syms, &size);
 
   if (symcount < 0)
     {
       mpiPi_msg_warn ("symcount < 0");
-      bfd_close (abfd);
-      return 0;
+      bfd_close (new_bfd);
+      return NULL;
     }
   else
     {
       mpiPi_msg_debug ("\n");
       mpiPi_msg_debug ("found %d symbols in file [%s]\n", symcount, filename);
     }
+ 
+  return new_bfd;
+}
 
-  return 1;
+int
+open_bfd_executable (char *filename)
+{
+  abfd = open_bfd_object(filename);
+  if ( abfd == NULL )
+    return 0;
+  else return 1; 
+}
+
+void
+close_bfd_object (bfd * close_bfd)
+{
+  assert (close_bfd);
+  bfd_close (close_bfd);
 }
 
 void

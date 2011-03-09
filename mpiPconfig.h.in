@@ -84,6 +84,9 @@
 /* Add mread_real_time declaration if needed. */
 #undef NEED_MREAD_REAL_TIME_DECL
 
+/* Use /proc/self/maps to get SO info for source lookup. */
+#undef SO_LOOKUP
+
 #endif /* _CONFIG_H */
 
 /* 
