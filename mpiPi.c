@@ -617,7 +617,8 @@ mpiPi_mergeResults ()
 #if defined(ENABLE_BFD) || defined(USE_LIBDWARF)
       else
 	{
-	  mpiPi_msg_warn ("Failed to open executable.  The mpiP -x runtime flag may address this issue.\n");
+	  mpiPi_msg_warn
+	    ("Failed to open executable.  The mpiP -x runtime flag may address this issue.\n");
 	  mpiPi.do_lookup = 0;
 	}
 #endif
@@ -931,7 +932,7 @@ mpiPi_generateReport (int report_style)
 void
 mpiPi_finalize ()
 {
-  if ( mpiPi.disable_finalize_report == 0 )
+  if (mpiPi.disable_finalize_report == 0)
     mpiPi_generateReport (mpiPi.report_style);
 
   /* clean up data structures, etc */
