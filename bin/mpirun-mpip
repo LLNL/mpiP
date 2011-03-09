@@ -16,10 +16,10 @@
 #  and compiler.
 
 
-MPIP_LIB_DIR=/home/chcham/mpiP/devo
-BINUTILS_LIB_DIR=/home/chcham/mpiP/binutils/binutils-2.15-test/lib
+MPIP_LIB_DIR=/home/chcham/workspace/mpiP
+#BINUTILS_LIB_DIR=/home/chcham/mpiP/binutils/binutils-2.15-test/lib
 
-export LD_PRELOAD=${MPIP_LIB_DIR}/libmpiP.so:${BINUTILS_LIB_DIR}/libbfd.so:${BINUTILS_LIB_DIR}/libiberty.so
+export LD_PRELOAD=${MPIP_LIB_DIR}/libmpiP.so
 
 mpirun "$@"
 
