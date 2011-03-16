@@ -19,6 +19,9 @@ static char *svnid = "$Id$";
 #endif
 
 #include <assert.h>
+#ifdef SO_LOOKUP
+#define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
