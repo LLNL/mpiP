@@ -14,6 +14,7 @@ AC_CANONICAL_TARGET()
 
 AC_PREFIX_DEFAULT(".")
 cross_compiling=yes
+ac_tool_warned=yes
 echo
 echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in"
 echo "        the case where test executables would need to be run as a parallel job."
@@ -357,11 +358,13 @@ SOURCE_LOOKUP=none
 
 if test "x$ENABLE_BFD" = "xyes" ; then
   BFD_AUX_LIBS=
+  AC_SEARCH_LIBS([dlopen], [dl dld]) # newer versions of binutils have a libdl dependency
+  AC_CHECK_LIB(z,inflate, BFD_AUX_LIBS="$BFD_AUX_LIBS -lz")  # newer versions of binutils have a zlib dependency
   AC_CHECK_LIB(intl,dcgettext__, BFD_AUX_LIBS="$BFD_AUX_LIBS -lintl")  #libintl required only on some platforms, eg AIX
   AC_CHECK_LIB(iberty,objalloc_create, BFD_AUX_LIBS="$BFD_AUX_LIBS -liberty")
   AC_CHECK_HEADER(bfd.h,
     AC_CHECK_LIB(bfd,bfd_openr, LIBS="$LIBS -lbfd", ENABLE_BFD=no, $BFD_AUX_LIBS)
-    AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), ,[#include "bfd.h"]) SOURCE_LOOKUP=bfd
+    AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), ,[#include "bfd.h"]) 
     , ENABLE_BFD=no
   )
   AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
@@ -369,6 +372,7 @@ if test "x$ENABLE_BFD" = "xyes" ; then
     AC_CHECK_HEADER(demangle.h, [AC_DEFINE(HAVE_DEMANGLE_H) if test "x$DO_DEMANGLE" = xfalse ; then DO_DEMANGLE=GNU ; fi])
     LIBS="$LIBS $BFD_AUX_LIBS"
     AC_DEFINE(ENABLE_BFD)
+    SOURCE_LOOKUP=bfd
   fi
 
 else
@@ -473,7 +477,7 @@ if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 fi
 
 if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then 
-  AC_CHECK_LIB(c,backtrace, AC_DEFINE(USE_BACKTRACE) UNWIND_WITH=glibc-backtrace, USE_SETJMP=yes)
+  AC_CHECK_FUNC(backtrace, AC_DEFINE(USE_BACKTRACE) UNWIND_WITH=glibc-backtrace, USE_SETJMP=yes)
 fi
 
 if test "$ENABLE_API_ONLY" = no && test "$ENABLE_MPI_IO" = yes ; then
