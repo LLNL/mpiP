@@ -392,92 +392,91 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
   bfd_map_over_sections (abfd, find_address_in_section, (PTR) NULL);
 
+#ifdef SO_LOOKUP
   if (!found)
     {
-#ifdef SO_LOOKUP
-      {
-	so_info_t cso, *fso;
+      so_info_t cso, *fso;
 
-	if (mpiPi.so_info == NULL)
-	  if (mpiPi_parse_maps () == 0)
-	    {
-	      mpiPi_msg_debug ("Failed to parse SO maps.\n");
-	      return 1;
-	    }
-
-	cso.lvma = (void *) i_addr_hex;
-
-	fso =
-	  *(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
-				 mpiPi_so_info_compare);
-
-	if (fso != NULL)
+      if (mpiPi.so_info == NULL)
+	if (mpiPi_parse_maps () == 0)
 	  {
-	    if (fso->bfd == NULL)
-	      {
-		mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
-		fso->bfd = (bfd *) open_bfd_object (fso->fpath);
-	      }
-
-	    pc = (char *) i_addr_hex - (char *) fso->lvma;
-	    mpiPi_msg_debug
-	      ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
-
-	    found = FALSE;
-
-	    mpiPi_msg_debug ("fso->bfd->sections is %p\n",
-			     ((bfd *) (fso->bfd))->sections);
-	    bfd_map_over_sections (fso->bfd, find_address_in_section,
-				   (PTR) NULL);
+	    mpiPi_msg_debug ("Failed to parse SO maps.\n");
+	    return 1;
 	  }
 
-      }
+      cso.lvma = (void *) i_addr_hex;
+
+      fso =
+	*(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
+			       mpiPi_so_info_compare);
+
+      if (fso != NULL)
+	{
+	  if (fso->bfd == NULL)
+	    {
+	      mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
+	      fso->bfd = (bfd *) open_bfd_object (fso->fpath);
+	    }
+
+	  pc = (char *) i_addr_hex - (char *) fso->lvma;
+	  mpiPi_msg_debug
+	    ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
+
+	  found = FALSE;
+
+	  mpiPi_msg_debug ("fso->bfd->sections is %p\n",
+			   ((bfd *) (fso->bfd))->sections);
+	  bfd_map_over_sections (fso->bfd, find_address_in_section,
+				 (PTR) NULL);
+	}
+
+    }
 #endif /* #ifdef SO_LOOKUP */
 
-      if (found == 0)
-	return 1;
+  if (found == 0)
+    return 1;			/*  Failed to find source info.  */
 
-      /* determine the function name */
-      if (functionname == NULL || *functionname == '\0')
+  /* determine the function name */
+  if (functionname == NULL || *functionname == '\0')
+    {
+      *o_funct_str = strdup ("[unknown]");
+    }
+  else
+    {
+      char *res = NULL;
+
+#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
+      res = mpiPdemangle (functionname);
+#endif
+      if (res == NULL)
 	{
-	  *o_funct_str = strdup ("[unknown]");
+	  *o_funct_str = strdup (functionname);
 	}
       else
 	{
-	  char *res = NULL;
-
-#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-	  res = mpiPdemangle (functionname);
-#endif
-	  if (res == NULL)
-	    {
-	      *o_funct_str = strdup (functionname);
-	    }
-	  else
-	    {
-	      *o_funct_str = res;
-	    }
-
-#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-	  mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
-			   *o_funct_str);
-#endif
-	}
-      /* set the filename and line no */
-      if (mpiPi.baseNames == 0 && filename != NULL)
-	{
-	  char *h;
-	  h = strrchr (filename, '/');
-	  if (h != NULL)
-	    filename = h + 1;
+	  *o_funct_str = res;
 	}
 
-      *o_lineno = line;
-      *o_file_str = strdup (filename ? filename : "[unknown]");
-
-      mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
+#if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
+      mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
 		       *o_funct_str);
+#endif
     }
+
+  /* set the filename and line no */
+  if (mpiPi.baseNames == 0 && filename != NULL)
+    {
+      char *h;
+      h = strrchr (filename, '/');
+      if (h != NULL)
+	filename = h + 1;
+    }
+
+  *o_lineno = line;
+  *o_file_str = strdup (filename ? filename : "[unknown]");
+
+  mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
+		   *o_funct_str);
 
   return 0;
 }
