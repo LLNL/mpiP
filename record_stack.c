@@ -156,26 +156,45 @@ mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back)
 int
 mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
 {
-  int frame_count;
-  int internal_frames = 3;
-  int max_back;
+#define MPIP_INTERNAL_FRAMES 3
+#define MPIP_MAX_TEMP_FRAMES (MPIP_CALLSITE_STACK_DEPTH_MAX + MPIP_INTERNAL_FRAMES)
+  int max_temp_back = MPIP_MAX_TEMP_FRAMES;
+  static void *temp_stack_trace[MPIP_MAX_TEMP_FRAMES];
+  int all_frame_count, user_frame_count;
   void **cp;
 
-  max_back = report_back + internal_frames;
+  /*  backtrace() will provide us with the 3 internal mpiP stack frames,
+     as well as the user stack frames.  We need to make sure that the
+     report_back maximum number of stack frames reflects only the user
+     frames and not the internal mpiP frames.
 
-  if (max_back > MPIP_CALLSITE_STACK_DEPTH_MAX)
-    max_back = MPIP_CALLSITE_STACK_DEPTH_MAX - 1;
+     So, let's:
+     o max_temp_back = MPIP_CALLSITE_STACK_DEPTH_MAX + 3
+     o use a temporary array of frame pointers size of max_temp_back
+     o call backtrace() for max_temp_back frames.
+     o memcpy backtrace results - 3 frames
+   */
 
-  frame_count = backtrace (pc_array, max_back);
+  if ((report_back + MPIP_INTERNAL_FRAMES) < max_temp_back)
+    max_temp_back = report_back + MPIP_INTERNAL_FRAMES;
 
-  memmove (pc_array, &(pc_array[internal_frames]),
-	   (frame_count - internal_frames) * sizeof (void *));
-  pc_array[frame_count - internal_frames] = NULL;
+  all_frame_count = backtrace (temp_stack_trace, max_temp_back);
 
+  user_frame_count = all_frame_count - MPIP_INTERNAL_FRAMES;
+
+  if (user_frame_count > report_back)
+    user_frame_count = report_back;
+
+  memmove (pc_array, &(temp_stack_trace[MPIP_INTERNAL_FRAMES]),
+	   (user_frame_count * sizeof (void *)));
+  pc_array[user_frame_count] = NULL;
+
+  /* Subtract 1 pointer size from results to point to the address 
+     of the calling instruction */
   for (cp = pc_array; cp != NULL && *cp != NULL; cp++)
     *cp = *cp - sizeof (cp);
 
-  return frame_count - internal_frames;
+  return user_frame_count;
 }
 
 #elif defined(USE_SETJMP)
