@@ -180,6 +180,9 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
 
   all_frame_count = backtrace (temp_stack_trace, max_temp_back);
 
+  if ( all_frame_count <= MPIP_INTERNAL_FRAMES )
+    return 0;
+
   user_frame_count = all_frame_count - MPIP_INTERNAL_FRAMES;
 
   if (user_frame_count > report_back)
