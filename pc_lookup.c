@@ -384,7 +384,6 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       return 1;
     }
 
-  mpiPi_msg_debug ("Caliper 1\n");
   sprintf (buf, "%s", mpiP_format_address (i_addr_hex, addr_buf));
   pc = bfd_scan_vma (buf, NULL, 16);
 
