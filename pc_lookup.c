@@ -219,6 +219,7 @@ find_address_in_section (abfd, section, data)
 
 
 #ifdef SO_LOOKUP
+
 /*******************************************************************************
   The following functions support source code lookup for shared objects
    with SO info stored in a tree. 
@@ -262,20 +263,29 @@ mpiPi_print_sos ()
 }
 
 
-/*  For insertin into and searching SO tree  */
+/*  For inserting into and searching SO tree  */
 static int
 mpiPi_so_info_compare (const void *n1, const void *n2)
 {
-  so_info_t *sn1 = (so_info_t *) n1, *sn2 = (so_info_t *) n2;
+  so_info_t *sn1, *sn2;
+  int retval;
 
-  /* mpiPi_msg_debug("comparing sn1->lvma %p to sn2->lvma %p\n", sn1->lvma, sn2->lvma); */
+  sn1 = (so_info_t *) n1;
+  sn2 = (so_info_t *) n2;
+
 
   if (sn1->lvma < sn2->lvma)
-    return -1;
-  if (sn1->lvma > sn2->uvma)
-    return 1;
+    retval = -1;
+  else if (sn1->lvma > sn2->uvma)
+    retval = 1;
+  else
+    retval = 0;
 
-  return 0;
+  mpiPi_msg_debug
+    ("info_compare returning %d after comparing sn1->lvma %p to (sn2->lvma - sn2->uvma)  %p - %p\n",
+     retval, sn1->lvma, sn2->lvma, sn2->uvma);
+
+  return retval;
 }
 
 
@@ -287,13 +297,27 @@ mpiPi_parse_maps ()
   FILE *fh;
   void *lvma, *uvma;
   char *fpath, *inbuf = NULL, *tokptr;
-  so_info_t *cso;
+  so_info_t *cso = NULL;
   size_t inbufsize;
   char *delim = " \n";
+  char *scan_str;
+  char *sp;
 
   snprintf (fbuf, 64, "/proc/%d/maps", (int) getpid ());
 
   fh = fopen (fbuf, "r");
+  if (fh == NULL)
+    {
+      mpiPi_msg_warn ("Failed to get process map info from %s\n", fbuf);
+      return 0;
+    }
+
+  if (sizeof (void *) == 4)
+    scan_str = "%x-%x";
+  else
+    scan_str = "%llx-%llx";
+
+  mpiPi.so_info = NULL;
 
   while (getline (&inbuf, &inbufsize, fh) != -1)
     {
@@ -304,32 +328,32 @@ mpiPi_parse_maps ()
       mpiPi_msg_debug ("maps getline is %s\n", inbuf);
 
       /* scan address range */
-      if (sscanf (inbuf, "%llx-%llx", &lvma, &uvma) < 2)
+      if (sscanf (inbuf, scan_str, &lvma, &uvma) < 2)
 	return 0;
 
       mpiPi_msg_debug ("Parsed range as %lx - %lx\n", lvma, uvma);
 
       /* get pointer to address range */
-      tokptr = strtok (inbuf, delim);
+      tokptr = strtok_r (inbuf, delim, &sp);
 
       /* get pointer to permissions */
-      tokptr = strtok (NULL, delim);
+      tokptr = strtok_r (NULL, delim, &sp);
 
       /* Check for text segment */
       if (tokptr == NULL || tokptr[0] != 'r' || tokptr[2] != 'x')
 	continue;
 
       /* get pointer to offset */
-      tokptr = strtok (NULL, delim);
+      tokptr = strtok_r (NULL, delim, &sp);
 
       /* get pointer to device */
-      tokptr = strtok (NULL, delim);
+      tokptr = strtok_r (NULL, delim, &sp);
 
       /* get pointer to inode */
-      tokptr = strtok (NULL, delim);
+      tokptr = strtok_r (NULL, delim, &sp);
 
       /* get pointer to file */
-      fpath = strtok (NULL, delim);
+      fpath = strtok_r (NULL, delim, &sp);
 
       /* Process file info */
       if (fpath == NULL || fpath[0] != '/')
@@ -351,7 +375,8 @@ mpiPi_parse_maps ()
 
   fclose (fh);
 
-  free (inbuf);
+  if (inbuf != NULL)
+    free (inbuf);
 
   if (mpiPi_debug)
     mpiPi_print_sos ();
@@ -394,7 +419,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 #ifdef SO_LOOKUP
   if (!found)
     {
-      so_info_t cso, *fso;
+      so_info_t cso, *fso, **pfso;
 
       if (mpiPi.so_info == NULL)
 	if (mpiPi_parse_maps () == 0)
@@ -405,12 +430,17 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
 
       cso.lvma = (void *) i_addr_hex;
 
-      fso =
-	*(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
-			       mpiPi_so_info_compare);
+      mpiPi_msg_debug
+	("At SO tfind, &cso is %p, &so_info is %p, &mpiPi_so_info_compare is %p\n",
+	 &cso, &(mpiPi.so_info), mpiPi_so_info_compare);
+      pfso =
+	(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
+			      mpiPi_so_info_compare);
+      mpiPi_msg_debug ("After SO tfind\n");
 
-      if (fso != NULL)
+      if (pfso != NULL)
 	{
+	  fso = *pfso;
 	  if (fso->bfd == NULL)
 	    {
 	      mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
