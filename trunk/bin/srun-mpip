@@ -27,9 +27,13 @@ ADDTL_RT_LIBS="/usr/lib64/libunwind.so"
 #  event that using LD_PRELOAD interferes with using RPATH values.
 
 EXE_RPATHS=
-#  Search through command-line arguments for executables
+#  Search through command-line arguments for executables with RPATH sections
 for iarg in $@ ; do
 
+  #  Skip arguments that start with a dash
+  if test ${iarg:0:1} = '-' ; then continue; fi;
+
+  #  Try to get the full path to executable
   FULL_PATH=`which $iarg 2> /dev/null`
 
   if test $? -eq 0 ; then  # Found an executable
@@ -43,7 +47,6 @@ for iarg in $@ ; do
   fi
 done
 #echo :${EXE_RPATHS}:
-
 
 #  Set LD_LIBRARY_PATH to find executable shared objects
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${EXE_RPATHS}
