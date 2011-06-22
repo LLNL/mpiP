@@ -162,6 +162,9 @@ mpiPi_init (char *appName)
   mpiPi.collective_report = 0;
 #endif
   mpiPi.disable_finalize_report = 0;
+#ifdef ENABLE_BFD
+  mpiPi.so_info = NULL;
+#endif
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =

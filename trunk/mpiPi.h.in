@@ -28,6 +28,10 @@
 
 #include "mpiPconfig.h"
 
+#ifdef ENABLE_BFD
+#include "bfd.h"
+#endif
+
 #if !defined(CEXTRACT) && !defined(ENABLE_API_ONLY)
 #include <mpi.h>
 #include "mpiPi_def.h"
@@ -126,13 +130,15 @@ typedef enum
 { MPIP_REPORT_SCI_FORMAT, MPIP_REPORT_FLT_FORMAT }
 MPIP_REPORT_FORMAT_TYPE;
 
+#ifdef ENABLE_BFD
 typedef struct SO_INFO
 {
   void *lvma;
   void *uvma;
   char *fpath;
-  void *bfd;
+  bfd *bfd;
 } so_info_t;
+#endif
 
 typedef struct _mpiPi_t
 {
@@ -201,7 +207,9 @@ typedef struct _mpiPi_t
   { mpiPi_style_verbose, mpiPi_style_concise, mpiPi_style_both } report_style;
   int print_callsite_detail;
   int collective_report;
+#ifdef ENABLE_BFD
   so_info_t **so_info;
+#endif
   int so_count;
   int disable_finalize_report;
 }
