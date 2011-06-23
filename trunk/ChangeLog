@@ -1,5 +1,62 @@
+2011-06-22  chcham
+
+	* bin/srun-mpip:
+	  Added check for flags to avoid verbose error condition for "which
+	  -V".
+	* pc_lookup.c:
+	  Fixed tfind lookup bug, added error checking and debugging info.
+	* mpiPi.c, mpiPi.h.in:
+	  Added macro conditionals for bfd-specific code.
+
+2011-06-16  chcham
+
+	* pc_lookup.c:
+	  Removed temporary debugging code.
+	* record_stack.c:
+	  Added backtrace failure test.
+
+2011-06-10  chcham
+
+	* configure, configure.in, pc_lookup.c, record_stack.c:
+	  Corrected shared object source lookup functionality when address
+	  no in SO.
+	  Corrected maximum number of user stack frames reported with glibc
+	  backtrace().
+	  Added libdl and zlib checks to support binutils dependencies.
+	  Corrected configure bug that erroneously reported BFD
+	  configuration in summary
+	  even if BFD tests failed.
+	  Removed use of "-lc" for backtrace availability test.
+	  Set ac_tool_warned=yes to suppress autoconf warnings.
+
+2011-03-16  chcham
+
+	* pc_lookup.c:
+	  Added _GNU_SOURCE for getline functionality.
+
+2011-03-15  chcham
+
+	* configure, configure.in, glob.c:
+	  Update version number.
+
+2011-03-09  chcham
+
+	* mpiPi.h.in:
+	  Missed file for SO lookup support.
+	* mpiPi.c, pc_lookup.c, report.c:
+	  Indent applied to recent changes.
+	* configure, configure.in, mpiPconfig.h.in, pc_lookup.c:
+	  Add shared object source lookup support for Linux using
+	  /proc/self/maps.
+	* bin/mpirun-mpip, configure.in, mpiPi.c, mpiPi.h.in, util.c:
+	  Added runtime flag to suppress printing of final report.
+
 2010-04-01  chcham
 
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Minor correction in documentation.
+	* ChangeLog, doc/UserGuide.html, doc/UserGuide.txt, glob.c:
+	  Version 3.2.1 release updates.
 	* bin/srun-mpip:
 	  Updated to account for LD_PRELOADing ignoring exe RPATH.
 	* configure:
