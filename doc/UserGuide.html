@@ -40,9 +40,9 @@ width="125" height="37" border="0" alt="SourceForge.net Logo" /></a>
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
 
-<p align="center">Version 3.2.1<br>
+<p align="center">Version 3.3<br>
 
-01 April 2010 <br>
+23 June 2011 <br>
 
 <br>
 
@@ -180,7 +180,18 @@ order):</p>
   <li>Karl Schulz (Texas Advanced Computing Center)</li>
 </ul>
 
-<h3><a name="New_Features">New Features with Release 3.2.1</a></h3>
+<h3><a name="New_Features">New Features with Release 3.3</a></h3>
+
+<p>Release v3.3 addresses the following issues:
+</p>
+
+<ul>
+
+  <li>Support for shared object source lookup with libbfd.</li>
+  <li>Improved configuration process for recent versions of binutils and Cray XE6.</li>
+  <li>Added "-z" MPIP run time flag to suppress report generation at Finalize.</li>
+  <li>Corrected number of stack frames available when using glibc backtrace.</li>
+</ul>
 
 <p>Release v3.2.1 addresses the following issue:
 </p>
@@ -268,8 +279,8 @@ is installed, add the following libraries to your link command:</p>
 </blockquote>
 
 <p> Make sure the mpiP library appears before the MPI library on your link
-line.  The three libraries (<span class="commandline">-lbfd -liberty
--lintl</span>) provide support for decoding the symbol information; they are
+line.  The libraries (<span class="commandline">-lbfd -liberty </span>)
+provide support for decoding the symbol information; they are
 part of GNU binutils.</p>
 
 <p> Run your application. You can verify that mpiP is working by identifying
@@ -298,9 +309,7 @@ them to this directory is safe.</p>
 
 <p>mpiP has been tested on several Linux,&nbsp;AIX, UNICOS
 and IBM BG/L systems. Please contact us with bug reports or questions regarding
-these platforms. Note that mpiP will not work with MPICH 1.1 nor with the IBM
-signal-based MPI library (libmpi.a, as opposed to the thread-based
-implementation libmpi_r.a). The following table indicates platforms where mpiP
+these platforms.  The following table indicates platforms where mpiP
 was succesfully run and any requirements for that platform.</p>
 
 <table border="1" cellpadding="3" cellspacing="0" width="100%">
@@ -544,8 +553,8 @@ are provided for the following options:</p>
       <td>Specify demangling support.</td>
 
       <td>If the GNU option is specified, demangling is applied to each symbol
-      by default using the libiberty implementation. For the IBM and Compaq
-      options, demangling support is implemented in the library libmpiPdmg.a.
+      by default using the libiberty implementation. For the IBM
+      option, demangling support is implemented in the library libmpiPdmg.a.
       Use GNU for the Intel compiler.</td>
 
     </tr>
@@ -898,7 +907,7 @@ sweep-ops.f -o sweep-ops.exe -L/usr/local/tools/mpiP/lib
 
       <td class="commandline">mpiicc -g 4-demangle.C -o
 4-demangle.exe -L/usr/local/tools/mpiP/lib
--lmpiP -lbfd -liberty-lm -lmpio</td>
+-lmpiP -lbfd -liberty -lm -lmpio</td>
 
     </tr>
 
@@ -1199,6 +1208,16 @@ for each callsite.</td>
       <td class="commandline">-x exe</td>
 
       <td>Specify the full path to the executable.</td>
+
+      <td>&nbsp</td>
+
+    </tr>
+
+    <tr>
+
+      <td class="commandline">-z</td>
+
+      <td>Suppress printing of the report at MPI_Finalize.</td>
 
       <td>&nbsp</td>
 
@@ -1750,9 +1769,6 @@ example:</p>
   <li>If you are calling MPI functions from within dynamically loaded objects,
   you may need to recompile the library as a shared object.</li>
 
-  <li>The mpiP library will not link with the signal-based IBM
-mpi library.</li>
-
   <li>We have encountered occaisional negative report values on Linux and AIX
   systems. We will continue to investigate this issue, but it is possible that
   this behavior may be experienced with mpiP.</li>
@@ -2284,7 +2300,7 @@ advertising or product endorsement purposes.<br>
 <hr>
 <p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
 
-<p class="pageinfo"> Last modified on April 1st, 2010.<br>
+<p class="pageinfo"> Last modified on June 23rd, 2011.<br>
 
 UCRL-CODE-223450</p>
 

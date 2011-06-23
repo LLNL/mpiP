@@ -1,8 +1,8 @@
 
                   mpiP: Lightweight, Scalable MPI Profiling
 
-                                Version 3.2.1
-                                01 April 2010
+                                 Version 3.3
+                                23 June 2011
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                                Chris Chambreau
@@ -87,7 +87,16 @@ Introduction
      * Philip Mucci (SiCortex)
      * Karl Schulz (Texas Advanced Computing Center)
 
-  New Features with Release 3.2.1
+  New Features with Release 3.3
+
+   Release v3.3 addresses the following issues:
+     * Support for shared object source lookup with libbfd.
+     * Improved configuration process for recent versions of binutils and
+       Cray XE6.
+     * Added "-z" MPIP run time flag to suppress report generation at
+       Finalize.
+     * Corrected number of stack frames available when using glibc
+       backtrace.
 
    Release v3.2.1 addresses the following issue:
      * Improved support for SLURM run-time instrumentation.
@@ -146,8 +155,8 @@ Using mpiP
      $ mpicc -g 1-hot-potato.o -o 1-hot-potato.exe
 
    Make sure the mpiP library appears before the MPI library on your link
-   line. The three libraries (-lbfd -liberty -lintl) provide support for
-   decoding the symbol information; they are part of GNU binutils.
+   line. The libraries (-lbfd -liberty ) provide support for decoding the
+   symbol information; they are part of GNU binutils.
 
    Run your application. You can verify that mpiP is working by
    identifying the header and trailer in standard out.
@@ -168,11 +177,8 @@ mpiP:
 
    mpiP has been tested on several Linux, AIX, UNICOS and IBM BG/L
    systems. Please contact us with bug reports or questions regarding
-   these platforms. Note that mpiP will not work with MPICH 1.1 nor with
-   the IBM signal-based MPI library (libmpi.a, as opposed to the
-   thread-based implementation libmpi_r.a). The following table indicates
-   platforms where mpiP was succesfully run and any requirements for that
-   platform.
+   these platforms. The following table indicates platforms where mpiP was
+   succesfully run and any requirements for that platform.
 
    Platform OS Compiler MPI binutils Requirements
    IA32-Linux 2.6.9 CHAOS Kernel Intel 9.0
@@ -239,9 +245,9 @@ Configuring and Building mpiP
    Reporting Options
    --enable-demangling=[type] Specify demangling support. If the GNU
    option is specified, demangling is applied to each symbol by default
-   using the libiberty implementation. For the IBM and Compaq options,
-   demangling support is implemented in the library libmpiPdmg.a. Use GNU
-   for the Intel compiler.
+   using the libiberty implementation. For the IBM option, demangling
+   support is implemented in the library libmpiPdmg.a. Use GNU for the
+   Intel compiler.
    --disable-mpi-io Disable MPI-I/O reporting. Useful for generating an
    mpiP library without MPI I/O for MPI implementations such as Quadrics
    MPI that has a separate MPI I/O library.
@@ -334,7 +340,7 @@ Configuring and Building mpiP
    Linux Intel C mpiicc -g 1-hot-potato.c -o 1-hot-potato.exe
    -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lm -lmpio
    C++ mpiicc -g 4-demangle.C -o 4-demangle.exe
-   -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty-lm -lmpio
+   -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lm -lmpio
    Fortran mpiifc -g sweep-ops.f -o sweep-ops.exe
    -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lm -lmpio
    PGI C mpipgcc -g 1-hot-potato.c -o 1-hot-potato.exe
@@ -393,6 +399,7 @@ Run-time Configuration of mpiP
    time for each callsite. 0.0
    -v Generates both concise and verbose report output.
    -x exe Specify the full path to the executable.
+   -z Suppress printing of the report at MPI_Finalize.
 
    For example, to set the callsite stack walking depth to 2 and the
    report print threshold to 10%, you simply need to define the mpiP
@@ -684,8 +691,8 @@ Caveats
        by looking at the assembler. In my experience, both instmap and
        addr2line do a pretty good job of mapping these transformed PCs
        into a file name and line number.
-          + instmap--an IBM utility
-          + addr2line--a gnu tool
+          + instmap—an IBM utility
+          + addr2line—a gnu tool
           + look at the assembler listing, or with GNU's objdump (-d -S)
           + use Totalview or gdb to translate the PC
      * There are known incompatibilities with certain binutils versions
@@ -705,8 +712,6 @@ Caveats
             to identify parent stack frames.
      * If you are calling MPI functions from within dynamically loaded
        objects, you may need to recompile the library as a shared object.
-     * The mpiP library will not link with the signal-based IBM mpi
-       library.
      * We have encountered occaisional negative report values on Linux and
        AIX systems. We will continue to investigate this issue, but it is
        possible that this behavior may be experienced with mpiP.
@@ -974,5 +979,5 @@ How to add MPI calls to profile
    For further information please send mail to
    mpip-help@lists.sourceforge.net.
 
-   Last modified on April 1st, 2010.
+   Last modified on June 23rd, 2011.
    UCRL-CODE-223450
