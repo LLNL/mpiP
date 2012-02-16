@@ -58,6 +58,7 @@ static void mpiPi_print_concise_task_info (FILE * fp);
 static void mpiPi_print_callsites (FILE * fp);
 static void mpiPi_print_top_time_sites (FILE * fp);
 static void mpiPi_print_top_sent_sites (FILE * fp);
+static void mpiPi_print_top_collective_sent_sites (FILE * fp);
 static void mpiPi_print_top_io_sites (FILE * fp);
 static void mpiPi_print_top_rma_sites (FILE * fp);
 static void mpiPi_print_all_callsite_time_info (FILE * fp);
@@ -140,7 +141,11 @@ static char *mpiP_Report_Formats[][2] = {
   {
    /*  MPIP_CALLSITE_MESS_CONCISE_FMT  */
    "%-17s %4d %7lld %9.4g %9.4g %9.4g %6d %6d\n",
-   "%-17s %4d %7lld %9.4f %9.4f %9.4f %6d %6d\n"}
+   "%-17s %4d %7lld %9.4f %9.4f %9.4f %6d %6d\n"},
+  {
+   /*  MPIP_COLLECTIVE_TIME_FMT  */
+   "%-20s %10.3g  %20s  %20s\n",
+   "%-20s %10.3f  %20s  %20s\n"}
 };
 
 static void
@@ -221,6 +226,24 @@ callsite_sort_by_cumulative_size (const void *a, const void *b)
       return 1;
     }
   if ((*a1)->cumulativeDataSent > (*b1)->cumulativeDataSent)
+    {
+      return -1;
+    }
+  return 0;
+}
+
+static int
+collective_sort_by_cumulative_time (const void *a, const void *b)
+{
+  double **a1 = (double **) a;
+  double **b1 = (double **) b;
+
+  /* NOTE: want descending sort, so compares are reveresed */
+  if (**a1 < **b1)
+    {
+      return 1;
+    }
+  if (**a1 > **b1)
     {
       return -1;
     }
@@ -717,6 +740,102 @@ mpiPi_print_top_sent_sites (FILE * fp)
 
       free (av);
     }
+}
+
+void get_histogram_bin_str(mpiPi_histogram_t *h, int v, char *s)
+{
+  int min = 0, max = 0, i = 0;
+
+  if ( v == 0 )
+    {
+      min = 0;
+      max = h->first_bin_max;
+    }
+  else
+    {
+      min = h->first_bin_max + 1;
+      min <<= (v-1);
+      max = (min << 1) - 1;
+    }
+
+  sprintf(s, "%8d - %8d", min, max);
+}
+
+static void
+mpiPi_print_top_collective_sent_sites (FILE * fp)
+{
+  int result_count, j, i;
+  double **result_ptrs;
+  int x, y, z;
+  int all_call_count, matrix_size;
+  char commbinbuf[32];
+  char databinbuf[32];
+
+  mpiPi_msg_debug("In mpiPi_print_top_collective_sent_sites\n");
+
+  all_call_count = mpiPi_DEF_END - mpiPi_BASE;
+  matrix_size = all_call_count * mpiPi.comm_histogram.hist_size * mpiPi.size_histogram.hist_size;
+
+  result_ptrs = (double**) malloc (sizeof(double*)*matrix_size);
+
+  result_count = 0;
+  for ( x = 0; x < all_call_count; x++ )
+    for ( y = 0; y < mpiPi.comm_histogram.hist_size; y++ )
+      for ( z = 0; z < mpiPi.size_histogram.hist_size; z++ )
+        {
+          if ( mpiPi.coll_time_stats[x][y][z] > 0 )
+            {
+              result_ptrs[result_count] = &mpiPi.coll_time_stats[x][y][z];
+              result_count++;
+            }
+        }
+
+  qsort (result_ptrs, result_count, sizeof (double *), collective_sort_by_cumulative_time);
+
+  if (mpiPi.global_mpi_size > 0)
+    {
+      print_section_heading (fp,
+                             "Aggregate Collective Time (top twenty, descending)");
+
+      fprintf (fp, "%-20s %10s %21s %21s\n", "Call", "MPI Time %",
+               "Comm Size", "Data Size");
+
+      mpiPi_msg_debug("Found max time of %6.3f at %p\n", *result_ptrs[0], result_ptrs[0]);
+
+      j = 0;
+      for (i = 0; (i < 20) && (i < result_count); i++)
+        {
+          /* Find location in matrix */
+          for ( x = 0; x < all_call_count; x++ )
+            for ( y = 0; y < mpiPi.comm_histogram.hist_size; y++ )
+              for ( z = 0; z < mpiPi.size_histogram.hist_size; z++ )
+                {
+                  if ( &mpiPi.coll_time_stats[x][y][z] == result_ptrs[j] )
+                    {
+                      j++;
+                      goto print;
+                    }
+                }
+
+print:
+          if ( mpiPi.coll_time_stats[x][y][z] == 0 ) goto done;
+
+          get_histogram_bin_str(&mpiPi.comm_histogram, y, commbinbuf);
+          get_histogram_bin_str(&mpiPi.size_histogram, z, databinbuf);
+
+          fprintf (fp,
+                   mpiP_Report_Formats[MPIP_COLLECTIVE_TIME_FMT]
+                   [mpiPi.reportFormat],
+                   &(mpiPi.lookup[x].name[4]),
+                   mpiPi.coll_time_stats[x][y][z] / mpiPi.global_mpi_time * 100, 
+                   commbinbuf, databinbuf
+          );
+        }
+
+    }
+
+done:
+  return;
 }
 
 static void
@@ -2823,6 +2942,8 @@ mpiPi_profile_print_concise (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
+      if ( mpiPi.do_collective_stats_report )
+        mpiPi_print_top_collective_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
 
@@ -2862,6 +2983,8 @@ mpiPi_profile_print_verbose (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
+      if ( mpiPi.do_collective_stats_report )
+        mpiPi_print_top_collective_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
     }

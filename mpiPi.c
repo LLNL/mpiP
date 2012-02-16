@@ -110,6 +110,15 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
 /* task level init 
    - executed by each MPI task only once immediately after MPI_Init
 */
+
+void init_histogram(mpiPi_histogram_t *h, int first_bin_max, int size, int* intervals)
+{
+  h->first_bin_max = first_bin_max;
+  h->hist_size = size;
+  h->bin_intervals = intervals;
+}
+
+
 void
 mpiPi_init (char *appName)
 {
@@ -162,6 +171,7 @@ mpiPi_init (char *appName)
   mpiPi.collective_report = 0;
 #endif
   mpiPi.disable_finalize_report = 0;
+  mpiPi.do_collective_stats_report = 0;
 #ifdef ENABLE_BFD
   mpiPi.so_info = NULL;
 #endif
@@ -170,6 +180,12 @@ mpiPi_init (char *appName)
   mpiPi.task_callsite_stats =
     h_open (mpiPi.tableSize, mpiPi_callsite_stats_pc_hashkey,
 	    mpiPi_callsite_stats_pc_comparator);
+
+  if ( mpiPi.do_collective_stats_report == 1 )
+    {
+      init_histogram(&mpiPi.comm_histogram, 7, 32, NULL);
+      init_histogram(&mpiPi.size_histogram, 7, 32, NULL);
+    }
 
   /* -- welcome msg only collector  */
   if (mpiPi.collectorRank == mpiPi.rank)
@@ -737,6 +753,46 @@ mpiPi_mergeResults ()
 }
 
 
+static int
+mpiPi_mergeCollectiveStats ()
+{
+  int matrix_size;
+  int all_call_count;
+  double* coll_time_results, *coll_time_local;
+  int i, x, y, z;
+
+  if ( mpiPi.do_collective_stats_report )
+    {
+      all_call_count = mpiPi_DEF_END - mpiPi_BASE + 1;
+      matrix_size = all_call_count * mpiPi.comm_histogram.hist_size * mpiPi.size_histogram.hist_size;
+      mpiPi_msg_debug("matrix_size is %d, histogram data is %d\n", matrix_size, sizeof(mpiPi.coll_time_stats));
+      coll_time_local = (double*)malloc(matrix_size * sizeof(double));
+      coll_time_results = (double*)malloc(matrix_size * sizeof(double));
+
+      i = 0;
+      for ( x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++ )
+        for ( y = 0; y < 32; y++ )
+          for ( z = 0; z < 32; z++ )
+            coll_time_local[i++] = mpiPi.coll_time_stats[x][y][z];
+
+      /*  Collect Collective statistic data were used  */
+      PMPI_Reduce (coll_time_local, coll_time_results, matrix_size, MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank,
+                   mpiPi.comm);
+
+      i = 0;
+      for ( x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++ )
+        for ( y = 0; y < 32; y++ )
+          for ( z = 0; z < 32; z++ )
+            mpiPi.coll_time_stats[x][y][z] = coll_time_results[i++];
+
+      free(coll_time_local);
+      free(coll_time_results);
+    }
+
+  return 1;
+}
+
+
 static void
 mpiPi_publishResults (int report_style)
 {
@@ -909,6 +965,7 @@ mpiPi_generateReport (int report_style)
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
+  mergeResult = mpiPi_mergeCollectiveStats ();
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
@@ -1033,6 +1090,48 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 
   return;
 }
+
+
+static int get_histogram_bin(mpiPi_histogram_t* h, int val)
+{
+  int wv = val;
+  int bin;
+
+  bin = 0;
+
+  if ( h->bin_intervals == NULL )
+    {
+      while ( wv > h->first_bin_max && bin < h->hist_size )
+        {
+          wv >>= 1;
+          bin++;
+        }
+    }
+  else  /* Add code for custom intervals later */
+    {
+    }
+
+  return bin;
+}
+
+
+void mpiPi_update_collective_stats(int op, double dur, double size, MPI_Comm *comm)
+{
+  int op_idx, comm_size, comm_bin, size_bin;
+
+  PMPI_Comm_size(*comm, &comm_size);
+
+  op_idx = op - mpiPi_BASE;
+
+  comm_bin = get_histogram_bin(&mpiPi.comm_histogram, comm_size);
+  size_bin = get_histogram_bin(&mpiPi.size_histogram, size);
+
+  mpiPi_msg_debug("Adding %.0f time to entry mpiPi.collective_stats[%d][%d][%d] value of %.0f\n",
+    dur, op_idx, comm_bin, size_bin, mpiPi.coll_time_stats[op_idx][comm_bin][size_bin]);
+
+  mpiPi.coll_time_stats[op_idx][comm_bin][size_bin] += dur;
+}
+
 
 #endif /* } ifndef ENABLE_API_ONLY */
 

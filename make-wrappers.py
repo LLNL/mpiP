@@ -386,6 +386,21 @@ xlateFortranArrayExceptions = {
   ("MPI_Waitany", "array_of_requests"): ("index") 
 }
 
+collectiveList = [ 
+  "MPI_Allgather", 
+  "MPI_Allgatherv", 
+  "MPI_Allreduce", 
+  "MPI_Alltoall", 
+  "MPI_Alltoallv", 
+  "MPI_Barrier", 
+  "MPI_Bcast", 
+  "MPI_Gather", 
+  "MPI_Gatherv", 
+  "MPI_Reduce", 
+  "MPI_Reduce_scatter", 
+  "MPI_Scatter", 
+  "MPI_Scatterv"
+  ]
 
 class VarDesc:
     def __init__ (self,name, basetype, pointerLevel, arrayLevel):
@@ -719,10 +734,13 @@ def GenerateStructureFile():
     olist.append("#define mpiPi_BASE " + str(baseID) + "\n")
     olist.append("\n")
 
+    defCount = 0
     for funct in flist:
       if funct not in noDefineList:
 	olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
+        defCount = defCount + 1
 
+    olist.append("#define mpiPi_DEF_END " + str(baseID + defCount) + "\n")
     olist.append("\n\n/* eof */\n")
     g.writelines(olist)
     g.close()
@@ -898,6 +916,12 @@ def CreateWrapper(funct, olist):
                   + "(double)ioSize,"
                   + "(double)rmaSize"
                   + ");\n" )
+
+    if funct in collectiveList :
+      for i in fdict[funct].paramConciseList:
+	 if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
+           olist.append("\nif (mpiPi.do_collective_stats_report) { mpiPi_update_collective_stats(" + "mpiPi_" + funct + "," \
+              + " dur, " + "(double)messSize," +  " " + i + "); }\n")
 
     # end of enabled check
     olist.append("}\n\n")
