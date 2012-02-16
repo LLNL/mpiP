@@ -99,6 +99,15 @@ main (int argc, char **argv)
   MPI_Allreduce (sendbuf, recvbuf, testcount, MPI_MESS_TYPE, MPI_SUM,
 		 MPI_COMM_WORLD);
   testcount += MESS_BASE_COUNT;
+  MPI_Allreduce (sendbuf, recvbuf, testcount, MPI_MESS_TYPE, MPI_SUM,
+		 MPI_COMM_WORLD);
+  testcount += MESS_BASE_COUNT;
+  MPI_Allreduce (sendbuf, recvbuf, testcount, MPI_MESS_TYPE, MPI_SUM,
+		 MPI_COMM_WORLD);
+  testcount += MESS_BASE_COUNT;
+  MPI_Allreduce (sendbuf, recvbuf, testcount, MPI_MESS_TYPE, MPI_SUM,
+		 MPI_COMM_WORLD);
+  testcount += MESS_BASE_COUNT;
 
   if (rank == 0)
     fprintf (stderr, "Alltoall\n");

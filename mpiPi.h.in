@@ -114,6 +114,16 @@ typedef struct _mpiPi_lookup_t
 }
 mpiPi_lookup_t;
 
+typedef struct _collective_entry_t
+{
+  int op;
+  double time;
+  long count;
+  int comm_size_bin;
+  int data_size_bin;
+}
+mpiPi_collective_entry_t;
+
 extern mpiPi_lookup_t mpiPi_lookup[];
 
 enum
@@ -123,7 +133,8 @@ enum
   MPIP_CALLSITE_TIME_SUMMARY_FMT, MPIP_CALLSITE_TIME_RANK_FMT,
   MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
   MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT,
-  MPIP_CALLSITE_TIME_CONCISE_FMT, MPIP_CALLSITE_MESS_CONCISE_FMT
+  MPIP_CALLSITE_TIME_CONCISE_FMT, MPIP_CALLSITE_MESS_CONCISE_FMT,
+  MPIP_COLLECTIVE_TIME_FMT
 };
 
 typedef enum
@@ -139,6 +150,13 @@ typedef struct SO_INFO
   bfd *bfd;
 } so_info_t;
 #endif
+
+typedef struct _mpiPi_histogram {
+  int first_bin_max;
+  int hist_size;
+  int *bin_intervals;
+} mpiPi_histogram_t;
+
 
 typedef struct _mpiPi_t
 {
@@ -207,11 +225,16 @@ typedef struct _mpiPi_t
   { mpiPi_style_verbose, mpiPi_style_concise, mpiPi_style_both } report_style;
   int print_callsite_detail;
   int collective_report;
-#ifdef ENABLE_BFD
+#ifdef SO_LOOKUP
   so_info_t **so_info;
-#endif
   int so_count;
+#endif
   int disable_finalize_report;
+  int do_collective_stats_report;
+  mpiPi_histogram_t comm_histogram;
+  mpiPi_histogram_t size_histogram;
+  double coll_time_stats[(mpiPi_DEF_END-mpiPi_BASE)][32][32];
+
 }
 mpiPi_t;
 
