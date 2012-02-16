@@ -80,7 +80,7 @@ mpiPi_getenv ()
 
       av[ac] = NULL;
 
-      for (; ((c = getopt (ac, av, "cdef:gk:lm:nors:t:vx:z")) != EOF);)
+      for (; ((c = getopt (ac, av, "cdef:gk:lm:nors:t:vx:yz")) != EOF);)
 	{
 	  switch (c)
 	    {
@@ -246,6 +246,10 @@ mpiPi_getenv ()
 	      mpiPi.disable_finalize_report = 1;
 	      break;
 
+	    case 'y':
+	      mpiPi.do_collective_stats_report = 1;
+	      break;
+
 	    case 'a':
 	    case 'b':
 	    case 'h':
@@ -255,7 +259,6 @@ mpiPi_getenv ()
 	    case 'q':
 	    case 'u':
 	    case 'w':
-	    case 'y':
 	    default:
 	      if (mpiPi.rank == 0)
 		mpiPi_msg_warn
