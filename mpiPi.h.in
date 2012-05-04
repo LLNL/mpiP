@@ -114,7 +114,7 @@ typedef struct _mpiPi_lookup_t
 }
 mpiPi_lookup_t;
 
-typedef struct _collective_entry_t
+typedef struct _histogram_entry_t
 {
   int op;
   double time;
@@ -122,7 +122,7 @@ typedef struct _collective_entry_t
   int comm_size_bin;
   int data_size_bin;
 }
-mpiPi_collective_entry_t;
+mpiPi_histogram_entry_t;
 
 extern mpiPi_lookup_t mpiPi_lookup[];
 
@@ -134,7 +134,7 @@ enum
   MPIP_CALLSITE_MESS_SUMMARY_FMT, MPIP_CALLSITE_MESS_RANK_FMT,
   MPIP_CALLSITE_IO_SUMMARY_FMT, MPIP_CALLSITE_IO_RANK_FMT,
   MPIP_CALLSITE_TIME_CONCISE_FMT, MPIP_CALLSITE_MESS_CONCISE_FMT,
-  MPIP_COLLECTIVE_TIME_FMT
+  MPIP_HISTOGRAM_FMT
 };
 
 typedef enum
@@ -230,10 +230,16 @@ typedef struct _mpiPi_t
   int so_count;
 #endif
   int disable_finalize_report;
+
   int do_collective_stats_report;
-  mpiPi_histogram_t comm_histogram;
-  mpiPi_histogram_t size_histogram;
+  mpiPi_histogram_t coll_comm_histogram;
+  mpiPi_histogram_t coll_size_histogram;
   double coll_time_stats[(mpiPi_DEF_END-mpiPi_BASE)][32][32];
+
+  int do_pt2pt_stats_report;
+  mpiPi_histogram_t pt2pt_comm_histogram;
+  mpiPi_histogram_t pt2pt_size_histogram;
+  double pt2pt_send_stats[(mpiPi_DEF_END-mpiPi_BASE)][32][32];
 
 }
 mpiPi_t;
