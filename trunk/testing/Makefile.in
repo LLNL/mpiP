@@ -48,13 +48,10 @@ endif
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
 API_SRCS = api-test.c
 
-ifneq ($(ENABLE_API_ONLY),yes)
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
-else
-EXES = $(API_SRCS:.c=.exe)
-endif
+EXES += $(API_SRCS:.c=.exe)
 
 all: ${EXES}
 	@echo All done.
