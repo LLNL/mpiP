@@ -207,7 +207,7 @@ ENABLE_BFD=yes
 AC_ARG_ENABLE(bfd,
 	AS_HELP_STRING(--disable-bfd,Do not use GNU binutils libbfd for source lookup.),
 	if test x"$enableval" = xno ; then
-		echo Use of libbfd has been disabled
+		echo Use of libbfd has been disabled.
 		ENABLE_BFD=no
 	fi
 	,
@@ -218,7 +218,17 @@ AC_ARG_ENABLE(libunwind,
 	AS_HELP_STRING(--disable-libunwind,Do not use libunwind to generate stack traces.),
 	if test x"$enableval" = xno ; then
 		DISABLE_LIBUNWIND=yes
-		echo Use of libunwind has been disabled
+		echo Use of libunwind has been disabled.
+	fi
+	,
+)
+
+DISABLE_SO_LOOKUP=no
+AC_ARG_ENABLE(so-lookup,
+	AS_HELP_STRING(--disable-so-lookup,Disable functionality to attempt to find source info in shared objects.),
+	if test x"$enableval" = xno ; then
+		DISABLE_SO_LOOKUP=yes
+		echo Use of shared object source lookup has been disabled.
 	fi
 	,
 )
@@ -504,19 +514,21 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
-SO_LOOKUP=no
-#  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
-AC_MSG_CHECKING(/proc/self/maps)
-if test -r /proc/self/maps ; then
-  AC_MSG_RESULT([yes])
-  SO_LOOKUP=yes
-else
-  AC_MSG_RESULT([no])
-fi
-
-#  SO lookup code uses getline, assumes ought to be available if we are using libbfd
-if test "x$SO_LOOKUP" = xyes ; then
-  AC_CHECK_FUNC(getline, AC_DEFINE(SO_LOOKUP), AC_MSG_RESULT([getline not found so SO lookup is disabled.]))
+if test "x$DISABLE_SO_LOOKUP" = "xno" ; then
+  SO_LOOKUP=no
+  #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
+  AC_MSG_CHECKING(/proc/self/maps)
+  if test -r /proc/self/maps ; then
+    AC_MSG_RESULT([yes])
+    SO_LOOKUP=yes
+  else
+    AC_MSG_RESULT([no])
+  fi
+  
+  #  SO lookup code uses getline, assumes ought to be available if we are using libbfd
+  if test "x$SO_LOOKUP" = xyes ; then
+    AC_CHECK_FUNC(getline, AC_DEFINE(SO_LOOKUP), AC_MSG_RESULT([getline not found so SO lookup is disabled.]))
+  fi
 fi
 
 if test "$ENABLE_API_ONLY" = no ; then
