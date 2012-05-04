@@ -21,6 +21,11 @@ check: site.exp @DEFAULT_TARGS@ test
 	DEJAGNU="./config/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
 	--tool testing --srcdir . $(TEST)
 	
+FAST_TEST=1-hot-potato
+check1: site.exp @DEFAULT_TARGS@ test
+	DEJAGNU="./config/testing.exp" $(RUNTEST) $(RUNTESTFLAGS) \
+	--tool testing --srcdir . ${FAST_TEST}.exp
+	
 # Make the local config file
 site.exp: ./config.status Makefile
 	@echo "Making a new config file..."
