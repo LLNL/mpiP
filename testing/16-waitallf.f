@@ -11,7 +11,7 @@ c
       include "mpif.h"
 
       integer  ierr, wsize, rank, starg, rtarg
-      integer  istat(2)
+      integer  istat(MPI_STATUS_SIZE,2)
       integer req(2)
       real*8 sendbuf, recvbuf
 
