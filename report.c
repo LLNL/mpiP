@@ -798,6 +798,12 @@ mpiPi_print_top_collective_sent_sites (FILE * fp)
     {
       print_section_heading (fp,
                              "Aggregate Collective Time (top twenty, descending)");
+      if( result_count == 0 )
+      {
+        /* there were no collective operations within this phase */
+        fprintf( fp, "No collective operations to report\n" );
+        goto done;
+      }
 
       fprintf (fp, "%-20s %10s %21s %21s\n", "Call", "MPI Time %",
                "Comm Size", "Data Size");
@@ -876,6 +882,12 @@ mpiPi_print_top_pt2pt_sent_sites (FILE * fp)
     {
       print_section_heading (fp,
                              "Aggregate Point-To-Point Sent (top twenty, descending)");
+      if( result_count == 0 )
+      {
+        /* there were no point to point messages send in the current phase */
+        fprintf( fp, "No point to point operations to report\n" );
+        goto done;
+      }
 
       fprintf (fp, "%-20s %10s %21s %21s\n", "Call", "MPI % Sent",
                "Comm Size", "Data Size");
