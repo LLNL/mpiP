@@ -151,7 +151,8 @@ typedef struct SO_INFO
 } so_info_t;
 #endif
 
-typedef struct _mpiPi_histogram {
+typedef struct _mpiPi_histogram
+{
   int first_bin_max;
   int hist_size;
   int *bin_intervals;
@@ -207,6 +208,7 @@ typedef struct _mpiPi_t
   callsite_stats_t *rawCallsiteData;
   h_t *global_callsite_stats;
   h_t *global_callsite_stats_agg;
+  h_t *global_MPI_stats_agg;
 
   mpiPi_lookup_t *lookup;
 
@@ -234,12 +236,12 @@ typedef struct _mpiPi_t
   int do_collective_stats_report;
   mpiPi_histogram_t coll_comm_histogram;
   mpiPi_histogram_t coll_size_histogram;
-  double coll_time_stats[(mpiPi_DEF_END-mpiPi_BASE)][32][32];
+  double coll_time_stats[(mpiPi_DEF_END - mpiPi_BASE)][32][32];
 
   int do_pt2pt_stats_report;
   mpiPi_histogram_t pt2pt_comm_histogram;
   mpiPi_histogram_t pt2pt_size_histogram;
-  double pt2pt_send_stats[(mpiPi_DEF_END-mpiPi_BASE)][32][32];
+  double pt2pt_send_stats[(mpiPi_DEF_END - mpiPi_BASE)][32][32];
 
 }
 mpiPi_t;

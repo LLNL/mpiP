@@ -161,7 +161,7 @@ AC_ARG_WITH(dclock,
 #  Enable / Disable specifications
 #
 
-DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API'
+DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
 ENABLE_API_ONLY=no
 AC_ARG_ENABLE(api-only,
 	AS_HELP_STRING(--enable-api-only,Only build the API library.),
@@ -333,6 +333,16 @@ AC_ARG_ENABLE(collective-report-default,
 	if test "x$enableval" = xyes ; then
                 AC_DEFINE(COLLECTIVE_REPORT_DEFAULT)
 		echo "Using collective report as default."
+	fi
+	,
+)
+
+AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_verbose])
+AC_ARG_ENABLE(concise-report-default,
+	AS_HELP_STRING(--enable-concise-report-default,Have mpiP default to a concise summary report format. (see runtime flags -c and -v).),
+	if test "x$enableval" = xyes ; then
+                AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_concise])
+		echo "Using concise report as default."
 	fi
 	,
 )
