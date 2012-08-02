@@ -87,6 +87,9 @@
 /* Use /proc/self/maps to get SO info for source lookup. */
 #undef SO_LOOKUP
 
+/* Set the default report format (concise or verbose). */
+#undef DEFAULT_REPORT_FORMAT
+
 #endif /* _CONFIG_H */
 
 /* 

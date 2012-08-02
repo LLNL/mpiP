@@ -738,6 +738,7 @@ enable_getarg
 enable_demangling
 enable_check_time
 enable_collective_report_default
+enable_concise_report_default
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1387,6 +1388,9 @@ Optional Features:
                           Have mpiP default to low-memory-use collective
                           report generation as opposed to collecting all data
                           at a single task (see runtime flags -l and -s).
+  --enable-concise-report-default
+                          Have mpiP default to a concise summary report
+                          format. (see runtime flags -c and -v).
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2726,7 +2730,7 @@ fi
 #  Enable / Disable specifications
 #
 
-DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API'
+DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
 ENABLE_API_ONLY=no
 # Check whether --enable-api-only was given.
 if test "${enable_api_only+set}" = set; then :
@@ -2928,6 +2932,19 @@ if test "${enable_collective_report_default+set}" = set; then :
                 $as_echo "#define COLLECTIVE_REPORT_DEFAULT 1" >>confdefs.h
 
 		echo "Using collective report as default."
+	fi
+
+fi
+
+
+$as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_verbose" >>confdefs.h
+
+# Check whether --enable-concise-report-default was given.
+if test "${enable_concise_report_default+set}" = set; then :
+  enableval=$enable_concise_report_default; if test "x$enableval" = xyes ; then
+                $as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_concise" >>confdefs.h
+
+		echo "Using concise report as default."
 	fi
 
 fi
@@ -5284,12 +5301,7 @@ if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then
   ac_fn_c_check_func "$LINENO" "backtrace" "ac_cv_func_backtrace"
 if test "x$ac_cv_func_backtrace" = xyes; then :
   $as_echo "#define USE_BACKTRACE 1" >>confdefs.h
- UNWIND_WITH=glibc-backtrace ac_fn_c_check_func "$LINENO" "backtrace_symbols" "ac_cv_func_backtrace_symbols"
-if test "x$ac_cv_func_backtrace_symbols" = xyes; then :
-  $as_echo "#define HAVE_BACKTRACE_SYMBOLS 1" >>confdefs.h
-
-fi
-
+ UNWIND_WITH=glibc-backtrace
 else
   USE_SETJMP=yes
 fi
