@@ -863,7 +863,7 @@ def CreateWrapper(funct, olist):
     olist.append("mpiPi_GETTIME (&start);\n" )
 
     # capture call stack
-    olist.append("mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
+    olist.append("if ( mpiPi.stackDepth > 0 ) mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
 
     # end of enabled check
     olist.append("}\n\n")

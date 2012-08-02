@@ -127,28 +127,29 @@ mpiPi_getenv ()
 	      {
 		int defaultStackDepth = mpiPi.stackDepth;
 		mpiPi.stackDepth = atoi (optarg);
-		if (mpiPi.stackDepth < 1)
+		if (mpiPi.stackDepth < 0)
 		  {
 		    if (mpiPi.rank == 0)
 		      mpiPi_msg_warn
-			("-k stack depth invalid %d. Using default.\n",
+			("-k stackdepth invalid %d. Using 0.\n",
 			 mpiPi.stackDepth);
-		    mpiPi.stackDepth = defaultStackDepth;
-		  }
-		if (mpiPi.stackDepth > 2)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("stackdepth large %d. Consider making it smaller.\n",
-			 mpiPi.stackDepth);
+		    mpiPi.stackDepth = 0;
+		    mpiPi.print_callsite_detail = 0;
 		  }
 		if (mpiPi.stackDepth > MPIP_CALLSITE_STACK_DEPTH_MAX)
 		  {
 		    if (mpiPi.rank == 0)
 		      mpiPi_msg_warn
-			("stackdepth too large %d. Making it smaller %d.\n",
-			 mpiPi.stackDepth);
+			("stackdepth of %d too large. Using %d.\n",
+			 mpiPi.stackDepth, MPIP_CALLSITE_STACK_DEPTH_MAX);
 		    mpiPi.stackDepth = MPIP_CALLSITE_STACK_DEPTH_MAX;
+		  }
+		else if (mpiPi.stackDepth > 4)
+		  {
+		    if (mpiPi.rank == 0)
+		      mpiPi_msg_warn
+			("stackdepth of %d is large. Consider making it smaller.\n",
+			 mpiPi.stackDepth);
 		  }
 		if (mpiPi.rank == 0)
 		  mpiPi_msg
@@ -226,8 +227,8 @@ mpiPi_getenv ()
 		}
 	      break;
 	    case 'd':
-	      /*  Suppress printing of call site detail   */
-	      mpiPi.print_callsite_detail = 0;
+	      /*  Suppress/Activate printing of call site detail based on default.  */
+	      mpiPi.print_callsite_detail ^= 1;
 	      break;
 
 	    case 'l':
