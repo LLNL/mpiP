@@ -152,7 +152,9 @@ mpiPi_init (char *appName)
   mpiPi.global_mpi_msize_threshold_count = 0;
   mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
-  mpiPi.global_task_info = NULL;
+  mpiPi.global_task_hostnames = NULL;
+  mpiPi.global_task_app_time = NULL;
+  mpiPi.global_task_mpi_time = NULL;
 
   /* set some defaults values */
   mpiPi.collectorRank = 0;
@@ -538,7 +540,7 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
     }
 
   /* Do global accumulation while we are iterating through individual callsites */
-  mpiPi.global_task_info[p->rank].mpi_time += p->cumulativeTime;
+  mpiPi.global_task_mpi_time[p->rank] += p->cumulativeTime;
 
   mpiPi.global_mpi_time += p->cumulativeTime;
   assert (mpiPi.global_mpi_time >= 0);
@@ -677,8 +679,10 @@ mpiPi_mergeResults ()
 
   if (totalCount < 1)
     {
-      mpiPi_msg_warn
-	("Collector found no records to merge. Omitting report.\n");
+      if ( mpiPi.rank == mpiPi.collectorRank )
+        mpiPi_msg_warn
+          ("Collector found no records to merge. Omitting report.\n");
+
       return 0;
     }
 
@@ -956,65 +960,75 @@ mpiPi_publishResults (int report_style)
  * collectorRank.
  */
 static void
-mpiPi_collect_basics ()
+mpiPi_collect_basics (int report_style)
 {
   int i = 0;
   double app_time = mpiPi.cumulativeTime;
-  int cnt;
-  mpiPi_task_info_t mti;
-  int blockcounts[4] = { 1, 1, 1, MPIPI_HOSTNAME_LEN_MAX };
-  MPI_Datatype types[4] = { MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_CHAR };
-  MPI_Aint displs[4];
-  MPI_Datatype mti_type;
-  MPI_Request *recv_req_arr;
 
   mpiPi_msg_debug ("Collect Basics\n");
-
-  cnt = 0;
-
-  PMPI_Address (&mti.mpi_time, &displs[cnt++]);
-  PMPI_Address (&mti.app_time, &displs[cnt++]);
-  PMPI_Address (&mti.rank, &displs[cnt++]);
-  PMPI_Address (&mti.hostname, &displs[cnt++]);
-
-  for (i = (cnt - 1); i >= 0; i--)
-    {
-      displs[i] -= displs[0];
-    }
-  PMPI_Type_struct (cnt, blockcounts, displs, types, &mti_type);
-  PMPI_Type_commit (&mti_type);
 
   if (mpiPi.rank == mpiPi.collectorRank)
     {
       /* In the case where multiple reports are generated per run,
          only allocate memory for global_task_info once */
-      if (mpiPi.global_task_info == NULL)
+      if (mpiPi.global_task_app_time == NULL)
 	{
-	  mpiPi.global_task_info =
-	    (mpiPi_task_info_t *) calloc (mpiPi.size,
-					  sizeof (mpiPi_task_info_t));
+	  mpiPi.global_task_app_time =
+	    (double *) calloc (mpiPi.size, sizeof (double));
 
-	  if (mpiPi.global_task_info == NULL)
-	    mpiPi_abort ("Failed to allocate memory for global_task_info");
+	  if (mpiPi.global_task_app_time == NULL)
+	    mpiPi_abort ("Failed to allocate memory for global_task_app_time");
 
 	  mpiPi_msg_debug
-	    ("MEMORY : Allocated for global_task_info :          %13ld\n",
-	     mpiPi.size * sizeof (mpiPi_task_info_t));
+	    ("MEMORY : Allocated for global_task_app_time :          %13ld\n",
+	     mpiPi.size * sizeof (double));
 	}
 
-      bzero (mpiPi.global_task_info, mpiPi.size * sizeof (mpiPi_task_info_t));
+      bzero (mpiPi.global_task_app_time, mpiPi.size * sizeof (double));
+
+      if (mpiPi.global_task_mpi_time == NULL)
+	{
+	  mpiPi.global_task_mpi_time =
+	    (double *) calloc (mpiPi.size, sizeof (double));
+
+	  if (mpiPi.global_task_mpi_time == NULL)
+	    mpiPi_abort ("Failed to allocate memory for global_task_mpi_time");
+
+	  mpiPi_msg_debug
+	    ("MEMORY : Allocated for global_task_mpi_time :          %13ld\n",
+	     mpiPi.size * sizeof (double));
+	}
+
+      bzero (mpiPi.global_task_mpi_time, mpiPi.size * sizeof (double));
+
+      //  Only allocate hostname storage if we are doing a verbose report
+      if (mpiPi.global_task_hostnames == NULL && (report_style == mpiPi_style_verbose || report_style == mpiPi_style_both))
+	{
+	  mpiPi.global_task_hostnames =
+	    (mpiPi_hostname_t *) calloc (mpiPi.size, sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+
+	  if (mpiPi.global_task_hostnames == NULL)
+	    mpiPi_abort ("Failed to allocate memory for global_task_hostnames");
+
+	  mpiPi_msg_debug
+	    ("MEMORY : Allocated for global_task_hostnames :          %13ld\n",
+	     mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+	}
+
+      if (mpiPi.global_task_hostnames != NULL )
+        bzero (mpiPi.global_task_hostnames, mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
     }
 
-  strcpy (mti.hostname, mpiPi.hostname);
-  mti.app_time = app_time;
-  mti.mpi_time = 0;		/* Will be calculated when call sites are processed. */
-  mti.rank = mpiPi.rank;
-
-  PMPI_Gather (&mti, 1, mti_type,
-	       mpiPi.global_task_info, 1, mti_type,
+  PMPI_Gather (&mpiPi.cumulativeTime, 1, MPI_DOUBLE,
+	       mpiPi.global_task_app_time, 1, MPI_DOUBLE,
 	       mpiPi.collectorRank, mpiPi.comm);
 
-  PMPI_Type_free (&mti_type);
+  if ( report_style == mpiPi_style_verbose || report_style == mpiPi_style_both )
+    {
+      PMPI_Gather (mpiPi.hostname, MPIPI_HOSTNAME_LEN_MAX, MPI_CHAR,
+                   mpiPi.global_task_hostnames, MPIPI_HOSTNAME_LEN_MAX, MPI_CHAR,
+                   mpiPi.collectorRank, mpiPi.comm);
+    }
 
   return;
 }
@@ -1047,7 +1061,7 @@ mpiPi_generateReport (int report_style)
   mpiPi_msg_debug0 ("starting collect_basics\n");
 
   mpiPi_GETTIME (&timer_start);
-  mpiPi_collect_basics ();
+  mpiPi_collect_basics (report_style);
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
@@ -1057,9 +1071,9 @@ mpiPi_generateReport (int report_style)
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
-  mergeResult = mpiPi_insert_MPI_records ();
-  mergeResult = mpiPi_mergeCollectiveStats ();
-  mergeResult = mpiPi_mergept2ptStats ();
+  if ( mergeResult == 1 ) mergeResult = mpiPi_insert_MPI_records ();
+  if ( mergeResult == 1 ) mergeResult = mpiPi_mergeCollectiveStats ();
+  if ( mergeResult == 1 ) mergeResult = mpiPi_mergept2ptStats ();
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
