@@ -679,9 +679,9 @@ mpiPi_mergeResults ()
 
   if (totalCount < 1)
     {
-      if ( mpiPi.rank == mpiPi.collectorRank )
-        mpiPi_msg_warn
-          ("Collector found no records to merge. Omitting report.\n");
+      if (mpiPi.rank == mpiPi.collectorRank)
+	mpiPi_msg_warn
+	  ("Collector found no records to merge. Omitting report.\n");
 
       return 0;
     }
@@ -977,7 +977,8 @@ mpiPi_collect_basics (int report_style)
 	    (double *) calloc (mpiPi.size, sizeof (double));
 
 	  if (mpiPi.global_task_app_time == NULL)
-	    mpiPi_abort ("Failed to allocate memory for global_task_app_time");
+	    mpiPi_abort
+	      ("Failed to allocate memory for global_task_app_time");
 
 	  mpiPi_msg_debug
 	    ("MEMORY : Allocated for global_task_app_time :          %13ld\n",
@@ -992,7 +993,8 @@ mpiPi_collect_basics (int report_style)
 	    (double *) calloc (mpiPi.size, sizeof (double));
 
 	  if (mpiPi.global_task_mpi_time == NULL)
-	    mpiPi_abort ("Failed to allocate memory for global_task_mpi_time");
+	    mpiPi_abort
+	      ("Failed to allocate memory for global_task_mpi_time");
 
 	  mpiPi_msg_debug
 	    ("MEMORY : Allocated for global_task_mpi_time :          %13ld\n",
@@ -1002,32 +1004,38 @@ mpiPi_collect_basics (int report_style)
       bzero (mpiPi.global_task_mpi_time, mpiPi.size * sizeof (double));
 
       //  Only allocate hostname storage if we are doing a verbose report
-      if (mpiPi.global_task_hostnames == NULL && (report_style == mpiPi_style_verbose || report_style == mpiPi_style_both))
+      if (mpiPi.global_task_hostnames == NULL
+	  && (report_style == mpiPi_style_verbose
+	      || report_style == mpiPi_style_both))
 	{
 	  mpiPi.global_task_hostnames =
-	    (mpiPi_hostname_t *) calloc (mpiPi.size, sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+	    (mpiPi_hostname_t *) calloc (mpiPi.size,
+					 sizeof (char) *
+					 MPIPI_HOSTNAME_LEN_MAX);
 
 	  if (mpiPi.global_task_hostnames == NULL)
-	    mpiPi_abort ("Failed to allocate memory for global_task_hostnames");
+	    mpiPi_abort
+	      ("Failed to allocate memory for global_task_hostnames");
 
 	  mpiPi_msg_debug
 	    ("MEMORY : Allocated for global_task_hostnames :          %13ld\n",
 	     mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
 	}
 
-      if (mpiPi.global_task_hostnames != NULL )
-        bzero (mpiPi.global_task_hostnames, mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+      if (mpiPi.global_task_hostnames != NULL)
+	bzero (mpiPi.global_task_hostnames,
+	       mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
     }
 
   PMPI_Gather (&mpiPi.cumulativeTime, 1, MPI_DOUBLE,
 	       mpiPi.global_task_app_time, 1, MPI_DOUBLE,
 	       mpiPi.collectorRank, mpiPi.comm);
 
-  if ( report_style == mpiPi_style_verbose || report_style == mpiPi_style_both )
+  if (report_style == mpiPi_style_verbose || report_style == mpiPi_style_both)
     {
       PMPI_Gather (mpiPi.hostname, MPIPI_HOSTNAME_LEN_MAX, MPI_CHAR,
-                   mpiPi.global_task_hostnames, MPIPI_HOSTNAME_LEN_MAX, MPI_CHAR,
-                   mpiPi.collectorRank, mpiPi.comm);
+		   mpiPi.global_task_hostnames, MPIPI_HOSTNAME_LEN_MAX,
+		   MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
     }
 
   return;
@@ -1071,9 +1079,12 @@ mpiPi_generateReport (int report_style)
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
-  if ( mergeResult == 1 ) mergeResult = mpiPi_insert_MPI_records ();
-  if ( mergeResult == 1 ) mergeResult = mpiPi_mergeCollectiveStats ();
-  if ( mergeResult == 1 ) mergeResult = mpiPi_mergept2ptStats ();
+  if (mergeResult == 1)
+    mergeResult = mpiPi_insert_MPI_records ();
+  if (mergeResult == 1)
+    mergeResult = mpiPi_mergeCollectiveStats ();
+  if (mergeResult == 1)
+    mergeResult = mpiPi_mergept2ptStats ();
   mpiPi_GETTIME (&timer_end);
   dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
 
@@ -1105,6 +1116,15 @@ mpiPi_finalize ()
 
   /* clean up data structures, etc */
   h_close (mpiPi.task_callsite_stats);
+
+  if (mpiPi.global_task_app_time != NULL)
+    free (mpiPi.global_task_app_time);
+
+  if (mpiPi.global_task_mpi_time != NULL)
+    free (mpiPi.global_task_mpi_time);
+
+  if (mpiPi.global_task_hostnames != NULL)
+    free (mpiPi.global_task_hostnames);
 
   /*  Could do a lot of housekeeping before calling PMPI_Finalize()
    *  but is it worth the additional work?
