@@ -50,6 +50,8 @@
 #define MPIP_CALLSITE_STATS_COOKIE 518641
 #define MPIP_CALLSITE_STATS_COOKIE_ASSERT(f) {assert(MPIP_CALLSITE_STATS_COOKIE==((f)->cookie));}
 
+typedef char mpiPi_hostname_t[MPIPI_HOSTNAME_LEN_MAX];
+
 typedef struct _callsite_stats
 {
   unsigned op;
@@ -92,20 +94,6 @@ typedef struct callsite_src_id_cache_entry_t
 callsite_src_id_cache_entry_t;
 
 extern h_t *callsite_src_id_cache;
-
-
-typedef struct _mpiPi_task_info_t
-{
-  /* this section is calculated at the collector */
-  double mpi_time;
-
-  /* this section is received from each task */
-  double app_time;		/* time from end of init to start of finalize */
-  int rank;
-  char hostname[MPIPI_HOSTNAME_LEN_MAX];
-
-}
-mpiPi_task_info_t;
 
 typedef struct _mpiPi_lookup_t
 {
@@ -174,7 +162,7 @@ typedef struct _mpiPi_t
   int collectorRank;
 #ifndef ENABLE_API_ONLY
   MPI_Comm comm;
-  char hostname[MPI_MAX_PROCESSOR_NAME];
+  mpiPi_hostname_t hostname;
 #endif
   int hostnamelen;
   char *outputDir;
@@ -193,7 +181,9 @@ typedef struct _mpiPi_t
   int enabledCount;
 
   mpiPi_TIMER timer;
-  mpiPi_task_info_t *global_task_info;
+  mpiPi_hostname_t *global_task_hostnames;
+  double *global_task_app_time;
+  double *global_task_mpi_time;
   double global_app_time;
   double global_mpi_time;
   double global_mpi_size;
