@@ -413,8 +413,7 @@ mpiPi_print_task_assignment (FILE * fp)
   for (i = 0; i < mpiPi.size; i++)
     {
       print_intro_line (fp, "MPI Task Assignment", "%d %s",
-			mpiPi.global_task_info[i].rank,
-			mpiPi.global_task_info[i].hostname);
+			i, mpiPi.global_task_hostnames[i]);
     }
 }
 
@@ -428,9 +427,9 @@ mpiPi_print_verbose_task_info (FILE * fp)
   for (i = 0; i < mpiPi.size; i++)
     {
       mpiPi_msg_debug ("app runtime for task %d is %g\n", i,
-		       mpiPi.global_task_info[i].app_time);
-      mpiPi.global_app_time += mpiPi.global_task_info[i].app_time;
-      /*mpiPi.global_task_info[i].mpi_time = 0; */
+		       mpiPi.global_task_app_time[i]);
+      mpiPi.global_app_time += mpiPi.global_task_app_time[i];
+      /*mpiPi.global_task_mpi_time[i] = 0; */
     }
 
 
@@ -442,18 +441,18 @@ mpiPi_print_verbose_task_info (FILE * fp)
     {
       double ratio;
 
-      if (mpiPi.global_task_info[i].app_time > 0)
+      if (mpiPi.global_task_app_time[i] > 0)
 	{
-	  ratio = (100.0 * mpiPi.global_task_info[i].mpi_time / 1e6) /
-	    mpiPi.global_task_info[i].app_time;
+	  ratio = (100.0 * mpiPi.global_task_mpi_time[i] / 1e6) /
+	    mpiPi.global_task_app_time[i];
 	}
       else
 	ratio = 0;
 
       fprintf (fp,
 	       mpiP_Report_Formats[MPIP_MPI_TIME_FMT][mpiPi.reportFormat],
-	       i, mpiPi.global_task_info[i].app_time,
-	       mpiPi.global_task_info[i].mpi_time / 1e6, ratio);
+	       i, mpiPi.global_task_app_time[i],
+	       mpiPi.global_task_mpi_time[i] / 1e6, ratio);
     }
   fprintf (fp,
 	   mpiP_Report_Formats[MPIP_MPI_TIME_SUMMARY_FMT][mpiPi.reportFormat],
@@ -480,34 +479,34 @@ mpiPi_print_concise_task_info (FILE * fp)
 
   for (i = 0; i < mpiPi.size; i++)
     {
-      if (mpiPi.global_task_info[i].app_time < min_app_time)
+      if (mpiPi.global_task_app_time[i] < min_app_time)
 	{
-	  min_app_time = mpiPi.global_task_info[i].app_time;
+	  min_app_time = mpiPi.global_task_app_time[i];
 	  min_app_rank = i;
 	}
 
-      if (mpiPi.global_task_info[i].app_time > max_app_time)
+      if (mpiPi.global_task_app_time[i] > max_app_time)
 	{
-	  max_app_time = mpiPi.global_task_info[i].app_time;
+	  max_app_time = mpiPi.global_task_app_time[i];
 	  max_app_rank = i;
 	}
 
-      tot_app_time += mpiPi.global_task_info[i].app_time;
+      tot_app_time += mpiPi.global_task_app_time[i];
 
-      if (mpiPi.global_task_info[i].mpi_time < min_mpi_time)
+      if (mpiPi.global_task_mpi_time[i] < min_mpi_time)
 	{
-	  min_mpi_time = mpiPi.global_task_info[i].mpi_time;
+	  min_mpi_time = mpiPi.global_task_mpi_time[i];
 	  min_mpi_rank = i;
 	}
 
-      if (mpiPi.global_task_info[i].mpi_time > max_mpi_time)
+      if (mpiPi.global_task_mpi_time[i] > max_mpi_time)
 	{
-	  max_mpi_time = mpiPi.global_task_info[i].mpi_time;
+	  max_mpi_time = mpiPi.global_task_mpi_time[i];
 	  max_mpi_rank = i;
 	}
 
-      tot_mpi_time += mpiPi.global_task_info[i].mpi_time;
-      mpiPi.global_app_time += mpiPi.global_task_info[i].app_time;
+      tot_mpi_time += mpiPi.global_task_mpi_time[i];
+      mpiPi.global_app_time += mpiPi.global_task_app_time[i];
     }
 
   mean_app_time = tot_app_time / mpiPi.size;
@@ -515,10 +514,8 @@ mpiPi_print_concise_task_info (FILE * fp)
 
   for (i = 0; i < mpiPi.size; i++)
     {
-      var_app_time +=
-	pow (mean_app_time - mpiPi.global_task_info[i].app_time, 2);
-      var_mpi_time +=
-	pow (mean_mpi_time - mpiPi.global_task_info[i].mpi_time, 2);
+      var_app_time += pow (mean_app_time - mpiPi.global_task_app_time[i], 2);
+      var_mpi_time += pow (mean_mpi_time - mpiPi.global_task_mpi_time[i], 2);
     }
   var_app_time /= mpiPi.size - 1;
   var_mpi_time /= mpiPi.size - 1;
@@ -1082,9 +1079,9 @@ mpiPi_print_all_callsite_time_info (FILE * fp)
 	sMax = max (av[i]->maxDur, sMax);
 	sMin = min (av[i]->minDur, sMin);
 
-	if (mpiPi.global_task_info[av[i]->rank].mpi_time != 0 &&
+	if (mpiPi.global_task_mpi_time[av[i]->rank] != 0 &&
 	    (100.0 * av[i]->cumulativeTime /
-	     mpiPi.global_task_info[av[i]->rank].mpi_time)
+	     mpiPi.global_task_mpi_time[av[i]->rank])
 	    >= mpiPi.reportPrintThreshold)
 	  {
 	    fprintf (fp,
@@ -1096,9 +1093,9 @@ mpiPi_print_all_callsite_time_info (FILE * fp)
 		     av[i]->cumulativeTime / (av[i]->count * 1000.0),
 		     av[i]->minDur / 1000.0,
 		     100.0 * av[i]->cumulativeTime /
-		     (mpiPi.global_task_info[av[i]->rank].app_time * 1e6),
+		     (mpiPi.global_task_app_time[av[i]->rank] * 1e6),
 		     100.0 * av[i]->cumulativeTime /
-		     mpiPi.global_task_info[av[i]->rank].mpi_time);
+		     mpiPi.global_task_mpi_time[av[i]->rank]);
 	  }
       }
     fprintf (fp,
@@ -1999,26 +1996,23 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 
 	      if (task_data[j].count > 0 &&
 		  (100.0 * task_data[j].cumulativeTime /
-		   mpiPi.global_task_info[task_data[j].rank].mpi_time)
+		   mpiPi.global_task_mpi_time[task_data[j].rank])
 		  >= mpiPi.reportPrintThreshold)
 		{
 		  fprintf (fp,
 			   mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT]
 			   [mpiPi.reportFormat],
-			   &(mpiPi.
-			     lookup[task_stats->op - mpiPi_BASE].name[4]),
-			   av[i]->csid, task_data[j].rank, task_data[j].count,
-			   task_data[j].maxDur / 1000.0,
+			   &(mpiPi.lookup[task_stats->op - mpiPi_BASE].
+			     name[4]), av[i]->csid, task_data[j].rank,
+			   task_data[j].count, task_data[j].maxDur / 1000.0,
 			   task_data[j].cumulativeTime / (task_data[j].count *
 							  1000.0),
 			   task_data[j].minDur / 1000.0,
 			   100.0 * task_data[j].cumulativeTime /
-			   (mpiPi.
-			    global_task_info[task_data[j].rank].app_time *
+			   (mpiPi.global_task_app_time[task_data[j].rank] *
 			    1e6),
 			   100.0 * task_data[j].cumulativeTime /
-			   mpiPi.global_task_info[task_data[j].
-						  rank].mpi_time);
+			   mpiPi.global_task_mpi_time[task_data[j].rank]);
 		}
 	    }
 	  if (sCount > 0)
@@ -2026,9 +2020,8 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 	      fprintf (fp,
 		       mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT]
 		       [mpiPi.reportFormat],
-		       &(mpiPi.
-			 lookup[task_data[j - 1].op - mpiPi_BASE].name[4]),
-		       av[i]->csid, "*", sCount, sMax / 1000.0,
+		       &(mpiPi.lookup[task_data[j - 1].op - mpiPi_BASE].
+			 name[4]), av[i]->csid, "*", sCount, sMax / 1000.0,
 		       sCumulative / (sCount * 1000.0), sMin / 1000.0,
 		       mpiPi.global_app_time >
 		       0 ? 100.0 * sCumulative / (mpiPi.global_app_time *
@@ -2684,9 +2677,8 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 				   mpiP_Report_Formats
 				   [MPIP_CALLSITE_MESS_RANK_FMT]
 				   [mpiPi.reportFormat],
-				   &(mpiPi.
-				     lookup[av[i]->op - mpiPi_BASE].name[4]),
-				   av[i]->csid, task_data[j].rank,
+				   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].
+				     name[4]), av[i]->csid, task_data[j].rank,
 				   task_data[j].count,
 				   task_data[j].maxDataSent,
 				   task_data[j].cumulativeDataSent /
@@ -2702,9 +2694,8 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 			       mpiP_Report_Formats
 			       [MPIP_CALLSITE_MESS_SUMMARY_FMT]
 			       [mpiPi.reportFormat],
-			       &(mpiPi.
-				 lookup[av[i]->op - mpiPi_BASE].name[4]),
-			       av[i]->csid, "*", sCount, sMax,
+			       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].
+				 name[4]), av[i]->csid, "*", sCount, sMax,
 			       sCumulative / sCount, sMin, sCumulative);
 		    }
 		  fprintf (fp, "\n");
