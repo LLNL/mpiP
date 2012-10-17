@@ -20,7 +20,7 @@ docdir=@docdir@
 
 include Defs.mak
 
-.PHONY: default all clean api API shared proto cleanobjs test \
+.PHONY: default all clean api API shared proto cleanobjs test testing \
         add_binutils_objs add_libunwind_objs TAGS cleanobjs distclean \
         lint indent proto install merged-install install-api install-bin \
         install-all
@@ -207,7 +207,7 @@ add_libunwind_objs:
 TAGS: ${SRCS}
 	etags $^
 
-test:
+test testing:
 	$(MAKE) -C testing
 
 clean::
