@@ -90,6 +90,9 @@
 /* Set the default report format (concise or verbose). */
 #undef DEFAULT_REPORT_FORMAT
 
+/* Specify use of "const"s, as per the MPI-3 specification.  */
+#undef USE_MPI3_CONSTS
+
 #endif /* _CONFIG_H */
 
 /* 

@@ -16,15 +16,15 @@ directives
 	nowrapper
 directives
 
-int MPI_Allgather ( void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm )
+int MPI_Allgather ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm )
 
-int MPI_Allgatherv ( void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int *recvcounts, int *displs, MPI_Datatype recvtype, MPI_Comm comm )
+int MPI_Allgatherv ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, mpip_const_int_t *recvcounts, mpip_const_int_t *displs, MPI_Datatype recvtype, MPI_Comm comm )
 
-int MPI_Allreduce ( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
+int MPI_Allreduce ( mpip_const_void_t *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
 
-int MPI_Alltoall ( void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, MPI_Comm comm )
+int MPI_Alltoall ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, MPI_Comm comm )
 
-int MPI_Alltoallv ( void *sendbuf, int *sendcnts, int *sdispls, MPI_Datatype sendtype, void *recvbuf, int *recvcnts, int *rdispls, MPI_Datatype recvtype, MPI_Comm comm )
+int MPI_Alltoallv ( mpip_const_void_t *sendbuf, mpip_const_int_t *sendcnts, mpip_const_int_t *sdispls, MPI_Datatype sendtype, void *recvbuf, mpip_const_int_t *recvcnts, mpip_const_int_t *rdispls, MPI_Datatype recvtype, MPI_Comm comm )
 
 int MPI_Attr_delete ( MPI_Comm comm, int keyval )
 
@@ -36,9 +36,9 @@ int MPI_Barrier ( MPI_Comm comm )
 
 int MPI_Bcast ( void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm )
 
-int MPI_Bsend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
+int MPI_Bsend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
 
-int MPI_Bsend_init ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Bsend_init ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
 int MPI_Buffer_attach ( void *buffer, int size )
 
@@ -48,17 +48,17 @@ int MPI_Cancel ( MPI_Request *request )
 
 int MPI_Cart_coords ( MPI_Comm comm, int rank, int maxdims, int *coords )
 
-int MPI_Cart_create ( MPI_Comm comm_old, int ndims, int *dims, int *periods, int reorder, MPI_Comm *comm_cart )
+int MPI_Cart_create ( MPI_Comm comm_old, int ndims, mpip_const_int_t *dims, mpip_const_int_t *periods, int reorder, MPI_Comm *comm_cart )
 
 int MPI_Cart_get ( MPI_Comm comm, int maxdims, int *dims, int *periods, int *coords )
 
-int MPI_Cart_map ( MPI_Comm comm_old, int ndims, int *dims, int *periods, int *newrank )
+int MPI_Cart_map ( MPI_Comm comm_old, int ndims, mpip_const_int_t *dims, mpip_const_int_t *periods, int *newrank )
 
-int MPI_Cart_rank ( MPI_Comm comm, int *coords, int *rank )
+int MPI_Cart_rank ( MPI_Comm comm, mpip_const_int_t *coords, int *rank )
 
 int MPI_Cart_shift ( MPI_Comm comm, int direction, int displ, int *source, int *dest )
 
-int MPI_Cart_sub ( MPI_Comm comm, int *remain_dims, MPI_Comm *comm_new )
+int MPI_Cart_sub ( MPI_Comm comm, mpip_const_int_t *remain_dims, MPI_Comm *comm_new )
 
 int MPI_Cartdim_get ( MPI_Comm comm, int *ndims )
 
@@ -136,8 +136,8 @@ directives
 	nowrapper
 directives
 
-int MPI_Gather ( void *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm )
-int MPI_Gatherv ( void *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int *recvcnts, int *displs, MPI_Datatype recvtype, int root, MPI_Comm comm )
+int MPI_Gather ( mpip_const_void_t *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm )
+int MPI_Gatherv ( mpip_const_void_t *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, mpip_const_int_t *recvcnts, mpip_const_int_t *displs, MPI_Datatype recvtype, int root, MPI_Comm comm )
 int MPI_Get_count ( MPI_Status *status, MPI_Datatype datatype, int *count )
 directives
 	nowrapper
@@ -158,17 +158,17 @@ directives
 	nowrapper
 directives
 
-int MPI_Graph_create ( MPI_Comm comm_old, int nnodes, int *index, int *edges, int reorder, MPI_Comm *comm_graph )
+int MPI_Graph_create ( MPI_Comm comm_old, int nnodes, mpip_const_int_t *index, mpip_const_int_t *edges, int reorder, MPI_Comm *comm_graph )
 int MPI_Graph_get ( MPI_Comm comm, int maxindex, int maxedges, int *index, int *edges )
-int MPI_Graph_map ( MPI_Comm comm_old, int nnodes, int *index, int *edges, int *newrank )
+int MPI_Graph_map ( MPI_Comm comm_old, int nnodes, mpip_const_int_t *index, mpip_const_int_t *edges, int *newrank )
 int MPI_Graph_neighbors ( MPI_Comm comm, int rank, int maxneighbors, int *neighbors )
 int MPI_Graph_neighbors_count ( MPI_Comm comm, int rank, int *nneighbors )
 int MPI_Graphdims_get ( MPI_Comm comm, int *nnodes, int *nedges )
 int MPI_Group_compare ( MPI_Group group1, MPI_Group group2, int *result )
 int MPI_Group_difference ( MPI_Group group1, MPI_Group group2, MPI_Group *group_out )
-int MPI_Group_excl ( MPI_Group group, int n, int *ranks, MPI_Group *newgroup )
+int MPI_Group_excl ( MPI_Group group, int n, mpip_const_int_t *ranks, MPI_Group *newgroup )
 int MPI_Group_free ( MPI_Group *group )
-int MPI_Group_incl ( MPI_Group group, int n, int *ranks, MPI_Group *group_out )
+int MPI_Group_incl ( MPI_Group group, int n, mpip_const_int_t *ranks, MPI_Group *group_out )
 int MPI_Group_intersection ( MPI_Group group1, MPI_Group group2, MPI_Group *group_out )
 
 int MPI_Group_range_excl ( MPI_Group group, int n, int ranges[][3], MPI_Group *newgroup )
@@ -191,11 +191,11 @@ directives
 	nowrapper
 directives
 
-int MPI_Group_translate_ranks ( MPI_Group group_a, int n, int *ranks_a, MPI_Group group_b, int *ranks_b )
+int MPI_Group_translate_ranks ( MPI_Group group_a, int n, mpip_const_int_t *ranks_a, MPI_Group group_b, int *ranks_b )
 int MPI_Group_union ( MPI_Group group1, MPI_Group group2, MPI_Group *group_out )
 
 @MPI_Fint MPI_Handle2int ( MPI_Handle_type c_handle, MPI_Handle_enum handle_kind )
-int MPI_Ibsend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Ibsend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
 @MPI_Fint MPI_Info_c2f ( MPI_Info info )
 
@@ -237,11 +237,11 @@ int MPI_Iprobe ( int source, int tag, MPI_Comm comm, int *flag, MPI_Status *stat
 
 int MPI_Irecv ( void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Irsend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Irsend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Isend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Isend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Issend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Issend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
 int MPI_Keyval_create ( MPI_Copy_function *copy_fn, MPI_Delete_function *delete_fn, int *keyval, void *extra_state )
 
@@ -257,7 +257,7 @@ directives
 	nowrapper
 directives
 
-int MPI_Pack ( void *inbuf, int incount, MPI_Datatype datatype, void *outbuf, int count, int *position, MPI_Comm comm )
+int MPI_Pack ( mpip_const_void_t *inbuf, int incount, MPI_Datatype datatype, void *outbuf, int count, int *position, MPI_Comm comm )
 
 int MPI_Pack_size ( int incount, MPI_Datatype datatype, MPI_Comm comm, int *size )
 directives
@@ -275,35 +275,35 @@ int MPI_Recv ( void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
 int MPI_Recv_init ( void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Reduce ( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm )
+int MPI_Reduce ( mpip_const_void_t *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm )
 
-int MPI_Reduce_scatter ( void *sendbuf, void *recvbuf, int *recvcnts, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
+int MPI_Reduce_scatter ( mpip_const_void_t *sendbuf, void *recvbuf, mpip_const_int_t *recvcnts, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
 
 @MPI_Fint MPI_Request_c2f ( MPI_Request c_request )
 
 int MPI_Request_free ( MPI_Request *request )
 
-int MPI_Rsend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
+int MPI_Rsend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
 
-int MPI_Rsend_init ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Rsend_init ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Scan ( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
+int MPI_Scan ( mpip_const_void_t *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm )
 
-int MPI_Scatter ( void *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm )
+int MPI_Scatter ( mpip_const_void_t *sendbuf, int sendcnt, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm )
 
-int MPI_Scatterv ( void *sendbuf, int *sendcnts, int *displs, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm )
+int MPI_Scatterv ( mpip_const_void_t *sendbuf, mpip_const_int_t *sendcnts, mpip_const_int_t *displs, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, int root, MPI_Comm comm )
 
-int MPI_Send ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
+int MPI_Send ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
 
-int MPI_Send_init ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Send_init ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Sendrecv ( void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm, MPI_Status *status )
+int MPI_Sendrecv ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm, MPI_Status *status )
 
 int MPI_Sendrecv_replace ( void *buf, int count, MPI_Datatype datatype, int dest, int sendtag, int source, int recvtag, MPI_Comm comm, MPI_Status *status )
 
-int MPI_Ssend ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
+int MPI_Ssend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm )
 
-int MPI_Ssend_init ( void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
+int MPI_Ssend_init ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
 int MPI_Start ( MPI_Request *request )
 
@@ -406,7 +406,7 @@ directives
 	nowrapper
 directives
 
-int MPI_Unpack ( void *inbuf, int insize, int *position, void *outbuf, int count, MPI_Datatype datatype, MPI_Comm comm )
+int MPI_Unpack ( mpip_const_void_t *inbuf, int insize, int *position, void *outbuf, int count, MPI_Datatype datatype, MPI_Comm comm )
 
 double MPI_Wtick ( void )
 directives
