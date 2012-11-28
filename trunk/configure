@@ -5140,6 +5140,29 @@ fi
 
 fi
 
+#  Check for MPI3
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mpi.h>
+int
+main ()
+{
+ #if MPI_VERSION < 3
+          # error not using MPI3
+          #endif
+
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  $as_echo "#define USE_MPI3_CONSTS 1" >>confdefs.h
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 #
 #  Find an appropriate timer function
 #
