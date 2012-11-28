@@ -422,6 +422,17 @@ if test "$ENABLE_API_ONLY" = no ; then
   AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
 fi
 
+#  Check for MPI3
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([@%:@include <mpi.h>],
+        [ #if MPI_VERSION < 3
+          # error not using MPI3
+          #endif
+        ])
+    ],
+    AC_DEFINE(USE_MPI3_CONSTS))
+
+
 #
 #  Find an appropriate timer function
 #

@@ -50,6 +50,16 @@
 #define MPIP_CALLSITE_STATS_COOKIE 518641
 #define MPIP_CALLSITE_STATS_COOKIE_ASSERT(f) {assert(MPIP_CALLSITE_STATS_COOKIE==((f)->cookie));}
 
+#ifdef USE_MPI3_CONSTS
+typedef const void mpip_const_void_t;
+typedef const int mpip_const_int_t;
+typedef const char mpip_const_char_t;
+#else
+typedef void mpip_const_void_t;
+typedef int mpip_const_int_t;
+typedef char mpip_const_char_t;
+#endif
+
 typedef char mpiPi_hostname_t[MPIPI_HOSTNAME_LEN_MAX];
 
 typedef struct _callsite_stats
