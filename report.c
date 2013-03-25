@@ -553,6 +553,10 @@ mpiPi_print_callsites (FILE * fp)
   int stack_continue_flag;
   char addr_buf[24];
 
+  /*  If stack depth is 0, call sites are really just MPI calls */
+  if ( mpiPi.stackDepth == 0 )
+    return;
+
   h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
   sprintf (buf, "Callsites: %d", ac);
   qsort (av, ac, sizeof (void *), callsite_src_id_cache_sort_by_id);

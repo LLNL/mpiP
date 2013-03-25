@@ -364,6 +364,7 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
   assert (ac != NULL);
   assert (av != NULL);
 
+#if !defined(USE_GETARG)
 #if defined(AIX)
   {
     /*  Works for C/C++ and Fortran  */
@@ -395,6 +396,7 @@ mpiPi_copy_args (int *ac, char **av, int av_len)
     argv = __argv_save;
   }
 #endif
+#endif /* USE_GETARG */
 
   mpiPi_copy_given_args (ac, av, av_len, argc, argv);
 }
