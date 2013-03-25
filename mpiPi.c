@@ -82,6 +82,14 @@ mpiPi_callsite_stats_src_comparator (const void *p1, const void *p2)
 }
 
 static int
+mpiPi_callsite_stats_MPI_id_hashkey (const void *p)
+{
+  callsite_stats_t *csp = (callsite_stats_t *) p;
+  MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp);
+  return 52271 ^ csp->op;
+}
+
+static int
 mpiPi_callsite_stats_src_id_hashkey (const void *p)
 {
   int res = 0;
@@ -342,31 +350,39 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   callsite_src_id_cache_entry_t *csp_2 = (callsite_src_id_cache_entry_t *) p2;
 
 #define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  if ( mpiPi.stackDepth == 0 )
+  {
+    express (id); /* In cases where the call stack depth is 0, the only unique info may be the id */
+    return 0;
+  }
+  else
+  {
+    for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
       if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
-	{
-	  if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
-	    {
-	      return 1;
-	    }
-	  if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
-	    {
-	      return -1;
-	    }
-	  express (line[i]);
-	  if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
-	    {
-	      return 1;
-	    }
-	  if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
-	    {
-	      return -1;
-	    }
-	}
+      {
+        if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
+        {
+          return 1;
+        }
+        if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
+        {
+          return -1;
+        }
+        express (line[i]);
+        if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
+        {
+          return 1;
+        }
+        if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
+        {
+          return -1;
+        }
+      }
 
       express (pc[i]);
     }
+  }
 #undef express
   return 0;
 }
@@ -429,6 +445,9 @@ mpiPi_query_src (callsite_stats_t * p)
       key.pc[i] = p->pc[i];
     }
 
+    /* MPI ID is compared when stack depth is 0 */
+    key.id = p->op - mpiPi_BASE;
+
   /* lookup/generate an ID based on the callstack, not just the callsite pc */
   if (h_search (callsite_src_id_cache, &key, (void **) &csp) == NULL)
     {
@@ -445,13 +464,17 @@ mpiPi_query_src (callsite_stats_t * p)
 	  csp->line[i] = key.line[i];
 	  csp->pc[i] = p->pc[i];
 	}
-      csp->id = callsite_src_id_counter++;
       csp->op = p->op;
+      if (mpiPi.stackDepth == 0 )
+        csp->id = csp->op - mpiPi_BASE;
+      else
+        csp->id = callsite_src_id_counter++;
       h_insert (callsite_src_id_cache, csp);
     }
 
   /* assign ID to this record */
   p->csid = csp->id;
+
   return p->csid;
 }
 
@@ -606,7 +629,7 @@ mpiPi_insert_MPI_records ()
     {
       /*  Open hash table for MPI call data.  */
       mpiPi.global_MPI_stats_agg = h_open (mpiPi.tableSize,
-					   mpiPi_callsite_stats_src_id_hashkey,
+					   mpiPi_callsite_stats_MPI_id_hashkey,
 					   mpiPi_callsite_stats_op_comparator);
 
       /*  Get individual call data.  */
@@ -629,7 +652,7 @@ mpiPi_insert_MPI_records ()
 	      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
 	      memcpy (newp, p, sizeof (callsite_stats_t));
 	      newp->rank = -1;
-	      newp->csid = 0;
+	      newp->csid = p->op - mpiPi_BASE;
 
 	      if (mpiPi.calcCOV)
 		{
