@@ -350,39 +350,39 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   callsite_src_id_cache_entry_t *csp_2 = (callsite_src_id_cache_entry_t *) p2;
 
 #define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
-  if ( mpiPi.stackDepth == 0 )
-  {
-    express (id); /* In cases where the call stack depth is 0, the only unique info may be the id */
-    return 0;
-  }
-  else
-  {
-    for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  if (mpiPi.stackDepth == 0)
     {
-      if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
-      {
-        if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
-        {
-          return 1;
-        }
-        if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
-        {
-          return -1;
-        }
-        express (line[i]);
-        if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
-        {
-          return 1;
-        }
-        if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
-        {
-          return -1;
-        }
-      }
-
-      express (pc[i]);
+      express (id);		/* In cases where the call stack depth is 0, the only unique info may be the id */
+      return 0;
     }
-  }
+  else
+    {
+      for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+	{
+	  if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
+	    {
+	      if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
+		{
+		  return 1;
+		}
+	      if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
+		{
+		  return -1;
+		}
+	      express (line[i]);
+	      if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
+		{
+		  return 1;
+		}
+	      if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
+		{
+		  return -1;
+		}
+	    }
+
+	  express (pc[i]);
+	}
+    }
 #undef express
   return 0;
 }
@@ -445,8 +445,8 @@ mpiPi_query_src (callsite_stats_t * p)
       key.pc[i] = p->pc[i];
     }
 
-    /* MPI ID is compared when stack depth is 0 */
-    key.id = p->op - mpiPi_BASE;
+  /* MPI ID is compared when stack depth is 0 */
+  key.id = p->op - mpiPi_BASE;
 
   /* lookup/generate an ID based on the callstack, not just the callsite pc */
   if (h_search (callsite_src_id_cache, &key, (void **) &csp) == NULL)
@@ -465,10 +465,10 @@ mpiPi_query_src (callsite_stats_t * p)
 	  csp->pc[i] = p->pc[i];
 	}
       csp->op = p->op;
-      if (mpiPi.stackDepth == 0 )
-        csp->id = csp->op - mpiPi_BASE;
+      if (mpiPi.stackDepth == 0)
+	csp->id = csp->op - mpiPi_BASE;
       else
-        csp->id = callsite_src_id_counter++;
+	csp->id = callsite_src_id_counter++;
       h_insert (callsite_src_id_cache, csp);
     }
 
@@ -621,9 +621,9 @@ static int
 mpiPi_insert_MPI_records ()
 {
   callsite_stats_t *csp = NULL;
-  int i, ac;
+  int i, ac, lai, lac;
   callsite_stats_t **av;
-  callsite_stats_t *p;
+  callsite_stats_t *p, *lap;
 
   if (mpiPi.rank == mpiPi.collectorRank)
     {
@@ -654,26 +654,12 @@ mpiPi_insert_MPI_records ()
 	      newp->rank = -1;
 	      newp->csid = p->op - mpiPi_BASE;
 
-	      if (mpiPi.calcCOV)
-		{
-		  newp->siteData =
-		    (double *) malloc (mpiPi.size * sizeof (double));
-		  newp->siteData[0] = p->cumulativeTime;
-		  newp->siteDataIdx = 1;
-		}
-
 	      /* insert new record into global */
 	      h_insert (mpiPi.global_MPI_stats_agg, newp);
 	    }
 	  else
 	    {
 	      mpiPi_merge_individual_callsite_records (csp, p);
-
-	      if (mpiPi.calcCOV)
-		{
-		  csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
-		  csp->siteDataIdx += 1;
-		}
 	    }
 	}
     }
@@ -970,7 +956,7 @@ mpiPi_publishResults (int report_style)
 	}
     }
   mpiPi_profile_print (fp, report_style);
-  PMPI_Barrier (MPI_COMM_WORLD);
+  PMPI_Barrier (mpiPi.comm);
   if (fp != stdout && fp != NULL)
     {
       fclose (fp);
@@ -1102,7 +1088,7 @@ mpiPi_generateReport (int report_style)
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
-  if (mergeResult == 1)
+  if (mergeResult == 1 && mpiPi.stackDepth == 0)
     mergeResult = mpiPi_insert_MPI_records ();
   if (mergeResult == 1)
     mergeResult = mpiPi_mergeCollectiveStats ();
