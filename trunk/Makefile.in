@@ -144,7 +144,7 @@ clean::
 
 ${SHARED_C_TARGET}: CFLAGS += -fpic -DPIC
 ${SHARED_C_TARGET}: cleanobjs ${OBJS}
-	${CC} -shared -o $@ ${OBJS} ${LIBS}
+	${CC} -shared -o $@ ${OBJS} ${LDFLAGS} ${LIBS}
 
 endif
 
