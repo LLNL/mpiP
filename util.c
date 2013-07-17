@@ -151,6 +151,13 @@ mpiPi_getenv ()
 			("stackdepth of %d is large. Consider making it smaller.\n",
 			 mpiPi.stackDepth);
 		  }
+
+                //  If the stack depth is 0, we are accumulating data
+                //  for each MPI op (i.e. potentially multiple callsites),
+                //  resulting in data that would not be useful for calculating COV.
+		if (mpiPi.stackDepth == 0)
+                  mpiPi.calcCOV = 0;
+
 		if (mpiPi.rank == 0)
 		  mpiPi_msg
 		    ("Set the callsite stack traceback depth to [%d].\n",
