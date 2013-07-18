@@ -749,7 +749,7 @@ mpiPi_print_top_sent_sites (FILE * fp)
 void
 get_histogram_bin_str (mpiPi_histogram_t * h, int v, char *s)
 {
-  int min = 0, max = 0, i = 0;
+  int min = 0, max = 0;
 
   if (v == 0)
     {
@@ -900,7 +900,7 @@ mpiPi_print_top_pt2pt_sent_sites (FILE * fp)
 	  goto done;
 	}
 
-      fprintf (fp, "%-20s %10s %21s %21s\n", "Call", "MPI % Sent",
+      fprintf (fp, "%-20s %10s %21s %21s\n", "Call", "MPI Sent %",
 	       "Comm Size", "Data Size");
 
       mpiPi_msg_debug ("Found max sent of %6.3f at %p\n", *result_ptrs[0],
@@ -3056,6 +3056,10 @@ mpiPi_profile_print_concise (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
+      if ( mpiPi.do_collective_stats_report )
+        mpiPi_print_top_collective_sent_sites (fp);
+      if (mpiPi.do_pt2pt_stats_report)
+        mpiPi_print_top_pt2pt_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
 
@@ -3102,6 +3106,10 @@ mpiPi_profile_print_verbose (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
+      if ( mpiPi.do_collective_stats_report )
+        mpiPi_print_top_collective_sent_sites (fp);
+      if (mpiPi.do_pt2pt_stats_report)
+        mpiPi_print_top_pt2pt_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
     }

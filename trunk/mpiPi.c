@@ -479,7 +479,7 @@ mpiPi_query_src (callsite_stats_t * p)
 }
 
 
-static int
+static void
 mpiPi_merge_individual_callsite_records (callsite_stats_t * a,
 					 callsite_stats_t * b)
 {
@@ -519,7 +519,6 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
     {
       if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
 	{
-	  int j;
 	  callsite_stats_t *newp = NULL;
 	  newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
 
@@ -534,7 +533,6 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
   /* Collect aggregate callsite summary information indpendent of rank. */
   if (NULL == h_search (mpiPi.global_callsite_stats_agg, p, (void **) &csp))
     {
-      int j;
       callsite_stats_t *newp = NULL;
       newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
 
@@ -621,9 +619,9 @@ static int
 mpiPi_insert_MPI_records ()
 {
   callsite_stats_t *csp = NULL;
-  int i, ac, lai, lac;
+  int i, ac;
   callsite_stats_t **av;
-  callsite_stats_t *p, *lap;
+  callsite_stats_t *p;
 
   if (mpiPi.rank == mpiPi.collectorRank)
     {
@@ -647,7 +645,6 @@ mpiPi_insert_MPI_records ()
 	  if (NULL ==
 	      h_search (mpiPi.global_MPI_stats_agg, p, (void **) &csp))
 	    {
-	      int j;
 	      callsite_stats_t *newp = NULL;
 	      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
 	      memcpy (newp, p, sizeof (callsite_stats_t));
@@ -971,9 +968,6 @@ mpiPi_publishResults (int report_style)
 static void
 mpiPi_collect_basics (int report_style)
 {
-  int i = 0;
-  double app_time = mpiPi.cumulativeTime;
-
   mpiPi_msg_debug ("Collect Basics\n");
 
   if (mpiPi.rank == mpiPi.collectorRank)
