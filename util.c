@@ -125,7 +125,6 @@ mpiPi_getenv ()
 
 	    case 'k':
 	      {
-		int defaultStackDepth = mpiPi.stackDepth;
 		mpiPi.stackDepth = atoi (optarg);
 		if (mpiPi.stackDepth < 0)
 		  {

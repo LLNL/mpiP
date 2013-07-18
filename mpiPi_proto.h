@@ -65,6 +65,8 @@ extern void mpiPi_copy_args (int *ac, char **av, int av_len);
 extern void mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc,
 				   char **argv);
 extern unsigned long long mpiPi_get_text_start (char *filename);
+extern void mpiPi_update_collective_stats (int op, double dur, double size, MPI_Comm * comm);
+extern void mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm);
 
 #ifdef NEED_MREAD_REAL_TIME_DECL
 #include <sys/systemcfg.h>
