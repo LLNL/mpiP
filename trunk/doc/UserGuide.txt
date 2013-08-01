@@ -1,8 +1,8 @@
 
                   mpiP: Lightweight, Scalable MPI Profiling
 
-                                 Version 3.3
-                                23 June 2011
+                                 Version 3.4
+                                31 July 2013
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                                Chris Chambreau
@@ -52,8 +52,8 @@ Introduction
    file.
 
    We have tested mpiP on a variety of C/C++/Fortran applications from 2
-   to 65536 processes, including an 8000-process run on the LLNL dawn BG/P
-   system and a 65536-process run on the LLNL BG/L system.
+   to 262144 processes, including a 262144-process run on the LLNL Sequoia
+   BG/Q system.
 
    Please send your comments, questions, and ideas for enhancements to
    mpip-help@lists.sourceforge.net. To receive mail regarding new mpiP
@@ -87,7 +87,18 @@ Introduction
      * Philip Mucci (SiCortex)
      * Karl Schulz (Texas Advanced Computing Center)
 
-  New Features with Release 3.3
+  New Features with Release 3.4
+
+   Release v3.4 addresses the following issues:
+     * Compatibility with MPI-3.
+     * Histogram reporting for Point-to-point (-p) and Collective (-y)
+       operation message sizes and communicators.
+     * Added a low-memory-use concise report format, with the ability to
+       set the default report format and specify report formats at run
+       time.
+     * Supports MPI call reporting (no call sites) with stack depth (-k)
+       of 0.
+     * Configure can disable SO lookup functionality.
 
    Release v3.3 addresses the following issues:
      * Support for shared object source lookup with libbfd.
@@ -175,26 +186,31 @@ mpiP:
 
   Supported Platforms
 
-   mpiP has been tested on several Linux, AIX, UNICOS and IBM BG/L
-   systems. Please contact us with bug reports or questions regarding
-   these platforms. The following table indicates platforms where mpiP was
+   mpiP has been tested on several Linux, AIX, UNICOS and IBM BG systems.
+   Please contact us with bug reports or questions regarding these
+   platforms. The following table indicates platforms where mpiP was
    succesfully run and any requirements for that platform.
 
    Platform OS Compiler MPI binutils Requirements
-   IA32-Linux 2.6.9 CHAOS Kernel Intel 9.0
-   PGI 6.2.3 Quadrics MPI 1.24-48 2.17 Some binutils mods required for
-   demangling support. Please send mail to the help list for more
-   information. When compiling optimized applications with Intel
-   compilers, the -fp flag may be needed to get accurate stack trace
-   information.
-   2.6.11 Kernel gcc 4.0.0 mpich2-1.0.4p1
-   IA64-Linux 2.6.9 CHAOS Kernel Intel 9.1 Quadrics MPI 1.24-48 2.17 The
-   use of libunwind is required on this platform.
    x86_64-Linux 2.6.18 CHAOS Kernel Intel 9.1
-   PGI 7.0 MVAPICH 0.9.7
-   IBM Power4/5 AIX 5.3 VA C 7.0
-   VA Fortran 9.1 PE 4.2 2.16.1 Binutils currently requires that
-   applications are linked with the -bnoobjreorder linker flag.
+   PGI 7.0 MVAPICH 0.9.7 2.20.51
+   Example configure command:
+   ./configure LDFLAGS=-L/usr/lib64 LIBS="-lbfd -liberty"
+   --enable-collective-report-default --enable-demangling=GNU
+   --with-cc=mpicc --with-cxx=mpiCC --with-f77=mpif77
+   IBM BG/Q
+   Driver V1R2M0
+   IBM XL 12.1
+   2.21.1
+   Source code lookup support requires zlib.  Example configure command:
+   CFLAGS=-I/bgsys/drivers/ppcfloor/toolchain/gnu/build-powerpc64-bgq-linu
+   x/binutils-2.21.1-build/bfd
+   -I/bgsys/drivers/ppcfloor/toolchain/gnu/gcc-4.4.6/include
+   -I/bgsys/drivers/ppcfloor/toolchain/gnu/gdb-7.1/include
+   LIBS=-L/bgsys/drivers/ppcfloor/toolchain/gnu/build-powerpc64-bgq-linux/
+   binutils-2.21.1-build/bfd
+   -L/g/g0/chcham/ToolTesting/mpiP/bgqos_0/mpiP-3.3/libz/zlib-1.2.6
+   CC=mpixlc_r CXX=mpixlcxx_r F77=mpixlf77_r ./configure --enable-getarg
    Cray XT3/XT4 Catamount 1.4.32
 
    PGI 6.1-4 C/C/Fortran, from Cray PrgEnv-pgi module version 1.4.32
@@ -357,8 +373,6 @@ Configuring and Building mpiP
    -L/usr/local/tools/mpiP/lib -lmpiP -lbfd -liberty -lm
    Cray X1 Cray C/C++/Fortran Link with -lmpiP -lbfd -liberty -ldwarf
    -lelf
-   SGI Altix GNU or Intel C/C++/Fortran Link with -lmpiP -lunwind -lbfd
-   -liberty
    Cray XD1 GNU or PGI C/C++/Fortran Link with
    [path_to_mpiP_install]/libmpiP.a -lbfd -liberty [mpich_libs]
 
@@ -393,12 +407,16 @@ Run-time Configuration of mpiP
    -n Do not truncate full pathname of filename in callsites.
    -o Disable profiling at initialization. Application must enable
    profiling with MPI_Pcontrol().
+   -p Point-to-point histogram reporting on message size and communicator
+   used.
    -r Generate the report by aggregating data at a single task. default
    -s n Set hash table size to <n>. 256
    -t x Set print threshold for report, where <x> is the MPI percentage of
    time for each callsite. 0.0
    -v Generates both concise and verbose report output.
    -x exe Specify the full path to the executable.
+   -y Collective histogram reporting on message size and communicator
+   used.
    -z Suppress printing of the report at MPI_Finalize.
 
    For example, to set the callsite stack walking depth to 2 and the
@@ -537,7 +555,6 @@ Bcast                   1         12        336      28      0.02
 Name              Site Rank  Count      Max     Mean      Min   App%   MPI%
 Barrier              1    0      1    0.107    0.107    0.107   0.00  44.03
 Barrier              1    *      4    0.174    0.137    0.107   0.00   0.00
-
 Barrier              2    0      1    0.136    0.136    0.136   0.00  55.97
 Barrier              2    1      1    1e+04    1e+04    1e+04  99.92 100.00
 Barrier              2    2      1    1e+04    1e+04    1e+04  99.92 100.00
@@ -594,7 +611,6 @@ Name              Site Rank   Count       Max      Mean       Min       Sum
 File_read            1    0      20        64        64        64      1280
 File_read            1    1      20        64        64        64      1280
 File_read            1    *      40        64        64        64      2560
-
 
   Report Viewers
 
@@ -979,5 +995,5 @@ How to add MPI calls to profile
    For further information please send mail to
    mpip-help@lists.sourceforge.net.
 
-   Last modified on June 23rd, 2011.
+   Last modified on July 30th, 2013.
    UCRL-CODE-223450
