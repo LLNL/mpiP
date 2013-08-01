@@ -151,11 +151,11 @@ mpiPi_getenv ()
 			 mpiPi.stackDepth);
 		  }
 
-                //  If the stack depth is 0, we are accumulating data
-                //  for each MPI op (i.e. potentially multiple callsites),
-                //  resulting in data that would not be useful for calculating COV.
+		//  If the stack depth is 0, we are accumulating data
+		//  for each MPI op (i.e. potentially multiple callsites),
+		//  resulting in data that would not be useful for calculating COV.
 		if (mpiPi.stackDepth == 0)
-                  mpiPi.calcCOV = 0;
+		  mpiPi.calcCOV = 0;
 
 		if (mpiPi.rank == 0)
 		  mpiPi_msg
