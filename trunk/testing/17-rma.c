@@ -8,7 +8,6 @@
 
 int main(int argc, char ** argv)
 {
-  MPI_Info info;
   MPI_Aint win_size = WIN_SIZE;
   MPI_Win win;
   MPI_Group group;
@@ -25,7 +24,7 @@ int main(int argc, char ** argv)
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   target_rank = (rank + 1) % size;
-  base = malloc(WIN_SIZE);
+  MPI_Alloc_mem(WIN_SIZE, MPI_INFO_NULL, &base);
   if ( NULL == base )
   {
     printf("failed to alloc %d\n", WIN_SIZE);
@@ -38,7 +37,7 @@ int main(int argc, char ** argv)
   /*************************************************************/
   /* MPI_Win_create(void *base, MPI_Aint size, int disp_unit, MPI_Info info,
      MPI_Comm comm, MPI_Win *win); */
-  r = MPI_Win_create(base, win_size, disp_unit, info, MPI_COMM_WORLD, &win); 
+  r = MPI_Win_create(base, win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD, &win); 
   if ( MPI_SUCCESS TEST_OP r ) printf("Rank %d failed MPI_Win_create\n", rank);
 
   /*************************************************************/
