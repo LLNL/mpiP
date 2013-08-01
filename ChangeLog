@@ -1,3 +1,116 @@
+2013-08-01  chcham
+
+	* mpiPi_proto.h, report.c, util.c:
+	  Another pass with indent.
+	* testing/10-coll-mess-size.c, testing/15-pcontrol.c,
+	  testing/15-pcontrol.src, testing/17-rma.c:
+	  Minor testing changes.
+	* doc/UserGuide.html, doc/UserGuide.txt:
+	  Updating documentation to reflect new features.
+
+2013-07-18  chcham
+
+	* Makefile.in, make-wrappers.py, mpiPi.c, mpiPi_proto.h, report.c,
+	  util.c:
+	  Several small changes including:
+	  
+	  o Inserted calls to generate histogram report sections.
+	  o Removed testing.sum with distclean target.
+	  o Minor improvements to readability of wrapper-generated code.
+	  o Removed unused variables and corrected return value.
+	  o Added new prototypes.
+
+2013-07-17  chcham
+
+	* mpiPi.c, util.c:
+	  Corrected errors related to MPI op-only reporting and COV
+	  calculation.
+	* Makefile.in:
+	  Added LDFLAGS to shared library build.
+
+2013-03-25  chcham
+
+	* mpiPi.c, report.c, util.c:
+	  o Corrected USE_GETARG conditional code to access Fortran
+	  command-line args.
+	  o Added MPI op-specific hashkey.
+	  o Support MPI-op-only call sites if stack depth is 0.
+
+2012-11-28  chcham
+
+	* configure, configure.in, mpi.io.protos.txt, mpi.protos.txt.in,
+	  mpi.rma.protos.txt, mpiPconfig.h.in, mpiPi.h.in:
+	  Initial changes to support MPI3: configure detects MPI_VERSION
+	  and adds "const"s for MPI3.
+
+2012-10-17  chcham
+
+	* mpiPi.c, report.c:
+	  Clean up task-specific allocations and code indent.
+	* mpiPi.c, mpiPi.h.in, report.c:
+	  o Changed task_info structure into individually-allocated
+	  mpi_time,
+	  app_time, and hostname arrays to allow flexibility with memory
+	  use.
+	  Hostnames are only collected for verbose reports.
+	  
+	  o Only Task 0 reports that the report will not be generated.
+	  
+	  o Only collect and merge call site information if initial merge
+	  was successful.
+	* Makefile.in:
+	  Added testing target, which is the same as the test target to
+	  reduce my own confusion.
+
+2012-08-02  chcham
+
+	* configure, configure.in, glob.c, make-wrappers.py,
+	  mpiPconfig.h.in, mpiPi.c, mpiPi.h.in, report.c, util.c:
+	  Consice report modifications:
+	  Allow setting default report format to concise report.
+	  Allow stack depth of 0 for concise report optimization.
+	  Aggregate call site data by MPI op for concise report.
+	* testing/Makefile.in:
+	  Remove API test.
+	* record_stack.c:
+	  Changes by indent.
+
+2012-06-26  chcham
+
+	* report.c:
+	  Patch by Phil Roth to handle cases where no collective or no
+	  pt2pt calls have been made.
+
+2012-06-11  chcham
+
+	* testing/16-waitallf.f:
+	  Phil Roth provided a fix for the waitallf test.
+
+2012-05-04  chcham
+
+	* configure, glob.c, make-wrappers.py, mpiPi.c, mpiPi.h.in,
+	  report.c, util.c:
+	  Added pt2pt message/comm size histogram reporting.
+	* testing/Makefile.in:
+	  Added api-test to standard tests to build for testing target.
+	* configure.in:
+	  Added flag to disable SO source lookup.
+	* Makefile.in:
+	  Clean tests for distclean target.
+	* Check.mak.in:
+	  Convenience target for testing single MPI run.
+
+2012-02-16  chcham
+
+	* glob.c, make-wrappers.py, mpiPi.c, mpiPi.h.in, report.c,
+	  testing/10-coll-mess-size.c, util.c:
+	  Added collective size histogram report section.
+
+2011-06-23  chcham
+
+	* ChangeLog, doc/UserGuide.html, doc/UserGuide.txt:
+	  Update documentation for 3.3 release.
+
 2011-06-22  chcham
 
 	* bin/srun-mpip:
