@@ -554,7 +554,7 @@ mpiPi_print_callsites (FILE * fp)
   char addr_buf[24];
 
   /*  If stack depth is 0, call sites are really just MPI calls */
-  if ( mpiPi.stackDepth == 0 )
+  if (mpiPi.stackDepth == 0)
     return;
 
   h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
@@ -2006,10 +2006,9 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 		  fprintf (fp,
 			   mpiP_Report_Formats[MPIP_CALLSITE_TIME_RANK_FMT]
 			   [mpiPi.reportFormat],
-			   &(mpiPi.
-			     lookup[task_stats->op - mpiPi_BASE].name[4]),
-			   av[i]->csid, task_data[j].rank, task_data[j].count,
-			   task_data[j].maxDur / 1000.0,
+			   &(mpiPi.lookup[task_stats->op - mpiPi_BASE].
+			     name[4]), av[i]->csid, task_data[j].rank,
+			   task_data[j].count, task_data[j].maxDur / 1000.0,
 			   task_data[j].cumulativeTime / (task_data[j].count *
 							  1000.0),
 			   task_data[j].minDur / 1000.0,
@@ -2025,9 +2024,8 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 	      fprintf (fp,
 		       mpiP_Report_Formats[MPIP_CALLSITE_TIME_SUMMARY_FMT]
 		       [mpiPi.reportFormat],
-		       &(mpiPi.
-			 lookup[task_data[j - 1].op - mpiPi_BASE].name[4]),
-		       av[i]->csid, "*", sCount, sMax / 1000.0,
+		       &(mpiPi.lookup[task_data[j - 1].op - mpiPi_BASE].
+			 name[4]), av[i]->csid, "*", sCount, sMax / 1000.0,
 		       sCumulative / (sCount * 1000.0), sMin / 1000.0,
 		       mpiPi.global_app_time >
 		       0 ? 100.0 * sCumulative / (mpiPi.global_app_time *
@@ -2683,9 +2681,8 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 				   mpiP_Report_Formats
 				   [MPIP_CALLSITE_MESS_RANK_FMT]
 				   [mpiPi.reportFormat],
-				   &(mpiPi.
-				     lookup[av[i]->op - mpiPi_BASE].name[4]),
-				   av[i]->csid, task_data[j].rank,
+				   &(mpiPi.lookup[av[i]->op - mpiPi_BASE].
+				     name[4]), av[i]->csid, task_data[j].rank,
 				   task_data[j].count,
 				   task_data[j].maxDataSent,
 				   task_data[j].cumulativeDataSent /
@@ -2701,9 +2698,8 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
 			       mpiP_Report_Formats
 			       [MPIP_CALLSITE_MESS_SUMMARY_FMT]
 			       [mpiPi.reportFormat],
-			       &(mpiPi.
-				 lookup[av[i]->op - mpiPi_BASE].name[4]),
-			       av[i]->csid, "*", sCount, sMax,
+			       &(mpiPi.lookup[av[i]->op - mpiPi_BASE].
+				 name[4]), av[i]->csid, "*", sCount, sMax,
 			       sCumulative / sCount, sMin, sCumulative);
 		    }
 		  fprintf (fp, "\n");
@@ -3056,10 +3052,10 @@ mpiPi_profile_print_concise (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
-      if ( mpiPi.do_collective_stats_report )
-        mpiPi_print_top_collective_sent_sites (fp);
+      if (mpiPi.do_collective_stats_report)
+	mpiPi_print_top_collective_sent_sites (fp);
       if (mpiPi.do_pt2pt_stats_report)
-        mpiPi_print_top_pt2pt_sent_sites (fp);
+	mpiPi_print_top_pt2pt_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
 
@@ -3106,10 +3102,10 @@ mpiPi_profile_print_verbose (FILE * fp)
 
       mpiPi_print_top_time_sites (fp);
       mpiPi_print_top_sent_sites (fp);
-      if ( mpiPi.do_collective_stats_report )
-        mpiPi_print_top_collective_sent_sites (fp);
+      if (mpiPi.do_collective_stats_report)
+	mpiPi_print_top_collective_sent_sites (fp);
       if (mpiPi.do_pt2pt_stats_report)
-        mpiPi_print_top_pt2pt_sent_sites (fp);
+	mpiPi_print_top_pt2pt_sent_sites (fp);
       mpiPi_print_top_io_sites (fp);
       mpiPi_print_top_rma_sites (fp);
     }
