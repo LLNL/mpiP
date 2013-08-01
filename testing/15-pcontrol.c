@@ -24,6 +24,7 @@ main (int argc, char **argv)
   MPI_Init (&argc, &argv);
   MPI_Barrier (MPI_COMM_WORLD);	/*  profiling should initially be disabled  */
   MPI_Pcontrol (1);		/*  enable profiling  */
+  MPI_Pcontrol (2);		/*  reset call site data  */
   MPI_Barrier (MPI_COMM_WORLD);
   MPI_Pcontrol (0);		/*  disable profiling  */
   MPI_Barrier (MPI_COMM_WORLD);
