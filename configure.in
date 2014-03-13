@@ -208,7 +208,7 @@ AC_ARG_ENABLE(bfd,
 	AS_HELP_STRING(--disable-bfd,Do not use GNU binutils libbfd for source lookup.),
 	if test x"$enableval" = xno ; then
 		echo Use of libbfd has been disabled.
-		ENABLE_BFD=no
+		ENABLE_BFD=no SO_LOOKUP=no
 	fi
 	,
 )
@@ -385,7 +385,7 @@ if test "x$ENABLE_BFD" = "xyes" ; then
   AC_CHECK_HEADER(bfd.h,
     AC_CHECK_LIB(bfd,bfd_openr, LIBS="$LIBS -lbfd", ENABLE_BFD=no, $BFD_AUX_LIBS)
     AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), ,[#include "bfd.h"]) 
-    , ENABLE_BFD=no
+    , ENABLE_BFD=no SO_LOOKUP=no
   )
   AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
   if test "x$ENABLE_BFD" = "xyes" ; then
@@ -411,6 +411,7 @@ else
       AC_DEFINE(USE_LIBDWARF)
       echo " found libelf/libdwarf"
       SOURCE_LOOKUP=libelf/libdwarf
+      SO_LOOKUP=no
     else
       echo " $ELFDWARF_ERR Not using libelf/libdwarf"
     fi
@@ -535,7 +536,7 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
-if test "x$DISABLE_SO_LOOKUP" = "xno" ; then
+if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
   AC_MSG_CHECKING(/proc/self/maps)
