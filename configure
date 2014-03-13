@@ -2781,7 +2781,7 @@ ENABLE_BFD=yes
 if test "${enable_bfd+set}" = set; then :
   enableval=$enable_bfd; if test x"$enableval" = xno ; then
 		echo Use of libbfd has been disabled.
-		ENABLE_BFD=no
+		ENABLE_BFD=no SO_LOOKUP=no
 	fi
 
 fi
@@ -4926,7 +4926,7 @@ fi
 
 
 else
-  ENABLE_BFD=no
+  ENABLE_BFD=no SO_LOOKUP=no
 
 fi
 
@@ -5407,7 +5407,7 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
-if test "x$DISABLE_SO_LOOKUP" = "xno" ; then
+if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking /proc/self/maps" >&5
