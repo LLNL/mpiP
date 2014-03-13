@@ -17,7 +17,6 @@
 
 
 MPIP_LIB_DIR=/home/chcham/workspace/mpiP
-#BINUTILS_LIB_DIR=/home/chcham/mpiP/binutils/binutils-2.15-test/lib
 
 export LD_PRELOAD=${MPIP_LIB_DIR}/libmpiP.so
 

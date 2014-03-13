@@ -1,8 +1,8 @@
 
                   mpiP: Lightweight, Scalable MPI Profiling
 
-                                 Version 3.4
-                                31 July 2013
+                                Version 3.4.1
+                                 13 March 2014
                                Jeffrey Vetter
                        jsvetter@users.sourceforge.net
                                Chris Chambreau
@@ -87,7 +87,11 @@ Introduction
      * Philip Mucci (SiCortex)
      * Karl Schulz (Texas Advanced Computing Center)
 
-  New Features with Release 3.4
+  New Features with Release 3.4.1
+
+   Release v3.4.1 addresses the following issue:
+     * Added de-activation of shared object source lookup when libbfd is
+       not available.
 
    Release v3.4 addresses the following issues:
      * Compatibility with MPI-3.
@@ -995,5 +999,5 @@ How to add MPI calls to profile
    For further information please send mail to
    mpip-help@lists.sourceforge.net.
 
-   Last modified on July 30th, 2013.
+   Last modified on March 13th, 2014.
    UCRL-CODE-223450
