@@ -96,12 +96,12 @@ static char *mpiP_Report_Formats[][2] = {
    "   * %10.3f %10.3f    %5.2lf\n"},
   {
    /*  MPIP_AGGREGATE_TIME_FMT  */
-   "%-20s %4d %10.3g  %6.2lf  %6.2lf\n",
-   "%-20s %4d %10.3f  %6.2lf  %6.2lf\n"},
+   "%-20s %4d %10.3g  %6.2lf  %6.2lf %10lld\n",
+   "%-20s %4d %10.3f  %6.2lf  %6.2lf %10lld\n"},
   {
    /*  MPIP_AGGREGATE_COV_TIME_FMT  */
-   "%-20s %4d %10.3g  %6.2lf  %6.2lf  %6.2lf\n",
-   "%-20s %4d %10.3f  %6.2lf  %6.2lf  %6.2lf\n",
+   "%-20s %4d %10.3g  %6.2lf  %6.2lf %10lld %6.2lf\n",
+   "%-20s %4d %10.3f  %6.2lf  %6.2lf %10lld %6.2lf\n",
    },
   {
    /*  MPIP_AGGREGATE_MESS_FMT  */
@@ -648,13 +648,13 @@ mpiPi_print_top_time_sites (FILE * fp)
 
   if (mpiPi.calcCOV)
     {
-      fprintf (fp, "%-20s %4s %12s%6s  %6s  %6s\n", "Call", "Site",
-	       "Time  ", "App%", "MPI%", "COV");
+      fprintf (fp, "%-20s %4s %12s%6s  %6s     %6s %6s\n", "Call", "Site",
+	       "Time  ", "App%", "MPI%", "Count", "COV");
     }
   else
     {
-      fprintf (fp, "%-20s %4s %12s%6s  %6s\n", "Call", "Site", "Time  ",
-	       "App%", "MPI%");
+      fprintf (fp, "%-20s %4s %12s%6s  %6s     %6s\n", "Call", "Site", "Time  ",
+	       "App%", "MPI%", "Count");
     }
 
   for (i = 0; (i < 20) && (i < ac); i++)
@@ -674,7 +674,9 @@ mpiPi_print_top_time_sites (FILE * fp)
 		       (mpiPi.global_app_time * 1e6),
 		       mpiPi.global_mpi_time >
 		       0 ? (100.0 * av[i]->cumulativeTime /
-			    mpiPi.global_mpi_time) : 0, timeCOV);
+			    mpiPi.global_mpi_time) : 0, 
+                       av[i]->count,
+                       timeCOV);
 	    }
 	  else
 	    {
@@ -688,7 +690,8 @@ mpiPi_print_top_time_sites (FILE * fp)
 		       (mpiPi.global_app_time * 1e6) : 0,
 		       mpiPi.global_mpi_time >
 		       0 ? 100.0 * av[i]->cumulativeTime /
-		       mpiPi.global_mpi_time : 0);
+		       mpiPi.global_mpi_time : 0,
+                       av[i]->count);
 	    }
 	}
     }
