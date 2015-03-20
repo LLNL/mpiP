@@ -35,6 +35,7 @@ static char *svnid =
 #include "libdwarf.h"
 #endif
 
+static Dwarf_Error dw_err;
 
 
 /*----------------------------------------------------------------------------
@@ -780,15 +781,26 @@ HandleFunctionDIE (Dwarf_Debug dwHandle, Dwarf_Die currChildDIE)
   Dwarf_Addr lowAddress = 0;
   Dwarf_Addr highAddress = 0;
 
-  int dwDieNameRet = dwarf_diename (currChildDIE,
-				    &funcName,
-				    NULL);
-  int dwDieLowAddrRet = dwarf_lowpc (currChildDIE,
-				     &lowAddress,
-				     NULL);
-  int dwDieHighAddrRet = dwarf_highpc (currChildDIE,
-				       &highAddress,
-				       NULL);
+  int dwDieNameRet, dwDieLowAddrRet, dwDieHighAddrRet;
+
+  dwDieNameRet = dwarf_diename (currChildDIE,
+				&funcName,
+				&dw_err);
+  if (dwDieNameRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get DIE name : %s\n", dwarf_errmsg(dw_err));
+
+  dwDieLowAddrRet = dwarf_lowpc (currChildDIE,
+				 &lowAddress,
+				 &dw_err);
+  if (dwDieLowAddrRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get low PC : %s\n", dwarf_errmsg(dw_err));
+
+  dwDieHighAddrRet = dwarf_highpc (currChildDIE,
+				   &highAddress,
+				   &dw_err);
+
+  if (dwDieHighAddrRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get high PC : %s\n", dwarf_errmsg(dw_err));
 
   if ((dwDieNameRet == DW_DLV_OK) &&
       (dwDieLowAddrRet == DW_DLV_OK) && (dwDieHighAddrRet == DW_DLV_OK))
@@ -835,12 +847,12 @@ open_dwarf_executable (char *fileName)
 			 NULL,	/* error handler */
 			 NULL,	/* error argument */
 			 &dwHandle,	/* session handle */
-			 NULL);	/* error object */
+			 &dw_err);	/* error object */
   if (dwStatus == DW_DLV_ERROR)
     {
       close (dwFd);
       dwFd = -1;
-      mpiPi_abort ("could not initialize DWARF library\n");
+      mpiPi_abort ("could not initialize DWARF library : %s\n", dwarf_errmsg(dw_err));
     }
 
   if (dwStatus == DW_DLV_NO_ENTRY)
@@ -871,12 +883,12 @@ open_dwarf_executable (char *fileName)
 				       NULL,	/* version_stamp */
 				       NULL,	/* abbrev_offset */
 				       NULL,	/* address_size */
-				       &nextCompilationUnitHeaderOffset, NULL);	/* error object */
+				       &nextCompilationUnitHeaderOffset, &dw_err);	/* error object */
       if (dwStatus != DW_DLV_OK)
 	{
 	  if (dwStatus != DW_DLV_NO_ENTRY)
 	    {
-	      mpiPi_abort ("failed to access next DWARF cu header\n");
+	      mpiPi_abort ("failed to access next DWARF cu header : %s\n", dwarf_errmsg(dw_err));
 	    }
 	  break;
 	}
@@ -884,10 +896,10 @@ open_dwarf_executable (char *fileName)
       /* access the first debug info entry (DIE) for this computation unit */
       dwStatus = dwarf_siblingof (dwHandle, NULL,	/* current DIE */
 				  &currCompileUnitDIE,	/* sibling DIE */
-				  NULL);	/* error object */
+				  &dw_err);	/* error object */
       if (dwStatus != DW_DLV_OK)
 	{
-	  mpiPi_abort ("failed to access first DWARF DIE\n");
+	  mpiPi_abort ("failed to access first DWARF DIE : %s\n", dwarf_errmsg(dw_err));
 	}
 
       /* get line number information for this compilation 
@@ -917,17 +929,28 @@ open_dwarf_executable (char *fileName)
 	      char *lineSourceFile = NULL;
 
 
-	      int lineNoStatus = dwarf_lineno (lineEntries[i],
-					       &lineNumber,
-					       NULL);
+	      int lineNoStatus, lineAddrStatus, lineSrcFileStatus;
 
-	      int lineAddrStatus = dwarf_lineaddr (lineEntries[i],
-						   &lineAddress,
-						   NULL);
+	      lineNoStatus = dwarf_lineno (lineEntries[i],
+					   &lineNumber,
+					   &dw_err);
 
-	      int lineSrcFileStatus = dwarf_linesrc (lineEntries[i],
-						     &lineSourceFile,
-						     NULL);
+              if (lineNoStatus != DW_DLV_OK)
+                 mpiPi_msg_debug("Failed to get line number : %s\n", dwarf_errmsg(dw_err));
+
+	      lineAddrStatus = dwarf_lineaddr (lineEntries[i],
+						&lineAddress,
+						&dw_err);
+
+              if (lineAddrStatus != DW_DLV_OK)
+                 mpiPi_msg_debug("Failed to get line address : %s\n", dwarf_errmsg(dw_err));
+
+	      lineSrcFileStatus = dwarf_linesrc (lineEntries[i],
+						 &lineSourceFile,
+						 &dw_err);
+
+              if (lineSrcFileStatus != DW_DLV_OK)
+                 mpiPi_msg_debug("Failed to get source file status : %s\n", dwarf_errmsg(dw_err));
 
 	      if ((lineNoStatus == DW_DLV_OK) &&
 		  (lineAddrStatus == DW_DLV_OK)
@@ -948,7 +971,7 @@ open_dwarf_executable (char *fileName)
 		      int nextLineAddrStatus =
 			dwarf_lineaddr (lineEntries[i + 1],
 					&nextLineAddress,
-					NULL);
+					&dw_err);
 		      assert (nextLineAddrStatus == DW_DLV_OK);
 		      if (nextLineAddress != lineAddress)
 			{
@@ -1000,14 +1023,16 @@ open_dwarf_executable (char *fileName)
        * a hierarchy.  However, we presume that the function entries are
        * all children of the compilation unit DIE.
        */
-      dwStatus = dwarf_tag (currCompileUnitDIE, &currDIETag, NULL);
+      dwStatus = dwarf_tag (currCompileUnitDIE, &currDIETag, &dw_err);
       assert ((dwStatus == DW_DLV_OK) && (currDIETag == DW_TAG_compile_unit));
 
       /* access the first child DIE of the compile unit DIE */
-      dwStatus = dwarf_child (currCompileUnitDIE, &currChildDIE, NULL);
+      dwStatus = dwarf_child (currCompileUnitDIE, &currChildDIE, &dw_err);
       if (dwStatus == DW_DLV_NO_ENTRY)
 	{
-	  mpiPi_abort ("no child DIEs of compile unit DIE\n");
+          // On some Cray systems, executables are linked with assembly compile units
+          // with no functions.
+          // mpiPi_abort ("no child DIEs of compile unit DIE\n");
 	}
       else if (dwStatus != DW_DLV_OK)
 	{
@@ -1018,7 +1043,7 @@ open_dwarf_executable (char *fileName)
       while (dwStatus == DW_DLV_OK)
 	{
 	  /* determine the type of the child DIE */
-	  dwStatus = dwarf_tag (currChildDIE, &currDIETag, NULL);
+	  dwStatus = dwarf_tag (currChildDIE, &currDIETag, &dw_err);
 	  if (dwStatus == DW_DLV_OK)
 	    {
 	      if ((currDIETag == DW_TAG_subprogram) ||
@@ -1029,13 +1054,13 @@ open_dwarf_executable (char *fileName)
 	    }
 	  else
 	    {
-	      mpiPi_abort ("unable to determine tag of current child DIE\n");
+	      mpiPi_abort ("unable to determine tag of current child DIE : %s \n", dwarf_errmsg(dw_err));
 	    }
 
 	  /* advance to the next child DIE */
 	  oldChildDIE = currChildDIE;
 	  dwStatus = dwarf_siblingof (dwHandle,
-				      currChildDIE, &nextChildDIE, NULL);
+				      currChildDIE, &nextChildDIE, &dw_err);
 	  if (dwStatus == DW_DLV_OK)
 	    {
 	      currChildDIE = nextChildDIE;
@@ -1044,12 +1069,12 @@ open_dwarf_executable (char *fileName)
 	  else if (dwStatus != DW_DLV_NO_ENTRY)
 	    {
 	      mpiPi_abort
-		("unable to access next child DIE of current compilation unit\n");
+		("unable to access next child DIE of current compilation unit : %s\n", dwarf_errmsg(dw_err));
 	    }
 
 	  if (oldChildDIE != NULL)
 	    {
-	      dwarf_dealloc (dwHandle, oldChildDIE, NULL);
+	      dwarf_dealloc (dwHandle, oldChildDIE, DW_DLA_DIE);
 	    }
 	}
 
@@ -1078,20 +1103,16 @@ close_dwarf_executable (void)
 
   assert (dwHandle != NULL);
   assert (dwFd != -1);
-  dwStatus = dwarf_get_elf (dwHandle, &elfHandle, NULL);
-  if (dwStatus == DW_DLV_OK)
-    {
-      elf_end (elfHandle);
-    }
-  else
-    {
-      mpiPi_msg_debug ("dwarf_get_elf failed; ignoring\n");
-    }
-
-  dwStatus = dwarf_finish (dwHandle, NULL);
+  dwStatus = dwarf_get_elf (dwHandle, &elfHandle, &dw_err);
   if (dwStatus != DW_DLV_OK)
     {
-      mpiPi_msg_debug ("dwarf_finish failed; ignoring\n");
+      mpiPi_msg_debug ("dwarf_get_elf failed; ignoring : %s\n", dwarf_errmsg(dw_err));
+    }
+
+  dwStatus = dwarf_finish (dwHandle, &dw_err);
+  if (dwStatus != DW_DLV_OK)
+    {
+      mpiPi_msg_debug ("dwarf_finish failed; ignoring : %s\n", dwarf_errmsg(dw_err));
     }
   dwHandle = NULL;
 
@@ -1118,7 +1139,7 @@ mpiP_find_src_loc (void *i_addr_hex,
   assert (o_funct_str != NULL);
 
   *o_file_str = NULL;
-  *o_lineno = NULL;
+  *o_lineno = 0;
   *o_funct_str = NULL;
 
   /* determine if we have source line info for this address */
