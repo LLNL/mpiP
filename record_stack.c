@@ -43,6 +43,11 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   unw_cursor_t cursor;
   unw_word_t pc;
 
+  assert(pc_array != NULL);
+
+  //  If we are unable to get a stack trace, ensure that the first frame PC is NULL
+  pc_array[0] = NULL;
+
   if (mpiPi.inAPIrtb)		/*  API unwinds fewer frames  */
     parent_frame_start = 1;
   else
@@ -63,14 +68,14 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
     {
       for (i = 0; i < parent_frame_start; i++)
 	{
-	  if (unw_step (&cursor))
+	  if (unw_step (&cursor) < 1)
 	    mpiPi_msg_debug
 	      ("unw_step failed to step into mpiPi caller frame.\n");
 	}
 
       for (i = 0, valid_cursor = 1; i < max_back; i++)
 	{
-	  if (valid_cursor && unw_step (&cursor) > 0)
+	  if (valid_cursor && unw_step (&cursor) >= 0)
 	    {
 	      frame_count++;
 	      if (unw_get_reg (&cursor, UNW_REG_IP, &pc) != UNW_ESUCCESS)
