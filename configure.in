@@ -605,7 +605,12 @@ if test -n "$F77" -a "$F77" != no ; then
   echo "      subroutine f_fun()" > ffunc.f
   echo "      return" >> ffunc.f
   echo "      end" >> ffunc.f
-  $F77 $FFLAGS -c ffunc.f 1>/dev/null 2>/dev/null
+  if ! $F77 $FFLAGS -c ffunc.f 1>/dev/null 2>/dev/null ; then
+    AC_MSG_RESULT(Failed to compile fortran test object. Example error follows:)
+    F77_OBJ_OUT=`$F77 $FFLAGS -c ffunc.f 2>&1`
+    AC_MSG_NOTICE($F77_OBJ_OUT)
+    AC_MSG_ERROR([giving up])
+  fi
   echo "main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     AC_MSG_RESULT(same as C)
@@ -626,8 +631,10 @@ if test -n "$F77" -a "$F77" != no ; then
     AC_MSG_RESULT(uppercase with 2 underscores)
     F77_SYMBOLS=SYMBOL__
   else
-    AC_MSG_RESULT(giving up)
-    AC_MSG_ERROR(could not determine F77 symbol names)
+    AC_MSG_RESULT(could not determine F77 symbol names. Example error follows:)
+    CC_F77_SYM_OUT=`$CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 2>&1`
+    AC_MSG_NOTICE($CC_F77_SYM_OUT)
+    AC_MSG_ERROR([giving up])
   fi
   /bin/rm -f ffunc.f ffunc.o flink flink.c flink.o ffunc
 else
