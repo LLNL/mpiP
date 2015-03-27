@@ -16,9 +16,9 @@
 #  and compiler.
 
 
-MPIP_LIB_DIR=/home/chcham/workspace/mpiP
+MPIP_DIR=/home/chcham/workspace/mpiP
 
-export LD_PRELOAD=${MPIP_LIB_DIR}/libmpiP.so
+export LD_PRELOAD=/usr/lib/libbfd.so:/usr/lib/libunwind.so:/lib/i386-linux-gnu/libz.so.1:${MPIP_DIR}/lib/libmpiP.so
 
 mpirun "$@"
 
