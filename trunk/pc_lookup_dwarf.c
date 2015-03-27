@@ -906,7 +906,7 @@ open_dwarf_executable (char *fileName)
        * unit, if available 
        */
       dwStatus = dwarf_srclines (currCompileUnitDIE,
-				 &lineEntries, &nLineEntries, NULL);
+				 &lineEntries, &nLineEntries, &dw_err);
       if (dwStatus == DW_DLV_OK)
 	{
 	  unsigned int i;
@@ -1014,7 +1014,7 @@ open_dwarf_executable (char *fileName)
 	}
       else
 	{
-	  mpiPi_abort ("failed to obtain line info for the current DIE\n");
+	  mpiPi_abort ("failed to obtain line info for the current DIE : %s\n", dwarf_errmsg(dw_err));
 	}
 
       /* discover function information for the current compilation unit */
