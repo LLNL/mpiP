@@ -231,6 +231,10 @@ ifeq ($(USE_SETJMP), yes)
   MAKE_WRAPPERS_ARGS += --usesetjmp
 endif
 
+#  Since mpiP needs to build wrappers and other files before building,
+#  parallel builds tend to fail.
+.NOTPARALLEL:
+
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
