@@ -33,6 +33,9 @@
 /* Define if MPI RMA functions are present */
 #undef HAVE_MPI_RMA
 
+/* Define if MPI non-blocking collectives functions are present */
+#undef HAVE_MPI_NONBLOCKINGCOLLECTIVES
+
 /* Define if bfd_boolean not defined */
 #undef HAVE_BFD_BOOLEAN
 

@@ -35,6 +35,7 @@ CSRCS =	0-simple.c \
 	12-null-null.c \
 	13-pcontrol-report.c \
 	15-pcontrol.c \
+	18-coll-non-block.c \
 	timer-info.c
 
 ifeq (${include_mpi_io_tests},yes)
