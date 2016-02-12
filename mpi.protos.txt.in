@@ -195,6 +195,7 @@ int MPI_Group_translate_ranks ( MPI_Group group_a, int n, mpip_const_int_t *rank
 int MPI_Group_union ( MPI_Group group1, MPI_Group group2, MPI_Group *group_out )
 
 @MPI_Fint MPI_Handle2int ( MPI_Handle_type c_handle, MPI_Handle_enum handle_kind )
+
 int MPI_Ibsend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
 @MPI_Fint MPI_Info_c2f ( MPI_Info info )
@@ -428,4 +429,5 @@ int MPI_Waitsome ( int incount, MPI_Request *array_of_requests, int *count, int 
 
 @HAVE_MPI_IO@
 @HAVE_MPI_RMA@
+@HAVE_MPI_NONBLOCKINGCOLLECTIVES@
 

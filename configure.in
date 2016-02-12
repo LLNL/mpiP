@@ -201,6 +201,17 @@ AC_ARG_ENABLE(mpi-rma,
 	,
 )
 AC_SUBST(ENABLE_MPI_RMA)
+
+ENABLE_MPI_NONBLOCKINGCOLLECTIVES=yes
+AC_ARG_ENABLE(mpi-nbc,
+	AS_HELP_STRING(--disable-mpi-nbc,[Disable MPI NONBLOCKINGCOLLECTIVES reporting.]),
+	if test x"$enableval" = xno ; then
+		ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
+		echo Profiling of MPI NONBLOCKINGCOLLECTIVES has been disabled.
+	fi
+	,
+)
+AC_SUBST(ENABLE_MPI_NONBLOCKINGCOLLECTIVES)
 fi
 
 ENABLE_BFD=yes
@@ -536,6 +547,17 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_NONBLOCKINGCOLLECTIVES" = xyes ; then
+AC_CHECK_FUNC(MPI_Ibarrier,
+              AC_DEFINE(HAVE_MPI_NONBLOCKINGCOLLECTIVES) HAVE_MPI_NONBLOCKINGCOLLECTIVES=mpi.nbc.protos.txt,
+                AC_MSG_RESULT([MPI NONBLOCKINGCOLLECTIVES symbols not found.  MPI NONBLOCKINGCOLLECTIVES reporting deactivated.])
+                HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
+                ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
+)
+else
+  HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
+fi
+
 if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
@@ -721,6 +743,7 @@ AC_SUBST(USE_BACKTRACE)
 AC_SUBST(USE_SETJMP)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(HAVE_MPI_RMA)
+AC_SUBST_FILE(HAVE_MPI_NONBLOCKINGCOLLECTIVES)
 AC_SUBST_FILE(FORTRAN_GETARG)
 
 if test "x${slibdir}" = x ; then
@@ -748,4 +771,5 @@ echo "  Address to Source Lookup : ${SOURCE_LOOKUP}"
 echo
 echo "  MPI-I/O support          : ${ENABLE_MPI_IO}"
 echo "  MPI-RMA support          : ${ENABLE_MPI_RMA}"
+echo "  MPI-NBC support          : ${ENABLE_MPI_NONBLOCKINGCOLLECTIVES}"
 echo "********************************************************************************"

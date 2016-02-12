@@ -47,10 +47,37 @@ messParamDict = {
     ( "MPI_Gather", "sendtype"):2,
     ( "MPI_Gatherv", "sendcnt"):1,
     ( "MPI_Gatherv", "sendtype"):2,
+    ( "MPI_Ialltoall", "sendcount"):1,
+    ( "MPI_Ialltoall", "sendtype"):2,
+    ( "MPI_Ialltoallv", "sendtype"):2,
+    ( "MPI_Iallgather", "sendcount"):1,
+    ( "MPI_Iallgather", "sendtype"):2,
+    ( "MPI_Iallgatherv", "sendcount"):1,
+    ( "MPI_Iallgatherv", "sendtype"):2,
+    ( "MPI_Iallreduce", "count"):1,
+    ( "MPI_Iallreduce", "datatype"):2,
+    ( "MPI_Ibcast", "count"):1,
+    ( "MPI_Ibcast", "datatype"):2,
+    ( "MPI_Iexscan", "count"):1,
+    ( "MPI_Iexscan", "datatype"):2,
+    ( "MPI_Igather", "sendcount"):1,
+    ( "MPI_Igather", "sendtype"):2,
+    ( "MPI_Igatherv", "sendcount"):1,
+    ( "MPI_Igatherv", "sendtype"):2,
+    ( "MPI_Ireduce", "count"):1,
+    ( "MPI_Ireduce", "datatype"):2,
+    ( "MPI_Ireduce_scatter_block", "recvcount"):1,
+    ( "MPI_Ireduce_scatter_block", "datatype"):2,
+    ( "MPI_Ireduce_scatter", "datatype"):2,
     ( "MPI_Ibsend", "count"):1,
     ( "MPI_Ibsend", "datatype"):2,
     ( "MPI_Irsend", "count"):1,
     ( "MPI_Irsend", "datatype"):2,
+    ( "MPI_Iscan", "count"):1,
+    ( "MPI_Iscan", "datatype"):2,
+    ( "MPI_Iscatter", "sendcount"):1,
+    ( "MPI_Iscatter", "sendtype"):2,
+    ( "MPI_Iscatterv", "sendtype"):2,
     ( "MPI_Isend", "count"):1,
     ( "MPI_Isend", "datatype"):2,
     ( "MPI_Issend", "count"):1,
@@ -72,6 +99,21 @@ messParamDict = {
     ( "MPI_Ssend", "count"):1,
     ( "MPI_Ssend", "datatype"):2
     }
+
+
+vectorsendParamDict = {
+
+    ( "MPI_Ialltoallv", "sendcounts"):1,
+    ( "MPI_Ialltoallw", "sendcounts"):1,
+    ( "MPI_Ireduce_scatter", "recvcounts"):1,
+    ( "MPI_Iscatterv", "sendcounts"):1,
+    }
+
+vectortypeParamDict = {
+
+    ( "MPI_Ialltoallw", "sendtypes"):2
+    }
+
 
 ioParamDict = {
 
@@ -214,6 +256,33 @@ opaqueInArgDict = {
   ("MPI_Group_translate_ranks", "group_b"):"MPI_Group",
   ("MPI_Group_union", "group1"):"MPI_Group",
   ("MPI_Group_union", "group2"):"MPI_Group",
+  ("MPI_Iallgather", "sendtype"):"MPI_Datatype",
+  ("MPI_Iallgather", "recvtype"):"MPI_Datatype",
+  ("MPI_Iallgather", "comm"):"MPI_Comm",
+  ("MPI_Iallreduce", "datatype"):"MPI_Datatype",
+  ("MPI_Iallreduce", "op"):"MPI_Op",
+  ("MPI_Iallreduce", "comm"):"MPI_Comm",
+  ("MPI_Ialltoall", "sendtype"):"MPI_Datatype",
+  ("MPI_Ialltoall", "recvtype"):"MPI_Datatype",
+  ("MPI_Ialltoall", "comm"):"MPI_Comm",
+  ("MPI_Ialltoallv", "sendtype"):"MPI_Datatype",
+  ("MPI_Ialltoallv", "recvtype"):"MPI_Datatype",
+  ("MPI_Ialltoallv", "comm"):"MPI_Comm",
+  ("MPI_Ialltoallw", "sendtype"):"MPI_Datatype",
+  ("MPI_Ialltoallw", "recvtype"):"MPI_Datatype",
+  ("MPI_Ialltoallw", "comm"):"MPI_Comm",
+  ("MPI_Ibarrier", "comm"):"MPI_Comm",
+  ("MPI_Ibcast", "datatype"):"MPI_Datatype",
+  ("MPI_Ibcast", "comm"):"MPI_Comm",
+  ("MPI_Iexscan", "datatype"):"MPI_Datatype",
+  ("MPI_Iexscan", "op"):"MPI_Op",
+  ("MPI_Iexscan", "comm"):"MPI_Comm",
+  ("MPI_Igather", "sendtype"):"MPI_Datatype",
+  ("MPI_Igather", "recvtype"):"MPI_Datatype",
+  ("MPI_Igather", "comm"):"MPI_Comm",
+  ("MPI_Igatherv", "sendtype"):"MPI_Datatype",
+  ("MPI_Igatherv", "recvtype"):"MPI_Datatype",
+  ("MPI_Igatherv", "comm"):"MPI_Comm",
   ("MPI_Ibsend", "comm"):"MPI_Comm",
   ("MPI_Ibsend", "datatype"):"MPI_Datatype",
   ("MPI_Intercomm_create", "local_comm"):"MPI_Comm",
@@ -222,8 +291,26 @@ opaqueInArgDict = {
   ("MPI_Iprobe", "comm"):"MPI_Comm",
   ("MPI_Irecv", "comm"):"MPI_Comm",
   ("MPI_Irecv", "datatype"):"MPI_Datatype",
+  ("MPI_Ireduce", "datatype"):"MPI_Datatype",
+  ("MPI_Ireduce", "op"):"MPI_Op",
+  ("MPI_Ireduce", "comm"):"MPI_Comm",
+  ("MPI_Ireduce_scatter_block", "datatype"):"MPI_Datatype",
+  ("MPI_Ireduce_scatter_block", "op"):"MPI_Op",
+  ("MPI_Ireduce_scatter_block", "comm"):"MPI_Comm",
+  ("MPI_Ireduce_scatter", "datatype"):"MPI_Datatype",
+  ("MPI_Ireduce_scatter", "op"):"MPI_Op",
+  ("MPI_Ireduce_scatter", "comm"):"MPI_Comm",
   ("MPI_Irsend", "comm"):"MPI_Comm",
   ("MPI_Irsend", "datatype"):"MPI_Datatype",
+  ("MPI_Iscan", "datatype"):"MPI_Datatype",
+  ("MPI_Iscan", "op"):"MPI_Op",
+  ("MPI_Iscan", "comm"):"MPI_Comm",
+  ("MPI_Iscatter", "sendtype"):"MPI_Datatype",
+  ("MPI_Iscatter", "recvtype"):"MPI_Datatype",
+  ("MPI_Iscatter", "comm"):"MPI_Comm",
+  ("MPI_Iscatterv", "sendtype"):"MPI_Datatype",
+  ("MPI_Iscatterv", "recvtype"):"MPI_Datatype",
+  ("MPI_Iscatterv", "comm"):"MPI_Comm",
   ("MPI_Isend", "comm"):"MPI_Comm",
   ("MPI_Isend", "datatype"):"MPI_Datatype",
   ("MPI_Issend", "comm"):"MPI_Comm",
@@ -340,6 +427,22 @@ opaqueOutArgDict = {
   ("MPI_Group_range_excl", "newgroup"):"MPI_Group",
   ("MPI_Group_range_incl", "newgroup"):"MPI_Group",
   ("MPI_Group_union", "group_out"):"MPI_Group",
+  ("MPI_Iallgather", "request"):"MPI_Request",
+  ("MPI_Iallreduce", "request"):"MPI_Request",
+  ("MPI_Ialltoall", "request"):"MPI_Request",
+  ("MPI_Ialltoallv", "request"):"MPI_Request",
+  ("MPI_Ialltoallw", "request"):"MPI_Request",
+  ("MPI_Ibarrier", "request"):"MPI_Request",
+  ("MPI_Ibcast", "request"):"MPI_Request",
+  ("MPI_Iexscan", "request"):"MPI_Request",
+  ("MPI_Igather", "request"):"MPI_Request",
+  ("MPI_Igatherv", "request"):"MPI_Request",
+  ("MPI_Ireduce", "request"):"MPI_Request",
+  ("MPI_Ireduce_scatter_block", "request"):"MPI_Request",
+  ("MPI_Ireduce_scatter", "request"):"MPI_Request",
+  ("MPI_Iscan", "request"):"MPI_Request",
+  ("MPI_Iscatter", "request"):"MPI_Request",
+  ("MPI_Iscatterv", "request"):"MPI_Request",
   ("MPI_Ibsend", "request"):"MPI_Request",
   ("MPI_Intercomm_create", "comm_out"):"MPI_Comm",
   ("MPI_Intercomm_merge", "comm_out"):"MPI_Comm",
@@ -396,6 +499,23 @@ collectiveList = [
   "MPI_Bcast", 
   "MPI_Gather", 
   "MPI_Gatherv", 
+  "MPI_Iallgather", 
+  "MPI_Iallgatherv", 
+  "MPI_Iallreduce", 
+  "MPI_Ialltoall", 
+  "MPI_Ialltoallv", 
+  "MPI_Ialltoallw", 
+  "MPI_Ibcast", 
+  "MPI_Ibarrier", 
+  "MPI_Iexscan",
+  "MPI_Igather",
+  "MPI_Igatherv",
+  "MPI_Ireduce",
+  "MPI_Ireduce_scatter_block",
+  "MPI_Ireduce_scatter",
+  "MPI_Iscan",
+  "MPI_Iscatter",
+  "MPI_Iscatterv",
   "MPI_Reduce", 
   "MPI_Reduce_scatter", 
   "MPI_Scatter", 
@@ -442,6 +562,8 @@ class fdecl:
 	self.extrafieldsList = []
         self.sendCountPname = ""
         self.sendTypePname = ""
+        self.vectorCountPname = ""
+        self.vectorTypePname = ""
         self.recvCountPname = ""
         self.recvTypePname = ""
         self.ioCountPname = ""
@@ -573,6 +695,18 @@ def ParamDictUpdate(fname):
                 fdict[fname].recvCountPname = pname
             elif paramMessType == 4:
                 fdict[fname].recvTypePname = pname                
+            
+        #  Identify and assign vector message size parameters
+        if vectorsendParamDict.has_key((fname,pname)):
+            paramMessType = vectorsendParamDict[(fname,pname)]
+            if paramMessType == 1:
+                fdict[fname].vectorCountPname = pname
+            
+        #  Identify and assign vector message datatype parameters
+        if vectortypeParamDict.has_key((fname,pname)):
+            paramMessType = vectortypeParamDict[(fname,pname)]
+            if paramMessType == 2:
+                fdict[fname].vectorTypePname = pname
             
         #  Identify and assign io size parameters
         if ioParamDict.has_key((fname,pname)):
@@ -894,6 +1028,7 @@ def CreateWrapper(funct, olist):
 		 + "mpiPi_GETTIME (&end);\n" 
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
 
+    #  Calculate message size based on count and datatype arguments
     if fdict[funct].sendCountPname != "":
         olist.append( "\n" 
                       + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { " 
@@ -904,6 +1039,40 @@ def CreateWrapper(funct, olist):
                       + "else { mpiPi_msg_warn(\"MPI_DATATYPE_NULL encountered.  MPI_IN_PLACE not supported.\\n\");\n"
                       + "mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n")
                   
+    #  Calculate message size based on array count and datatype arguments
+    if fdict[funct].vectorCountPname != "":
+      #  Has array of datatypes, as in Ialltoallw
+      if fdict[funct].vectorTypePname != "":
+        olist.append( "\n" 
+                      + "  int loc_comm_size, i;\n"
+                      + "  int loc_sent = 0;\n\n"
+                      + "  PMPI_Comm_size(*comm, &loc_comm_size);\n\n"
+                      + "  for ( i = 0; i<loc_comm_size; i++) { \n" 
+                      + "    if ( " + fdict[funct].vectorTypePname + "[i] != MPI_DATATYPE_NULL ) { \n" 
+                      + "      PMPI_Type_size(" + fdict[funct].vectorTypePname + "[i], &tsize);\n" 
+                      + "      loc_sent = " + fdict[funct].vectorCountPname + "[i];\n"
+                      + "      messSize += (double)(tsize * loc_sent);\n"
+                      + "    }\n"
+                      + "    else { mpiPi_msg_warn(\"MPI_DATATYPE_NULL encountered.  MPI_IN_PLACE not supported.\\n\");\n"
+                      + "     mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n"
+                      +  "}\n"
+                      )
+
+      #  Scalar datatype handling
+      elif ( fdict[funct].sendTypePname != "" ) :
+        olist.append( "\n" 
+                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { \n" 
+                      + "  int loc_comm_size, i;\n"
+                      + "  int loc_sent = 0;\n\n"
+                      + "  PMPI_Comm_size(*comm, &loc_comm_size);\n"
+                      + "  PMPI_Type_size(*" + fdict[funct].sendTypePname + ", &tsize);\n" 
+                      + "  for ( i = 0; i<loc_comm_size; i++) \n" 
+                      + "    loc_sent += " + fdict[funct].vectorCountPname + "[i];\n"
+                      + "  messSize = (double)(tsize * loc_sent);\n"
+                      +  "}\n"
+                      + "else { mpiPi_msg_warn(\"MPI_DATATYPE_NULL encountered.  MPI_IN_PLACE not supported.\\n\");\n"
+                      + "mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n")
+
     if fdict[funct].ioCountPname != "":
         olist.append( "\n" 
                       + "PMPI_Type_size(*" + fdict[funct].ioTypePname + ", " 
