@@ -664,6 +664,7 @@ USE_LIBDWARF
 STACKDEPTH
 ENABLE_FORTRAN_WEAK_SYMS
 ENABLE_FORTRAN_XLATE
+ENABLE_MPI_NONBLOCKINGCOLLECTIVES
 ENABLE_MPI_RMA
 ENABLE_MPI_IO
 BIN_TYPE_FLAG
@@ -724,7 +725,8 @@ PATH_SEPARATOR
 SHELL'
 ac_subst_files='FORTRAN_GETARG
 HAVE_MPI_IO
-HAVE_MPI_RMA'
+HAVE_MPI_RMA
+HAVE_MPI_NONBLOCKINGCOLLECTIVES'
 ac_user_opts='
 enable_option_checking
 with_cc
@@ -746,6 +748,7 @@ with_dclock
 enable_api_only
 enable_mpi_io
 enable_mpi_rma
+enable_mpi_nbc
 enable_bfd
 enable_libunwind
 enable_so_lookup
@@ -1388,6 +1391,7 @@ Optional Features:
   --enable-api-only       Only build the API library.
   --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-mpi-rma       Disable MPI RMA reporting.
+  --disable-mpi-nbc       Disable MPI NONBLOCKINGCOLLECTIVES reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-so-lookup     Disable functionality to attempt to find source info
@@ -2787,6 +2791,18 @@ if test "${enable_mpi_rma+set}" = set; then :
   enableval=$enable_mpi_rma; if test x"$enableval" = xno ; then
 		ENABLE_MPI_RMA=no
 		echo Profiling of MPI RMA has been disabled.
+	fi
+
+fi
+
+
+
+ENABLE_MPI_NONBLOCKINGCOLLECTIVES=yes
+# Check whether --enable-mpi-nbc was given.
+if test "${enable_mpi_nbc+set}" = set; then :
+  enableval=$enable_mpi_nbc; if test x"$enableval" = xno ; then
+		ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
+		echo Profiling of MPI NONBLOCKINGCOLLECTIVES has been disabled.
 	fi
 
 fi
@@ -5425,6 +5441,23 @@ else
   HAVE_MPI_RMA=/dev/null
 fi
 
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_NONBLOCKINGCOLLECTIVES" = xyes ; then
+ac_fn_c_check_func "$LINENO" "MPI_Ibarrier" "ac_cv_func_MPI_Ibarrier"
+if test "x$ac_cv_func_MPI_Ibarrier" = xyes; then :
+  $as_echo "#define HAVE_MPI_NONBLOCKINGCOLLECTIVES 1" >>confdefs.h
+ HAVE_MPI_NONBLOCKINGCOLLECTIVES=mpi.nbc.protos.txt
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI NONBLOCKINGCOLLECTIVES symbols not found.  MPI NONBLOCKINGCOLLECTIVES reporting deactivated." >&5
+$as_echo "MPI NONBLOCKINGCOLLECTIVES symbols not found.  MPI NONBLOCKINGCOLLECTIVES reporting deactivated." >&6; }
+                HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
+                ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
+
+fi
+
+else
+  HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
+fi
+
 if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
@@ -5887,6 +5920,7 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 ENABLE_BFD=$ENABLE_BFD
+
 
 
 
@@ -7164,4 +7198,5 @@ echo "  Address to Source Lookup : ${SOURCE_LOOKUP}"
 echo
 echo "  MPI-I/O support          : ${ENABLE_MPI_IO}"
 echo "  MPI-RMA support          : ${ENABLE_MPI_RMA}"
+echo "  MPI-NBC support          : ${ENABLE_MPI_NONBLOCKINGCOLLECTIVES}"
 echo "********************************************************************************"
