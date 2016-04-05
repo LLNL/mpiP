@@ -38,9 +38,9 @@ int MPI_Win_create_dynamic ( MPI_Info info, MPI_Comm comm, MPI_Win *win )
 
 int MPI_Get_accumulate ( mpip_const_void_t *origin_addr, int origin_count, MPI_Datatype origin_datatype, void *result_addr, int result_count, MPI_Datatype result_datatype, int target_rank, MPI_Aint target_disp, int target_count, MPI_Datatype target_datatype, MPI_Op op, MPI_Win win )
 
-int MPI_Fetch_and_op ( mpip_const_void_t *origin_addr, void *result_addr, MPI_Datatype target_datatype, int target_rank, MPI_Aint target_disp, MPI_Op op, MPI_Win win )
+int MPI_Fetch_and_op ( mpip_const_void_t *origin_addr, void *result_addr, MPI_Datatype datatype, int target_rank, MPI_Aint target_disp, MPI_Op op, MPI_Win win )
 
-int MPI_Compare_and_swap ( mpip_const_void_t *origin_addr, mpip_const_void_t *compare_addr, void *result_addr, MPI_Datatype target_datatype, int target_rank, MPI_Aint target_disp, MPI_Win win )
+int MPI_Compare_and_swap ( mpip_const_void_t *origin_addr, mpip_const_void_t *compare_addr, void *result_addr, MPI_Datatype datatype, int target_rank, MPI_Aint target_disp, MPI_Win win )
 
 int MPI_Rput ( mpip_const_void_t *origin_addr, int origin_count, MPI_Datatype origin_datatype, int target_rank, MPI_Aint target_disp, int target_count, MPI_Datatype target_datatype, MPI_Win win, MPI_Request *request )
 
