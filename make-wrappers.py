@@ -135,20 +135,22 @@ rmaParamDict = {
 
     ( "MPI_Accumulate", "target_count"):1,
     ( "MPI_Accumulate", "target_datatype"):2,
-    ( "MPI_Get", "origin_count"):1,
+    ( "MPI_Compare_and_swap", "target_datatype"):2,
+    ( "MPI_Fetch_and_op", "target_datatype"):2,
+    ( "MPI_Get", "origin_count"):2,
     ( "MPI_Get", "origin_datatype"):2,
-    ( "MPI_Put", "origin_count"):1,
-    ( "MPI_Put", "origin_datatype"):2
     ( "MPI_Get_accumulate", "target_count"):1,
     ( "MPI_Get_accumulate", "target_datatype"):2,
+    ( "MPI_Put", "origin_count"):1,
+    ( "MPI_Put", "origin_datatype"):2,
     ( "MPI_Raccumulate", "target_count"):1,
     ( "MPI_Raccumulate", "target_datatype"):2,
     ( "MPI_Rget", "origin_count"):1,
     ( "MPI_Rget", "origin_datatype"):2,
     ( "MPI_Rput", "origin_count"):1,
-    ( "MPI_Rput", "origin_datatype"):2
+    ( "MPI_Rput", "origin_datatype"):2,
     ( "MPI_Rget_accumulate", "target_count"):1,
-    ( "MPI_Rget_accumulate", "target_datatype"):2,
+    ( "MPI_Rget_accumulate", "target_datatype"):2
     }
 
 noDefineList = [
@@ -209,8 +211,13 @@ opaqueInArgDict = {
   ("MPI_Comm_size", "comm"):"MPI_Comm",
   ("MPI_Comm_split", "comm"):"MPI_Comm",
   ("MPI_Comm_test_inter", "comm"):"MPI_Comm",
+  ("MPI_Compare_and_swap", "datatype"):"MPI_Datatype",
+  ("MPI_Compare_and_swap", "win"):"MPI_Win",
   ("MPI_Errhandler_get", "comm"):"MPI_Comm",
   ("MPI_Errhandler_set", "comm"):"MPI_Comm",
+  ("MPI_Fetch_and_op", "datatype"):"MPI_Datatype",
+  ("MPI_Fetch_and_op", "op"):"MPI_Op",
+  ("MPI_Fetch_and_op", "win"):"MPI_Win",
   ("MPI_File_close", "fh"):"MPI_File",
   ("MPI_File_open", "comm"):"MPI_Comm",
   ("MPI_File_open", "info"):"MPI_Info",
