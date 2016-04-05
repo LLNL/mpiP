@@ -139,6 +139,16 @@ rmaParamDict = {
     ( "MPI_Get", "origin_datatype"):2,
     ( "MPI_Put", "origin_count"):1,
     ( "MPI_Put", "origin_datatype"):2
+    ( "MPI_Get_accumulate", "target_count"):1,
+    ( "MPI_Get_accumulate", "target_datatype"):2,
+    ( "MPI_Raccumulate", "target_count"):1,
+    ( "MPI_Raccumulate", "target_datatype"):2,
+    ( "MPI_Rget", "origin_count"):1,
+    ( "MPI_Rget", "origin_datatype"):2,
+    ( "MPI_Rput", "origin_count"):1,
+    ( "MPI_Rput", "origin_datatype"):2
+    ( "MPI_Rget_accumulate", "target_count"):1,
+    ( "MPI_Rget_accumulate", "target_datatype"):2,
     }
 
 noDefineList = [
