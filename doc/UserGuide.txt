@@ -1,12 +1,7 @@
-
                   mpiP: Lightweight, Scalable MPI Profiling
 
                                 Version 3.4.1
                                  13 March 2014
-                               Jeffrey Vetter
-                       jsvetter@users.sourceforge.net
-                               Chris Chambreau
-                        chcham@users.sourceforge.net
    _______________________________________________________________________
 
 Contents
@@ -55,30 +50,25 @@ Introduction
    to 262144 processes, including a 262144-process run on the LLNL Sequoia
    BG/Q system.
 
-   Please send your comments, questions, and ideas for enhancements to
-   mpip-help@googlegroups.com. To receive mail regarding new mpiP
-   releases, please subscribe to mpip-announce@lists.sourceforge.net (send
-   e-mail with body "subscribe" to
-   mpip-announce-request@lists.sourceforge.net). Please also consider
-   subscribing to mpip-users@lists.sourceforge.net to contribute and
-   receive mpiP use and status information.
-
-   To learn more about performance analysis with mpiP, see Vetter, J.S.
-   and M.O. McCracken, "Statistical Scalability Analysis of Communication
-   Operations in Distributed Applications," Proc. ACM SIGPLAN Symp. on
-   Principles and Practice of Parallel Programming (PPOPP), 2001.
+   The initial paper detailing performance analysis with mpiP: Vetter,
+   J.S. and M.O. McCracken, "Statistical Scalability Analysis of
+   Communication Operations in Distributed Applications," Proc. ACM
+   SIGPLAN Symp. on Principles and Practice of Parallel Programming
+   (PPOPP), 2001.
 
   Downloading
 
    You may download the current version of mpiP from
-   http://sourceforge.net/projects/mpip.
+   https://github.com/LLNL/mpiP/releases/latest.
 
   Contributing
 
    We are constantly improving mpiP. Bug fixes and ports to new platforms
    are always welcome. Many thanks to the following contributors
    (chronological order):
+     * Jeffrey Vetter (Oak Ridge National Laboratory)
      * Michael McCracken (UCSD)
+     * Chris Chambreau (Lawrence Livermore National Laboratory)
      * Curt Janssen (Sandia National Laboratories)
      * Mike Campbell (UIUC)
      * Jim Brandt (Sandia National Laboratories)
@@ -178,9 +168,6 @@ Using mpiP
 
 mpiP:
 mpiP: mpiP: mpiP V3.2.0 (Build Mar 10 2010/13:27:39)
-mpiP: Direct questions and errors to mpip-help@googlegroups.com
-mpiP:
-mpiP:
 mpiP: Storing mpiP output in [./1-hot-potato.exe.2.27872.1.mpiP].
 mpiP:
 
@@ -995,9 +982,6 @@ How to add MPI calls to profile
    advertising or product endorsement purposes.
 
      __________________________________________________________________
-
-   For further information please send mail to
-   mpip-help@googlegroups.com.
 
    Last modified on March 13th, 2014.
    UCRL-CODE-223450
