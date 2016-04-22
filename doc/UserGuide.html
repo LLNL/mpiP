@@ -1,9 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
-
-
-
 <style type="text/css">
 <!--
 body,p,h1,h2,h3,th,td,ol,ul,li {
@@ -29,7 +26,6 @@ font-family: "Courier New", Courier, mono;
 -->
 </style><title>mpiP: Lightweight, Scalable MPI Profiling</title></head><body>
 
-<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=178874&amp;type=2" alt="SourceForge.net Logo" border="0" height="37" width="125"></a>
 
 <h1 align="center"><a name="top">mpiP: Lightweight, Scalable MPI
 Profiling</a></h1>
@@ -37,16 +33,6 @@ Profiling</a></h1>
 <p align="center">Version 3.4.1<br>&nbsp; 13 March 2014 <br>
 
 <br>
-
-Jeffrey Vetter <br>
-
-<a href="mailto:jsvetter@users.sourceforge.net">jsvetter@users.sourceforge.net</a><br>
-
-<br>
-
-Chris Chambreau <br>
-
-<a href="mailto:chcham@users.sourceforge.net">chcham@users.sourceforge.net</a></p>
 
 <hr width="100%">
 <h2>Contents</h2>
@@ -126,23 +112,15 @@ from all of the tasks into one output file.  </p>
 2 to 262144 processes, including a 262144-process run on the LLNL
 Sequoia BG/Q system. </p>
 
-<p>Please send your comments, questions, and ideas for enhancements
-to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.
-To receive mail regarding new mpiP releases, please subscribe to
-mpip-announce@lists.sourceforge.net (send e-mail with body "subscribe"
-to <a href="mailto:mpip-announce-request@lists.sourceforge.net">mpip-announce-request@lists.sourceforge.net</a>).
-Please also consider subscribing to <a href="mailto:mpip-users-request@lists.sourceforge.net">mpip-users@lists.sourceforge.net</a>
-to contribute and receive mpiP use and status information.</p>
-
-<p> To learn more about performance analysis with mpiP, see Vetter, J.S. and
-M.O.  McCracken, "<a href="http://mpip.sourceforge.net/statistical-scalability-analysis-of.pdf">Statistical
+<p> The initial paper detailing performance analysis with mpiP: Vetter, J.S. and
+M.O.  McCracken, "<a href="http://llnl.github.io/mpiP/statistical-scalability-analysis-mpiP.pdf">Statistical
 Scalability Analysis of Communication Operations in Distributed
 Applications</a>," Proc. ACM SIGPLAN Symp. on Principles and Practice of
 Parallel Programming (PPOPP), 2001.  </p>
 
 <h3><a name="Downloading">Downloading</a></h3>
 
-<p>You may download the current version of mpiP from <a href="http://sourceforge.net/projects/mpip">http://sourceforge.net/projects/mpip</a>.</p>
+<p>You may download the current version of mpiP from <a href="https://github.com/LLNL/mpiP/releases/latest">https://github.com/LLNL/mpiP/releases/latest</a>.</p>
 
 <h3><a name="Contributing">Contributing</a></h3>
 
@@ -152,7 +130,11 @@ order):</p>
 
 <ul>
 
+  <li>Jeffrey Vetter (Oak Ridge National Laboratory)</li>
+
   <li>Michael McCracken (UCSD)</li>
+
+  <li>Chris Chambreau (Lawrence Livermore National Laboratory)</li>
 
   <li>Curt Janssen (Sandia National Laboratories)</li>
 
@@ -269,7 +251,7 @@ to include the '-g' option. This is important if you want mpiP to decode the PC
 to a source code filename and line number automatically. mpiP will work without
 <span class="commandline">-g</span>, but mileage may vary.</p>
 
-<p> To compile a simple program on an LLNL x86_64-linux system where libunwind 
+<p> To compile a simple program on an LLNL x86_64-linux system where libunwind
 is installed, add the following libraries to your link command:</p>
 
 <blockquote>
@@ -302,7 +284,7 @@ the header and trailer in standard out.</p>
 
 <blockquote>
   <p class="commandline">
-</p><pre>mpiP:<br>mpiP: mpiP: mpiP V3.2.0 (Build Mar 10 2010/13:27:39)<br>mpiP: Direct questions and errors to mpip-help@lists.sourceforge.net<br>mpiP:<br>mpiP:<br>mpiP: Storing mpiP output in [./1-hot-potato.exe.2.27872.1.mpiP].<br>mpiP:<br></pre>
+</p><pre>mpiP:<br>mpiP: mpiP: mpiP V3.2.0 (Build Mar 10 2010/13:27:39)<br>mpiP: Storing mpiP output in [./1-hot-potato.exe.2.27872.1.mpiP].<br>mpiP:<br></pre>
 <p></p>
 
 </blockquote>
@@ -338,11 +320,11 @@ was succesfully run and any requirements for that platform.</p>
 
     </tr>
 
-    
 
-    
 
-    
+
+
+
     <tr>
 
       <td>x86_64-Linux</td>
@@ -364,7 +346,7 @@ was succesfully run and any requirements for that platform.</p>
   </td>
     </tr>
 
-    
+
 
     <tr>
       <td>IBM BG/Q<br>
@@ -985,7 +967,7 @@ sweep-ops.exe -L/usr/local/tools/mpiP/lib
 
 <ul>
 
-  <li>If source lookup is failing during report generation, the script mpip-insert-src 
+  <li>If source lookup is failing during report generation, the script mpip-insert-src
   can be used from a login node to translate addresses in the mpiP report to source information.</li>
 
   <li>Source lookup for callsites may fail with certain versions of binutils.
@@ -2047,7 +2029,7 @@ All rights reserved. <br>
 <span style="">&nbsp;</span><br>
 
 This file is part of mpiP.<span style="">&nbsp; </span>For details, see
-http://mpip.sourceforge.net/. <br>
+http://llnl.github.io/mpiP. <br>
 
 <span style="">&nbsp;</span><br>
 
@@ -2168,8 +2150,6 @@ advertising or product endorsement purposes.<br>
 <p class="sectionreturn"><a href="UserGuide.html#top">Top</a></p>
 
 <hr>
-<p>For further information please send mail to <a href="mailto:mpip-help@lists.sourceforge.net">mpip-help@lists.sourceforge.net</a>.</p>
-
 <p class="pageinfo"> Last modified on March 13th, 2014.<br>
 
 UCRL-CODE-223450</p>
