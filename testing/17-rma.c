@@ -84,7 +84,7 @@ int main(int argc, char ** argv)
   if ( MPI_SUCCESS TEST_OP r ) printf("Rank %d failed MPI_Win_wait\n", rank);
 
   /*************************************************************************/
-  /* Second epoch: Tests Accumulate and Fence */
+  /* Second epoch: Tests Accumulate, Get_accumulate and Fence */
   /*************************************************************************/
   r = MPI_Win_fence(0, win);
   if ( MPI_SUCCESS TEST_OP r ) printf("Rank %d failed MPI_Win_fence\n", rank);
@@ -103,6 +103,20 @@ int main(int argc, char ** argv)
   r = MPI_Win_fence(0, win);
   if ( MPI_SUCCESS TEST_OP r ) printf("Rank %d failed MPI_Win_fence\n", rank);
 
+  if ( rank == 0 )
+  {
+    /* MPI_Accumulate(void *origin_addr, int origin_count, MPI_Datatype
+       origin_datatype, void *result_addr, int result_count, MPI_Datatype 
+       result_datatype, int target_rank, MPI_Aint target_disp, 
+       int target_count, MPI_Datatype target_datatype, 
+       MPI_Op op, MPI_Win win) */
+    r = MPI_Get_accumulate(NULL, 0, MPI_BYTE, base, WIN_SIZE, MPI_BYTE, 0,
+        target_disp, WIN_SIZE, MPI_BYTE, MPI_NO_OP, win);
+    if ( MPI_SUCCESS TEST_OP r ) 
+      printf("Rank %d failed MPI_Get_accumulate\n", rank);
+  }
+  r = MPI_Win_fence(0, win);
+  if ( MPI_SUCCESS TEST_OP r ) printf("Rank %d failed MPI_Win_fence\n", rank);
 
   /*************************************************************/
   /* Win_free and Finalize */
