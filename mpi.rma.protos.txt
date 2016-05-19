@@ -64,3 +64,10 @@ int MPI_Win_flush_local_all ( MPI_Win win )
 
 int MPI_Win_sync ( MPI_Win win )
 
+int MPI_Win_attach ( MPI_Win win, void *base, MPI_Aint size )
+
+int MPI_Win_detach ( MPI_Win win, mpip_const_void_t *base )
+
+int MPI_Win_set_info ( MPI_Win win, MPI_Info info )
+
+int MPI_Win_get_info ( MPI_Win win, MPI_Info *info_used )
