@@ -197,10 +197,12 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
 	   (user_frame_count * sizeof (void *)));
   pc_array[user_frame_count] = NULL;
 
+#if defined(DO_PC_SUBTRACTION)
   /* Subtract 1 pointer size from results to point to the address 
      of the calling instruction */
   for (cp = pc_array; cp != NULL && *cp != NULL; cp++)
     *cp = *cp - sizeof (cp);
+#endif
 
   return user_frame_count;
 }

@@ -317,7 +317,8 @@ extern void *saved_ret_addr;
 
 /*  undefined  */
 #else
-#if ! defined(HAVE_LIBUNWIND)
+#if ! (defined(HAVE_LIBUNWIND) || defined(USE_BACKTRACE))
+
 #warning "No stack trace mechanism defined for this platform."
 #endif
 #define ParentFP(jb) (0)
