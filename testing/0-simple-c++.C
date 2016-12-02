@@ -12,7 +12,7 @@
 
 
 #ifndef lint
-static char *svnid =
+static const char *svnid =
   "$Id$";
 #endif
 

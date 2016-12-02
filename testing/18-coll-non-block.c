@@ -22,14 +22,14 @@ static char *svnid =
 #define MSG_COUNT 4
 #define TEST_OP_COUNT 17
 
-main (int ac, char **av)
+int main (int ac, char **av)
 {
   int i, j;
   MPI_Request r[TEST_OP_COUNT];
   MPI_Status s[TEST_OP_COUNT];
   int count;
   int tag = 111;
-  int comm = MPI_COMM_WORLD;
+  MPI_Comm comm = MPI_COMM_WORLD;
   int nprocs, rank;
   float *sendX;
   float *recvX;

@@ -19,7 +19,7 @@ static char *svnid =
 #include <stdlib.h>
 #include "mpi.h"
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
   MPI_Init (&argc, &argv);
   MPI_Barrier (MPI_COMM_WORLD);	/*  profiling should initially be disabled  */

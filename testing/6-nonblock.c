@@ -21,14 +21,14 @@ static char *svnid =
 
 #define MSG_CNT 4
 
-main (int ac, char **av)
+int main (int ac, char **av)
 {
   int i, j;
   MPI_Request r1, r2;
   MPI_Status s1, s2;
   int cnt = MSG_CNT;
   int tag = 111;
-  int comm = MPI_COMM_WORLD;
+  MPI_Comm comm = MPI_COMM_WORLD;
   int nprocs, rank;
   float sendX[MSG_CNT] = { 1, 2, 3, 4 };
   float recvX[MSG_CNT];

@@ -25,7 +25,7 @@ static char *svnid =
 
 int sleeptime = (10);
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
   int nprocs = -1;
   int rank = -1;

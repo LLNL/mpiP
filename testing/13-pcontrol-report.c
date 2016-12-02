@@ -20,7 +20,7 @@ static char *svnid =
 #include <stdlib.h>
 #include "mpi.h"
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
   int nprocs = -1;
   int rank = -1;

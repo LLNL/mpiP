@@ -58,7 +58,7 @@ main (int argc, char **argv)
   if (MPI_SUCCESS TEST_OP r)
     {
       MPI_Error_string (r, errmsg, &errlen);
-      printf ("Rank %d failed MPI_Win_create : %s\n", errmsg);
+      printf ("Rank %d failed MPI_Win_create : %s\n", rank, errmsg);
     }
 
   r = MPI_Win_fence (0, win);
@@ -116,7 +116,7 @@ main (int argc, char **argv)
   else
     {
       r =
-	MPI_Win_create (NULL, 0, MPI_INT, MPI_INFO_NULL, MPI_COMM_WORLD,
+	MPI_Win_create (NULL, 0, sizeof(MPI_INT), MPI_INFO_NULL, MPI_COMM_WORLD,
 			&win);
       if (MPI_SUCCESS TEST_OP r)
 	printf ("Rank %d failed MPI_Win_create\n", rank);

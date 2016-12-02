@@ -64,7 +64,7 @@ exchangeData ()
 }
 
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
   char processor_name[128];
   int namelen = 128;

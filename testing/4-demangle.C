@@ -41,7 +41,7 @@ int comm::doBarriers(MPI_Comm com, const int x)
   return 1;
 }
 
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   const int x = 10;
 
