@@ -26,11 +26,12 @@ int MPI_Alltoall ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendt
 
 int MPI_Alltoallv ( mpip_const_void_t *sendbuf, mpip_const_int_t *sendcnts, mpip_const_int_t *sdispls, MPI_Datatype sendtype, void *recvbuf, mpip_const_int_t *recvcnts, mpip_const_int_t *rdispls, MPI_Datatype recvtype, MPI_Comm comm )
 
-int MPI_Attr_delete ( MPI_Comm comm, int keyval )
+@ Deprecated since MPI-2.0
+@int MPI_Attr_delete ( MPI_Comm comm, int keyval )
 
-int MPI_Attr_get ( MPI_Comm comm, int keyval, void *attr_value, int *flag )
+@int MPI_Attr_get ( MPI_Comm comm, int keyval, void *attr_value, int *flag )
 
-int MPI_Attr_put ( MPI_Comm comm, int keyval, void *attr_value )
+@int MPI_Attr_put ( MPI_Comm comm, int keyval, void *attr_value )
 
 int MPI_Barrier ( MPI_Comm comm )
 
@@ -244,9 +245,10 @@ int MPI_Isend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int de
 
 int MPI_Issend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-int MPI_Keyval_create ( MPI_Copy_function *copy_fn, MPI_Delete_function *delete_fn, int *keyval, void *extra_state )
+@int MPI_Keyval_create ( MPI_Copy_function *copy_fn, MPI_Delete_function *delete_fn, int *keyval, void *extra_state )
 
-int MPI_Keyval_free ( int *keyval )
+@ Deprecated since MPI-2.0
+@int MPI_Keyval_free ( int *keyval )
 
 int MPI_Op_create ( MPI_User_function *function, int commute, MPI_Op *op )
 directives
