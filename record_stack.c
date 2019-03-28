@@ -48,10 +48,9 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   //  If we are unable to get a stack trace, ensure that the first frame PC is NULL
   pc_array[0] = NULL;
 
-  if (mpiPi.inAPIrtb)		/*  API unwinds fewer frames  */
-    parent_frame_start = 1;
-  else
-    parent_frame_start = 2;
+  // Inlining / noinlining may affect frames in report
+  //   - Tools frames may appear in report
+  parent_frame_start = 1;
 
   if (unw_getcontext (&uc) != 0)
     {
