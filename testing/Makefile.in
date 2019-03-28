@@ -59,13 +59,13 @@ all: ${EXES}
 
 .SUFFIXES: .exe
 .c.exe::
-	${CC} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${LIBS}
+	${CC} ${CFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} -o $@ ${LDFLAGS} ${LIBS}
 
 .C.exe:
-	${CXX} ${CFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${CXXLIBS}
+	${CXX} ${CFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} -o $@ ${LDFLAGS} ${CXXLIBS}
 
 .f.exe:
-	${FC} ${FFLAGS} ${CPPFLAGS} $< -o $@ ${LDFLAGS} ${FLIBS}
+	${FC} ${FFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} -o $@ ${LDFLAGS} ${FLIBS}
 
 api-test.exe :: LIBS=$(API_LIBS)
 
