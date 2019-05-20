@@ -54,7 +54,10 @@ Profiling</a></h1>
 
   <li><a href="#Using">Using mpiP (summary)</a>
     <ul>
-
+      <li><a href="#Using_mpiP_with_buildsystems">Using mpiP with buildsystems</a></li>
+        <ul>
+          <li><a href="#CMake">CMake</a></li>
+        </ul>
       <li><a href="#Supported">Supported Platforms</a></li>
 
     </ul>
@@ -292,6 +295,19 @@ the header and trailer in standard out.</p>
 <p> By default, the output file is written to the current directory of the
 application.  mpiP files are always much smaller than trace files, so writing
 them to this directory is safe.</p>
+
+<h3><a name="Using_mpiP_with_buildsystems">Using mpiP with buildsystems</a></h3>
+<p>Using mpiP with buildsystems may be a little tricky because of their
+indirection.</p>
+
+<h4><a name="CMake">CMake</a></h4>
+<p>Use the <code>CMAKE_CXX_STANDARD_LIBRARIES</code> parameter, for example:</p>
+<blockquote>
+  <p class="commandline">
+    $ cmake -DCMAKE_CXX_STANDARD_LIBRARIES='-L${mpiP_root}/lib -lmpiP -lm
+      -lbfd -liberty -lunwind' /path/to/sources  </p>
+</blockquote>
+
 
 <h3><a name="Supported">Supported Platforms</a></h3>
 
