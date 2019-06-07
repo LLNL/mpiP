@@ -29,9 +29,9 @@ typedef struct _h_t
 {
   int size;
   int count;
-  h_HashFunct hf;		/* given an element compute the hash number */
-  h_Comparator hc;		/* given two elements, do they match? 0 for yes */
-  h_entry_t **table;		/* table[size] of pointers to lists of entries */
+  h_HashFunct hf;    /* given an element compute the hash number */
+  h_Comparator hc;   /* given two elements, do they match? 0 for yes */
+  h_entry_t **table; /* table[size] of pointers to lists of entries */
 }
 h_t;
 

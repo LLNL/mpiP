@@ -81,12 +81,12 @@ mpiPi_MPI_Pcontrol (const int flag)
   if (flag == 0)
     {
       if (!mpiPi.enabled)
-	mpiPi_msg_warn
-	  ("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
+        mpiPi_msg_warn
+            ("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
 
       mpiPi_GETTIME (&mpiPi.endTime);
       dur =
-	(mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
+          (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
       mpiPi.cumulativeTime += dur;
       assert (mpiPi.cumulativeTime >= 0);
       mpiPi.enabled = 0;
@@ -108,8 +108,8 @@ mpiPi_MPI_Pcontrol (const int flag)
   else
     {
       if (mpiPi.enabled)
-	mpiPi_msg_warn
-	  ("MPI_Pcontrol trying to enable MPIP while it is already enabled.\n");
+        mpiPi_msg_warn
+            ("MPI_Pcontrol trying to enable MPIP while it is already enabled.\n");
 
       mpiPi.enabled = 1;
       mpiPi.enabledCount++;
