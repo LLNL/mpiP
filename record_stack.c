@@ -50,7 +50,11 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   // Inlining / noinlining may affect frames in report
   //   - Tools frames may appear in report
-  parent_frame_start = 1;
+  /*  API unwinds fewer frames  */
+  if (mpiPi.inAPIrtb)
+    parent_frame_start = 1;
+  else
+    parent_frame_start = 2;
 
   if (unw_getcontext (&uc) != 0)
     {
