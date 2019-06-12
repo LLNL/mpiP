@@ -24,32 +24,7 @@ static char *svnid = "$Id$";
 void
 mpiPi_reset_callsite_data ()
 {
-  int ac, ndx;
-  callsite_stats_t **av;
-  callsite_stats_t *csp = NULL;
-
-  /* gather local task data */
-  h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
-
-  for (ndx = 0; ndx < ac; ndx++)
-    {
-      csp = av[ndx];
-
-      csp->maxDur = 0;
-      csp->minDur = DBL_MAX;
-      csp->maxIO = 0;
-      csp->minIO = DBL_MAX;
-      csp->maxDataSent = 0;
-      csp->minDataSent = DBL_MAX;
-
-      csp->count = 0;
-      csp->cumulativeTime = 0;
-      csp->cumulativeTimeSquared = 0;
-      csp->cumulativeDataSent = 0;
-      csp->cumulativeIO = 0;
-
-      csp->arbitraryMessageCount = 0;
-    }
+  mpiPi_stats_thr_cs_reset(&mpiPi.task_stats);
 
   if (time (&mpiPi.start_timeofday) == (time_t) - 1)
     {
@@ -67,8 +42,6 @@ mpiPi_reset_callsite_data ()
   mpiPi.global_mpi_msize_threshold_count = 0;
   mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
-
-  free (av);
 }
 
 

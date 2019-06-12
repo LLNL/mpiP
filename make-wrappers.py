@@ -1053,7 +1053,7 @@ def CreateWrapper(funct, olist):
     olist.append("\n{\n")
     olist.append( " int rc, enabledState;\n double dur;\n int tsize;\n double messSize = 0.;\n double ioSize = 0.;\n double rmaSize =0.;\n mpiPi_TIME start, end;\n void *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
 
-    olist.append("\nif (mpiPi.enabled) {\n")
+    olist.append("\nif (mpiPi_stats_thr_is_on(&mpiPi.task_stats)) {\n")
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
 
@@ -1066,9 +1066,10 @@ def CreateWrapper(funct, olist):
     # end of enabled check
     olist.append("}\n\n")
 
+    # Mark that we have already entered Profiler to avoid nested invocations
+    olist.append("mpiPi_stats_thr_enter(&mpiPi.task_stats);\n")
+
     # call PMPI 
-    olist.append("enabledState = mpiPi.enabled;\n")
-    olist.append("mpiPi.enabled = 0;\n")
     olist.append("\nrc = P" + funct + "( " )
 
     for i in fdict[funct].paramConciseList:
@@ -1086,8 +1087,9 @@ def CreateWrapper(funct, olist):
 	    olist.append(", ")
     olist.append(");\n\n")
 
-    olist.append("mpiPi.enabled = enabledState;\n")
-    olist.append("if (mpiPi.enabled) {\n")
+    # Mark that we exited Profiler
+    olist.append("mpiPi_stats_thr_exit(&mpiPi.task_stats);\n")
+    olist.append("if (mpiPi_stats_thr_is_on(&mpiPi.task_stats)) {\n")
     olist.append("\n" 
 		 + "mpiPi_GETTIME (&end);\n" 
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
