@@ -616,6 +616,7 @@ mpiPi_mergeResults ()
   int totalCount = 0;
   int maxCount = 0;
   int retval = 1, sendval;
+  callsite_stats_t *rawCallsiteData = NULL;
 
   /* gather local task data */
   mpiPi_stats_thr_cs_gather(&mpiPi.task_stats, &ac, &av);
@@ -624,6 +625,9 @@ mpiPi_mergeResults ()
   PMPI_Allreduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.comm);
   PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
                mpiPi.comm);
+  if (mpiPi.collectorRank != mpiPi.rank) {
+      maxCount = ac;
+    }
 
   if (totalCount < 1)
     {
@@ -632,6 +636,16 @@ mpiPi_mergeResults ()
             ("Collector found no records to merge. Omitting report.\n");
 
       return 0;
+    }
+
+  /* Try to allocate space for max count of callsite info from all tasks  */
+  rawCallsiteData =
+      (callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
+  if (rawCallsiteData == NULL)
+    {
+      mpiPi_msg_warn
+          ("Failed to allocate memory to collect callsite info");
+      retval = 0;
     }
 
   /* gather global data at collector */
@@ -681,15 +695,6 @@ mpiPi_mergeResults ()
                                           callsite_src_id_cache_hashkey,
                                           callsite_src_id_cache_comparator);
         }
-      /* Try to allocate space for max count of callsite info from all tasks  */
-      mpiPi.rawCallsiteData =
-          (callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
-      if (mpiPi.rawCallsiteData == NULL)
-        {
-          mpiPi_msg_warn
-              ("Failed to allocate memory to collect callsite info");
-          retval = 0;
-        }
 
       /* Clear global_mpi_time and global_mpi_size before accumulation in mpiPi_insert_callsite_records */
       mpiPi.global_mpi_time = 0.0;
@@ -697,48 +702,47 @@ mpiPi_mergeResults ()
 
       if (retval == 1)
         {
-          /* Insert collector callsite data into global and task-specific hash tables */
+          /* Insert local callsite information */
           for (ndx = 0; ndx < ac; ndx++)
             {
               mpiPi_insert_callsite_records (av[ndx]);
             }
-          ndx = 0;
+
+          /* Collect remote pc data */
           for (i = 1; i < mpiPi.size; i++)	/* n-1 */
             {
               MPI_Status status;
               int count;
-              int j;
 
               /* okay in any order */
               PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
               PMPI_Get_count (&status, MPI_CHAR, &count);
-              PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
+              PMPI_Recv (rawCallsiteData, count, MPI_CHAR,
                          status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
               count /= sizeof (callsite_stats_t);
 
-
-              for (j = 0; j < count; j++)
+              for (ndx = 0; ndx < count; ndx++)
                 {
-                  mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+                  mpiPi_insert_callsite_records (&rawCallsiteData[ndx]);
                 }
             }
-          free (mpiPi.rawCallsiteData);
         }
     }
   else
     {
       int ndx;
-      char *sbuf = (char *) malloc (ac * sizeof (callsite_stats_t));
       for (ndx = 0; ndx < ac; ndx++)
         {
           bcopy (av[ndx],
-                 &(sbuf[ndx * sizeof (callsite_stats_t)]),
+                 &(rawCallsiteData[ndx]),
                  sizeof (callsite_stats_t));
         }
-      PMPI_Send (sbuf, ac * sizeof (callsite_stats_t),
+      PMPI_Send (rawCallsiteData, ac * sizeof (callsite_stats_t),
                  MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
-      free (sbuf);
     }
+
+  free (rawCallsiteData);
+
   if (mpiPi.rank == mpiPi.collectorRank && retval == 1)
     {
       if (mpiPi.collective_report == 0)

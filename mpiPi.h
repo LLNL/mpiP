@@ -167,7 +167,6 @@ typedef struct _mpiPi_t
   long long global_time_callsite_count;
 
   int tableSize;
-  callsite_stats_t *rawCallsiteData;
   h_t *global_callsite_stats;
   h_t *global_callsite_stats_agg;
   h_t *global_MPI_stats_agg;
