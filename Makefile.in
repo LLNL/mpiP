@@ -36,6 +36,7 @@ PC_LOOKUP_OBJ = $(PC_LOOKUP_FILE:.c=.o)
 SRCS =	diag_msgs.c \
 	mpiP-hash.c \
 	mpiP-stats.c \
+	mpiP-tslist.c \
 	glob.c \
 	wrappers.c \
 	wrappers_special.c \
