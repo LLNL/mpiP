@@ -157,7 +157,7 @@ mpiPi_init (char *appName)
 #endif
   mpiPi_getenv ();
 
-  mpiPi_stats_thr_init(&mpiPi.task_stats);
+  mpiPi_stats_mt_init(&mpiPi.task_stats);
 
   /* -- welcome msg only collector  */
   if (mpiPi.collectorRank == mpiPi.rank)
@@ -619,7 +619,7 @@ mpiPi_mergeResults ()
   callsite_stats_t *rawCallsiteData = NULL;
 
   /* gather local task data */
-  mpiPi_stats_thr_cs_gather(&mpiPi.task_stats, &ac, &av);
+  mpiPi_stats_mt_cs_gather(&mpiPi.task_stats, &ac, &av);
 
   /* determine size of space necessary on collector */
   PMPI_Allreduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.comm);
@@ -793,7 +793,7 @@ mpiPi_mergeCollectiveStats ()
       coll_time_results = (double *) malloc (sizeof(mpiPi.coll_time_stats));
     }
 
-  mpiPi_stats_thr_coll_gather(&mpiPi.task_stats, &coll_time_local);
+  mpiPi_stats_mt_coll_gather(&mpiPi.task_stats, &coll_time_local);
 
   /*  Collect Collective statistic data were used  */
   size = sizeof(mpiPi.pt2pt_send_stats) / sizeof(double);
@@ -828,7 +828,7 @@ mpiPi_mergept2ptStats ()
   if (mpiPi.collectorRank == mpiPi.rank){
       pt2pt_send_results = (double *) malloc (sizeof(mpiPi.pt2pt_send_stats));
     }
-  mpiPi_stats_thr_pt2pt_gather(&mpiPi.task_stats, &pt2pt_send_local);
+  mpiPi_stats_mt_pt2pt_gather(&mpiPi.task_stats, &pt2pt_send_local);
 
   /*  Collect Collective statistic data were used  */
   size = sizeof(mpiPi.pt2pt_send_stats) / sizeof(double);
@@ -1050,7 +1050,7 @@ mpiPi_finalize ()
   if (mpiPi.disable_finalize_report == 0)
     mpiPi_generateReport (mpiPi.report_style);
 
-  mpiPi_stats_thr_fini(&mpiPi.task_stats);
+  mpiPi_stats_mt_fini(&mpiPi.task_stats);
 
   if (mpiPi.global_task_app_time != NULL)
     free (mpiPi.global_task_app_time);
@@ -1085,10 +1085,10 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   callsite_stats_t *csp = NULL;
   callsite_stats_t key;
 
-  if (!mpiPi_stats_thr_is_on(&mpiPi.task_stats))
+  if (!mpiPi_stats_mt_is_on(&mpiPi.task_stats))
     return;
 
-  mpiPi_stats_thr_cs_upd(&mpiPi.task_stats, op, rank, pc, dur,
+  mpiPi_stats_mt_cs_upd(&mpiPi.task_stats, op, rank, pc, dur,
                          sendSize, ioSize, rmaSize);
 }
 
@@ -1096,13 +1096,13 @@ void
 mpiPi_update_collective_stats (int op, double dur, double size,
                                MPI_Comm * comm)
 {
-  mpiPi_stats_thr_coll_upd(&mpiPi.task_stats, op, dur, size, comm);
+  mpiPi_stats_mt_coll_upd(&mpiPi.task_stats, op, dur, size, comm);
 }
 
 void
 mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm)
 {
-  mpiPi_stats_thr_pt2pt_upd(&mpiPi.task_stats, op, dur, size, comm);
+  mpiPi_stats_mt_pt2pt_upd(&mpiPi.task_stats, op, dur, size, comm);
 }
 
 #endif /* } ifndef ENABLE_API_ONLY */

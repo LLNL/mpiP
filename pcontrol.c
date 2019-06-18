@@ -24,7 +24,7 @@ static char *svnid = "$Id$";
 void
 mpiPi_reset_callsite_data ()
 {
-  mpiPi_stats_thr_cs_reset(&mpiPi.task_stats);
+  mpiPi_stats_mt_cs_reset(&mpiPi.task_stats);
 
   if (time (&mpiPi.start_timeofday) == (time_t) - 1)
     {
