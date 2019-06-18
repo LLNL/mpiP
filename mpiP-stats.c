@@ -160,6 +160,11 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
 
   assert (dur >= 0);
 
+
+  /* Check for the nested calls */
+  if (!mpiPi_stats_thr_is_on(stat))
+    return;
+
   key.op = op;
   key.rank = rank;
   key.cookie = MPIP_CALLSITE_STATS_COOKIE;
@@ -346,6 +351,10 @@ void mpiPi_stats_thr_coll_upd (mpiPi_thread_stat_t *stat,
                                   int op, double dur, double size,
                                   MPI_Comm * comm)
 {
+  /* Check for the nested calls */
+  if (!mpiPi_stats_thr_is_on(stat))
+    return;
+
   _update_msize_stat(&stat->coll, op, dur, size, comm, "collectives");
 }
 
@@ -367,6 +376,10 @@ void mpiPi_stats_thr_pt2pt_upd (mpiPi_thread_stat_t *stat,
                                    int op, double dur, double size,
                                    MPI_Comm * comm)
 {
+  /* Check for the nested calls */
+  if (!mpiPi_stats_thr_is_on(stat))
+    return;
+
   _update_msize_stat(&stat->pt2pt, op, dur, size, comm, "point-to-point");
 }
 

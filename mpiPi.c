@@ -1085,9 +1085,6 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   callsite_stats_t *csp = NULL;
   callsite_stats_t key;
 
-  if (!mpiPi_stats_mt_is_on(&mpiPi.task_stats))
-    return;
-
   mpiPi_stats_mt_cs_upd(&mpiPi.task_stats, op, rank, pc, dur,
                          sendSize, ioSize, rmaSize);
 }
