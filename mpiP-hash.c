@@ -115,8 +115,6 @@ h_search (h_t * ht, void *key, void **ptr)
   unsigned tableIndex;
   h_entry_t *het_index = NULL;
   if (ht == NULL){
-      int delay = 1;
-      while(delay) { sleep(1); }
     Abort ("hash table uninitialized");
     }
   if (key == NULL)

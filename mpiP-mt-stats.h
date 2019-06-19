@@ -2,24 +2,38 @@
 #define MPIPMTSTATS_H
 
 #include "mpiP-stats.h"
+#include "mpiP-tslist.h"
+#include <pthread.h>
+
+typedef enum {
+  MPIPI_MODE_ST,
+  MPIPI_MODE_MT
+} mpiPi_thr_mode_t;
+
+typedef struct {
+  mpiPi_thread_stat_t merget_stat;
+
+} _mpiPi_mt_state_t;
 
 /* Per-thread MPI status */
 typedef struct {
-  union {
-    mpiPi_thread_stat_t st_stat;
-  };
+  mpiPi_thr_mode_t mode;
+  mpiPi_thread_stat_t rank_stats;
+  mpiP_tslist_t *tls_list;
+  pthread_key_t tls_this;
 } mpiPi_mt_stat_t;
 
-int mpiPi_stats_mt_init(mpiPi_mt_stat_t *stat);
+int mpiPi_stats_mt_init(mpiPi_mt_stat_t *stat, mpiPi_thr_mode_t mode);
 void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *stat);
+void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state);
+
 void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *stat,
                              int *ac, callsite_stats_t ***av );
 void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_t *stat,
                            unsigned op, unsigned rank, void **pc,
                            double dur, double sendSize, double ioSize,
                            double rmaSize);
-#define MPIPI_CALLSITE_MIN2MAX 1
-#define MPIPI_CALLSITE_MIN2ZERO 0
+
 void mpiPi_stats_mt_cs_lookup(mpiPi_mt_stat_t *stat,
                               callsite_stats_t *task_stats,
                               callsite_stats_t **task_lookup,

@@ -42,16 +42,16 @@ _MPI_Init (int *argc, char ***argv)
 #if defined(Linux) && ! defined(ppc64)
   mpiPi.appFullName = getProcExeLink ();
   mpiPi_msg_debug ("appFullName is %s\n", mpiPi.appFullName);
-  mpiPi_init (GetBaseAppName (mpiPi.appFullName));
+  mpiPi_init (GetBaseAppName (mpiPi.appFullName), MPIPI_MODE_ST);
 #else
   if (argv != NULL && *argv != NULL && **argv != NULL)
     {
-      mpiPi_init (GetBaseAppName (**argv));
+      mpiPi_init (GetBaseAppName (**argv), MPIPI_MODE_ST);
       mpiPi.appFullName = strdup (**argv);
     }
   else
     {
-      mpiPi_init ("Unknown");
+      mpiPi_init ("Unknown", MPIPI_MODE_ST);
       mpiPi_msg_debug ("argv is NULL\n");
     }
 #endif
@@ -110,27 +110,31 @@ _MPI_Init_thread (int *argc, char ***argv, int required, int *provided)
 {
   int rc = 0;
   int enabledStatus;
+  mpiPi_thr_mode_t mode = MPIPI_MODE_ST;
 
   enabledStatus = mpiPi.enabled;
   mpiPi.enabled = 0;
 
   rc = PMPI_Init_thread (argc, argv, required, provided);
+  if (MPI_THREAD_MULTIPLE == *provided) {
+      mode = MPIPI_MODE_MT;
+  }
 
   mpiPi.enabled = enabledStatus;
 
 #if defined(Linux) && ! defined(ppc64)
   mpiPi.appFullName = getProcExeLink ();
   mpiPi_msg_debug ("appFullName is %s\n", mpiPi.appFullName);
-  mpiPi_init (GetBaseAppName (mpiPi.appFullName));
+  mpiPi_init (GetBaseAppName (mpiPi.appFullName), mode);
 #else
   if (argv != NULL && *argv != NULL && **argv != NULL)
     {
-      mpiPi_init (GetBaseAppName (**argv));
+      mpiPi_init (GetBaseAppName (**argv), mode);
       mpiPi.appFullName = strdup (**argv);
     }
   else
     {
-      mpiPi_init ("Unknown");
+      mpiPi_init ("Unknown", MPIPI_MODE_MT);
       mpiPi_msg_debug ("argv is NULL\n");
     }
 #endif

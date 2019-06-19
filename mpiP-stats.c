@@ -111,15 +111,17 @@ trd_pc_comparator (const void *p1, const void *p2)
 
 int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat)
 {
-  stat->task_callsite_stats = h_open (mpiPi.tableSize, _thrd_pc_hashkey,
+  stat->cs_stats = h_open (mpiPi.tableSize, _thrd_pc_hashkey,
                                       trd_pc_comparator);
 
+  bzero(stat->coll.time_stats, sizeof(stat->coll.time_stats));
   if (mpiPi.do_collective_stats_report == 1)
     {
       init_histogram (&stat->coll.comm_hist, 7, MPIP_COMM_HISTCNT, NULL);
       init_histogram (&stat->coll.size_hist, 7, MPIP_SIZE_HISTCNT, NULL);
     }
 
+  bzero(stat->pt2pt.time_stats, sizeof(stat->pt2pt.time_stats));
   if (mpiPi.do_pt2pt_stats_report == 1)
     {
       init_histogram (&stat->pt2pt.comm_hist, 7, MPIP_COMM_HISTCNT, NULL);
@@ -129,7 +131,23 @@ int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat)
 
 void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat)
 {
-  h_close (stat->task_callsite_stats);
+  h_close (stat->cs_stats);
+}
+
+void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat)
+{
+  /* Reset callsite statistics */
+  mpiPi_stats_thr_cs_reset(stat);
+  bzero(stat->coll.time_stats, sizeof(stat->coll.time_stats));
+  (stat->pt2pt.time_stats, sizeof(stat->pt2pt.time_stats));
+}
+
+void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
+                               mpiPi_thread_stat_t *src)
+{
+  mpiPi_stats_thr_cs_merge(dst, src);
+  mpiPi_stats_thr_coll_merge(dst, src);
+  mpiPi_stats_thr_pt2pt_merge(dst, src);
 }
 
 int mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat)
@@ -171,13 +189,13 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
       key.pc[i] = pc[i];
     }
 
-  if (NULL == h_search (stat->task_callsite_stats, &key, (void **) &csp))
+  if (NULL == h_search (stat->cs_stats, &key, (void **) &csp))
     {
       /* create and insert */
       csp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
       bzero (csp, sizeof (callsite_stats_t));
       mpiPi_cs_init(csp, pc, op, rank);
-      h_insert (stat->task_callsite_stats, csp);
+      h_insert (stat->cs_stats, csp);
     }
   /* ASSUME: csp cannot be deleted from list */
   mpiPi_cs_update(csp, dur, sendSize, ioSize, rmaSize,
@@ -196,7 +214,7 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
 void mpiPi_stats_thr_cs_gather(mpiPi_thread_stat_t *stat,
                              int *ac, callsite_stats_t ***av )
 {
-  h_gather_data (stat->task_callsite_stats, ac, (void ***)av);
+  h_gather_data (stat->cs_stats, ac, (void ***)av);
 }
 
 void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat)
@@ -214,7 +232,6 @@ void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat)
       mpiPi_cs_reset_stat(csp);
     }
   free(av);
-
 }
 
 void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
@@ -224,7 +241,7 @@ void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
                               int initMax)
 {
   callsite_stats_t *record = NULL;
-  if (NULL == h_search(stat->task_callsite_stats,
+  if (NULL == h_search(stat->cs_stats,
                        task_stats,(void **)&record))
     {
       record = dummy_buf;
@@ -237,6 +254,39 @@ void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
       record->rank = mpiPi.rank;
     }
   *task_lookup = record;
+}
+
+void mpiPi_stats_thr_cs_merge(mpiPi_thread_stat_t *dst,
+                              mpiPi_thread_stat_t *src)
+{
+  int ac, i;
+  callsite_stats_t **av;
+  /* Merge callsite statistics */
+  mpiPi_stats_thr_cs_gather(src, &ac, &av);
+  for(i=0; i<ac; i++)
+    {
+      callsite_stats_t *csp_src = av[i], *csp_dst;
+
+      /* update file/line in p if need */
+      if( NULL == csp_src->filename || NULL == csp_src->functname )
+        {
+          mpiPi_query_src (csp_src);
+        }
+
+      /* Search for the callsite and create a new record if needed */
+      if (NULL == h_search (dst->cs_stats, csp_src, (void **) &csp_dst))
+        {
+          /* create and insert */
+          csp_dst = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
+          bzero (csp_dst, sizeof (callsite_stats_t));
+          mpiPi_cs_init(csp_dst, csp_src->pc, csp_src->op, csp_src->rank);
+          h_insert (dst->cs_stats, csp_dst);
+        }
+      /* Merge callsite records */
+      mpiPi_cs_merge(csp_dst, csp_src);
+    }
+
+  free (av);
 }
 
 /* Message size statistics */
@@ -271,6 +321,15 @@ static void _update_msize_stat (mpiPi_msg_stat_t *stat,
   stat->time_stats[op_idx][comm_bin][size_bin] += size;
 }
 
+static void _merge_msize_stat (mpiPi_msg_stat_t *dst, mpiPi_msg_stat_t *src)
+{
+  int i = 0, x, y, z;
+  for (x = 0; x < MPIP_NFUNC; x++)
+    for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+      for (z = 0; z < MPIP_SIZE_HISTCNT; z++)
+        dst->time_stats[x][y][z] += src->time_stats[x][y][z];
+}
+
 static void _get_binstrings (mpiPi_msg_stat_t *stat,
                              int comm_idx, char *comm_buf,
                              int size_idx, char *size_buf)
@@ -297,6 +356,12 @@ void mpiPi_stats_thr_coll_gather(mpiPi_thread_stat_t *stat, double **_outbuf)
   _gather_msize_stat(&stat->coll, _outbuf);
 }
 
+void mpiPi_stats_thr_coll_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src)
+{
+  _merge_msize_stat(&dst->coll, &src->coll);
+}
+
 void mpiPi_stats_thr_coll_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf)
@@ -320,6 +385,12 @@ void mpiPi_stats_thr_pt2pt_upd (mpiPi_thread_stat_t *stat,
 void mpiPi_stats_thr_pt2pt_gather(mpiPi_thread_stat_t *stat, double **_outbuf)
 {
   _gather_msize_stat(&stat->pt2pt, _outbuf);
+}
+
+void mpiPi_stats_thr_pt2pt_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src)
+{
+  _merge_msize_stat(&dst->pt2pt, &src->pt2pt);
 }
 
 void mpiPi_stats_thr_pt2pt_binstrings(mpiPi_thread_stat_t *stat,

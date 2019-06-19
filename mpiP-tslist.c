@@ -35,9 +35,11 @@ void mpiPi_tslist_release(mpiP_tslist_t *list)
   free(list);
 }
 
-void mpiPi_tslist_append(mpiP_tslist_t *list, mpiP_tslist_elem_t *elem)
+void mpiPi_tslist_append(mpiP_tslist_t *list, void *data_ptr)
 {
+  mpiP_tslist_elem_t *elem = calloc(1, sizeof(*elem));
   elem->next = NULL;
+  elem->ptr = data_ptr;
   /* Ensure that all chnages to the elem structure are complete */////
   mpiP_atomic_wmb();
   /* Atomically swap the tail of the list to point to this element */

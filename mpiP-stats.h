@@ -50,13 +50,18 @@ typedef struct {
   int disabled;
 
   /* Callsite statistics */
-  h_t *task_callsite_stats;
+  h_t *cs_stats;
 
+  /* Collectives and point-to-point statistics */
   mpiPi_msg_stat_t coll, pt2pt;
 } mpiPi_thread_stat_t;
 
 int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
+                               mpiPi_thread_stat_t *src);
+
 void mpiPi_stats_thr_cs_gather(mpiPi_thread_stat_t *stat,
                              int *ac, callsite_stats_t ***av );
 
@@ -71,12 +76,17 @@ void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
                               callsite_stats_t **task_lookup,
                               callsite_stats_t *dummy_buf,
                               int initMax);
+void mpiPi_stats_thr_cs_merge(mpiPi_thread_stat_t *dst,
+                              mpiPi_thread_stat_t *src);
 
 void mpiPi_stats_thr_coll_upd(mpiPi_thread_stat_t *stat,
                                   int op, double dur, double size,
                                   MPI_Comm * comm);
 void mpiPi_stats_thr_coll_gather(mpiPi_thread_stat_t *stat, double **_outbuf);
 void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_coll_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src);
+
 void mpiPi_stats_thr_coll_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
@@ -85,6 +95,8 @@ void mpiPi_stats_thr_pt2pt_upd (mpiPi_thread_stat_t *stat,
                                    int op, double dur, double size,
                                    MPI_Comm * comm);
 void mpiPi_stats_thr_pt2pt_gather(mpiPi_thread_stat_t *stat, double **_outbuf);
+void mpiPi_stats_thr_pt2pt_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src);
 void mpiPi_stats_thr_pt2pt_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);

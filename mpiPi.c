@@ -78,7 +78,7 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
 */
 
 void
-mpiPi_init (char *appName)
+mpiPi_init (char *appName, mpiPi_thr_mode_t thr_mode)
 {
   if (time (&mpiPi.start_timeofday) == (time_t) - 1)
     {
@@ -149,7 +149,7 @@ mpiPi_init (char *appName)
 #endif
   mpiPi_getenv ();
 
-  mpiPi_stats_mt_init(&mpiPi.task_stats);
+  mpiPi_stats_mt_init(&mpiPi.task_stats, thr_mode);
 
   /* -- welcome msg only collector  */
   if (mpiPi.collectorRank == mpiPi.rank)
@@ -174,8 +174,6 @@ mpiPi_init (char *appName)
   return;
 }
 #endif /* } ifndef ENABLE_API_ONLY */
-
-
 
 static int
 mpiPi_insert_callsite_records (callsite_stats_t * p)
@@ -746,6 +744,7 @@ mpiPi_generateReport (int report_style)
   mpiPi_msg_debug0 ("starting mergeResults\n");
 
   mpiPi_GETTIME (&timer_start);
+  mpiPi_stats_mt_merge(&mpiPi.task_stats);
   mergeResult = mpiPi_mergeResults ();
   if (mergeResult == 1 && mpiPi.stackDepth == 0)
     mergeResult = mpiPi_insert_MPI_records ();
