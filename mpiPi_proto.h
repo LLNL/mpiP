@@ -35,9 +35,6 @@ extern void *h_search (h_t * ht, void *key, void **ptr);
 extern void *h_delete (h_t * ht, void *key, void **ptr);
 extern int h_gather_data (h_t * ht, int *ac, void ***ptr);
 extern void mpiPi_init (char *appName);
-extern int mpiPi_query_pc (void *pc, char **filename, char **functname,
-                           int *lineno);
-extern int mpiPi_query_src (callsite_stats_t * p);
 extern void mpiPi_generateReport (int report_style);
 extern void mpiPi_finalize (void);
 extern void mpiPi_update_callsite_stats (unsigned op, unsigned rank,

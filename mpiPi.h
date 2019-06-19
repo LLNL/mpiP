@@ -38,6 +38,7 @@
 #endif
 
 #include "mpiP-hash.h"
+#include "mpiP-callsites.h"
 #include "mpiP-mt-stats.h"
 
 #include "mpip_timers.h"

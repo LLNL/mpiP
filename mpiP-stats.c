@@ -147,7 +147,6 @@ int mpiPi_stats_thr_is_on(mpiPi_thread_stat_t *stat)
   return !(stat->disabled) && mpiPi.enabled;
 }
 
-/* Callsite statistics */
 void
 mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
                            unsigned op, unsigned rank, void **pc,
@@ -159,7 +158,6 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
   callsite_stats_t key;
 
   assert (dur >= 0);
-
 
   /* Check for the nested calls */
   if (!mpiPi_stats_thr_is_on(stat))
@@ -178,44 +176,12 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
       /* create and insert */
       csp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
       bzero (csp, sizeof (callsite_stats_t));
-      csp->op = op;
-      csp->rank = rank;
-      for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-        {
-          csp->pc[i] = pc[i];
-        }
-      csp->cookie = MPIP_CALLSITE_STATS_COOKIE;
-      csp->cumulativeTime = 0;
-      csp->minDur = DBL_MAX;
-      csp->minDataSent = DBL_MAX;
-      csp->minIO = DBL_MAX;
-      csp->arbitraryMessageCount = 0;
+      mpiPi_cs_init(csp, pc, op, rank);
       h_insert (stat->task_callsite_stats, csp);
     }
   /* ASSUME: csp cannot be deleted from list */
-  csp->count++;
-  csp->cumulativeTime += dur;
-  assert (csp->cumulativeTime >= 0);
-  csp->cumulativeTimeSquared += (dur * dur);
-  assert (csp->cumulativeTimeSquared >= 0);
-  csp->maxDur = max (csp->maxDur, dur);
-  csp->minDur = min (csp->minDur, dur);
-  csp->cumulativeDataSent += sendSize;
-  csp->cumulativeIO += ioSize;
-  csp->cumulativeRMA += rmaSize;
-
-  csp->maxDataSent = max (csp->maxDataSent, sendSize);
-  csp->minDataSent = min (csp->minDataSent, sendSize);
-
-  csp->maxIO = max (csp->maxIO, ioSize);
-  csp->minIO = min (csp->minIO, ioSize);
-
-  csp->maxRMA = max (csp->maxRMA, rmaSize);
-  csp->minRMA = min (csp->minRMA, rmaSize);
-
-  if (mpiPi.messageCountThreshold > -1
-      && sendSize >= (double) mpiPi.messageCountThreshold)
-    csp->arbitraryMessageCount++;
+  mpiPi_cs_update(csp, dur, sendSize, ioSize, rmaSize,
+                  mpiPi.messageCountThreshold);
 
 #if 0
   mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n",
@@ -245,21 +211,7 @@ void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat)
   for (ndx = 0; ndx < ac; ndx++)
     {
       csp = av[ndx];
-
-      csp->maxDur = 0;
-      csp->minDur = DBL_MAX;
-      csp->maxIO = 0;
-      csp->minIO = DBL_MAX;
-      csp->maxDataSent = 0;
-      csp->minDataSent = DBL_MAX;
-
-      csp->count = 0;
-      csp->cumulativeTime = 0;
-      csp->cumulativeTimeSquared = 0;
-      csp->cumulativeDataSent = 0;
-      csp->cumulativeIO = 0;
-
-      csp->arbitraryMessageCount = 0;
+      mpiPi_cs_reset_stat(csp);
     }
   free(av);
 
@@ -276,30 +228,12 @@ void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
                        task_stats,(void **)&record))
     {
       record = dummy_buf;
-      record->count = 0;
-      record->cumulativeTime = 0;
-      record->cumulativeTimeSquared = 0;
-      record->maxDur = 0;
-      if (initMax) {
-          record->minDur = DBL_MAX;
-        } else {
+      mpiPi_cs_reset_stat(record);
+      if (!initMax) {
           record->minDur = 0;
-        }
-      record->cumulativeDataSent = 0;
-      record->cumulativeIO = 0;
-      record->maxDataSent = 0;
-      if (initMax) {
-          record->minDataSent = DBL_MAX;
-        } else {
           record->minDataSent = 0;
-        }
-      record->maxIO = 0;
-      if (initMax){
-          record->minIO = DBL_MAX;
-        } else {
           record->minIO = 0;
         }
-      record->arbitraryMessageCount = 0;
       record->rank = mpiPi.rank;
     }
   *task_lookup = record;
@@ -395,3 +329,78 @@ void mpiPi_stats_thr_pt2pt_binstrings(mpiPi_thread_stat_t *stat,
   _get_binstrings(&stat->pt2pt, comm_idx, comm_buf, size_idx, size_buf);
 }
 
+/*
+
+  <license>
+
+  Copyright (c) 2006, The Regents of the University of California.
+  Produced at the Lawrence Livermore National Laboratory
+  Written by Jeffery Vetter and Christopher Chambreau.
+  UCRL-CODE-223450.
+  All rights reserved.
+
+  Copyright (c) 2019, Mellanox Technologies Inc.
+  Written by Artem Polyakov
+  All rights reserved.
+
+
+  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  * Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the disclaimer below.
+
+  * Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the disclaimer (as noted below) in
+  the documentation and/or other materials provided with the
+  distribution.
+
+  * Neither the name of the UC/LLNL nor the names of its contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OF
+  THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+  Additional BSD Notice
+
+  1. This notice is required to be provided under our contract with the
+  U.S. Department of Energy (DOE).  This work was produced at the
+  University of California, Lawrence Livermore National Laboratory under
+  Contract No. W-7405-ENG-48 with the DOE.
+
+  2. Neither the United States Government nor the University of
+  California nor any of their employees, makes any warranty, express or
+  implied, or assumes any liability or responsibility for the accuracy,
+  completeness, or usefulness of any information, apparatus, product, or
+  process disclosed, or represents that its use would not infringe
+  privately-owned rights.
+
+  3.  Also, reference herein to any specific commercial products,
+  process, or services by trade name, trademark, manufacturer or
+  otherwise does not necessarily constitute or imply its endorsement,
+  recommendation, or favoring by the United States Government or the
+  University of California.  The views and opinions of authors expressed
+  herein do not necessarily state or reflect those of the United States
+  Government or the University of California, and shall not be used for
+  advertising or product endorsement purposes.
+
+  </license>
+
+*/
+
+/* EOF */
