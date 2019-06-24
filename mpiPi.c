@@ -808,7 +808,8 @@ mpiPi_finalize ()
 
 
 void
-mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
+mpiPi_update_callsite_stats (mpiPi_mt_stat_tls_t *tls,
+                             unsigned op, unsigned rank, void **pc,
                              double dur, double sendSize, double ioSize,
                              double rmaSize)
 {
@@ -816,21 +817,23 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   callsite_stats_t *csp = NULL;
   callsite_stats_t key;
 
-  mpiPi_stats_mt_cs_upd(&mpiPi.task_stats, op, rank, pc, dur,
-                         sendSize, ioSize, rmaSize);
+  mpiPi_stats_mt_cs_upd(tls, op, rank, pc, dur,
+                        sendSize, ioSize, rmaSize);
 }
 
 void
-mpiPi_update_collective_stats (int op, double dur, double size,
+mpiPi_update_collective_stats (mpiPi_mt_stat_tls_t *tls, int op, double dur, double size,
                                MPI_Comm * comm)
 {
-  mpiPi_stats_mt_coll_upd(&mpiPi.task_stats, op, dur, size, comm);
+  mpiPi_stats_mt_coll_upd(tls, op, dur, size, comm);
 }
 
 void
-mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm)
+mpiPi_update_pt2pt_stats (mpiPi_mt_stat_tls_t *tls,
+                          int op, double dur, double size,
+                          MPI_Comm * comm)
 {
-  mpiPi_stats_mt_pt2pt_upd(&mpiPi.task_stats, op, dur, size, comm);
+  mpiPi_stats_mt_pt2pt_upd(tls, op, dur, size, comm);
 }
 
 #endif /* } ifndef ENABLE_API_ONLY */

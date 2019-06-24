@@ -17,41 +17,6 @@ static void key_destruct(void *data)
   /* TODO: do we need to do anything here? */
 }
 
-static inline mpiPi_thread_stat_t *
-_get_local_tls(mpiPi_mt_stat_t *mt_state)
-{
-  mpiPi_thread_stat_t *st_state;
-
-  if (MPIPI_MODE_ST == mt_state->mode)
-    {
-      /* For all non-MPI_THREAD_MULTIPLE modes use
-       * embedded data structure
-       */
-      st_state = &mt_state->rank_stats;
-    } else {
-      /* For the MPI_THREAD_MULTIPLE mode use TLS
-       */
-      st_state = pthread_getspecific(mt_state->tls_this);
-      if (NULL == st_state)
-        {
-          st_state = malloc(sizeof(mpiPi_thread_stat_t));
-          if (NULL == st_state) {
-              mpiPi_abort("failed to allocate TLS");
-            }
-          (void) pthread_setspecific(mt_state->tls_this, st_state);
-          mpiPi_stats_thr_init(st_state);
-          mpiPi_tslist_append(mt_state->tls_list, st_state);
-        }
-    }
-  return st_state;
-}
-
-static void _merge_mt_stat(mpiPi_mt_stat_t *mt_state)
-{
-
-}
-
-
 /*
  * ============================================================================
  *
@@ -65,6 +30,9 @@ int mpiPi_stats_mt_init(mpiPi_mt_stat_t *mt_state, mpiPi_thr_mode_t mode)
   mt_state->mode = mode;
   mpiPi_stats_thr_init(&mt_state->rank_stats);
   switch(mt_state->mode) {
+    case MPIPI_MODE_ST:
+      mt_state->st_hndl.mt_state = mt_state;
+      mt_state->st_hndl.tls_ptr = &mt_state->rank_stats;
     case MPIPI_MODE_MT:
       mt_state->tls_list = mpiPi_tslist_create();
       pthread_key_create(&mt_state->tls_this, key_destruct);
@@ -88,6 +56,40 @@ void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *mt_state)
       mpiPi_stats_thr_init(&mt_state->rank_stats);
       break;
     }
+}
+
+mpiPi_mt_stat_tls_t *
+mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
+{
+  mpiPi_mt_stat_tls_t *hndl = NULL;
+
+  if (MPIPI_MODE_ST == mt_state->mode)
+    {
+      /* For all non-MPI_THREAD_MULTIPLE modes use
+       * embedded data structure
+       */
+      return &mt_state->st_hndl;
+    } else {
+      /* For the MPI_THREAD_MULTIPLE mode use TLS
+       */
+      hndl = pthread_getspecific(mt_state->tls_this);
+      if (NULL == hndl)
+        {
+          hndl = calloc(1, sizeof(*hndl));
+          if (NULL == hndl) {
+              mpiPi_abort("failed to allocate TLS handler");
+            }
+          hndl->mt_state = mt_state;
+          hndl->tls_ptr = calloc(1, sizeof(*hndl->mt_state));
+          if (NULL == hndl->tls_ptr) {
+              mpiPi_abort("failed to allocate TLS");
+            }
+          (void) pthread_setspecific(mt_state->tls_this, hndl);
+          mpiPi_stats_thr_init(hndl->tls_ptr);
+          mpiPi_tslist_append(mt_state->tls_list, hndl->tls_ptr);
+        }
+    }
+  return hndl;
 }
 
 void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state)
@@ -124,14 +126,12 @@ void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *mt_state,
     }
 }
 
-void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_t *mt_state,
-                           unsigned op, unsigned rank, void **pc,
-                           double dur, double sendSize, double ioSize,
-                           double rmaSize)
+void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_tls_t *hndl,
+                            unsigned op, unsigned rank, void **pc,
+                            double dur, double sendSize, double ioSize,
+                            double rmaSize)
 {
-  mpiPi_thread_stat_t *st_state = NULL;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_cs_upd(st_state, op, rank, pc, dur,
+  mpiPi_stats_thr_cs_upd(hndl->tls_ptr, op, rank, pc, dur,
                          sendSize, ioSize, rmaSize);
 }
 
@@ -145,13 +145,11 @@ void mpiPi_stats_mt_cs_lookup(mpiPi_mt_stat_t *stat,
                             dummy_buf, initMax);
 }
 
-void mpiPi_stats_mt_coll_upd(mpiPi_mt_stat_t *mt_state,
-                                  int op, double dur, double size,
-                                  MPI_Comm * comm)
+void mpiPi_stats_mt_coll_upd(mpiPi_mt_stat_tls_t *hndl,
+                             int op, double dur, double size,
+                             MPI_Comm * comm)
 {
-  mpiPi_thread_stat_t *st_state;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_coll_upd(st_state, op, dur, size, comm);
+  mpiPi_stats_thr_coll_upd(hndl->tls_ptr, op, dur, size, comm);
 }
 
 void mpiPi_stats_mt_coll_gather(mpiPi_mt_stat_t *stat, double **_outbuf)
@@ -173,13 +171,11 @@ void mpiPi_stats_mt_coll_binstrings(mpiPi_mt_stat_t *stat,
                                   size_idx, size_buf);
 }
 
-void mpiPi_stats_mt_pt2pt_upd (mpiPi_mt_stat_t *mt_state,
-                                   int op, double dur, double size,
-                                   MPI_Comm * comm)
+void mpiPi_stats_mt_pt2pt_upd (mpiPi_mt_stat_tls_t *hndl,
+                               int op, double dur, double size,
+                               MPI_Comm * comm)
 {
-  mpiPi_thread_stat_t *st_state;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_pt2pt_upd(st_state, op, dur, size, comm);
+  mpiPi_stats_thr_pt2pt_upd(hndl->tls_ptr, op, dur, size, comm);
 }
 
 void mpiPi_stats_mt_pt2pt_gather(mpiPi_mt_stat_t *stat, double **_outbuf)
@@ -195,23 +191,17 @@ void mpiPi_stats_mt_pt2pt_binstrings(mpiPi_mt_stat_t *stat,
                                    size_idx, size_buf);
 }
 
-int mpiPi_stats_mt_exit(mpiPi_mt_stat_t *mt_state)
+int mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl)
 {
-  mpiPi_thread_stat_t *st_state;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_exit(st_state);
+  mpiPi_stats_thr_exit(hndl->tls_ptr);
 }
 
-int mpiPi_stats_mt_enter(mpiPi_mt_stat_t *mt_state)
+int mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl)
 {
-  mpiPi_thread_stat_t *st_state;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_enter(st_state);
+  mpiPi_stats_thr_enter(hndl->tls_ptr);
 }
 
-int mpiPi_stats_mt_is_on(mpiPi_mt_stat_t *mt_state)
+int mpiPi_stats_mt_is_on(mpiPi_mt_stat_tls_t *hndl)
 {
-  mpiPi_thread_stat_t *st_state;
-  st_state = _get_local_tls(mt_state);
-  mpiPi_stats_thr_is_on(st_state);
+  mpiPi_stats_thr_is_on(hndl->tls_ptr);
 }

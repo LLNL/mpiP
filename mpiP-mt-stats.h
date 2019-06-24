@@ -10,15 +10,21 @@ typedef enum {
   MPIPI_MODE_MT
 } mpiPi_thr_mode_t;
 
-typedef struct {
-  mpiPi_thread_stat_t merget_stat;
+typedef struct mpiPi_mt_stat_s mpiPi_mt_stat_t;
 
-} _mpiPi_mt_state_t;
+typedef struct {
+  mpiPi_mt_stat_t *mt_state;
+  mpiPi_thread_stat_t *tls_ptr;
+} mpiPi_mt_stat_tls_t;
 
 /* Per-thread MPI status */
-typedef struct {
+typedef struct mpiPi_mt_stat_s {
+  /* generic part */
   mpiPi_thr_mode_t mode;
+  mpiPi_mt_stat_tls_t st_hndl;
   mpiPi_thread_stat_t rank_stats;
+
+  /* MT-only part */
   mpiP_tslist_t *tls_list;
   pthread_key_t tls_this;
 } mpiPi_mt_stat_t;
@@ -27,12 +33,14 @@ int mpiPi_stats_mt_init(mpiPi_mt_stat_t *stat, mpiPi_thr_mode_t mode);
 void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *stat);
 void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state);
 
+mpiPi_mt_stat_tls_t *mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state);
+
 void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *stat,
                              int *ac, callsite_stats_t ***av );
-void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_t *stat,
-                           unsigned op, unsigned rank, void **pc,
-                           double dur, double sendSize, double ioSize,
-                           double rmaSize);
+void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_tls_t *hndl,
+                            unsigned op, unsigned rank, void **pc,
+                            double dur, double sendSize, double ioSize,
+                            double rmaSize);
 
 void mpiPi_stats_mt_cs_lookup(mpiPi_mt_stat_t *stat,
                               callsite_stats_t *task_stats,
@@ -40,26 +48,26 @@ void mpiPi_stats_mt_cs_lookup(mpiPi_mt_stat_t *stat,
                               callsite_stats_t *dummy_buf,
                               int initMax);
 
-void mpiPi_stats_mt_coll_upd(mpiPi_mt_stat_t *stat,
-                                  int op, double dur, double size,
-                                  MPI_Comm * comm);
+void mpiPi_stats_mt_coll_upd(mpiPi_mt_stat_tls_t *hndl,
+                             int op, double dur, double size,
+                             MPI_Comm * comm);
 void mpiPi_stats_mt_coll_gather(mpiPi_mt_stat_t *stat, double **_outbuf);
 void mpiPi_stats_mt_cs_reset(mpiPi_mt_stat_t *stat);
 void mpiPi_stats_mt_coll_binstrings(mpiPi_mt_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
 
-void mpiPi_stats_mt_pt2pt_upd (mpiPi_mt_stat_t *stat,
-                                   int op, double dur, double size,
-                                   MPI_Comm * comm);
+void mpiPi_stats_mt_pt2pt_upd (mpiPi_mt_stat_tls_t *hndl,
+                               int op, double dur, double size,
+                               MPI_Comm * comm);
 void mpiPi_stats_mt_pt2pt_gather(mpiPi_mt_stat_t *stat, double **_outbuf);
 void mpiPi_stats_mt_pt2pt_binstrings(mpiPi_mt_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
 
-int mpiPi_stats_mt_exit(mpiPi_mt_stat_t *stat);
-int mpiPi_stats_mt_enter(mpiPi_mt_stat_t *stat);
-int mpiPi_stats_mt_is_on(mpiPi_mt_stat_t *stat);
+int mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl);
+int mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl);
+int mpiPi_stats_mt_is_on(mpiPi_mt_stat_tls_t *hndl);
 
 #endif // MPIPMTSTATS_H
 
