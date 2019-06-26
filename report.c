@@ -583,38 +583,54 @@ mpiPi_print_callsites (FILE * fp)
 
   for (i = 0; i < ac; i++)
     {
-      int j;
-      for (j = 0, stack_continue_flag = 1;
+      int j, start_point = 0;
+      char *mpi_funcname = mpiPi.lookup[av[i]->op - mpiPi_BASE].name;
+
+      /* Find the starting point:
+       * search for the MPI operation name in the stacktrace and use it
+       * as the beginning of the stack.
+       */
+      for (j = 0;
+           (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL);
+           j++)
+        {
+
+          if (strcmp (av[i]->functname[j], mpi_funcname) == 0)
+            {
+              start_point = j + 1;
+            }
+        }
+
+      for (j = start_point, stack_continue_flag = 1;
            (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL) &&
            stack_continue_flag == 1; j++)
         {
+          int level = j - start_point;
           if (av[i]->line[j] == 0 &&
               (strcmp (av[i]->filename[j], "[unknown]") == 0 ||
                strcmp (av[i]->functname[j], "[unknown]") == 0))
             {
               fprintf (fp, "%3d %3d %-*s %-*s %s\n",
                        av[i]->id,
-                       j,
+                       level,
                        fileLenMax + 6,
                        mpiP_format_address (av[i]->pc[j], addr_buf),
                        funcLenMax,
                        av[i]->functname[j],
-                       (j ==
-                        0) ? &(mpiPi.lookup[av[i]->op -
-                             mpiPi_BASE].name[4]) : "");
+                       (level == 0) ?
+                         &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]) : "");
             }
           else
             {
               fprintf (fp, "%3d %3d %-*s %5d %-*s %s\n",
                        av[i]->id,
-                       j,
+                       level,
                        fileLenMax,
                        av[i]->filename[j], av[i]->line[j],
                        funcLenMax,
                        av[i]->functname[j],
-                       (j ==
-                        0) ? &(mpiPi.lookup[av[i]->op -
-                             mpiPi_BASE].name[4]) : "");
+                       (level == 0) ?
+                         &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]) : "");
             }
           /*  Do not bother printing stack frames above main   */
           if (strcmp (av[i]->functname[j], "main") == 0
