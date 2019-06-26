@@ -15,7 +15,7 @@ static char *svnid =
 #endif
 
 #include <stdio.h>
-#include "mpi.h"
+#include <mpi.h>
 
 int nprocs = -1;
 int rank = -1;
