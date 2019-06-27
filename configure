@@ -5991,7 +5991,7 @@ if test "x${slibdir}" = x ; then
 fi
 
 
-ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h"
+ac_config_files="$ac_config_files Defs.mak Makefile testing/Makefile Check.mak mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h"
 
 
 
@@ -6604,7 +6604,6 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "testing/Makefile") CONFIG_FILES="$CONFIG_FILES testing/Makefile" ;;
     "Check.mak") CONFIG_FILES="$CONFIG_FILES Check.mak" ;;
-    "mpiPi.h") CONFIG_FILES="$CONFIG_FILES mpiPi.h" ;;
     "mpi.protos.txt") CONFIG_FILES="$CONFIG_FILES mpi.protos.txt" ;;
     "get_fortran_arg.f") CONFIG_FILES="$CONFIG_FILES get_fortran_arg.f" ;;
     "mpip_timers/aix_local.h") CONFIG_FILES="$CONFIG_FILES mpip_timers/aix_local.h" ;;

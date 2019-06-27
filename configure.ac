@@ -753,7 +753,7 @@ if test "x${slibdir}" = x ; then
 fi
 AC_SUBST(slibdir)
 
-AC_CONFIG_FILES([Defs.mak Makefile testing/Makefile Check.mak mpiPi.h mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h])
+AC_CONFIG_FILES([Defs.mak Makefile testing/Makefile Check.mak mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h])
 AC_OUTPUT
 
 #  
