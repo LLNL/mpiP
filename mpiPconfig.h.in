@@ -1,172 +1,142 @@
-/* -*- C -*-
+/* mpiPconfig.h.in.  Generated from configure.ac by autoheader.  */
 
-   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
-
-   Please see COPYRIGHT AND LICENSE information at the end of this file.
-
-   ----- 
-
-   Autoconf configuration macros
-
-   $Id$
-*/
-
-
-#ifndef _MPIPCONFIG_H
-#define _MPIPCONFIG_H
-
-/* Define if demangle.h is present. */
-#undef HAVE_DEMANGLE_H
-
-/* Define if using libdwarf for source lookup */
-#undef USE_LIBDWARF
-
-/* Define if using binutils libbfd */
-#undef ENABLE_BFD
-
-/* Define if using libunwind */
-#undef HAVE_LIBUNWIND
-
-/* Define if MPI I/O functions are present */
-#undef HAVE_MPI_IO
-
-/* Define if MPI RMA functions are present */
-#undef HAVE_MPI_RMA
-
-/* Define if MPI non-blocking collectives functions are present */
-#undef HAVE_MPI_NONBLOCKINGCOLLECTIVES
-
-/* Define if bfd_boolean not defined */
-#undef HAVE_BFD_BOOLEAN
-
-/* Define to activate check for negative time values */
-#undef MPIP_CHECK_TIME
-
-/* Define to force use of read_real_time for timing */
-#undef USE_READ_REAL_TIME
-
-/* Define to force use of gettimeofday for timing */
-#undef USE_GETTIMEOFDAY
-
-/* Define to use clock_gettime for timing */
-#undef USE_CLOCK_GETTIME
-
-/* Define to use dclock for timing */
-#undef USE_DCLOCK
-
-/* Define to use MPI_Wtime for timing */
-#undef USE_WTIME
-
-/* Define to use rts_get_timebase on BG/L for timing */
-#undef USE_RTS_GET_TIMEBASE
-
-/* Define to use _rtc on Cray X1 */
-#undef USE_RTC
-
-/* Distinguish available BFD calls between 2.15 and 2.15.96 */
-#undef HAVE_BFD_GET_SECTION_SIZE
-
-/* Address bug in Quadrics MPI Opaque Object translation */
-#undef HAVE_MPIR_TOPOINTER
-
-/* Do non-MPI configure for API library only */
-#undef ENABLE_API_ONLY
-
-/* Have collective report generation be default */
+/* "Use collective reporting by default" */
 #undef COLLECTIVE_REPORT_DEFAULT
 
-/* Determine whether to include weak symbol include files */
-#undef ENABLE_FORTRAN_WEAK_SYMS
-
-/* Use glibc backtrace for stack trace */
-#undef USE_BACKTRACE
-
-/* Use setjmp to get stack pointer for naive stack unwinding */
-#undef USE_SETJMP
-
-/* Add mread_real_time declaration if needed. */
-#undef NEED_MREAD_REAL_TIME_DECL
-
-/* Use /proc/self/maps to get SO info for source lookup. */
-#undef SO_LOOKUP
-
-/* Set the default report format (concise or verbose). */
+/* The default format of the report */
 #undef DEFAULT_REPORT_FORMAT
 
-/* Specify use of "const"s, as per the MPI-3 specification.  */
-#undef USE_MPI3_CONSTS
+/* "Only build API" */
+#undef ENABLE_API_ONLY
 
-/* PACKAGE definitions */
+/* Enable BFD library for the PC to source lookups */
+#undef ENABLE_BFD
+
+/* Enable weak symbols for FORTRAN */
+#undef ENABLE_FORTRAN_WEAK_SYMS
+
+/* F77 symbols */
+#undef F77_SYMBOLS
+
+/* BFD booleans */
+#undef HAVE_BFD_BOOLEAN
+
+/* BFD get section size */
+#undef HAVE_BFD_GET_SECTION_SIZE
+
+/* Have demangling */
+#undef HAVE_DEMANGLE_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Have libunwind */
+#undef HAVE_LIBUNWIND
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Have MPIR to pointer */
+#undef HAVE_MPIR_TOPOINTER
+
+/* Have MPI-IO */
+#undef HAVE_MPI_IO
+
+/* Have MPI non-blocking collectives */
+#undef HAVE_MPI_NONBLOCKINGCOLLECTIVES
+
+/* Have MPI RMA */
+#undef HAVE_MPI_RMA
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Depth of the callsite */
+#undef MPIP_CALLSITE_STACK_DEPTH_MAX
+
+/* MPI check time */
+#undef MPIP_CHECK_TIME
+
+/* Need Real-time declaration */
+#undef NEED_MREAD_REAL_TIME_DECL
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
 #undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-#endif /* _CONFIG_H */
+/* SO lookup */
+#undef SO_LOOKUP
 
-/* 
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
 
-<license>
+/* Use backtrace */
+#undef USE_BACKTRACE
 
-Copyright (c) 2006, The Regents of the University of California. 
-Produced at the Lawrence Livermore National Laboratory 
-Written by Jeffery Vetter and Christopher Chambreau. 
-UCRL-CODE-223450. 
-All rights reserved. 
- 
-This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
- 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
- 
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the disclaimer below.
+/* Use clock_gettime for timing */
+#undef USE_CLOCK_GETTIME
 
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the disclaimer (as noted below) in
-the documentation and/or other materials provided with the
-distribution.
+/* Use dlock */
+#undef USE_DCLOCK
 
-* Neither the name of the UC/LLNL nor the names of its contributors
-may be used to endorse or promote products derived from this software
-without specific prior written permission.
+/* Use getarg */
+#undef USE_GETARG
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OF
-THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- 
-Additional BSD Notice 
- 
-1. This notice is required to be provided under our contract with the
-U.S. Department of Energy (DOE).  This work was produced at the
-University of California, Lawrence Livermore National Laboratory under
-Contract No. W-7405-ENG-48 with the DOE.
- 
-2. Neither the United States Government nor the University of
-California nor any of their employees, makes any warranty, express or
-implied, or assumes any liability or responsibility for the accuracy,
-completeness, or usefulness of any information, apparatus, product, or
-process disclosed, or represents that its use would not infringe
-privately-owned rights.
- 
-3.  Also, reference herein to any specific commercial products,
-process, or services by trade name, trademark, manufacturer or
-otherwise does not necessarily constitute or imply its endorsement,
-recommendation, or favoring by the United States Government or the
-University of California.  The views and opinions of authors expressed
-herein do not necessarily state or reflect those of the United States
-Government or the University of California, and shall not be used for
-advertising or product endorsement purposes.
+/* Use gettimofday */
+#undef USE_GETTIMEOFDAY
 
-</license>
+/* Use libdwarf */
+#undef USE_LIBDWARF
 
-*/
+/* Use MPI v3 constructions */
+#undef USE_MPI3_CONSTS
+
+/* Use read real time */
+#undef USE_READ_REAL_TIME
+
+/* Use RTC */
+#undef USE_RTC
+
+/* Use RTS get timebase */
+#undef USE_RTS_GET_TIMEBASE
+
+/* Use setjmp */
+#undef USE_SETJMP
+
+/* Use MPI_Wtime */
+#undef USE_WTIME

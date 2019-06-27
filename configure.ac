@@ -99,7 +99,7 @@ AC_SUBST(BIN_TYPE_FLAG)
 TIMER_OPTION=no
 AC_ARG_WITH(gettimeofday,
 	AS_HELP_STRING(--with-gettimeofday,Use gettimeofday for timing.),
-	AC_DEFINE(USE_GETTIMEOFDAY)
+	AC_DEFINE([USE_GETTIMEOFDAY],[],[Use gettimeofday for the timer])
         USE_GETTIMEOFDAY=true
 	TIMER_OPTION=yes
 	,
@@ -107,14 +107,14 @@ AC_ARG_WITH(gettimeofday,
 
 AC_ARG_WITH(wtime,
 	AS_HELP_STRING(--with-wtime,Use MPI_Wtime for timing.),
-	AC_DEFINE(USE_WTIME)
+	AC_DEFINE([USE_WTIME],[],[Use MPI_Wtime for timer])
 	TIMER_OPTION=yes
 	,
 )
 
 AC_ARG_WITH(clock_gettime,
 	AS_HELP_STRING(--with-clock_gettime,Use clock_gettime for timing.),
-	AC_DEFINE(USE_CLOCK_GETTIME)
+	AC_DEFINE([USE_CLOCK_GETTIME], [], [Use clock_gettime for timing])
 	USE_CLOCK_GETTIME=yes
 	TIMER_OPTION=yes
 	,
@@ -122,7 +122,7 @@ AC_ARG_WITH(clock_gettime,
 
 AC_ARG_WITH(rts_get_timebase,
 	AS_HELP_STRING(--with-rts_get_timebase,Use rts_get_timebase for timing on BG/L systems (default for BG/L).),
-	AC_DEFINE(USE_RTS_GET_TIMEBASE)
+	AC_DEFINE([USE_RTS_GET_TIMEBASE],[],[Use RTS get timebase])
 	USE_RTS_GET_TIMEBASE=yes
 	TIMER_OPTION=yes
 	,
@@ -131,7 +131,7 @@ AC_ARG_WITH(rts_get_timebase,
 
 AC_ARG_WITH(read_real_time,
 	AS_HELP_STRING(--with-read_real_time,Use read_real_time for timing on AIX systems (default for AIX).),
-	AC_DEFINE(USE_READ_REAL_TIME)
+	AC_DEFINE([USE_READ_REAL_TIME], [], [Use read real time])
 	USE_READ_REAL_TIME=yes
 	TIMER_OPTION=yes
 	,
@@ -140,7 +140,7 @@ AC_ARG_WITH(read_real_time,
 
 AC_ARG_WITH(rtc,
 	AS_HELP_STRING(--with-rtc,Use _rtc for timing on CRAY X1 systems (default for X1).),
-	AC_DEFINE(USE_RTC)
+	AC_DEFINE([USE_RTC], [], [Use RTC])
 	USE_RTC=yes
 	TIMER_OPTION=yes
 	,
@@ -149,7 +149,7 @@ AC_ARG_WITH(rtc,
 
 AC_ARG_WITH(dclock,
 	AS_HELP_STRING(--with-dclock,Use Catamount dclock for timing.),
-	AC_DEFINE(USE_DCLOCK)
+	AC_DEFINE([USE_DCLOCK], [], [Use dlock])
 	USE_DCLOCK=yes
 	TIMER_OPTION=yes
 	,
@@ -168,7 +168,7 @@ AC_ARG_ENABLE(api-only,
 	if test x"$enableval" = xyes ; then
 		ENABLE_API_ONLY=yes
 		echo Configuring for API library only.
-               	AC_DEFINE(ENABLE_API_ONLY)
+               	AC_DEFINE([ENABLE_API_ONLY], [], ["Only build API"])
 		DEFAULT_TARGS="API test"
 	fi
 	,
@@ -249,7 +249,7 @@ AC_ARG_ENABLE(setjmp,
 	AS_HELP_STRING(--enable-setjmp,Use setjmp instead of glic backtrace() to generate stack traces.),
 	if test x"$enableval" = xyes ; then
 		USE_SETJMP=yes
-    AC_DEFINE(USE_SETJMP)
+    AC_DEFINE([USE_SETJMP], [], [Use setjmp])
 		echo Setjmp will be used to generate stack traces.
 	fi
 	,
@@ -277,7 +277,7 @@ AC_ARG_ENABLE(fortranweak,
                   echo Generation of additional weak FORTRAN symbol names has been disabled.
         else
                 ENABLE_FORTRAN_WEAK_SYMS=yes
-                AC_DEFINE(ENABLE_FORTRAN_WEAK_SYMS)
+                AC_DEFINE([ENABLE_FORTRAN_WEAK_SYMS], [], [Enable weak symbols for FORTRAN])
                 echo Generation of additional weak FORTRAN symbol names has been enabled.
         fi
         ,
@@ -285,14 +285,16 @@ AC_ARG_ENABLE(fortranweak,
 )
 AC_SUBST(ENABLE_FORTRAN_WEAK_SYMS)
 
+
+
 AC_ARG_ENABLE(stackdepth,
-	AS_HELP_STRING(--enable-stackdepth,Specify maximum stacktrace depth (default is 8).),
-	STACKDEPTH=$enableval
-	echo Maximum stacktrace depth is $STACKDEPTH
-	,
-	STACKDEPTH=8
+	AS_HELP_STRING([--enable-stackdepth], [Specify maximum stacktrace depth (default is 8).]),
+	STACKDEPTH=$enableval; 
+    echo "Maximum stacktrace depth is $STACKDEPTH",
+	STACKDEPTH=8,
 )
-AC_SUBST(STACKDEPTH)
+AC_DEFINE_UNQUOTED([MPIP_CALLSITE_STACK_DEPTH_MAX], [$STACKDEPTH], [Depth of the callsite])
+#AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
 
 PC_LOOKUP_FILE=pc_lookup.c
 AC_ARG_ENABLE(dwarf,
@@ -313,7 +315,7 @@ USE_GETARG=false
 AC_ARG_ENABLE(getarg,
 	AS_HELP_STRING(--enable-getarg,Use getarg to get fortran command line args.),
 	if test x"$enableval" = xyes ; then
-		AC_DEFINE(USE_GETARG)
+		AC_DEFINE([USE_GETARG], [], [Use getarg])
 		echo Use of getarg has been enabled
 		USE_GETARG=true
 	fi
@@ -333,7 +335,7 @@ AC_SUBST(DO_DEMANGLE)
 AC_ARG_ENABLE(check-time,
 	AS_HELP_STRING(--enable-check-time,Enable AIX check for negative time values.),
 	if test x"$enableval" = xyes ; then
-		AC_DEFINE(MPIP_CHECK_TIME)
+		AC_DEFINE([MPIP_CHECK_TIME], [], [MPI check time])
 		echo AIX negative time value checking has been enabled
 	fi
 	,
@@ -342,17 +344,17 @@ AC_ARG_ENABLE(check-time,
 AC_ARG_ENABLE(collective-report-default,
 	AS_HELP_STRING(--enable-collective-report-default,Have mpiP default to low-memory-use collective report generation as opposed to collecting all data at a single task (see runtime flags -l and -s).),
 	if test "x$enableval" = xyes ; then
-                AC_DEFINE(COLLECTIVE_REPORT_DEFAULT)
+                AC_DEFINE([COLLECTIVE_REPORT_DEFAULT],[], ["Use collective reporting by default"])
 		echo "Using collective report as default."
 	fi
 	,
 )
 
-AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_verbose])
+AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_verbose], [Default report style])
 AC_ARG_ENABLE(concise-report-default,
 	AS_HELP_STRING(--enable-concise-report-default,Have mpiP default to a concise summary report format. (see runtime flags -c and -v).),
 	if test "x$enableval" = xyes ; then
-                AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_concise])
+                AC_DEFINE([DEFAULT_REPORT_FORMAT], [mpiPi_style_concise],[The default format of the report])
 		echo "Using concise report as default."
 	fi
 	,
@@ -395,14 +397,14 @@ if test "x$ENABLE_BFD" = "xyes" ; then
   AC_CHECK_LIB(iberty,objalloc_create, BFD_AUX_LIBS="$BFD_AUX_LIBS -liberty")
   AC_CHECK_HEADER(bfd.h,
     AC_CHECK_LIB(bfd,bfd_openr, LIBS="$LIBS -lbfd", ENABLE_BFD=no, $BFD_AUX_LIBS)
-    AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE(HAVE_BFD_GET_SECTION_SIZE), ,[#include "bfd.h"]) 
+    AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE([HAVE_BFD_GET_SECTION_SIZE], [], [BFD get section size]), ,[#include "bfd.h"]) 
     , ENABLE_BFD=no SO_LOOKUP=no
   )
-  AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE(HAVE_BFD_BOOLEAN), [#include "bfd.h"])
+  AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE([HAVE_BFD_BOOLEAN], [], [BFD booleans]), [#include "bfd.h"])
   if test "x$ENABLE_BFD" = "xyes" ; then
-    AC_CHECK_HEADER(demangle.h, [AC_DEFINE(HAVE_DEMANGLE_H) if test "x$DO_DEMANGLE" = xfalse ; then DO_DEMANGLE=GNU ; fi])
+    AC_CHECK_HEADER(demangle.h, [AC_DEFINE([HAVE_DEMANGLE_H], [], [Have demangling]) if test "x$DO_DEMANGLE" = xfalse ; then DO_DEMANGLE=GNU ; fi])
     LIBS="$LIBS $BFD_AUX_LIBS"
-    AC_DEFINE(ENABLE_BFD)
+    AC_DEFINE([ENABLE_BFD], [], [Enable BFD library for the PC to source lookups])
     SOURCE_LOOKUP=bfd
   fi
 
@@ -419,7 +421,7 @@ else
     echo $ECHO_N "checking for libelf/libdwarf..." $ECHO_C
     if test x$LIBELF_FOUND = xyes -a x$LIBDWARF_FOUND = xyes ; then
       LIBS="${LIBS} -ldwarf -lelf"
-      AC_DEFINE(USE_LIBDWARF)
+      AC_DEFINE([USE_LIBDWARF], [], [Use libdwarf])
       echo " found libelf/libdwarf"
       SOURCE_LOOKUP=libelf/libdwarf
       SO_LOOKUP=no
@@ -430,8 +432,8 @@ else
 fi
 
 if test "$ENABLE_API_ONLY" = no ; then
-  AC_CHECK_LIB(mpi,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
-  AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE(HAVE_MPIR_TOPOINTER),)
+  AC_CHECK_LIB(mpi,MPIR_ToPointer,AC_DEFINE([HAVE_MPIR_TOPOINTER], [], [Have MPIR to pointer]),)
+  AC_CHECK_LIB(mpich,MPIR_ToPointer,AC_DEFINE([HAVE_MPIR_TOPOINTER],[], [Have MPIR to pointer]),)
 fi
 
 #  Check for MPI3
@@ -442,7 +444,7 @@ AC_COMPILE_IFELSE(
           #endif
         ])
     ],
-    AC_DEFINE(USE_MPI3_CONSTS))
+    AC_DEFINE([USE_MPI3_CONSTS],[],[Use MPI v3 constructions]))
 
 
 #
@@ -455,7 +457,7 @@ TIMER_NAME=none
 # use rts_get_timebase (BG/L) by default if it exists
 if test x$TIMER_FOUND = xno && \
   (test x$TIMER_OPTION = xno || test x$USE_RTS_GET_TIMEBASE = xyes); then
-AC_CHECK_FUNC(rts_get_timebase, AC_DEFINE(USE_RTS_GET_TIMEBASE) 
+AC_CHECK_FUNC(rts_get_timebase, AC_DEFINE([USE_RTS_GET_TIMEBASE], [], [Use RTS get timebase])
         USE_RTS_GET_TIMEBASE=yes ; TIMER_FOUND=yes ; TIMER_NAME="rts_get_timebase (assuming 700MHz)" ; AC_SUBST(USE_RTS_GET_TIMEBASE)
         )
 fi
@@ -463,7 +465,7 @@ fi
 # use _rtc (Cray X1) by default if it exists
 if test x$TIMER_FOUND = xno && \
   (test x$TIMER_OPTION = xno || test x$USE_RTC = xyes); then
-AC_CHECK_DECL(_rtc, AC_DEFINE(USE_RTC) 
+AC_CHECK_DECL(_rtc, AC_DEFINE([USE_RTC], [], [Use RTC])
         USE_RTC=yes ; TIMER_FOUND=yes ; TIMER_NAME=_rtc ; AC_SUBST(USE_RTC)
         , , [#include <intrinsics.h>])
 fi
@@ -474,7 +476,7 @@ if test x$TIMER_FOUND = xno && test x$TIMER_OPTION = xno ; then
   AC_CHECK_FUNC(mread_real_time, READ_REAL_TIME=mread_real_time TIMER_FOUND=yes)
   if test x$TIMER_FOUND = xyes; then
     #  In AIX 5.3, finding mread_real_time in libc, but not in header files.
-    AC_CHECK_DECL(mread_real_time, ,AC_DEFINE(NEED_MREAD_REAL_TIME_DECL),[#include <sys/systemcfg.h>] [#include <sys/time.h>])
+    AC_CHECK_DECL(mread_real_time, ,AC_DEFINE([NEED_MREAD_REAL_TIME_DECL], [], [Need Real-time declaration]),[#include <sys/systemcfg.h>] [#include <sys/time.h>])
   else
     AC_CHECK_FUNC(read_real_time, READ_REAL_TIME=read_real_time TIMER_FOUND=yes)
   fi
@@ -485,19 +487,19 @@ fi
 
 # If specified, try to use clock_gettime
 if test x$TIMER_FOUND = xno && test "x$USE_CLOCK_GETTIME" = "xyes" ; then
-  AC_CHECK_LIB(rt,clock_gettime, AC_DEFINE(USE_CLOCK_GETTIME) USE_CLOCK_GETTIME=true TIMER_FOUND=yes TIMER_NAME=clock_gettime LIBS="$LIBS -lrt"
+  AC_CHECK_LIB(rt,clock_gettime, AC_DEFINE([USE_CLOCK_GETTIME],[] [Use clock_gettime for timing]) USE_CLOCK_GETTIME=true TIMER_FOUND=yes TIMER_NAME=clock_gettime LIBS="$LIBS -lrt"
   )
 fi
 
 # If specified, use dclock
 if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
-  AC_DEFINE(USE_DCLOCK) TIMER_FOUND=yes TIMER_NAME=dclock
+  AC_DEFINE([USE_DCLOCK], [], [Use dlock]) TIMER_FOUND=yes TIMER_NAME=dclock
 fi
 
 # If no appropriate timers were found, default to MPI_Wtime
 if test x$TIMER_FOUND = xno ; then
-        AC_CHECK_FUNC(MPI_Wtime, AC_DEFINE(USE_WTIME) TIMER_NAME=MPI_Wtime
-          , echo Failed to find MPI_Wtime.  Trying to use gettimeofday.; AC_DEFINE(USE_GETTIMEOFDAY) USE_GETTIMEOFDAY=true)
+        AC_CHECK_FUNC(MPI_Wtime, AC_DEFINE([USE_WTIME], [], [Use MPI_Wtime]) TIMER_NAME=MPI_Wtime
+          , echo Failed to find MPI_Wtime.  Trying to use gettimeofday.; AC_DEFINE([USE_GETTIMEOFDAY],[],[Use gettimofday]) USE_GETTIMEOFDAY=true)
 fi
 
 
@@ -507,7 +509,7 @@ UNWIND_WITH=internal
 #  access platform-specific functions.
 HAVE_LIBUNWIND=no
 if test "x$DISABLE_LIBUNWIND" = "xno" ; then
-	AC_CHECK_HEADER(libunwind.h, AC_DEFINE(HAVE_LIBUNWIND) LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes UNWIND_WITH=libunwind, 
+	AC_CHECK_HEADER(libunwind.h, AC_DEFINE([HAVE_LIBUNWIND],[], [Have libunwind]) LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes UNWIND_WITH=libunwind, 
 	[ if test x$build_cpu = xx86_64 ; then
 	  echo
 	  echo "  mpiP on x86_64 platforms requires libunwind."
@@ -520,14 +522,14 @@ if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 fi
 
 if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then 
-  AC_CHECK_FUNC(backtrace, AC_DEFINE(USE_BACKTRACE) UNWIND_WITH=glibc-backtrace, USE_SETJMP=yes)
+  AC_CHECK_FUNC(backtrace, AC_DEFINE([USE_BACKTRACE], [], [Use backtrace]) UNWIND_WITH=glibc-backtrace, USE_SETJMP=yes)
 fi
 
 if test "$ENABLE_API_ONLY" = no && test "$ENABLE_MPI_IO" = yes ; then
 AC_CHECK_FUNC(MPI_File_open,
-              AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt,
+              AC_DEFINE([HAVE_MPI_IO], [], [Have MPI-IO]) HAVE_MPI_IO=mpi.io.protos.txt,
 	      AC_CHECK_LIB(mpio,MPI_File_open, 
-                AC_DEFINE(HAVE_MPI_IO) HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio",
+                AC_DEFINE([HAVE_MPI_IO],[],[Have MPI-IO]) HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio",
                 AC_MSG_RESULT(MPI I/O symbols not found.  MPI I/O reporting deactivated.)
                 HAVE_MPI_IO=/dev/null
                 ENABLE_MPI_IO=no )
@@ -538,7 +540,7 @@ fi
 
 if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_RMA" = xyes ; then
 AC_CHECK_FUNC(MPI_Win_allocate,
-              AC_DEFINE(HAVE_MPI_RMA) HAVE_MPI_RMA=mpi.rma.protos.txt,
+              AC_DEFINE([HAVE_MPI_RMA], [], [Have MPI RMA]) HAVE_MPI_RMA=mpi.rma.protos.txt,
                 AC_MSG_RESULT([MPI RMA symbols not found.  MPI RMA reporting deactivated.])
                 HAVE_MPI_RMA=/dev/null
                 ENABLE_MPI_RMA=no
@@ -549,7 +551,7 @@ fi
 
 if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_NONBLOCKINGCOLLECTIVES" = xyes ; then
 AC_CHECK_FUNC(MPI_Ibarrier,
-              AC_DEFINE(HAVE_MPI_NONBLOCKINGCOLLECTIVES) HAVE_MPI_NONBLOCKINGCOLLECTIVES=mpi.nbc.protos.txt,
+              AC_DEFINE([HAVE_MPI_NONBLOCKINGCOLLECTIVES],[],[Have MPI non-blocking collectives]) HAVE_MPI_NONBLOCKINGCOLLECTIVES=mpi.nbc.protos.txt,
                 AC_MSG_RESULT([MPI NONBLOCKINGCOLLECTIVES symbols not found.  MPI NONBLOCKINGCOLLECTIVES reporting deactivated.])
                 HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
                 ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
@@ -571,7 +573,7 @@ if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   
   #  SO lookup code uses getline, assumes ought to be available if we are using libbfd
   if test "x$SO_LOOKUP" = xyes ; then
-    AC_CHECK_FUNC(getline, AC_DEFINE(SO_LOOKUP), AC_MSG_RESULT([getline not found so SO lookup is disabled.]))
+    AC_CHECK_FUNC(getline, AC_DEFINE([SO_LOOKUP],[],[SO lookup]), AC_MSG_RESULT([getline not found so SO lookup is disabled.]))
   fi
 fi
 
@@ -664,7 +666,7 @@ else
   AC_MSG_RESULT(guessing lowercase with underscore)
 fi
 AC_SUBST(F77_SYMBOLS)
-AC_DEFINE_UNQUOTED(F77_SYMBOLS,$F77_SYMBOLS)
+AC_DEFINE_UNQUOTED([F77_SYMBOLS],[$F77_SYMBOLS], [F77 symbols])
 
 
 dnl ========== Identify F77 ==========
