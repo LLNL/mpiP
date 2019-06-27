@@ -143,8 +143,6 @@ typedef struct _mpiPi_t
   char *envStr;
   FILE *stdout_;
   FILE *stderr_;
-  mpiPi_TIME startTime;
-  mpiPi_TIME endTime;
 
   double cumulativeTime;	/* necessary for pcontrol */
   time_t start_timeofday;

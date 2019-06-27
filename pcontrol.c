@@ -45,7 +45,7 @@ mpiPi_reset_callsite_data ()
       mpiPi_msg_warn ("Could not get time of day from time()\n");
     }
 
-  mpiPi_GETTIME (&mpiPi.startTime);
+  mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
   mpiPi.cumulativeTime = 0;
 
   mpiPi.global_app_time = 0;
@@ -71,11 +71,7 @@ mpiPi_MPI_Pcontrol (const int flag)
         mpiPi_msg_warn
             ("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
 
-      mpiPi_GETTIME (&mpiPi.endTime);
-      dur =
-          (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
-      mpiPi.cumulativeTime += dur;
-      assert (mpiPi.cumulativeTime >= 0);
+      mpiPi_stats_mt_timer_stop(&mpiPi.task_stats);
       mpiPi.enabled = 0;
     }
   else if (flag == 2)
@@ -85,12 +81,12 @@ mpiPi_MPI_Pcontrol (const int flag)
   else if (flag == 3)
     {
       mpiPi_generateReport (mpiPi_style_verbose);
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
   else if (flag == 4)
     {
       mpiPi_generateReport (mpiPi_style_concise);
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
   else
     {
@@ -100,7 +96,7 @@ mpiPi_MPI_Pcontrol (const int flag)
 
       mpiPi.enabled = 1;
       mpiPi.enabledCount++;
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
 
   return MPI_SUCCESS;

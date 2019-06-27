@@ -134,12 +134,13 @@ void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat)
   h_close (stat->cs_stats);
 }
 
-void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat)
+void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *s)
 {
   /* Reset callsite statistics */
-  mpiPi_stats_thr_cs_reset(stat);
-  bzero(stat->coll.time_stats, sizeof(stat->coll.time_stats));
-  (stat->pt2pt.time_stats, sizeof(stat->pt2pt.time_stats));
+  mpiPi_stats_thr_cs_reset(s);
+  bzero(s->coll.time_stats, sizeof(s->coll.time_stats));
+  (s->pt2pt.time_stats, sizeof(s->pt2pt.time_stats));
+  s->cum_time = 0;
 }
 
 void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
@@ -148,6 +149,29 @@ void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
   mpiPi_stats_thr_cs_merge(dst, src);
   mpiPi_stats_thr_coll_merge(dst, src);
   mpiPi_stats_thr_pt2pt_merge(dst, src);
+  dst->cum_time += src->cum_time;
+}
+
+static inline double _get_duration(mpiPi_thread_stat_t *s)
+{
+  double dur = 0.0;
+  dur = (mpiPi_GETTIMEDIFF (&s->ts_end, &s->ts_start) / 1000000.0);
+  return dur;
+}
+
+void mpiPi_stats_thr_timer_start(mpiPi_thread_stat_t *s)
+{
+  mpiPi_GETTIME (&s->ts_start);
+}
+void mpiPi_stats_thr_timer_stop(mpiPi_thread_stat_t *s)
+{
+  mpiPi_GETTIME (&s->ts_end);
+  s->cum_time += _get_duration(s);
+}
+
+double mpiPi_stats_thr_cum_time(mpiPi_thread_stat_t *s)
+{
+  return s->cum_time;
 }
 
 int mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat)

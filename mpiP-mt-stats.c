@@ -13,8 +13,12 @@
 
 static void key_destruct(void *data)
 {
-  mpiPi_thread_stat_t *stat = (mpiPi_thread_stat_t *)data;
-  /* TODO: do we need to do anything here? */
+  mpiPi_mt_stat_tls_t *hndl = (mpiPi_mt_stat_tls_t *)data;
+  mpiPi_thread_stat_t *s = hndl->tls_ptr;
+  /* Stop the timer and disable this TLS */
+  s->disabled = 1;
+  mpiPi_stats_thr_timer_stop(hndl->tls_ptr);
+
 }
 
 /*
@@ -86,6 +90,19 @@ mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
             }
           (void) pthread_setspecific(mt_state->tls_this, hndl);
           mpiPi_stats_thr_init(hndl->tls_ptr);
+          if( mpiPi.enabled ) {
+              /* NOTE: this is not precise!
+               * - The thread could have been started long time ago
+               * - In the scope of mpiP we only rely on the MPI API
+               *   hich doesn't track thread creation
+               * - we only can only start tracking a thread after the first
+               *   invocation of any MPI operation tracked by mpiP.
+               * - This is still important to track threads at least this way
+               *   because we don't want to have MPI operations to span more
+               *   than 100% of the application time.
+               */
+              mpiPi_stats_thr_timer_start(hndl->tls_ptr);
+            }
           mpiPi_tslist_append(mt_state->tls_list, hndl);
         }
     }
@@ -100,17 +117,63 @@ void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state)
       /* Nothing to do here */
       return;
     }
-  curr = mpiPi_tslist_first(mt_state->tls_list);
 
+  curr = mpiPi_tslist_first(mt_state->tls_list);
   mpiPi_stats_thr_cs_reset(&mt_state->rank_stats);
 
   /* Go over all TLS structures and merge them into the rank-wide callsite info */
   while (curr)
     {
       mpiPi_mt_stat_tls_t *hndl = curr->ptr;
-      mpiPi_stats_thr_merge_all(&mt_state->rank_stats, hndl->tls_ptr);
+      mpiPi_thread_stat_t *s = hndl->tls_ptr;
+      mpiPi_stats_thr_merge_all(&mt_state->rank_stats, s);
       curr = mpiPi_tslist_next(curr);
     }
+}
+
+void mpiPi_stats_mt_timer_start(mpiPi_mt_stat_t *mt_state)
+{
+  mpiP_tslist_elem_t *curr = NULL;
+
+  if(MPIPI_MODE_ST == mt_state->mode) {
+      /* Only update the cumulative time */
+      mpiPi_stats_thr_timer_start(&mt_state->rank_stats);
+      return;
+    }
+
+  curr = mpiPi_tslist_first(mt_state->tls_list);
+  /* Go over all TLS structures and update the timers */
+  while (curr)
+    {
+      mpiPi_mt_stat_tls_t *hndl = curr->ptr;
+      mpiPi_stats_thr_timer_start(hndl->tls_ptr);
+      curr = mpiPi_tslist_next(curr);
+    }
+}
+
+void mpiPi_stats_mt_timer_stop(mpiPi_mt_stat_t *mt_state)
+{
+  mpiP_tslist_elem_t *curr = NULL;
+
+  if(MPIPI_MODE_ST == mt_state->mode) {
+      /* Only update the cumulative time */
+      mpiPi_stats_thr_timer_stop(&mt_state->rank_stats);
+      return;
+    }
+
+  curr = mpiPi_tslist_first(mt_state->tls_list);
+  /* Go over all TLS structures and update the timers */
+  while (curr)
+    {
+      mpiPi_mt_stat_tls_t *hndl = curr->ptr;
+      mpiPi_stats_thr_timer_stop(hndl->tls_ptr);
+      curr = mpiPi_tslist_next(curr);
+    }
+}
+
+double mpiPi_stats_mt_cum_time(mpiPi_mt_stat_t *mt_state)
+{
+    return mpiPi_stats_thr_cum_time(&mt_state->rank_stats);
 }
 
 void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *mt_state,
@@ -154,9 +217,14 @@ void mpiPi_stats_mt_cs_reset(mpiPi_mt_stat_t *mt_state)
 {
   mpiP_tslist_elem_t *curr = NULL;
 
-  curr = mpiPi_tslist_first(mt_state->tls_list);
-
   mpiPi_stats_thr_cs_reset(&mt_state->rank_stats);
+
+  if(MPIPI_MODE_ST == mt_state->mode) {
+      /* Only update the cumulative time */
+      return;
+    }
+
+  curr = mpiPi_tslist_first(mt_state->tls_list);
 
   /* Go over all TLS structures and merge them into the rank-wide callsite info */
   while (curr)

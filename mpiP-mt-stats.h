@@ -33,6 +33,9 @@ int mpiPi_stats_mt_init(mpiPi_mt_stat_t *stat, mpiPi_thr_mode_t mode);
 void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *stat);
 void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state);
 
+void mpiPi_stats_mt_timer_stop(mpiPi_mt_stat_t *mt_state);
+void mpiPi_stats_mt_timer_start(mpiPi_mt_stat_t *mt_state);
+double mpiPi_stats_mt_cum_time(mpiPi_mt_stat_t *mt_state);
 mpiPi_mt_stat_tls_t *mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state);
 
 void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *stat,

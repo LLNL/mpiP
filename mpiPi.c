@@ -166,9 +166,10 @@ mpiPi_init (char *appName, mpiPi_thr_mode_t thr_mode)
                    sizeof (callsite_stats_t));
   mpiPi_msg_debug ("successful init on %d, %s\n", mpiPi.rank, mpiPi.hostname);
 
+
   if (mpiPi.enabled)
     {
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
 
   return;
@@ -715,15 +716,16 @@ mpiPi_generateReport (int report_style)
   mpiPi_TIME timer_start, timer_end;
   int mergeResult;
 
-  mpiPi_GETTIME (&mpiPi.endTime);
-
   if (mpiPi.enabled)
     {
-      dur =
-          (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
-      mpiPi.cumulativeTime += dur;
-      assert (mpiPi.cumulativeTime >= 0);
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_stop(&mpiPi.task_stats);
+    }
+  mpiPi_stats_mt_merge(&mpiPi.task_stats);
+  mpiPi.cumulativeTime = mpiPi_stats_mt_cum_time(&mpiPi.task_stats);
+  assert (mpiPi.cumulativeTime >= 0);
+  if (mpiPi.enabled)
+    {
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
 
   if (time (&mpiPi.stop_timeofday) == (time_t) - 1)
@@ -744,7 +746,6 @@ mpiPi_generateReport (int report_style)
   mpiPi_msg_debug0 ("starting mergeResults\n");
 
   mpiPi_GETTIME (&timer_start);
-  mpiPi_stats_mt_merge(&mpiPi.task_stats);
   mergeResult = mpiPi_mergeResults ();
   if (mergeResult == 1 && mpiPi.stackDepth == 0)
     mergeResult = mpiPi_insert_MPI_records ();

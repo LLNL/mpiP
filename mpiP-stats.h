@@ -21,7 +21,7 @@
 #include "mpiP-hash.h"
 #include "mpiPi_def.h"
 #include "mpiP-callsites.h"
-
+#include "mpip_timers.h"
 
 /* Histograms */
 typedef struct _mpiPi_histogram
@@ -49,9 +49,12 @@ typedef struct {
    */
   int disabled;
 
+  /* Usage time */
+  mpiPi_TIME ts_start, ts_end;
+  double cum_time;
+
   /* Callsite statistics */
   h_t *cs_stats;
-
   /* Collectives and point-to-point statistics */
   mpiPi_msg_stat_t coll, pt2pt;
 } mpiPi_thread_stat_t;
@@ -61,6 +64,10 @@ void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
                                mpiPi_thread_stat_t *src);
+
+void mpiPi_stats_thr_timer_start(mpiPi_thread_stat_t *s);
+void mpiPi_stats_thr_timer_stop(mpiPi_thread_stat_t *s);
+double mpiPi_stats_thr_cum_time(mpiPi_thread_stat_t *s);
 
 void mpiPi_stats_thr_cs_gather(mpiPi_thread_stat_t *stat,
                              int *ac, callsite_stats_t ***av );
