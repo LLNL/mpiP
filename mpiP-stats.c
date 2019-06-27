@@ -224,12 +224,11 @@ void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat)
   callsite_stats_t *csp = NULL;
 
   /* gather local task data */
-  mpiPi_stats_thr_cs_gather(stat, &ac, &av );
+  h_drain(stat->cs_stats, &ac, (void ***)&av);
 
   for (ndx = 0; ndx < ac; ndx++)
     {
-      csp = av[ndx];
-      mpiPi_cs_reset_stat(csp);
+      free(av[ndx]);
     }
   free(av);
 }

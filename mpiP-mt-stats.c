@@ -86,7 +86,7 @@ mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
             }
           (void) pthread_setspecific(mt_state->tls_this, hndl);
           mpiPi_stats_thr_init(hndl->tls_ptr);
-          mpiPi_tslist_append(mt_state->tls_list, hndl->tls_ptr);
+          mpiPi_tslist_append(mt_state->tls_list, hndl);
         }
     }
   return hndl;
@@ -107,23 +107,16 @@ void mpiPi_stats_mt_merge(mpiPi_mt_stat_t *mt_state)
   /* Go over all TLS structures and merge them into the rank-wide callsite info */
   while (curr)
     {
-      mpiPi_stats_thr_merge_all(&mt_state->rank_stats, curr->ptr);
+      mpiPi_mt_stat_tls_t *hndl = curr->ptr;
+      mpiPi_stats_thr_merge_all(&mt_state->rank_stats, hndl->tls_ptr);
       curr = mpiPi_tslist_next(curr);
     }
 }
 
 void mpiPi_stats_mt_cs_gather(mpiPi_mt_stat_t *mt_state,
-                             int *ac, callsite_stats_t ***av )
+                             int *ac, callsite_stats_t ***av)
 {
-  switch(mt_state->mode)
-    {
-    case MPIPI_MODE_ST:
-      mpiPi_stats_thr_cs_gather(&mt_state->rank_stats, ac, av);
-      break;
-    case MPIPI_MODE_MT:
-      mpiPi_stats_thr_cs_gather(&mt_state->rank_stats, ac, av);
-      break;
-    }
+  mpiPi_stats_thr_cs_gather(&mt_state->rank_stats, ac, av);
 }
 
 void mpiPi_stats_mt_cs_upd (mpiPi_mt_stat_tls_t *hndl,
@@ -157,9 +150,21 @@ void mpiPi_stats_mt_coll_gather(mpiPi_mt_stat_t *stat, double **_outbuf)
   mpiPi_stats_thr_coll_gather(&stat->rank_stats, _outbuf);
 }
 
-void mpiPi_stats_mt_cs_reset(mpiPi_mt_stat_t *stat)
+void mpiPi_stats_mt_cs_reset(mpiPi_mt_stat_t *mt_state)
 {
-  mpiPi_stats_thr_cs_reset(&stat->rank_stats);
+  mpiP_tslist_elem_t *curr = NULL;
+
+  curr = mpiPi_tslist_first(mt_state->tls_list);
+
+  mpiPi_stats_thr_cs_reset(&mt_state->rank_stats);
+
+  /* Go over all TLS structures and merge them into the rank-wide callsite info */
+  while (curr)
+    {
+      mpiPi_mt_stat_tls_t *hndl = curr->ptr;
+      mpiPi_stats_thr_cs_reset(hndl->tls_ptr);
+      curr = mpiPi_tslist_next(curr);
+    }
 }
 
 void mpiPi_stats_mt_coll_binstrings(mpiPi_mt_stat_t *stat,

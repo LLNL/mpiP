@@ -25,6 +25,20 @@ void
 mpiPi_reset_callsite_data ()
 {
   mpiPi_stats_mt_cs_reset(&mpiPi.task_stats);
+  /* Drop the content of the src ID cache so the old callsites won't appear in
+   * the callsites unless they are invoked again
+   */
+  if (NULL != callsite_src_id_cache) {
+      int ac, ndx;
+      callsite_stats_t **av;
+
+      h_drain(callsite_src_id_cache, &ac, (void ***)&av);
+      for (ndx = 0; ndx < ac; ndx++)
+        {
+          free(av[ndx]);
+        }
+      free(av);
+    }
 
   if (time (&mpiPi.start_timeofday) == (time_t) - 1)
     {

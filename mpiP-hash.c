@@ -205,6 +205,30 @@ h_gather_data (h_t * ht, int *ac, void ***ptr)
   return *ac;
 }
 
+int
+h_drain (h_t * ht, int *ac, void ***ptr)
+{
+  int i;
+  h_entry_t *het_index = NULL;
+  h_gather_data (ht, ac, ptr);
+
+  for (i = 0; i < ht->size; i++)
+    {
+      if (ht->table[i] != NULL)
+        {
+          for (het_index = ht->table[i];
+               het_index != NULL; )
+            {
+              h_entry_t *to_free = het_index;
+              het_index = het_index->next;
+              free(to_free);
+            }
+        }
+      ht->table[i] = NULL;
+    }
+  ht->count = 0;
+  return *ac;
+}
 
 #define TESTING 0
 #if TESTING

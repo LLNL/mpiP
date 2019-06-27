@@ -21,6 +21,7 @@ extern int h_insert (h_t * ht, void *ptr);
 extern void *h_search (h_t * ht, void *key, void **ptr);
 extern void *h_delete (h_t * ht, void *key, void **ptr);
 extern int h_gather_data (h_t * ht, int *ac, void ***ptr);
+extern int h_drain (h_t * ht, int *ac, void ***ptr);
 
 #else /* __STDC__ */
 
@@ -31,6 +32,7 @@ extern int h_insert ( /* h_t * ht, void *ptr */ );
 extern void *h_search ( /* h_t * ht, void *key, void **ptr */ );
 extern void *h_delete ( /* h_t * ht, void *key, void **ptr */ );
 extern int h_gather_data ( /* h_t * ht, int *ac, void ***ptr */ );
+extern int h_drain ( /* h_t * ht, int *ac, void ***ptr */ );
 
 #endif /* __STDC__ */
 #endif /* __CEXTRACT__ */
