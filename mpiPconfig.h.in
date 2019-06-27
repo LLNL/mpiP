@@ -96,6 +96,10 @@
 /* Specify use of "const"s, as per the MPI-3 specification.  */
 #undef USE_MPI3_CONSTS
 
+/* PACKAGE definitions */
+#undef PACKAGE_NAME
+#undef PACKAGE_VERSION
+
 #endif /* _CONFIG_H */
 
 /* 
