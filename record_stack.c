@@ -61,39 +61,39 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   if (unw_init_local (&cursor, &uc) != UNW_ESUCCESS)
     {
       mpiPi_msg_debug
-	("Failed to initialize libunwind cursor with unw_init_local\n");
+          ("Failed to initialize libunwind cursor with unw_init_local\n");
     }
   else
     {
       for (i = 0; i < parent_frame_start; i++)
-	{
-	  if (unw_step (&cursor) < 1)
-	    mpiPi_msg_debug
-	      ("unw_step failed to step into mpiPi caller frame.\n");
-	}
+        {
+          if (unw_step (&cursor) < 1)
+            mpiPi_msg_debug
+                ("unw_step failed to step into mpiPi caller frame.\n");
+        }
 
       for (i = 0, valid_cursor = 1; i < max_back; i++)
-	{
-	  if (valid_cursor && unw_step (&cursor) >= 0)
-	    {
-	      frame_count++;
-	      if (unw_get_reg (&cursor, UNW_REG_IP, &pc) != UNW_ESUCCESS)
-		{
-		  pc_array[i] = NULL;
-		  mpiPi_msg_debug ("unw_get_reg failed.\n");
-		}
-	      else
-		{
-		  pc_array[i] = (void *) ((char *) pc - 1);
-		}
-	    }
-	  else
-	    {
-	      pc_array[i] = NULL;
-	      mpiPi_msg_debug ("unw_step failed.\n");
-	      valid_cursor = 0;
-	    }
-	}
+        {
+          if (valid_cursor && unw_step (&cursor) >= 0)
+            {
+              frame_count++;
+              if (unw_get_reg (&cursor, UNW_REG_IP, &pc) != UNW_ESUCCESS)
+                {
+                  pc_array[i] = NULL;
+                  mpiPi_msg_debug ("unw_get_reg failed.\n");
+                }
+              else
+                {
+                  pc_array[i] = (void *) ((char *) pc - 1);
+                }
+            }
+          else
+            {
+              pc_array[i] = NULL;
+              mpiPi_msg_debug ("unw_step failed.\n");
+              valid_cursor = 0;
+            }
+        }
     }
 
   return frame_count;
@@ -119,24 +119,24 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
     {
       pc = (void *) context->sc_pc;
       if (pc != NULL)
-	unwind (context, 0);
+        unwind (context, 0);
     }
 
   for (i = 0; i < max_back; i++)
     {
       if (pc != NULL)
-	{
-	  unwind (context, 0);
+        {
+          unwind (context, 0);
 
-	  /* record this frame's pc and calculate the previous instruction  */
-	  pc_array[i] = (void *) context->sc_pc - (void *) 0x4;
-	  pc = (void *) context->sc_pc;
-	  frame_count++;
-	}
+          /* record this frame's pc and calculate the previous instruction  */
+          pc_array[i] = (void *) context->sc_pc - (void *) 0x4;
+          pc = (void *) context->sc_pc;
+          frame_count++;
+        }
       else
-	{
-	  pc_array[i] = NULL;
-	}
+        {
+          pc_array[i] = NULL;
+        }
     }
 
   return frame_count;
@@ -193,7 +193,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
     user_frame_count = report_back;
 
   memmove (pc_array, &(temp_stack_trace[MPIP_INTERNAL_FRAMES]),
-	   (user_frame_count * sizeof (void *)));
+           (user_frame_count * sizeof (void *)));
   pc_array[user_frame_count] = NULL;
 
 #if defined(DO_PC_SUBTRACTION)
@@ -256,27 +256,27 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
   for (i = 0; i < max_back; i++)
     {
       if (fp != NULL && pc != NULL)
-	{
-	  /* record this frame's pc */
-	  pc = FramePC (fp);
-	  if (pc != NULL)
-	    {
-	      frame_count++;
-	      /*  Get previous instruction  */
-	      pc_array[i] = (void *) ((char *) pc - 1);
-	    }
-	  else
-	    pc_array[i] = NULL;
+        {
+          /* record this frame's pc */
+          pc = FramePC (fp);
+          if (pc != NULL)
+            {
+              frame_count++;
+              /*  Get previous instruction  */
+              pc_array[i] = (void *) ((char *) pc - 1);
+            }
+          else
+            pc_array[i] = NULL;
 
-	  /* update frame ptr */
-	  lastfp = fp;
-	  fp = NextFP (fp);
-	}
+          /* update frame ptr */
+          lastfp = fp;
+          fp = NextFP (fp);
+        }
       else
-	{
-	  /* pad the array w/ nulls, if necessary */
-	  pc_array[i] = NULL;
-	}
+        {
+          /* pad the array w/ nulls, if necessary */
+          pc_array[i] = NULL;
+        }
     }
 
   return frame_count;

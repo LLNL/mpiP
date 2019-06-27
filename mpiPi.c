@@ -1,10 +1,10 @@
-/* -*- C -*- 
+/* -*- C -*-
 
    mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   ----- 
+   -----
 
    mpiPi.c -- main mpiP internal functions
 
@@ -115,13 +115,13 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
 }
 
 #ifndef ENABLE_API_ONLY		/* { */
-/* task level init 
+/* task level init
    - executed by each MPI task only once immediately after MPI_Init
 */
 
 void
 init_histogram (mpiPi_histogram_t * h, int first_bin_max, int size,
-		int *intervals)
+                int *intervals)
 {
   h->first_bin_max = first_bin_max;
   h->hist_size = size;
@@ -181,7 +181,7 @@ mpiPi_init (char *appName)
       mpiPi.stackDepth = 0;
       mpiPi.print_callsite_detail = 0;
     }
-  else				// verbose default
+  else // verbose default
     {
       mpiPi.report_style = mpiPi_style_verbose;
       mpiPi.stackDepth = 1;
@@ -202,8 +202,8 @@ mpiPi_init (char *appName)
   mpiPi_getenv ();
 
   mpiPi.task_callsite_stats =
-    h_open (mpiPi.tableSize, mpiPi_callsite_stats_pc_hashkey,
-	    mpiPi_callsite_stats_pc_comparator);
+      h_open (mpiPi.tableSize, mpiPi_callsite_stats_pc_hashkey,
+              mpiPi_callsite_stats_pc_comparator);
 
   if (mpiPi.do_collective_stats_report == 1)
     {
@@ -222,14 +222,14 @@ mpiPi_init (char *appName)
     {
       mpiPi_msg ("");
       mpiPi_msg ("%s V%d.%d.%d (Build %s/%s)\n", mpiPi.toolname, mpiPi_vmajor,
-		 mpiPi_vminor, mpiPi_vpatch, mpiPi_vdate, mpiPi_vtime);
+                 mpiPi_vminor, mpiPi_vpatch, mpiPi_vdate, mpiPi_vtime);
       mpiPi_msg ("Direct questions and errors to %s\n", MPIP_HELP_LIST);
       mpiPi_msg ("\n");
     }
 
   mpiPi_msg_debug ("appName is %s\n", appName);
   mpiPi_msg_debug ("sizeof(callsite_stats_t) is %d\n",
-		   sizeof (callsite_stats_t));
+                   sizeof (callsite_stats_t));
   mpiPi_msg_debug ("successful init on %d, %s\n", mpiPi.rank, mpiPi.hostname);
 
   if (mpiPi.enabled)
@@ -291,35 +291,35 @@ mpiPi_query_pc (void *pc, char **filename, char **functname, int *lineno)
     {
       /* no cache entry: create, lookup, and insert */
       csp =
-	(callsite_pc_cache_entry_t *)
-	malloc (sizeof (callsite_pc_cache_entry_t));
+          (callsite_pc_cache_entry_t *)
+          malloc (sizeof (callsite_pc_cache_entry_t));
       csp->pc = pc;
 #if defined(ENABLE_BFD) || defined(USE_LIBDWARF)
       if (mpiP_find_src_loc (pc, filename, lineno, functname) == 0)
-	{
-	  if (*filename == NULL || strcmp (*filename, "??") == 0)
-	    *filename = "[unknown]";
+        {
+          if (*filename == NULL || strcmp (*filename, "??") == 0)
+            *filename = "[unknown]";
 
-	  if (*functname == NULL)
-	    *functname = "[unknown]";
+          if (*functname == NULL)
+            *functname = "[unknown]";
 
-	  mpiPi_msg_debug
-	    ("Successful Source lookup for [%s]: %s, %d, %s\n",
-	     mpiP_format_address (pc, addr_buf), *filename, *lineno,
-	     *functname);
+          mpiPi_msg_debug
+              ("Successful Source lookup for [%s]: %s, %d, %s\n",
+               mpiP_format_address (pc, addr_buf), *filename, *lineno,
+               *functname);
 
-	  csp->filename = strdup (*filename);
-	  csp->functname = strdup (*functname);
-	  csp->line = *lineno;
-	}
+          csp->filename = strdup (*filename);
+          csp->functname = strdup (*functname);
+          csp->line = *lineno;
+        }
       else
-	{
-	  mpiPi_msg_debug ("Unsuccessful Source lookup for [%s]\n",
-			   mpiP_format_address (pc, addr_buf));
-	  csp->filename = strdup ("[unknown]");
-	  csp->functname = strdup ("[unknown]");
-	  csp->line = 0;
-	}
+        {
+          mpiPi_msg_debug ("Unsuccessful Source lookup for [%s]\n",
+                           mpiP_format_address (pc, addr_buf));
+          csp->filename = strdup ("[unknown]");
+          csp->functname = strdup ("[unknown]");
+          csp->line = 0;
+        }
 #else /* ! ENABLE_BFD || USE_LIBDWARF */
       csp->filename = strdup ("[unknown]");
       csp->functname = strdup ("[unknown]");
@@ -358,30 +358,30 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   else
     {
       for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-	{
-	  if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
-	    {
-	      if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
-		{
-		  return 1;
-		}
-	      if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
-		{
-		  return -1;
-		}
-	      express (line[i]);
-	      if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
-		{
-		  return 1;
-		}
-	      if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
-		{
-		  return -1;
-		}
-	    }
+        {
+          if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
+            {
+              if (strcmp (csp_1->filename[i], csp_2->filename[i]) > 0)
+                {
+                  return 1;
+                }
+              if (strcmp (csp_1->filename[i], csp_2->filename[i]) < 0)
+                {
+                  return -1;
+                }
+              express (line[i]);
+              if (strcmp (csp_1->functname[i], csp_2->functname[i]) > 0)
+                {
+                  return 1;
+                }
+              if (strcmp (csp_1->functname[i], csp_2->functname[i]) < 0)
+                {
+                  return -1;
+                }
+            }
 
-	  express (pc[i]);
-	}
+          express (pc[i]);
+        }
     }
 #undef express
   return 0;
@@ -396,16 +396,16 @@ callsite_src_id_cache_hashkey (const void *p1)
   for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
     {
       if (cs1->filename[i] != NULL)
-	{
-	  for (j = 0; cs1->filename[i][j] != '\0'; j++)
-	    {
-	      res ^= (unsigned) cs1->filename[i][j];
-	    }
-	  for (j = 0; cs1->functname[i][j] != '\0'; j++)
-	    {
-	      res ^= (unsigned) cs1->functname[i][j];
-	    }
-	}
+        {
+          for (j = 0; cs1->filename[i][j] != '\0'; j++)
+            {
+              res ^= (unsigned) cs1->filename[i][j];
+            }
+          for (j = 0; cs1->functname[i][j] != '\0'; j++)
+            {
+              res ^= (unsigned) cs1->functname[i][j];
+            }
+        }
       res ^= cs1->line[i];
     }
   return 662917 ^ res;
@@ -430,14 +430,14 @@ mpiPi_query_src (callsite_stats_t * p)
   for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
     {
       if (mpiPi.do_lookup == 1)
-	mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
-			&(p->lineno[i]));
+        mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
+                        &(p->lineno[i]));
       else
-	{
-	  p->filename[i] = strdup ("[unknown]");
-	  p->functname[i] = strdup ("[unknown]");
-	  p->lineno[i] = 0;
-	}
+        {
+          p->filename[i] = strdup ("[unknown]");
+          p->functname[i] = strdup ("[unknown]");
+          p->lineno[i] = 0;
+        }
 
       key.filename[i] = p->filename[i];
       key.functname[i] = p->functname[i];
@@ -453,22 +453,22 @@ mpiPi_query_src (callsite_stats_t * p)
     {
       /* create a new entry, and assign an id based on callstack */
       csp =
-	(callsite_src_id_cache_entry_t *)
-	malloc (sizeof (callsite_src_id_cache_entry_t));
+          (callsite_src_id_cache_entry_t *)
+          malloc (sizeof (callsite_src_id_cache_entry_t));
       bzero (csp, sizeof (callsite_src_id_cache_entry_t));
 
       for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
-	{
-	  csp->filename[i] = strdup (key.filename[i]);
-	  csp->functname[i] = strdup (key.functname[i]);
-	  csp->line[i] = key.line[i];
-	  csp->pc[i] = p->pc[i];
-	}
+        {
+          csp->filename[i] = strdup (key.filename[i]);
+          csp->functname[i] = strdup (key.functname[i]);
+          csp->line[i] = key.line[i];
+          csp->pc[i] = p->pc[i];
+        }
       csp->op = p->op;
       if (mpiPi.stackDepth == 0)
-	csp->id = csp->op - mpiPi_BASE;
+        csp->id = csp->op - mpiPi_BASE;
       else
-	csp->id = callsite_src_id_counter++;
+        csp->id = callsite_src_id_counter++;
       h_insert (callsite_src_id_cache, csp);
     }
 
@@ -481,7 +481,7 @@ mpiPi_query_src (callsite_stats_t * p)
 
 static void
 mpiPi_merge_individual_callsite_records (callsite_stats_t * a,
-					 callsite_stats_t * b)
+                                         callsite_stats_t * b)
 {
   a->count += b->count;
   a->cumulativeTime += b->cumulativeTime;
@@ -510,24 +510,24 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
 
   /* If exists, accumulate, otherwise insert. This is
      specifically for optimizations that have multiple PCs for
-     one src line. We aggregate across rank after this. 
+     one src line. We aggregate across rank after this.
 
-     The collective_report reporting approach does not aggregate individual 
+     The collective_report reporting approach does not aggregate individual
      process callsite information at the collector process.
    */
   if (mpiPi.collective_report == 0)
     {
       if (NULL == h_search (mpiPi.global_callsite_stats, p, (void **) &csp))
-	{
-	  callsite_stats_t *newp = NULL;
-	  newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
+        {
+          callsite_stats_t *newp = NULL;
+          newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
 
-	  memcpy (newp, p, sizeof (callsite_stats_t));
-	  /* insert new record into global */
-	  h_insert (mpiPi.global_callsite_stats, newp);
-	}
+          memcpy (newp, p, sizeof (callsite_stats_t));
+          /* insert new record into global */
+          h_insert (mpiPi.global_callsite_stats, newp);
+        }
       else
-	mpiPi_merge_individual_callsite_records (csp, p);
+        mpiPi_merge_individual_callsite_records (csp, p);
     }
 
   /* Collect aggregate callsite summary information indpendent of rank. */
@@ -540,11 +540,11 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
       newp->rank = -1;
 
       if (mpiPi.calcCOV)
-	{
-	  newp->siteData = (double *) malloc (mpiPi.size * sizeof (double));
-	  newp->siteData[0] = p->cumulativeTime;
-	  newp->siteDataIdx = 1;
-	}
+        {
+          newp->siteData = (double *) malloc (mpiPi.size * sizeof (double));
+          newp->siteData[0] = p->cumulativeTime;
+          newp->siteDataIdx = 1;
+        }
 
       /* insert new record into global */
       h_insert (mpiPi.global_callsite_stats_agg, newp);
@@ -554,10 +554,10 @@ mpiPi_insert_callsite_records (callsite_stats_t * p)
       mpiPi_merge_individual_callsite_records (csp, p);
 
       if (mpiPi.calcCOV)
-	{
-	  csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
-	  csp->siteDataIdx += 1;
-	}
+        {
+          csp->siteData[csp->siteDataIdx] = p->cumulativeTime;
+          csp->siteDataIdx += 1;
+        }
     }
 
   /* Do global accumulation while we are iterating through individual callsites */
@@ -627,8 +627,8 @@ mpiPi_insert_MPI_records ()
     {
       /*  Open hash table for MPI call data.  */
       mpiPi.global_MPI_stats_agg = h_open (mpiPi.tableSize,
-					   mpiPi_callsite_stats_MPI_id_hashkey,
-					   mpiPi_callsite_stats_op_comparator);
+                                           mpiPi_callsite_stats_MPI_id_hashkey,
+                                           mpiPi_callsite_stats_op_comparator);
 
       /*  Get individual call data.  */
       h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
@@ -638,27 +638,27 @@ mpiPi_insert_MPI_records ()
 
       /*  For each call site, add call site info to hash table entry for MPI op, independent of rank.  */
       for (i = 0; i < ac; i++)
-	{
-	  p = av[i];
+        {
+          p = av[i];
 
-	  /* Check if there is already an entry for the MPI op. */
-	  if (NULL ==
-	      h_search (mpiPi.global_MPI_stats_agg, p, (void **) &csp))
-	    {
-	      callsite_stats_t *newp = NULL;
-	      newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
-	      memcpy (newp, p, sizeof (callsite_stats_t));
-	      newp->rank = -1;
-	      newp->csid = p->op - mpiPi_BASE;
+          /* Check if there is already an entry for the MPI op. */
+          if (NULL ==
+              h_search (mpiPi.global_MPI_stats_agg, p, (void **) &csp))
+            {
+              callsite_stats_t *newp = NULL;
+              newp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
+              memcpy (newp, p, sizeof (callsite_stats_t));
+              newp->rank = -1;
+              newp->csid = p->op - mpiPi_BASE;
 
-	      /* insert new record into global */
-	      h_insert (mpiPi.global_MPI_stats_agg, newp);
-	    }
-	  else
-	    {
-	      mpiPi_merge_individual_callsite_records (csp, p);
-	    }
-	}
+              /* insert new record into global */
+              h_insert (mpiPi.global_MPI_stats_agg, newp);
+            }
+          else
+            {
+              mpiPi_merge_individual_callsite_records (csp, p);
+            }
+        }
     }
 
   return 1;
@@ -681,13 +681,13 @@ mpiPi_mergeResults ()
   /* determine size of space necessary on collector */
   PMPI_Allreduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.comm);
   PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
-	       mpiPi.comm);
+               mpiPi.comm);
 
   if (totalCount < 1)
     {
       if (mpiPi.rank == mpiPi.collectorRank)
-	mpiPi_msg_warn
-	  ("Collector found no records to merge. Omitting report.\n");
+        mpiPi_msg_warn
+            ("Collector found no records to merge. Omitting report.\n");
 
       return 0;
     }
@@ -700,113 +700,113 @@ mpiPi_mergeResults ()
 
 #ifdef ENABLE_BFD
       if (mpiPi.appFullName != NULL)
-	{
-	  if (open_bfd_executable (mpiPi.appFullName) == 0)
-	    mpiPi.do_lookup = 0;
-	}
+        {
+          if (open_bfd_executable (mpiPi.appFullName) == 0)
+            mpiPi.do_lookup = 0;
+        }
 #elif defined(USE_LIBDWARF)
       if (mpiPi.appFullName != NULL)
-	{
-	  if (open_dwarf_executable (mpiPi.appFullName) == 0)
-	    mpiPi.do_lookup = 0;
-	}
+        {
+          if (open_dwarf_executable (mpiPi.appFullName) == 0)
+            mpiPi.do_lookup = 0;
+        }
 #endif
 #if defined(ENABLE_BFD) || defined(USE_LIBDWARF)
       else
-	{
-	  mpiPi_msg_warn
-	    ("Failed to open executable.  The mpiP -x runtime flag may address this issue.\n");
-	  mpiPi.do_lookup = 0;
-	}
+        {
+          mpiPi_msg_warn
+              ("Failed to open executable.  The mpiP -x runtime flag may address this issue.\n");
+          mpiPi.do_lookup = 0;
+        }
 #endif
 
       /* Open call site hash tables.  */
       mpiPi.global_callsite_stats = h_open (mpiPi.tableSize,
-					    mpiPi_callsite_stats_src_hashkey,
-					    mpiPi_callsite_stats_src_comparator);
+                                            mpiPi_callsite_stats_src_hashkey,
+                                            mpiPi_callsite_stats_src_comparator);
       mpiPi.global_callsite_stats_agg = h_open (mpiPi.tableSize,
-						mpiPi_callsite_stats_src_id_hashkey,
-						mpiPi_callsite_stats_src_id_comparator);
+                                                mpiPi_callsite_stats_src_id_hashkey,
+                                                mpiPi_callsite_stats_src_id_comparator);
       if (callsite_pc_cache == NULL)
-	{
-	  callsite_pc_cache = h_open (mpiPi.tableSize,
-				      callsite_pc_cache_hashkey,
-				      callsite_pc_cache_comparator);
-	}
+        {
+          callsite_pc_cache = h_open (mpiPi.tableSize,
+                                      callsite_pc_cache_hashkey,
+                                      callsite_pc_cache_comparator);
+        }
       if (callsite_src_id_cache == NULL)
-	{
-	  callsite_src_id_cache = h_open (mpiPi.tableSize,
-					  callsite_src_id_cache_hashkey,
-					  callsite_src_id_cache_comparator);
-	}
+        {
+          callsite_src_id_cache = h_open (mpiPi.tableSize,
+                                          callsite_src_id_cache_hashkey,
+                                          callsite_src_id_cache_comparator);
+        }
       /* Try to allocate space for max count of callsite info from all tasks  */
       mpiPi.rawCallsiteData =
-	(callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
+          (callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
       if (mpiPi.rawCallsiteData == NULL)
-	{
-	  mpiPi_msg_warn
-	    ("Failed to allocate memory to collect callsite info");
-	  retval = 0;
-	}
+        {
+          mpiPi_msg_warn
+              ("Failed to allocate memory to collect callsite info");
+          retval = 0;
+        }
 
       /* Clear global_mpi_time and global_mpi_size before accumulation in mpiPi_insert_callsite_records */
       mpiPi.global_mpi_time = 0.0;
       mpiPi.global_mpi_size = 0.0;
 
       if (retval == 1)
-	{
-	  /* Insert collector callsite data into global and task-specific hash tables */
-	  for (ndx = 0; ndx < ac; ndx++)
-	    {
-	      mpiPi_insert_callsite_records (av[ndx]);
-	    }
-	  ndx = 0;
-	  for (i = 1; i < mpiPi.size; i++)	/* n-1 */
-	    {
-	      MPI_Status status;
-	      int count;
-	      int j;
+        {
+          /* Insert collector callsite data into global and task-specific hash tables */
+          for (ndx = 0; ndx < ac; ndx++)
+            {
+              mpiPi_insert_callsite_records (av[ndx]);
+            }
+          ndx = 0;
+          for (i = 1; i < mpiPi.size; i++)	/* n-1 */
+            {
+              MPI_Status status;
+              int count;
+              int j;
 
-	      /* okay in any order */
-	      PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	      PMPI_Get_count (&status, MPI_CHAR, &count);
-	      PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
-			 status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
-	      count /= sizeof (callsite_stats_t);
+              /* okay in any order */
+              PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+              PMPI_Get_count (&status, MPI_CHAR, &count);
+              PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
+                         status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
+              count /= sizeof (callsite_stats_t);
 
 
-	      for (j = 0; j < count; j++)
-		{
-		  mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
-		}
-	    }
-	  free (mpiPi.rawCallsiteData);
-	}
+              for (j = 0; j < count; j++)
+                {
+                  mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+                }
+            }
+          free (mpiPi.rawCallsiteData);
+        }
     }
   else
     {
       int ndx;
       char *sbuf = (char *) malloc (ac * sizeof (callsite_stats_t));
       for (ndx = 0; ndx < ac; ndx++)
-	{
-	  bcopy (av[ndx],
-		 &(sbuf[ndx * sizeof (callsite_stats_t)]),
-		 sizeof (callsite_stats_t));
-	}
+        {
+          bcopy (av[ndx],
+                 &(sbuf[ndx * sizeof (callsite_stats_t)]),
+                 sizeof (callsite_stats_t));
+        }
       PMPI_Send (sbuf, ac * sizeof (callsite_stats_t),
-		 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
+                 MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
       free (sbuf);
     }
   if (mpiPi.rank == mpiPi.collectorRank && retval == 1)
     {
       if (mpiPi.collective_report == 0)
-	mpiPi_msg_debug
-	  ("MEMORY : Allocated for global_callsite_stats     : %13ld\n",
-	   h_count (mpiPi.global_callsite_stats) * sizeof (callsite_stats_t));
+        mpiPi_msg_debug
+            ("MEMORY : Allocated for global_callsite_stats     : %13ld\n",
+             h_count (mpiPi.global_callsite_stats) * sizeof (callsite_stats_t));
       mpiPi_msg_debug
-	("MEMORY : Allocated for global_callsite_stats_agg : %13ld\n",
-	 h_count (mpiPi.global_callsite_stats_agg) *
-	 sizeof (callsite_stats_t));
+          ("MEMORY : Allocated for global_callsite_stats_agg : %13ld\n",
+           h_count (mpiPi.global_callsite_stats_agg) *
+           sizeof (callsite_stats_t));
     }
 
   /* TODO: need to free all these pointers as well. */
@@ -815,14 +815,14 @@ mpiPi_mergeResults ()
   if (mpiPi.rank == mpiPi.collectorRank)
     {
       if (mpiPi.do_lookup == 1)
-	{
+        {
 #ifdef ENABLE_BFD
-	  /* clean up */
-	  close_bfd_executable ();
+		  /* clean up */
+		  close_bfd_executable ();
 #elif defined(USE_LIBDWARF)
-	  close_dwarf_executable ();
+		  close_dwarf_executable ();
 #endif
-	}
+        }
     }
 
   /*  Quadrics MPI does not appear to support MPI_IN_PLACE   */
@@ -844,28 +844,28 @@ mpiPi_mergeCollectiveStats ()
     {
       all_call_count = mpiPi_DEF_END - mpiPi_BASE + 1;
       matrix_size =
-	all_call_count * mpiPi.coll_comm_histogram.hist_size *
-	mpiPi.coll_size_histogram.hist_size;
+          all_call_count * mpiPi.coll_comm_histogram.hist_size *
+          mpiPi.coll_size_histogram.hist_size;
       mpiPi_msg_debug ("matrix_size is %d, histogram data is %d\n",
-		       matrix_size, sizeof (mpiPi.coll_time_stats));
+                       matrix_size, sizeof (mpiPi.coll_time_stats));
       coll_time_local = (double *) malloc (matrix_size * sizeof (double));
       coll_time_results = (double *) malloc (matrix_size * sizeof (double));
 
       i = 0;
       for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-	for (y = 0; y < 32; y++)
-	  for (z = 0; z < 32; z++)
-	    coll_time_local[i++] = mpiPi.coll_time_stats[x][y][z];
+        for (y = 0; y < 32; y++)
+          for (z = 0; z < 32; z++)
+            coll_time_local[i++] = mpiPi.coll_time_stats[x][y][z];
 
       /*  Collect Collective statistic data were used  */
       PMPI_Reduce (coll_time_local, coll_time_results, matrix_size,
-		   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
+                   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
 
       i = 0;
       for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-	for (y = 0; y < 32; y++)
-	  for (z = 0; z < 32; z++)
-	    mpiPi.coll_time_stats[x][y][z] = coll_time_results[i++];
+        for (y = 0; y < 32; y++)
+          for (z = 0; z < 32; z++)
+            mpiPi.coll_time_stats[x][y][z] = coll_time_results[i++];
 
       free (coll_time_local);
       free (coll_time_results);
@@ -887,28 +887,28 @@ mpiPi_mergept2ptStats ()
     {
       all_call_count = mpiPi_DEF_END - mpiPi_BASE + 1;
       matrix_size =
-	all_call_count * mpiPi.pt2pt_comm_histogram.hist_size *
-	mpiPi.pt2pt_size_histogram.hist_size;
+          all_call_count * mpiPi.pt2pt_comm_histogram.hist_size *
+          mpiPi.pt2pt_size_histogram.hist_size;
       mpiPi_msg_debug ("matrix_size is %d, histogram data is %d\n",
-		       matrix_size, sizeof (mpiPi.pt2pt_send_stats));
+                       matrix_size, sizeof (mpiPi.pt2pt_send_stats));
       pt2pt_send_local = (double *) malloc (matrix_size * sizeof (double));
       pt2pt_send_results = (double *) malloc (matrix_size * sizeof (double));
 
       i = 0;
       for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-	for (y = 0; y < 32; y++)
-	  for (z = 0; z < 32; z++)
-	    pt2pt_send_local[i++] = mpiPi.pt2pt_send_stats[x][y][z];
+        for (y = 0; y < 32; y++)
+          for (z = 0; z < 32; z++)
+            pt2pt_send_local[i++] = mpiPi.pt2pt_send_stats[x][y][z];
 
       /*  Collect Collective statistic data were used  */
       PMPI_Reduce (pt2pt_send_local, pt2pt_send_results, matrix_size,
-		   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
+                   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
 
       i = 0;
       for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-	for (y = 0; y < 32; y++)
-	  for (z = 0; z < 32; z++)
-	    mpiPi.pt2pt_send_stats[x][y][z] = pt2pt_send_results[i++];
+        for (y = 0; y < 32; y++)
+          for (z = 0; z < 32; z++)
+            mpiPi.pt2pt_send_stats[x][y][z] = pt2pt_send_results[i++];
 
       free (pt2pt_send_local);
       free (pt2pt_send_results);
@@ -929,28 +929,28 @@ mpiPi_publishResults (int report_style)
 
       /* Generate output filename, and open */
       do
-	{
-	  printCount++;
-	  snprintf (mpiPi.oFilename, 256, "%s/%s.%d.%d.%d.mpiP",
-		    mpiPi.outputDir, mpiPi.appName, mpiPi.size, mpiPi.procID,
-		    printCount);
-	}
+        {
+          printCount++;
+          snprintf (mpiPi.oFilename, 256, "%s/%s.%d.%d.%d.mpiP",
+                    mpiPi.outputDir, mpiPi.appName, mpiPi.size, mpiPi.procID,
+                    printCount);
+        }
       while (access (mpiPi.oFilename, F_OK) == 0);
 
       fp = fopen (mpiPi.oFilename, "w");
 
       if (fp == NULL)
-	{
-	  mpiPi_msg_warn ("Could not open [%s], writing to stdout\n",
-			  mpiPi.oFilename);
-	  fp = stdout;
-	}
+        {
+          mpiPi_msg_warn ("Could not open [%s], writing to stdout\n",
+                          mpiPi.oFilename);
+          fp = stdout;
+        }
       else
-	{
-	  mpiPi_msg ("\n");
-	  mpiPi_msg ("Storing mpiP output in [%s].\n", mpiPi.oFilename);
-	  mpiPi_msg ("\n");
-	}
+        {
+          mpiPi_msg ("\n");
+          mpiPi_msg ("Storing mpiP output in [%s].\n", mpiPi.oFilename);
+          mpiPi_msg ("\n");
+        }
     }
   mpiPi_profile_print (fp, report_style);
   PMPI_Barrier (mpiPi.comm);
@@ -975,70 +975,70 @@ mpiPi_collect_basics (int report_style)
       /* In the case where multiple reports are generated per run,
          only allocate memory for global_task_info once */
       if (mpiPi.global_task_app_time == NULL)
-	{
-	  mpiPi.global_task_app_time =
-	    (double *) calloc (mpiPi.size, sizeof (double));
+        {
+          mpiPi.global_task_app_time =
+              (double *) calloc (mpiPi.size, sizeof (double));
 
-	  if (mpiPi.global_task_app_time == NULL)
-	    mpiPi_abort
-	      ("Failed to allocate memory for global_task_app_time");
+          if (mpiPi.global_task_app_time == NULL)
+            mpiPi_abort
+                ("Failed to allocate memory for global_task_app_time");
 
-	  mpiPi_msg_debug
-	    ("MEMORY : Allocated for global_task_app_time :          %13ld\n",
-	     mpiPi.size * sizeof (double));
-	}
+          mpiPi_msg_debug
+              ("MEMORY : Allocated for global_task_app_time :          %13ld\n",
+               mpiPi.size * sizeof (double));
+        }
 
       bzero (mpiPi.global_task_app_time, mpiPi.size * sizeof (double));
 
       if (mpiPi.global_task_mpi_time == NULL)
-	{
-	  mpiPi.global_task_mpi_time =
-	    (double *) calloc (mpiPi.size, sizeof (double));
+        {
+          mpiPi.global_task_mpi_time =
+              (double *) calloc (mpiPi.size, sizeof (double));
 
-	  if (mpiPi.global_task_mpi_time == NULL)
-	    mpiPi_abort
-	      ("Failed to allocate memory for global_task_mpi_time");
+          if (mpiPi.global_task_mpi_time == NULL)
+            mpiPi_abort
+                ("Failed to allocate memory for global_task_mpi_time");
 
-	  mpiPi_msg_debug
-	    ("MEMORY : Allocated for global_task_mpi_time :          %13ld\n",
-	     mpiPi.size * sizeof (double));
-	}
+          mpiPi_msg_debug
+              ("MEMORY : Allocated for global_task_mpi_time :          %13ld\n",
+               mpiPi.size * sizeof (double));
+        }
 
       bzero (mpiPi.global_task_mpi_time, mpiPi.size * sizeof (double));
 
       //  Only allocate hostname storage if we are doing a verbose report
       if (mpiPi.global_task_hostnames == NULL
-	  && (report_style == mpiPi_style_verbose
-	      || report_style == mpiPi_style_both))
-	{
-	  mpiPi.global_task_hostnames =
-	    (mpiPi_hostname_t *) calloc (mpiPi.size,
-					 sizeof (char) *
-					 MPIPI_HOSTNAME_LEN_MAX);
+          && (report_style == mpiPi_style_verbose
+              || report_style == mpiPi_style_both))
+        {
+          mpiPi.global_task_hostnames =
+              (mpiPi_hostname_t *) calloc (mpiPi.size,
+                                           sizeof (char) *
+                                           MPIPI_HOSTNAME_LEN_MAX);
 
-	  if (mpiPi.global_task_hostnames == NULL)
-	    mpiPi_abort
-	      ("Failed to allocate memory for global_task_hostnames");
+          if (mpiPi.global_task_hostnames == NULL)
+            mpiPi_abort
+                ("Failed to allocate memory for global_task_hostnames");
 
-	  mpiPi_msg_debug
-	    ("MEMORY : Allocated for global_task_hostnames :          %13ld\n",
-	     mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
-	}
+          mpiPi_msg_debug
+              ("MEMORY : Allocated for global_task_hostnames :          %13ld\n",
+               mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+        }
 
       if (mpiPi.global_task_hostnames != NULL)
-	bzero (mpiPi.global_task_hostnames,
-	       mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
+        bzero (mpiPi.global_task_hostnames,
+               mpiPi.size * sizeof (char) * MPIPI_HOSTNAME_LEN_MAX);
     }
 
   PMPI_Gather (&mpiPi.cumulativeTime, 1, MPI_DOUBLE,
-	       mpiPi.global_task_app_time, 1, MPI_DOUBLE,
-	       mpiPi.collectorRank, mpiPi.comm);
+               mpiPi.global_task_app_time, 1, MPI_DOUBLE,
+               mpiPi.collectorRank, mpiPi.comm);
 
   if (report_style == mpiPi_style_verbose || report_style == mpiPi_style_both)
     {
       PMPI_Gather (mpiPi.hostname, MPIPI_HOSTNAME_LEN_MAX, MPI_CHAR,
-		   mpiPi.global_task_hostnames, MPIPI_HOSTNAME_LEN_MAX,
-		   MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
+                   mpiPi.global_task_hostnames, MPIPI_HOSTNAME_LEN_MAX,
+                   MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
     }
 
   return;
@@ -1057,7 +1057,7 @@ mpiPi_generateReport (int report_style)
   if (mpiPi.enabled)
     {
       dur =
-	(mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
+          (mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
       mpiPi.cumulativeTime += dur;
       assert (mpiPi.cumulativeTime >= 0);
       mpiPi_GETTIME (&mpiPi.startTime);
@@ -1098,12 +1098,12 @@ mpiPi_generateReport (int report_style)
     {
       mpiPi_GETTIME (&timer_start);
       if (mpiPi.report_style == mpiPi_style_both)
-	{
-	  mpiPi_publishResults (mpiPi_style_concise);
-	  mpiPi_publishResults (mpiPi_style_verbose);
-	}
+        {
+          mpiPi_publishResults (mpiPi_style_concise);
+          mpiPi_publishResults (mpiPi_style_verbose);
+        }
       else
-	mpiPi_publishResults (report_style);
+        mpiPi_publishResults (report_style);
       mpiPi_GETTIME (&timer_end);
       dur = (mpiPi_GETTIMEDIFF (&timer_end, &timer_start) / 1000000.0);
       mpiPi_msg_debug0 ("TIMING : publish time is        %12.6f\n", dur);
@@ -1146,8 +1146,8 @@ mpiPi_finalize ()
 
 void
 mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
-			     double dur, double sendSize, double ioSize,
-			     double rmaSize)
+                             double dur, double sendSize, double ioSize,
+                             double rmaSize)
 {
   int i;
   callsite_stats_t *csp = NULL;
@@ -1176,9 +1176,9 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
       csp->op = op;
       csp->rank = rank;
       for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-	{
-	  csp->pc[i] = pc[i];
-	}
+        {
+          csp->pc[i] = pc[i];
+        }
       csp->cookie = MPIP_CALLSITE_STATS_COOKIE;
       csp->cumulativeTime = 0;
       csp->minDur = DBL_MAX;
@@ -1214,10 +1214,10 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
 
 #if 0
   mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n",
-		   mpiPi.messageCountThreshold);
+                   mpiPi.messageCountThreshold);
   mpiPi_msg_debug ("sendSize is %f\n", sendSize);
   mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n",
-		   csp->arbitraryMessageCount);
+                   csp->arbitraryMessageCount);
 #endif
 
   return;
@@ -1235,12 +1235,12 @@ get_histogram_bin (mpiPi_histogram_t * h, int val)
   if (h->bin_intervals == NULL)
     {
       while (wv > h->first_bin_max && bin < h->hist_size)
-	{
-	  wv >>= 1;
-	  bin++;
-	}
+        {
+          wv >>= 1;
+          bin++;
+        }
     }
-  else				/* Add code for custom intervals later */
+  else   /* Add code for custom intervals later */
     {
     }
 
@@ -1250,7 +1250,7 @@ get_histogram_bin (mpiPi_histogram_t * h, int val)
 
 void
 mpiPi_update_collective_stats (int op, double dur, double size,
-			       MPI_Comm * comm)
+                               MPI_Comm * comm)
 {
   int op_idx, comm_size, comm_bin, size_bin;
 
@@ -1262,9 +1262,9 @@ mpiPi_update_collective_stats (int op, double dur, double size,
   size_bin = get_histogram_bin (&mpiPi.coll_size_histogram, size);
 
   mpiPi_msg_debug
-    ("Adding %.0f time to entry mpiPi.collective_stats[%d][%d][%d] value of %.0f\n",
-     dur, op_idx, comm_bin, size_bin,
-     mpiPi.coll_time_stats[op_idx][comm_bin][size_bin]);
+      ("Adding %.0f time to entry mpiPi.collective_stats[%d][%d][%d] value of %.0f\n",
+       dur, op_idx, comm_bin, size_bin,
+       mpiPi.coll_time_stats[op_idx][comm_bin][size_bin]);
 
   mpiPi.coll_time_stats[op_idx][comm_bin][size_bin] += dur;
 }
@@ -1283,9 +1283,9 @@ mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm)
   size_bin = get_histogram_bin (&mpiPi.pt2pt_size_histogram, size);
 
   mpiPi_msg_debug
-    ("Adding %.0f send size to entry mpiPi.pt2pt_stats[%d][%d][%d] value of %.0f\n",
-     size, op_idx, comm_bin, size_bin,
-     mpiPi.pt2pt_send_stats[op_idx][comm_bin][size_bin]);
+      ("Adding %.0f send size to entry mpiPi.pt2pt_stats[%d][%d][%d] value of %.0f\n",
+       size, op_idx, comm_bin, size_bin,
+       mpiPi.pt2pt_send_stats[op_idx][comm_bin][size_bin]);
 
   mpiPi.pt2pt_send_stats[op_idx][comm_bin][size_bin] += size;
 }
@@ -1295,22 +1295,22 @@ mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm)
 
 
 
-/* 
+/*
 
 <license>
 
-Copyright (c) 2006, The Regents of the University of California. 
-Produced at the Lawrence Livermore National Laboratory 
-Written by Jeffery Vetter and Christopher Chambreau. 
-UCRL-CODE-223450. 
-All rights reserved. 
- 
-This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
- 
+Copyright (c) 2006, The Regents of the University of California.
+Produced at the Lawrence Livermore National Laboratory
+Written by Jeffery Vetter and Christopher Chambreau.
+UCRL-CODE-223450.
+All rights reserved.
+
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP.
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
- 
+
 * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the disclaimer below.
 
@@ -1335,22 +1335,22 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- 
-Additional BSD Notice 
- 
+
+
+Additional BSD Notice
+
 1. This notice is required to be provided under our contract with the
 U.S. Department of Energy (DOE).  This work was produced at the
 University of California, Lawrence Livermore National Laboratory under
 Contract No. W-7405-ENG-48 with the DOE.
- 
+
 2. Neither the United States Government nor the University of
 California nor any of their employees, makes any warranty, express or
 implied, or assumes any liability or responsibility for the accuracy,
 completeness, or usefulness of any information, apparatus, product, or
 process disclosed, or represents that its use would not infringe
 privately-owned rights.
- 
+
 3.  Also, reference herein to any specific commercial products,
 process, or services by trade name, trademark, manufacturer or
 otherwise does not necessarily constitute or imply its endorsement,
