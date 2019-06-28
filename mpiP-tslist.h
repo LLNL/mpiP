@@ -29,7 +29,7 @@ typedef struct tslist_s {
 mpiP_tslist_t *mpiPi_tslist_create();
 void mpiPi_tslist_release(mpiP_tslist_t *list);
 void mpiPi_tslist_append(mpiP_tslist_t *list, void *data_ptr);
-void mpiPi_tslist_dequeue(mpiP_tslist_t *list, mpiP_tslist_elem_t **_elem);
+void *mpiPi_tslist_dequeue(mpiP_tslist_t *list);
 mpiP_tslist_elem_t *mpiPi_tslist_first(mpiP_tslist_t *list);
 mpiP_tslist_elem_t *mpiPi_tslist_next(mpiP_tslist_elem_t *current);
 

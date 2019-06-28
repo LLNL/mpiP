@@ -13,6 +13,8 @@
 #ifndef ARCH_PPC_H
 #define ARCH_PPC_H
 
+#include <stdint.h>
+
 #define MB()  __asm__ __volatile__ ("sync" : : : "memory")
 #define RMB() __asm__ __volatile__ ("lwsync" : : : "memory")
 #define WMB() __asm__ __volatile__ ("lwsync" : : : "memory")
@@ -42,6 +44,27 @@ static inline int64_t mpiP_atomic_swap(int64_t *addr, int64_t newval)
                         : "cc", "memory");
 
   return ret;
+}
+
+static inline int mpiP_atomic_cas(int64_t *addr, int64_t *oldval, int64_t newval)
+{
+    int64_t prev;
+    bool ret;
+
+    __asm__ __volatile__ (
+                          "1: ldarx   %0, 0, %2  \n\t"
+                          "   cmpd    0, %0, %3  \n\t"
+                          "   bne-    2f         \n\t"
+                          "   stdcx.  %4, 0, %2  \n\t"
+                          "   bne-    1b         \n\t"
+                          "2:"
+                          : "=&r" (prev), "=m" (*addr)
+                          : "r" (addr), "r" (OPAL_ASM_VALUE64(*oldval)), "r" (OPAL_ASM_VALUE64(newval)), "m" (*addr)
+                          : "cc", "memory");
+
+    ret = (prev == *oldval);
+    *oldval = prev;
+    return ret;
 }
 
 #endif

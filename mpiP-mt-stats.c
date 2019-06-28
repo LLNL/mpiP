@@ -29,6 +29,37 @@ static void key_destruct(void *data)
  * ============================================================================
  */
 
+static mpiPi_mt_stat_tls_t *_alloc_tls(mpiPi_mt_stat_t *mt_state)
+{
+  mpiPi_mt_stat_tls_t *hndl = calloc(1, sizeof(*hndl));
+  if (NULL == hndl) {
+      mpiPi_abort("failed to allocate TLS handler");
+    }
+  hndl->mt_state = mt_state;
+  hndl->tls_ptr = calloc(1, sizeof(*hndl->mt_state));
+  if (NULL == hndl->tls_ptr) {
+      mpiPi_abort("failed to allocate TLS");
+    }
+  return hndl;
+}
+
+static void _free_tls(mpiPi_mt_stat_tls_t *hndl)
+{
+  hndl->mt_state = NULL;
+  free(hndl->tls_ptr);
+  free(hndl);
+}
+
+static void _release_all_tls(mpiP_tslist_t *tls_list)
+{
+  mpiPi_mt_stat_tls_t *hndl = mpiPi_tslist_dequeue(tls_list);
+  while(hndl) {
+      _free_tls(hndl);
+      hndl = mpiPi_tslist_dequeue(tls_list);
+    }
+}
+
+
 int mpiPi_stats_mt_init(mpiPi_mt_stat_t *mt_state, mpiPi_thr_mode_t mode)
 {
   mt_state->mode = mode;
@@ -55,6 +86,7 @@ void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *mt_state)
       break;
     case MPIPI_MODE_MT:
       // TODO: Make sure that list is drained
+      _release_all_tls(mt_state->tls_list);
       mpiPi_tslist_release(mt_state->tls_list);
       pthread_key_delete(mt_state->tls_this);
       mpiPi_stats_thr_init(&mt_state->rank_stats);
@@ -79,15 +111,7 @@ mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
       hndl = pthread_getspecific(mt_state->tls_this);
       if (NULL == hndl)
         {
-          hndl = calloc(1, sizeof(*hndl));
-          if (NULL == hndl) {
-              mpiPi_abort("failed to allocate TLS handler");
-            }
-          hndl->mt_state = mt_state;
-          hndl->tls_ptr = calloc(1, sizeof(*hndl->mt_state));
-          if (NULL == hndl->tls_ptr) {
-              mpiPi_abort("failed to allocate TLS");
-            }
+          hndl = _alloc_tls(mt_state);
           (void) pthread_setspecific(mt_state->tls_this, hndl);
           mpiPi_stats_thr_init(hndl->tls_ptr);
           if( mpiPi.enabled ) {

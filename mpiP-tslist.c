@@ -47,45 +47,58 @@ void mpiPi_tslist_append(mpiP_tslist_t *list, void *data_ptr)
   prev->next = elem;
 }
 
-void mpiPi_tslist_dequeue(mpiP_tslist_t *list, mpiP_tslist_elem_t **_elem)
+void *mpiPi_tslist_dequeue(mpiP_tslist_t *list)
 {
-  *_elem = NULL;
+  mpiP_tslist_elem_t *elem = NULL, *tmp;
+  void *ret = NULL;
+
   if( list->head == list->tail ){
       // the list is empty
-      return;
+      return NULL;
     }
 
   if(list->head->next == NULL ){
       // Someone is adding a new element, but it is not yet ready
-      return;
+      return NULL;
     }
 
-  mpiP_tslist_elem_t *elem = list->head->next;
+  elem = list->head->next;
   if( elem->next ) {
       /* We have more than one elements in the list
          * it is safe to dequeue this elemen as only one thread
          * is allowed to dequeue
          */
       list->head->next = elem->next;
-      *_elem = elem;
-      /* Terminate element */
+      /* Terminate element to be on the safe side */
       elem->next = NULL;
-      return;
+      goto ret;
     }
 
-  mpiP_tslist_elem_t *iter;
-  /* requeue the dummy element to make sure that no one is adding currently */
-  mpiPi_tslist_append(list, list->head);
-  iter = elem;
-  while(iter->next != list->head) {
-      mpiP_atomic_isync();
-      if((volatile void*)iter->next) {
-          iter = iter->next;
-        }
-    }
-  /* Terminate the extracted chain */
-  iter->next = NULL;
-  *_elem = elem;
+  /* There is a possibility of a race condition:
+   * elem->next may still be NULL while a new addition has started that
+   * already obtained the pointer to elem.
+   */
+  list->head->next = NULL;
+  tmp = elem;
+  if( mpiP_atomic_cas((uint64_t*)&list->tail, (uint64_t*)&tmp, (uint64_t)list->head) ){
+      /* Replacement was successful, this means that list->head was placed
+       * as the very first element of the list
+       */
+  } else {
+      /* Replacement failed, this means that other thread is in the process
+       * of adding to the list
+       */
+      /* Wait for the pointer to appear */
+      while(NULL != elem->next) {
+          mpiP_atomic_isync();
+      }
+      /* Hand this element over to the head element */
+      list->head->next = elem->next;
+  }
+ret:
+  ret = elem->ptr;
+  free(elem);
+  return ret;
 }
 
 mpiP_tslist_elem_t *mpiPi_tslist_first(mpiP_tslist_t *list)

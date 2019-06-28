@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define SMPLOCK "lock; "
+
 #define MB() __asm__ __volatile__("": : :"memory")
 
 static inline void mpiP_atomic_wmb(void)
@@ -24,6 +26,21 @@ static inline int64_t mpiP_atomic_swap(int64_t *addr, int64_t newval)
                        "memory");
   return oldval;
 }
+
+static inline int mpiP_atomic_cas(int64_t *addr, int64_t *oldval, int64_t newval)
+{
+   unsigned char ret;
+   __asm__ __volatile__ (
+                       SMPLOCK "cmpxchgq %3,%2   \n\t"
+                               "sete     %0      \n\t"
+                       : "=qm" (ret), "+a" (*oldval), "+m" (*addr)
+                       : "q"(newval)
+                       : "memory", "cc"
+                       );
+
+   return (int) ret;
+}
+
 
 #endif
 

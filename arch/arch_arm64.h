@@ -13,6 +13,8 @@
 #ifndef ARCH_ARM64_H
 #define ARCH_ARM64_H
 
+#include <stdint.h>
+
 #define MB()  __asm__ __volatile__ ("dmb sy" : : : "memory")
 #define RMB() __asm__ __volatile__ ("dmb ld" : : : "memory")
 #define WMB() __asm__ __volatile__ ("dmb st" : : : "memory")
@@ -58,6 +60,27 @@ static inline int64_t _mpiP_atomic_swap_lse(int64_t *addr, int64_t newval)
 static inline int64_t mpiP_atomic_swap(int64_t *addr, int64_t newval)
 {
   return _mpiP_atomic_swap_lse(addr, newval);
+}
+
+static inline int mpiP_atomic_cas(int64_t *addr, int64_t *oldval, int64_t newval)
+{
+    int64_t prev;
+    int tmp;
+    int ret;
+
+    __asm__ __volatile__ ("1:  ldaxr    %0, [%2]       \n"
+                          "    cmp     %0, %3          \n"
+                          "    bne     2f              \n"
+                          "    stxr    %w1, %4, [%2]   \n"
+                          "    cbnz    %w1, 1b         \n"
+                          "2:                          \n"
+                          : "=&r" (prev), "=&r" (tmp)
+                          : "r" (addr), "r" (*oldval), "r" (newval)
+                          : "cc", "memory");
+
+    ret = (prev == *oldval);
+    *oldval = prev;
+    return ret;
 }
 
 #endif
