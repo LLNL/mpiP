@@ -43,7 +43,7 @@ void mpiPi_tslist_append(mpiP_tslist_t *list, void *data_ptr)
   /* Ensure that all chnages to the elem structure are complete */////
   mpiP_atomic_wmb();
   /* Atomically swap the tail of the list to point to this element */
-  mpiP_tslist_elem_t *prev = (mpiP_tslist_elem_t*)mpiP_atomic_swap((uint64_t*)&list->tail, (uint64_t)elem);
+  mpiP_tslist_elem_t *prev = (mpiP_tslist_elem_t*)mpiP_atomic_swap((void**)&list->tail, elem);
   prev->next = elem;
 }
 
@@ -80,7 +80,7 @@ void *mpiPi_tslist_dequeue(mpiP_tslist_t *list)
    */
   list->head->next = NULL;
   tmp = elem;
-  if( mpiP_atomic_cas((uint64_t*)&list->tail, (uint64_t*)&tmp, (uint64_t)list->head) ){
+  if( mpiP_atomic_cas((void**)&list->tail, (void**)&tmp, list->head) ){
       /* Replacement was successful, this means that list->head was placed
        * as the very first element of the list
        */

@@ -14,6 +14,7 @@
 #define ARCH_PPC_H
 
 #include <stdint.h>
+#include "mpiPconfig.h"
 
 #define MB()  __asm__ __volatile__ ("sync" : : : "memory")
 #define RMB() __asm__ __volatile__ ("lwsync" : : : "memory")
@@ -32,8 +33,14 @@ void opal_atomic_isync(void)
   ISYNC();
 }
 
-static inline int64_t mpiP_atomic_swap(int64_t *addr, int64_t newval)
+#if (SIZEOF_VOIDP == 8)
+
+/* 64-bit system (hacky way) */
+
+static inline void *mpiP_atomic_swap(void **_addr, void *_newval)
 {
+  int64_t *addr= (int64_t *)_addr;
+  int64_t newval = (int64_t)_newval;
   int64_t ret;
 
   __asm__ __volatile__ ("1: ldarx   %0, 0, %2  \n\t"
@@ -43,29 +50,76 @@ static inline int64_t mpiP_atomic_swap(int64_t *addr, int64_t newval)
                         : "r" (addr), "r" (OPAL_ASM_VALUE64(newval))
                         : "cc", "memory");
 
+  return (void*)ret;
+}
+
+static inline int mpiP_atomic_cas(void **_addr, void **_oldval, void *_newval)
+{
+  int64_t *addr = (int64_t*)_addr;
+  int64_t *oldval = (int64_t*)_oldval;
+  int64_t newval = (int64_t)_newval;
+  int64_t prev;
+  bool ret;
+
+  __asm__ __volatile__ (
+        "1: ldarx   %0, 0, %2  \n\t"
+        "   cmpd    0, %0, %3  \n\t"
+        "   bne-    2f         \n\t"
+        "   stdcx.  %4, 0, %2  \n\t"
+        "   bne-    1b         \n\t"
+        "2:"
+        : "=&r" (prev), "=m" (*addr)
+        : "r" (addr), "r" (OPAL_ASM_VALUE64(*oldval)), "r" (OPAL_ASM_VALUE64(newval)), "m" (*addr)
+        : "cc", "memory");
+
+  ret = (prev == *oldval);
+  *oldval = prev;
   return ret;
 }
 
-static inline int mpiP_atomic_cas(int64_t *addr, int64_t *oldval, int64_t newval)
-{
-    int64_t prev;
-    bool ret;
+#else
 
-    __asm__ __volatile__ (
-                          "1: ldarx   %0, 0, %2  \n\t"
-                          "   cmpd    0, %0, %3  \n\t"
-                          "   bne-    2f         \n\t"
-                          "   stdcx.  %4, 0, %2  \n\t"
+static inline void *mpiP_atomic_swap(void **_addr, void *_newval)
+{
+  int32_t *addr= (int32_t *)_addr;
+  int32_t newval = (int32_t)_newval;
+  int32_t ret;
+
+    __asm__ __volatile__ ("1: lwarx   %0, 0, %2  \n\t"
+                          "   stwcx.  %3, 0, %2  \n\t"
                           "   bne-    1b         \n\t"
-                          "2:"
-                          : "=&r" (prev), "=m" (*addr)
-                          : "r" (addr), "r" (OPAL_ASM_VALUE64(*oldval)), "r" (OPAL_ASM_VALUE64(newval)), "m" (*addr)
+                          : "=&r" (ret), "=m" (*addr)
+                          : "r" (addr), "r" (newval)
                           : "cc", "memory");
 
-    ret = (prev == *oldval);
-    *oldval = prev;
-    return ret;
+   return (void*)ret;
 }
+
+static inline int mpiP_atomic_cas(void **_addr, void **_oldval, void *_newval)
+{
+  int32_t *addr = (int32_t*)_addr;
+  int32_t *oldval = (int32_t*)_oldval;
+  int32_t newval = (int32_t)_newval;
+  int32_t prev;
+  bool ret;
+
+  __asm__ __volatile__ (
+        "1: lwarx   %0, 0, %2  \n\t"
+        "   cmpw    0, %0, %3  \n\t"
+        "   bne-    2f         \n\t"
+        "   stwcx.  %4, 0, %2  \n\t"
+        "   bne-    1b         \n\t"
+        "2:"
+        : "=&r" (prev), "=m" (*addr)
+        : "r" OPAL_ASM_ADDR(addr), "r" (*oldval), "r" (newval), "m" (*addr)
+        : "cc", "memory");
+
+  ret = (prev == *oldval);
+  *oldval = prev;
+  return ret;
+}
+
+#endif
 
 #endif
 
