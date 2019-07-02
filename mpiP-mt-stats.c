@@ -16,9 +16,9 @@ static void key_destruct(void *data)
   mpiPi_mt_stat_tls_t *hndl = (mpiPi_mt_stat_tls_t *)data;
   mpiPi_thread_stat_t *s = hndl->tls_ptr;
   /* Stop the timer and disable this TLS */
-  s->disabled = 1;
   mpiPi_stats_thr_timer_stop(hndl->tls_ptr);
-
+  s->disabled = 1;
+  hndl->is_active = 0;
 }
 
 /*
@@ -74,6 +74,10 @@ int mpiPi_stats_mt_init(mpiPi_mt_stat_t *mt_state, mpiPi_thr_mode_t mode)
     default:
       break;
     }
+
+  /* Initialize TLS for the main thread */
+  (void)mpiPi_stats_mt_gettls(mt_state);
+
   return 0;
 }
 
@@ -93,6 +97,7 @@ void mpiPi_stats_mt_fini(mpiPi_mt_stat_t *mt_state)
       break;
     }
 }
+
 
 mpiPi_mt_stat_tls_t *
 mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
@@ -114,6 +119,7 @@ mpiPi_stats_mt_gettls(mpiPi_mt_stat_t *mt_state)
           hndl = _alloc_tls(mt_state);
           (void) pthread_setspecific(mt_state->tls_this, hndl);
           mpiPi_stats_thr_init(hndl->tls_ptr);
+          hndl->is_active = 1;
           if( mpiPi.enabled ) {
               /* NOTE: this is not precise!
                * - The thread could have been started long time ago
@@ -170,7 +176,10 @@ void mpiPi_stats_mt_timer_start(mpiPi_mt_stat_t *mt_state)
   while (curr)
     {
       mpiPi_mt_stat_tls_t *hndl = curr->ptr;
-      mpiPi_stats_thr_timer_start(hndl->tls_ptr);
+      if( hndl->is_active )
+        {
+          mpiPi_stats_thr_timer_start(hndl->tls_ptr);
+        }
       curr = mpiPi_tslist_next(curr);
     }
 }
@@ -190,7 +199,10 @@ void mpiPi_stats_mt_timer_stop(mpiPi_mt_stat_t *mt_state)
   while (curr)
     {
       mpiPi_mt_stat_tls_t *hndl = curr->ptr;
-      mpiPi_stats_thr_timer_stop(hndl->tls_ptr);
+      if( hndl->is_active )
+        {
+          mpiPi_stats_thr_timer_stop(hndl->tls_ptr);
+        }
       curr = mpiPi_tslist_next(curr);
     }
 }
