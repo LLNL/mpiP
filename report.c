@@ -816,7 +816,7 @@ print:
           if (mpiPi.coll_time_stats[x][y][z] == 0)
             goto done;
 
-          mpiPi_stats_thr_coll_binstrings(&mpiPi.task_stats, y, commbinbuf,
+          mpiPi_stats_mt_coll_binstrings(&mpiPi.task_stats, y, commbinbuf,
                                         z, databinbuf);
 
           fprintf (fp,
@@ -900,7 +900,7 @@ print:
           if (mpiPi.pt2pt_send_stats[x][y][z] == 0)
             goto done;
 
-          mpiPi_stats_thr_pt2pt_binstrings(&mpiPi.task_stats,
+          mpiPi_stats_mt_pt2pt_binstrings(&mpiPi.task_stats,
                                            y, commbinbuf,
                                            z, databinbuf);
 
@@ -1935,7 +1935,7 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 
       task_stats->rank = mpiPi.rank;
 
-      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+      mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                task_stats, &task_lookup, &cs_buf,
                                MPIPI_CALLSITE_MIN2ZERO);
 
@@ -2057,7 +2057,7 @@ mpiPi_coll_print_concise_callsite_time_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+      mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                task_stats, &task_lookup, &cs_buf,
                                MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
@@ -2172,7 +2172,7 @@ mpiPi_coll_print_concise_callsite_sent_info (FILE * fp)
 
       task_stats->rank = mpiPi.rank;
       /*  Search for task local entry for the current call site   */
-      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+      mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                task_stats, &task_lookup, &cs_buf,
                                MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
@@ -2292,7 +2292,7 @@ mpiPi_coll_print_concise_callsite_io_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+      mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                task_stats, &task_lookup, &cs_buf,
                                MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
@@ -2406,7 +2406,7 @@ mpiPi_coll_print_concise_callsite_rma_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+      mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                task_stats, &task_lookup, &cs_buf,
                                MPIPI_CALLSITE_MIN2MAX);
 
@@ -2531,7 +2531,7 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+              mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                        task_stats, &task_lookup, &cs_buf,
                                        MPIPI_CALLSITE_MIN2ZERO);
 
@@ -2670,7 +2670,7 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+              mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                        task_stats, &task_lookup, &cs_buf,
                                        MPIPI_CALLSITE_MIN2ZERO);
 
@@ -2805,7 +2805,7 @@ mpiPi_coll_print_all_callsite_rma_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+              mpiPi_stats_mt_cs_lookup(&mpiPi.task_stats,
                                        task_stats, &task_lookup, &cs_buf,
                                        MPIPI_CALLSITE_MIN2ZERO);
 

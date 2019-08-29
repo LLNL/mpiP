@@ -20,7 +20,8 @@
 #include "mpiPconfig.h"
 #include "mpiP-hash.h"
 #include "mpiPi_def.h"
-
+#include "mpiP-callsites.h"
+#include "mpip_timers.h"
 
 /* Histograms */
 typedef struct _mpiPi_histogram
@@ -29,36 +30,6 @@ typedef struct _mpiPi_histogram
   int hist_size;
   int *bin_intervals;
 } mpiPi_histogram_t;
-
-/* Callsite statistics */
-typedef struct _callsite_stats
-{
-  unsigned op;
-  unsigned rank;
-  int csid;
-  long long count;
-  double cumulativeTime;
-  double cumulativeTimeSquared;
-  double maxDur;
-  double minDur;
-  double maxDataSent;
-  double minDataSent;
-  double maxIO;
-  double minIO;
-  double maxRMA;
-  double minRMA;
-  double cumulativeDataSent;
-  double cumulativeIO;
-  double cumulativeRMA;
-  long long arbitraryMessageCount;
-  double *siteData;
-  int siteDataIdx;
-  void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  char *filename[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  char *functname[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  int lineno[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  long cookie;
-} callsite_stats_t;
 
 /* Message/Communicator statistics */
 #define MPIP_NFUNC (mpiPi_DEF_END - mpiPi_BASE)
@@ -78,16 +49,29 @@ typedef struct {
    */
   int disabled;
 
-  /* Callsite statistics */
-  h_t *task_callsite_stats;
+  /* Usage time */
+  mpiPi_TIME ts_start, ts_end;
+  double cum_time;
 
+  /* Callsite statistics */
+  h_t *cs_stats;
+  /* Collectives and point-to-point statistics */
   mpiPi_msg_stat_t coll, pt2pt;
 } mpiPi_thread_stat_t;
 
 int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
+                               mpiPi_thread_stat_t *src);
+
+void mpiPi_stats_thr_timer_start(mpiPi_thread_stat_t *s);
+void mpiPi_stats_thr_timer_stop(mpiPi_thread_stat_t *s);
+double mpiPi_stats_thr_cum_time(mpiPi_thread_stat_t *s);
+
 void mpiPi_stats_thr_cs_gather(mpiPi_thread_stat_t *stat,
                              int *ac, callsite_stats_t ***av );
+
 void mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
                            unsigned op, unsigned rank, void **pc,
                            double dur, double sendSize, double ioSize,
@@ -99,12 +83,17 @@ void mpiPi_stats_thr_cs_lookup(mpiPi_thread_stat_t *stat,
                               callsite_stats_t **task_lookup,
                               callsite_stats_t *dummy_buf,
                               int initMax);
+void mpiPi_stats_thr_cs_merge(mpiPi_thread_stat_t *dst,
+                              mpiPi_thread_stat_t *src);
 
-void mpiPi_stats_thr_coll_upd (mpiPi_thread_stat_t *stat,
+void mpiPi_stats_thr_coll_upd(mpiPi_thread_stat_t *stat,
                                   int op, double dur, double size,
                                   MPI_Comm * comm);
 void mpiPi_stats_thr_coll_gather(mpiPi_thread_stat_t *stat, double **_outbuf);
 void mpiPi_stats_thr_cs_reset(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_coll_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src);
+
 void mpiPi_stats_thr_coll_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
@@ -113,6 +102,8 @@ void mpiPi_stats_thr_pt2pt_upd (mpiPi_thread_stat_t *stat,
                                    int op, double dur, double size,
                                    MPI_Comm * comm);
 void mpiPi_stats_thr_pt2pt_gather(mpiPi_thread_stat_t *stat, double **_outbuf);
+void mpiPi_stats_thr_pt2pt_merge(mpiPi_thread_stat_t *dst,
+                                mpiPi_thread_stat_t *src);
 void mpiPi_stats_thr_pt2pt_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);

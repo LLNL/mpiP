@@ -20,6 +20,9 @@ echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in
 echo "        the case where test executables would need to be run as a parallel job."
 echo
 
+AC_CHECK_SIZEOF(void*)
+
+
 #
 #  With specifications
 #

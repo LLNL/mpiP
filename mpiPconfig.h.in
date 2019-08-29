@@ -99,6 +99,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* The size of `void*', as computed by sizeof. */
+#undef SIZEOF_VOIDP
+
 /* SO lookup */
 #undef SO_LOOKUP
 

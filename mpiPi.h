@@ -38,7 +38,8 @@
 #endif
 
 #include "mpiP-hash.h"
-#include "mpiP-stats.h"
+#include "mpiP-callsites.h"
+#include "mpiP-mt-stats.h"
 
 #include "mpip_timers.h"
 
@@ -142,8 +143,6 @@ typedef struct _mpiPi_t
   char *envStr;
   FILE *stdout_;
   FILE *stderr_;
-  mpiPi_TIME startTime;
-  mpiPi_TIME endTime;
 
   double cumulativeTime;	/* necessary for pcontrol */
   time_t start_timeofday;
@@ -171,7 +170,7 @@ typedef struct _mpiPi_t
   h_t *global_callsite_stats_agg;
   h_t *global_MPI_stats_agg;
 
-  mpiPi_thread_stat_t task_stats;
+  mpiPi_mt_stat_t task_stats;
 
   mpiPi_lookup_t *lookup;
 

@@ -11,6 +11,7 @@
      $Id$
 
 */
+#include "mpiP-mt-stats.h"
 
 extern int open_dwarf_executable (char *fileName);
 extern void close_dwarf_executable (void);
@@ -34,13 +35,11 @@ extern int h_insert (h_t * ht, void *ptr);
 extern void *h_search (h_t * ht, void *key, void **ptr);
 extern void *h_delete (h_t * ht, void *key, void **ptr);
 extern int h_gather_data (h_t * ht, int *ac, void ***ptr);
-extern void mpiPi_init (char *appName);
-extern int mpiPi_query_pc (void *pc, char **filename, char **functname,
-                           int *lineno);
-extern int mpiPi_query_src (callsite_stats_t * p);
+extern void mpiPi_init (char *appName, mpiPi_thr_mode_t thr_mode);
 extern void mpiPi_generateReport (int report_style);
 extern void mpiPi_finalize (void);
-extern void mpiPi_update_callsite_stats (unsigned op, unsigned rank,
+extern void mpiPi_update_callsite_stats (mpiPi_mt_stat_tls_t *hndl,
+                                         unsigned op, unsigned rank,
                                          void **pc, double dur,
                                          double sendSize, double ioSize,
                                          double rmaSize);
@@ -65,9 +64,9 @@ extern void mpiPi_copy_args (int *ac, char **av, int av_len);
 extern void mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc,
                                    char **argv);
 extern unsigned long long mpiPi_get_text_start (char *filename);
-extern void mpiPi_update_collective_stats (int op, double dur, double size,
+extern void mpiPi_update_collective_stats (mpiPi_mt_stat_tls_t *tls, int op, double dur, double size,
                                            MPI_Comm * comm);
-extern void mpiPi_update_pt2pt_stats (int op, double dur, double size,
+extern void mpiPi_update_pt2pt_stats (mpiPi_mt_stat_tls_t *tls, int op, double dur, double size,
                                       MPI_Comm * comm);
 
 #ifdef NEED_MREAD_REAL_TIME_DECL

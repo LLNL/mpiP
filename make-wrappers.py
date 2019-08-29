@@ -1052,8 +1052,11 @@ def CreateWrapper(funct, olist):
     # start wrapper code
     olist.append("\n{\n")
     olist.append( " int rc, enabledState;\n double dur;\n int tsize;\n double messSize = 0.;\n double ioSize = 0.;\n double rmaSize =0.;\n mpiPi_TIME start, end;\n void *call_stack[MPIP_CALLSITE_STACK_DEPTH_MAX] = { NULL };\n" )
+    olist.append( "  mpiPi_mt_stat_tls_t *hndl;\n" )
 
-    olist.append("\nif (mpiPi_stats_thr_is_on(&mpiPi.task_stats)) {\n")
+    olist.append("\n  hndl = mpiPi_stats_mt_gettls(&mpiPi.task_stats);\n")
+
+    olist.append("\nif (mpiPi_stats_mt_is_on(hndl)) {\n")
     if fdict[funct].wrapperPreList:
 	olist.extend(fdict[funct].wrapperPreList)
 
@@ -1067,7 +1070,7 @@ def CreateWrapper(funct, olist):
     olist.append("}\n\n")
 
     # Mark that we have already entered Profiler to avoid nested invocations
-    olist.append("mpiPi_stats_thr_enter(&mpiPi.task_stats);\n")
+    olist.append("mpiPi_stats_mt_enter(hndl);\n")
 
     # call PMPI 
     olist.append("\nrc = P" + funct + "( " )
@@ -1088,8 +1091,8 @@ def CreateWrapper(funct, olist):
     olist.append(");\n\n")
 
     # Mark that we exited Profiler
-    olist.append("mpiPi_stats_thr_exit(&mpiPi.task_stats);\n")
-    olist.append("if (mpiPi_stats_thr_is_on(&mpiPi.task_stats)) {\n")
+    olist.append("mpiPi_stats_mt_exit(hndl);\n")
+    olist.append("if (mpiPi_stats_mt_is_on(hndl)) {\n")
     olist.append("\n" 
 		 + "mpiPi_GETTIME (&end);\n" 
 		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
@@ -1157,7 +1160,7 @@ def CreateWrapper(funct, olist):
 		 + "if ( dur < 0 )\n"
 		 + "  mpiPi_msg_warn(\"Rank %5d : Negative time difference : %11.9f in %s\\n\", mpiPi.rank, dur, \"" + funct + "\");\n"
 		 + "else\n")
-    olist.append( "  mpiPi_update_callsite_stats(" + "mpiPi_" + funct + ", " \
+    olist.append( "  mpiPi_update_callsite_stats(hndl, " + "mpiPi_" + funct + ", " \
                   + "mpiPi.rank, "
                   + "call_stack, "
                   + "dur, "
@@ -1169,13 +1172,13 @@ def CreateWrapper(funct, olist):
     if funct in collectiveList :
       for i in fdict[funct].paramConciseList:
 	 if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
-           olist.append("\nif (mpiPi.do_collective_stats_report) { mpiPi_update_collective_stats(" + "mpiPi_" + funct + "," \
+           olist.append("\nif (mpiPi.do_collective_stats_report) { mpiPi_update_collective_stats(hndl, " + "mpiPi_" + funct + "," \
               + " dur, " + "(double)messSize," +  " " + i + "); }\n")
 
     if funct in pt2ptList :
       for i in fdict[funct].paramConciseList:
 	 if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
-           olist.append("\nif (mpiPi.do_pt2pt_stats_report) { mpiPi_update_pt2pt_stats(" + "mpiPi_" + funct + "," \
+           olist.append("\nif (mpiPi.do_pt2pt_stats_report) { mpiPi_update_pt2pt_stats(hndl, " + "mpiPi_" + funct + "," \
               + " dur, " + "(double)messSize," +  " " + i + "); }\n")
 
     # end of enabled check
