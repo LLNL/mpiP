@@ -1192,7 +1192,7 @@ def CreateWrapper(funct, olist):
     if ( 'mips' in arch ) :
     	decl =    "\nint rc;\n"
     else :
-	decl =    "\nint rc;\njmp_buf jbuf;\n"
+        decl =    "\nint rc;\njmp_buf jbuf;\n"
     
 
     #####
@@ -1263,7 +1263,8 @@ def CreateWrapper(funct, olist):
     xlateCount = 0
     #  Input types to translate
     xlateTargetTypes = [ "MPI_Comm", "MPI_Datatype", "MPI_File", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
-        
+    stringType = "mpip_const_char_t"
+    stringVarNames = []
     freelist = []
     
     #  Iterate through the arguments for this function
@@ -1292,6 +1293,10 @@ def CreateWrapper(funct, olist):
                 decl += xlateTypes[xlateCount] + " c_" + xlateVarNames[xlateCount] + ";\n";
                 
             xlateCount += 1
+        elif ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype == stringType and 
+                1 == fdict[funct].paramDict[i].pointerLevel ) :
+            stringVarNames.append(i);
+            decl += "  char *c_" + i + " = NULL;\n";
         else:
             #  Not translating this variable
     		currBasetype = fdict[funct].paramDict[i].basetype
@@ -1321,7 +1326,14 @@ def CreateWrapper(funct, olist):
     	    olist.append(", ")
     
     #  Add ierr argument and declarations to output list        
-    olist.append(" , MPI_Fint *ierr)")
+    olist.append(" , MPI_Fint *ierr")
+    
+    # Append all string lengths parameter
+    for i in stringVarNames :
+        olist.append(" , int " + i + "_len")
+    olist.append(")")
+
+    
     olist.append(" {")
     olist.append(decl)
     olist.append("\n")
@@ -1358,6 +1370,17 @@ def CreateWrapper(funct, olist):
                 + funct + "\");\n")
             freelist.append("c_"+xlateVarName)
     
+
+    for i in stringVarNames :
+        olist.append("  for(; " + i + "_len > 0; " + i + "_len--){\n")
+        olist.append("    if( " + i + "[" + i + "_len] != ' '){\n")
+        olist.append("      " + i +"_len++; // The length is last symbol index + 1\n")
+        olist.append("      break;\n")
+        olist.append("    }\n")
+        olist.append("  }\n");
+        olist.append("  c_" + i + " = calloc( " + i + "_len + 1, sizeof(char));\n")
+        olist.append("  memcpy( c_" + i + ", " + i + ", " + i + "_len);\n")
+
     #  Generate pre-call translation code if necessary by iterating through arguments that
     #  were identified as opaque objects needing translation above
     for i in range(len(xlateVarNames)) :
@@ -1402,6 +1425,8 @@ def CreateWrapper(funct, olist):
                 argname = "c_" + i;
             else:
                 argname = "&c_" + i;
+        elif ( i in stringVarNames ) :
+            argname = "c_" + i;
         else:
             argname = i
             
@@ -1494,6 +1519,8 @@ def GenerateWrappers():
     sname = cwd + "/wrappers.c"
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
+
+    olist.append("#include <string.h>\n")
     olist.append("#include \"mpiPi.h\"\n")
     olist.append("#include \"symbols.h\"\n")
     if doWeakSymbols == True :
