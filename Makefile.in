@@ -35,6 +35,7 @@ PC_LOOKUP_OBJ = $(PC_LOOKUP_FILE:.c=.o)
 
 SRCS =	diag_msgs.c \
 	mpiP-hash.c \
+	mpiP-stats.c \
 	glob.c \
 	wrappers.c \
 	wrappers_special.c \
@@ -49,6 +50,7 @@ SRCS =	diag_msgs.c \
 
 API_SRCS =	diag_msgs_api.c \
 	mpiP-hash.c \
+	mpiP-stats.c \
 	glob.c \
 	mpiPi.c \
 	util.c \
@@ -298,7 +300,7 @@ lint: ${SRCS}
 
 distclean: clean
 	make -C testing clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
 
 include Check.mak
 

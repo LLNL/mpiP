@@ -19,41 +19,7 @@ static char *svnid = "$Id$";
 #include <unistd.h>
 #include "mpiPi.h"
 
-static int
-mpiPi_callsite_stats_pc_hashkey (const void *p)
-{
-  int res = 0;
-  int i;
-  callsite_stats_t *csp = (callsite_stats_t *) p;
-  MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp);
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-    {
-      res ^= (unsigned) (long) csp->pc[i];
-    }
-  return 52271 ^ csp->op ^ res ^ csp->rank;
-}
 
-static int
-mpiPi_callsite_stats_pc_comparator (const void *p1, const void *p2)
-{
-  int i;
-  callsite_stats_t *csp_1 = (callsite_stats_t *) p1;
-  callsite_stats_t *csp_2 = (callsite_stats_t *) p2;
-  MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp_1);
-  MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp_2);
-
-#define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
-  express (op);
-  express (rank);
-
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-    {
-      express (pc[i]);
-    }
-#undef express
-
-  return 0;
-}
 
 static int
 mpiPi_callsite_stats_src_hashkey (const void *p)
@@ -118,16 +84,6 @@ mpiPi_callsite_stats_src_id_comparator (const void *p1, const void *p2)
 /* task level init
    - executed by each MPI task only once immediately after MPI_Init
 */
-
-void
-init_histogram (mpiPi_histogram_t * h, int first_bin_max, int size,
-                int *intervals)
-{
-  h->first_bin_max = first_bin_max;
-  h->hist_size = size;
-  h->bin_intervals = intervals;
-}
-
 
 void
 mpiPi_init (char *appName)
@@ -201,21 +157,7 @@ mpiPi_init (char *appName)
 #endif
   mpiPi_getenv ();
 
-  mpiPi.task_callsite_stats =
-      h_open (mpiPi.tableSize, mpiPi_callsite_stats_pc_hashkey,
-              mpiPi_callsite_stats_pc_comparator);
-
-  if (mpiPi.do_collective_stats_report == 1)
-    {
-      init_histogram (&mpiPi.coll_comm_histogram, 7, 32, NULL);
-      init_histogram (&mpiPi.coll_size_histogram, 7, 32, NULL);
-    }
-
-  if (mpiPi.do_pt2pt_stats_report == 1)
-    {
-      init_histogram (&mpiPi.pt2pt_comm_histogram, 7, 32, NULL);
-      init_histogram (&mpiPi.pt2pt_size_histogram, 7, 32, NULL);
-    }
+  mpiPi_stats_thr_init(&mpiPi.task_stats);
 
   /* -- welcome msg only collector  */
   if (mpiPi.collectorRank == mpiPi.rank)
@@ -674,14 +616,18 @@ mpiPi_mergeResults ()
   int totalCount = 0;
   int maxCount = 0;
   int retval = 1, sendval;
+  callsite_stats_t *rawCallsiteData = NULL;
 
   /* gather local task data */
-  h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
+  mpiPi_stats_thr_cs_gather(&mpiPi.task_stats, &ac, &av);
 
   /* determine size of space necessary on collector */
   PMPI_Allreduce (&ac, &totalCount, 1, MPI_INT, MPI_SUM, mpiPi.comm);
   PMPI_Reduce (&ac, &maxCount, 1, MPI_INT, MPI_MAX, mpiPi.collectorRank,
                mpiPi.comm);
+  if (mpiPi.collectorRank != mpiPi.rank) {
+      maxCount = ac;
+    }
 
   if (totalCount < 1)
     {
@@ -690,6 +636,16 @@ mpiPi_mergeResults ()
             ("Collector found no records to merge. Omitting report.\n");
 
       return 0;
+    }
+
+  /* Try to allocate space for max count of callsite info from all tasks  */
+  rawCallsiteData =
+      (callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
+  if (rawCallsiteData == NULL)
+    {
+      mpiPi_msg_warn
+          ("Failed to allocate memory to collect callsite info");
+      retval = 0;
     }
 
   /* gather global data at collector */
@@ -739,15 +695,6 @@ mpiPi_mergeResults ()
                                           callsite_src_id_cache_hashkey,
                                           callsite_src_id_cache_comparator);
         }
-      /* Try to allocate space for max count of callsite info from all tasks  */
-      mpiPi.rawCallsiteData =
-          (callsite_stats_t *) calloc (maxCount, sizeof (callsite_stats_t));
-      if (mpiPi.rawCallsiteData == NULL)
-        {
-          mpiPi_msg_warn
-              ("Failed to allocate memory to collect callsite info");
-          retval = 0;
-        }
 
       /* Clear global_mpi_time and global_mpi_size before accumulation in mpiPi_insert_callsite_records */
       mpiPi.global_mpi_time = 0.0;
@@ -755,48 +702,47 @@ mpiPi_mergeResults ()
 
       if (retval == 1)
         {
-          /* Insert collector callsite data into global and task-specific hash tables */
+          /* Insert local callsite information */
           for (ndx = 0; ndx < ac; ndx++)
             {
               mpiPi_insert_callsite_records (av[ndx]);
             }
-          ndx = 0;
+
+          /* Collect remote pc data */
           for (i = 1; i < mpiPi.size; i++)	/* n-1 */
             {
               MPI_Status status;
               int count;
-              int j;
 
               /* okay in any order */
               PMPI_Probe (MPI_ANY_SOURCE, mpiPi.tag, mpiPi.comm, &status);
               PMPI_Get_count (&status, MPI_CHAR, &count);
-              PMPI_Recv (&(mpiPi.rawCallsiteData[ndx]), count, MPI_CHAR,
+              PMPI_Recv (rawCallsiteData, count, MPI_CHAR,
                          status.MPI_SOURCE, mpiPi.tag, mpiPi.comm, &status);
               count /= sizeof (callsite_stats_t);
 
-
-              for (j = 0; j < count; j++)
+              for (ndx = 0; ndx < count; ndx++)
                 {
-                  mpiPi_insert_callsite_records (&(mpiPi.rawCallsiteData[j]));
+                  mpiPi_insert_callsite_records (&rawCallsiteData[ndx]);
                 }
             }
-          free (mpiPi.rawCallsiteData);
         }
     }
   else
     {
       int ndx;
-      char *sbuf = (char *) malloc (ac * sizeof (callsite_stats_t));
       for (ndx = 0; ndx < ac; ndx++)
         {
           bcopy (av[ndx],
-                 &(sbuf[ndx * sizeof (callsite_stats_t)]),
+                 &(rawCallsiteData[ndx]),
                  sizeof (callsite_stats_t));
         }
-      PMPI_Send (sbuf, ac * sizeof (callsite_stats_t),
+      PMPI_Send (rawCallsiteData, ac * sizeof (callsite_stats_t),
                  MPI_CHAR, mpiPi.collectorRank, mpiPi.tag, mpiPi.comm);
-      free (sbuf);
     }
+
+  free (rawCallsiteData);
+
   if (mpiPi.rank == mpiPi.collectorRank && retval == 1)
     {
       if (mpiPi.collective_report == 0)
@@ -835,42 +781,34 @@ mpiPi_mergeResults ()
 static int
 mpiPi_mergeCollectiveStats ()
 {
-  int matrix_size;
-  int all_call_count;
-  double *coll_time_results, *coll_time_local;
-  int i, x, y, z;
+  double *coll_time_results = NULL, *coll_time_local = NULL;
+  size_t size;
 
-  if (mpiPi.do_collective_stats_report)
+  if (!mpiPi.do_collective_stats_report)
     {
-      all_call_count = mpiPi_DEF_END - mpiPi_BASE + 1;
-      matrix_size =
-          all_call_count * mpiPi.coll_comm_histogram.hist_size *
-          mpiPi.coll_size_histogram.hist_size;
-      mpiPi_msg_debug ("matrix_size is %d, histogram data is %d\n",
-                       matrix_size, sizeof (mpiPi.coll_time_stats));
-      coll_time_local = (double *) malloc (matrix_size * sizeof (double));
-      coll_time_results = (double *) malloc (matrix_size * sizeof (double));
-
-      i = 0;
-      for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-        for (y = 0; y < 32; y++)
-          for (z = 0; z < 32; z++)
-            coll_time_local[i++] = mpiPi.coll_time_stats[x][y][z];
-
-      /*  Collect Collective statistic data were used  */
-      PMPI_Reduce (coll_time_local, coll_time_results, matrix_size,
-                   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
-
-      i = 0;
-      for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-        for (y = 0; y < 32; y++)
-          for (z = 0; z < 32; z++)
-            mpiPi.coll_time_stats[x][y][z] = coll_time_results[i++];
-
-      free (coll_time_local);
-      free (coll_time_results);
+      return 1;
     }
 
+  if (mpiPi.collectorRank == mpiPi.rank){
+      coll_time_results = (double *) malloc (sizeof(mpiPi.coll_time_stats));
+    }
+
+  mpiPi_stats_thr_coll_gather(&mpiPi.task_stats, &coll_time_local);
+
+  /*  Collect Collective statistic data were used  */
+  size = sizeof(mpiPi.pt2pt_send_stats) / sizeof(double);
+  PMPI_Reduce (coll_time_local, coll_time_results,
+               size, MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
+  free (coll_time_local);
+
+  if (mpiPi.collectorRank == mpiPi.rank){
+      int i = 0, x, y, z;
+      for (x = 0; x < MPIP_NFUNC; x++)
+        for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+          for (z = 0; z < MPIP_SIZE_HISTCNT; z++)
+            mpiPi.coll_time_stats[x][y][z] = coll_time_results[i++];
+      free (coll_time_results);
+    }
   return 1;
 }
 
@@ -878,39 +816,34 @@ mpiPi_mergeCollectiveStats ()
 static int
 mpiPi_mergept2ptStats ()
 {
-  int matrix_size;
-  int all_call_count;
-  double *pt2pt_send_results, *pt2pt_send_local;
-  int i, x, y, z;
+  double *pt2pt_send_results = NULL, *pt2pt_send_local = NULL;
+  size_t size;
+
 
   if (mpiPi.do_pt2pt_stats_report)
     {
-      all_call_count = mpiPi_DEF_END - mpiPi_BASE + 1;
-      matrix_size =
-          all_call_count * mpiPi.pt2pt_comm_histogram.hist_size *
-          mpiPi.pt2pt_size_histogram.hist_size;
-      mpiPi_msg_debug ("matrix_size is %d, histogram data is %d\n",
-                       matrix_size, sizeof (mpiPi.pt2pt_send_stats));
-      pt2pt_send_local = (double *) malloc (matrix_size * sizeof (double));
-      pt2pt_send_results = (double *) malloc (matrix_size * sizeof (double));
+      return 1;
+    }
 
-      i = 0;
-      for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
-        for (y = 0; y < 32; y++)
-          for (z = 0; z < 32; z++)
-            pt2pt_send_local[i++] = mpiPi.pt2pt_send_stats[x][y][z];
+  if (mpiPi.collectorRank == mpiPi.rank){
+      pt2pt_send_results = (double *) malloc (sizeof(mpiPi.pt2pt_send_stats));
+    }
+  mpiPi_stats_thr_pt2pt_gather(&mpiPi.task_stats, &pt2pt_send_local);
 
-      /*  Collect Collective statistic data were used  */
-      PMPI_Reduce (pt2pt_send_local, pt2pt_send_results, matrix_size,
-                   MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
+  /*  Collect Collective statistic data were used  */
+  size = sizeof(mpiPi.pt2pt_send_stats) / sizeof(double);
+  PMPI_Reduce (pt2pt_send_local, pt2pt_send_results,
+               size, MPI_DOUBLE, MPI_SUM, mpiPi.collectorRank, mpiPi.comm);
+  free(pt2pt_send_local);
 
-      i = 0;
+  if (mpiPi.collectorRank == mpiPi.rank)
+    {
+      int i = 0, x, y, z;
       for (x = 0; x < mpiPi_DEF_END - mpiPi_BASE; x++)
         for (y = 0; y < 32; y++)
           for (z = 0; z < 32; z++)
             mpiPi.pt2pt_send_stats[x][y][z] = pt2pt_send_results[i++];
 
-      free (pt2pt_send_local);
       free (pt2pt_send_results);
     }
 
@@ -1117,8 +1050,7 @@ mpiPi_finalize ()
   if (mpiPi.disable_finalize_report == 0)
     mpiPi_generateReport (mpiPi.report_style);
 
-  /* clean up data structures, etc */
-  h_close (mpiPi.task_callsite_stats);
+  mpiPi_stats_thr_fini(&mpiPi.task_stats);
 
   if (mpiPi.global_task_app_time != NULL)
     free (mpiPi.global_task_app_time);
@@ -1153,143 +1085,25 @@ mpiPi_update_callsite_stats (unsigned op, unsigned rank, void **pc,
   callsite_stats_t *csp = NULL;
   callsite_stats_t key;
 
-  if (!mpiPi.enabled)
+  if (!mpiPi_stats_thr_is_on(&mpiPi.task_stats))
     return;
 
-  assert (mpiPi.task_callsite_stats != NULL);
-  assert (dur >= 0);
-
-
-  key.op = op;
-  key.rank = rank;
-  key.cookie = MPIP_CALLSITE_STATS_COOKIE;
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-    {
-      key.pc[i] = pc[i];
-    }
-
-  if (NULL == h_search (mpiPi.task_callsite_stats, &key, (void **) &csp))
-    {
-      /* create and insert */
-      csp = (callsite_stats_t *) malloc (sizeof (callsite_stats_t));
-      bzero (csp, sizeof (callsite_stats_t));
-      csp->op = op;
-      csp->rank = rank;
-      for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
-        {
-          csp->pc[i] = pc[i];
-        }
-      csp->cookie = MPIP_CALLSITE_STATS_COOKIE;
-      csp->cumulativeTime = 0;
-      csp->minDur = DBL_MAX;
-      csp->minDataSent = DBL_MAX;
-      csp->minIO = DBL_MAX;
-      csp->arbitraryMessageCount = 0;
-      h_insert (mpiPi.task_callsite_stats, csp);
-    }
-  /* ASSUME: csp cannot be deleted from list */
-  csp->count++;
-  csp->cumulativeTime += dur;
-  assert (csp->cumulativeTime >= 0);
-  csp->cumulativeTimeSquared += (dur * dur);
-  assert (csp->cumulativeTimeSquared >= 0);
-  csp->maxDur = max (csp->maxDur, dur);
-  csp->minDur = min (csp->minDur, dur);
-  csp->cumulativeDataSent += sendSize;
-  csp->cumulativeIO += ioSize;
-  csp->cumulativeRMA += rmaSize;
-
-  csp->maxDataSent = max (csp->maxDataSent, sendSize);
-  csp->minDataSent = min (csp->minDataSent, sendSize);
-
-  csp->maxIO = max (csp->maxIO, ioSize);
-  csp->minIO = min (csp->minIO, ioSize);
-
-  csp->maxRMA = max (csp->maxRMA, rmaSize);
-  csp->minRMA = min (csp->minRMA, rmaSize);
-
-  if (mpiPi.messageCountThreshold > -1
-      && sendSize >= (double) mpiPi.messageCountThreshold)
-    csp->arbitraryMessageCount++;
-
-#if 0
-  mpiPi_msg_debug ("mpiPi.messageCountThreshold is %d\n",
-                   mpiPi.messageCountThreshold);
-  mpiPi_msg_debug ("sendSize is %f\n", sendSize);
-  mpiPi_msg_debug ("csp->arbitraryMessageCount is %lld\n",
-                   csp->arbitraryMessageCount);
-#endif
-
-  return;
+  mpiPi_stats_thr_cs_upd(&mpiPi.task_stats, op, rank, pc, dur,
+                         sendSize, ioSize, rmaSize);
 }
-
-
-static int
-get_histogram_bin (mpiPi_histogram_t * h, int val)
-{
-  int wv = val;
-  int bin;
-
-  bin = 0;
-
-  if (h->bin_intervals == NULL)
-    {
-      while (wv > h->first_bin_max && bin < h->hist_size)
-        {
-          wv >>= 1;
-          bin++;
-        }
-    }
-  else   /* Add code for custom intervals later */
-    {
-    }
-
-  return bin;
-}
-
 
 void
 mpiPi_update_collective_stats (int op, double dur, double size,
                                MPI_Comm * comm)
 {
-  int op_idx, comm_size, comm_bin, size_bin;
-
-  PMPI_Comm_size (*comm, &comm_size);
-
-  op_idx = op - mpiPi_BASE;
-
-  comm_bin = get_histogram_bin (&mpiPi.coll_comm_histogram, comm_size);
-  size_bin = get_histogram_bin (&mpiPi.coll_size_histogram, size);
-
-  mpiPi_msg_debug
-      ("Adding %.0f time to entry mpiPi.collective_stats[%d][%d][%d] value of %.0f\n",
-       dur, op_idx, comm_bin, size_bin,
-       mpiPi.coll_time_stats[op_idx][comm_bin][size_bin]);
-
-  mpiPi.coll_time_stats[op_idx][comm_bin][size_bin] += dur;
+  mpiPi_stats_thr_coll_upd(&mpiPi.task_stats, op, dur, size, comm);
 }
-
 
 void
 mpiPi_update_pt2pt_stats (int op, double dur, double size, MPI_Comm * comm)
 {
-  int op_idx, comm_size, comm_bin, size_bin;
-
-  PMPI_Comm_size (*comm, &comm_size);
-
-  op_idx = op - mpiPi_BASE;
-
-  comm_bin = get_histogram_bin (&mpiPi.pt2pt_comm_histogram, comm_size);
-  size_bin = get_histogram_bin (&mpiPi.pt2pt_size_histogram, size);
-
-  mpiPi_msg_debug
-      ("Adding %.0f send size to entry mpiPi.pt2pt_stats[%d][%d][%d] value of %.0f\n",
-       size, op_idx, comm_bin, size_bin,
-       mpiPi.pt2pt_send_stats[op_idx][comm_bin][size_bin]);
-
-  mpiPi.pt2pt_send_stats[op_idx][comm_bin][size_bin] += size;
+  mpiPi_stats_thr_pt2pt_upd(&mpiPi.task_stats, op, dur, size, comm);
 }
-
 
 #endif /* } ifndef ENABLE_API_ONLY */
 

@@ -749,50 +749,26 @@ mpiPi_print_top_sent_sites (FILE * fp)
     }
 }
 
-void
-get_histogram_bin_str (mpiPi_histogram_t * h, int v, char *s)
-{
-  int min = 0, max = 0;
-
-  if (v == 0)
-    {
-      min = 0;
-      max = h->first_bin_max;
-    }
-  else
-    {
-      min = h->first_bin_max + 1;
-      min <<= (v - 1);
-      max = (min << 1) - 1;
-    }
-
-  sprintf (s, "%8d - %8d", min, max);
-}
-
-
 static void
 mpiPi_print_top_collective_sent_sites (FILE * fp)
 {
   int result_count, j, i;
   double **result_ptrs;
   int x, y, z;
-  int all_call_count, matrix_size;
+  int matrix_size;
   char commbinbuf[32];
   char databinbuf[32];
 
   mpiPi_msg_debug ("In mpiPi_print_top_collective_sent_sites\n");
 
-  all_call_count = mpiPi_DEF_END - mpiPi_BASE;
-  matrix_size =
-      all_call_count * mpiPi.coll_comm_histogram.hist_size *
-      mpiPi.coll_size_histogram.hist_size;
+  matrix_size = MPIP_NFUNC * MPIP_COMM_HISTCNT * MPIP_SIZE_HISTCNT;
 
   result_ptrs = (double **) malloc (sizeof (double *) * matrix_size);
 
   result_count = 0;
-  for (x = 0; x < all_call_count; x++)
-    for (y = 0; y < mpiPi.coll_comm_histogram.hist_size; y++)
-      for (z = 0; z < mpiPi.coll_size_histogram.hist_size; z++)
+  for (x = 0; x < MPIP_NFUNC; x++)
+    for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+      for (z = 0; z < MPIP_SIZE_HISTCNT; z++)
         {
           if (mpiPi.coll_time_stats[x][y][z] > 0)
             {
@@ -825,9 +801,9 @@ mpiPi_print_top_collective_sent_sites (FILE * fp)
       for (i = 0; (i < 20) && (i < result_count); i++)
         {
           /* Find location in matrix */
-          for (x = 0; x < all_call_count; x++)
-            for (y = 0; y < mpiPi.coll_comm_histogram.hist_size; y++)
-              for (z = 0; z < mpiPi.coll_size_histogram.hist_size; z++)
+          for (x = 0; x < MPIP_NFUNC; x++)
+            for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+              for (z = 0; z < MPIP_COMM_HISTCNT; z++)
                 {
                   if (&mpiPi.coll_time_stats[x][y][z] == result_ptrs[j])
                     {
@@ -840,8 +816,8 @@ print:
           if (mpiPi.coll_time_stats[x][y][z] == 0)
             goto done;
 
-          get_histogram_bin_str (&mpiPi.coll_comm_histogram, y, commbinbuf);
-          get_histogram_bin_str (&mpiPi.coll_size_histogram, z, databinbuf);
+          mpiPi_stats_thr_coll_binstrings(&mpiPi.task_stats, y, commbinbuf,
+                                        z, databinbuf);
 
           fprintf (fp,
               mpiP_Report_Formats[MPIP_HISTOGRAM_FMT]
@@ -864,23 +840,19 @@ mpiPi_print_top_pt2pt_sent_sites (FILE * fp)
   int result_count, j, i;
   double **result_ptrs;
   int x, y, z;
-  int all_call_count, matrix_size;
+  int matrix_size;
   char commbinbuf[32];
   char databinbuf[32];
 
   mpiPi_msg_debug ("In mpiPi_print_top_pt2pt_sent_sites\n");
 
-  all_call_count = mpiPi_DEF_END - mpiPi_BASE;
-  matrix_size =
-      all_call_count * mpiPi.pt2pt_comm_histogram.hist_size *
-      mpiPi.pt2pt_size_histogram.hist_size;
-
+  matrix_size = MPIP_NFUNC * MPIP_COMM_HISTCNT * MPIP_SIZE_HISTCNT;
   result_ptrs = (double **) malloc (sizeof (double *) * matrix_size);
 
   result_count = 0;
-  for (x = 0; x < all_call_count; x++)
-    for (y = 0; y < mpiPi.pt2pt_comm_histogram.hist_size; y++)
-      for (z = 0; z < mpiPi.pt2pt_size_histogram.hist_size; z++)
+  for (x = 0; x < MPIP_NFUNC; x++)
+    for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+      for (z = 0; z < MPIP_SIZE_HISTCNT; z++)
         {
           if (mpiPi.pt2pt_send_stats[x][y][z] > 0)
             {
@@ -913,9 +885,9 @@ mpiPi_print_top_pt2pt_sent_sites (FILE * fp)
       for (i = 0; (i < 20) && (i < result_count); i++)
         {
           /* Find location in matrix */
-          for (x = 0; x < all_call_count; x++)
-            for (y = 0; y < mpiPi.pt2pt_comm_histogram.hist_size; y++)
-              for (z = 0; z < mpiPi.pt2pt_size_histogram.hist_size; z++)
+          for (x = 0; x < MPIP_NFUNC; x++)
+            for (y = 0; y < MPIP_COMM_HISTCNT; y++)
+              for (z = 0; z < MPIP_SIZE_HISTCNT; z++)
                 {
                   if (&mpiPi.pt2pt_send_stats[x][y][z] == result_ptrs[j])
                     {
@@ -928,8 +900,9 @@ print:
           if (mpiPi.pt2pt_send_stats[x][y][z] == 0)
             goto done;
 
-          get_histogram_bin_str (&mpiPi.pt2pt_comm_histogram, y, commbinbuf);
-          get_histogram_bin_str (&mpiPi.pt2pt_size_histogram, z, databinbuf);
+          mpiPi_stats_thr_pt2pt_binstrings(&mpiPi.task_stats,
+                                           y, commbinbuf,
+                                           z, databinbuf);
 
           fprintf (fp,
                    mpiP_Report_Formats[MPIP_HISTOGRAM_FMT]
@@ -1962,25 +1935,9 @@ mpiPi_coll_print_all_callsite_time_info (FILE * fp)
 
       task_stats->rank = mpiPi.rank;
 
-      if (h_search
-          (mpiPi.task_callsite_stats, task_stats,
-           (void **) &task_lookup) == NULL)
-        {
-          task_lookup = &cs_buf;
-          task_lookup->count = 0;
-          task_lookup->cumulativeTime = 0;
-          task_lookup->cumulativeTimeSquared = 0;
-          task_lookup->maxDur = 0;
-          task_lookup->minDur = 0;
-          task_lookup->cumulativeDataSent = 0;
-          task_lookup->cumulativeIO = 0;
-          task_lookup->maxDataSent = 0;
-          task_lookup->minDataSent = 0;
-          task_lookup->maxIO = 0;
-          task_lookup->minIO = 0;
-          task_lookup->arbitraryMessageCount = 0;
-          task_lookup->rank = mpiPi.rank;
-        }
+      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                               task_stats, &task_lookup, &cs_buf,
+                               MPIPI_CALLSITE_MIN2ZERO);
 
       PMPI_Gather (task_lookup, sizeof (callsite_stats_t),
                    MPI_CHAR, task_data,
@@ -2100,25 +2057,9 @@ mpiPi_coll_print_concise_callsite_time_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      if (h_search
-          (mpiPi.task_callsite_stats, task_stats,
-           (void **) &task_lookup) == NULL)
-        {
-          task_lookup = &cs_buf;
-          task_lookup->count = 0;
-          task_lookup->cumulativeTime = 0;
-          task_lookup->cumulativeTimeSquared = 0;
-          task_lookup->maxDur = 0;
-          task_lookup->minDur = DBL_MAX;
-          task_lookup->cumulativeDataSent = 0;
-          task_lookup->cumulativeIO = 0;
-          task_lookup->maxDataSent = 0;
-          task_lookup->minDataSent = DBL_MAX;
-          task_lookup->maxIO = 0;
-          task_lookup->minIO = DBL_MAX;
-          task_lookup->arbitraryMessageCount = 0;
-          task_lookup->rank = mpiPi.rank;
-        }
+      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                               task_stats, &task_lookup, &cs_buf,
+                               MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
       task_flag = task_lookup->count > 0 ? 1 : 0;
 
@@ -2229,27 +2170,11 @@ mpiPi_coll_print_concise_callsite_sent_info (FILE * fp)
                   MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
 
-      /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      if (h_search
-          (mpiPi.task_callsite_stats, task_stats,
-           (void **) &task_lookup) == NULL)
-        {
-          task_lookup = &cs_buf;
-          task_lookup->count = 0;
-          task_lookup->cumulativeTime = 0;
-          task_lookup->cumulativeTimeSquared = 0;
-          task_lookup->maxDur = 0;
-          task_lookup->minDur = DBL_MAX;
-          task_lookup->cumulativeDataSent = 0;
-          task_lookup->cumulativeIO = 0;
-          task_lookup->maxDataSent = 0;
-          task_lookup->minDataSent = DBL_MAX;
-          task_lookup->maxIO = 0;
-          task_lookup->minIO = DBL_MAX;
-          task_lookup->arbitraryMessageCount = 0;
-          task_lookup->rank = mpiPi.rank;
-        }
+      /*  Search for task local entry for the current call site   */
+      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                               task_stats, &task_lookup, &cs_buf,
+                               MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
       task_flag = task_lookup->cumulativeDataSent > 0 ? 1 : 0;
 
@@ -2367,25 +2292,9 @@ mpiPi_coll_print_concise_callsite_io_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      if (h_search
-          (mpiPi.task_callsite_stats, task_stats,
-           (void **) &task_lookup) == NULL)
-        {
-          task_lookup = &cs_buf;
-          task_lookup->count = 0;
-          task_lookup->cumulativeTime = 0;
-          task_lookup->cumulativeTimeSquared = 0;
-          task_lookup->maxDur = 0;
-          task_lookup->minDur = DBL_MAX;
-          task_lookup->cumulativeDataSent = 0;
-          task_lookup->cumulativeIO = 0;
-          task_lookup->maxDataSent = 0;
-          task_lookup->minDataSent = DBL_MAX;
-          task_lookup->maxIO = 0;
-          task_lookup->minIO = DBL_MAX;
-          task_lookup->arbitraryMessageCount = 0;
-          task_lookup->rank = mpiPi.rank;
-        }
+      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                               task_stats, &task_lookup, &cs_buf,
+                               MPIPI_CALLSITE_MIN2MAX);
       tot_tasks = 0;
       task_flag = task_lookup->cumulativeIO > 0 ? 1 : 0;
 
@@ -2497,26 +2406,10 @@ mpiPi_coll_print_concise_callsite_rma_info (FILE * fp)
 
       /*  Search for task local entry for the current call site   */
       task_stats->rank = mpiPi.rank;
-      if (h_search
-          (mpiPi.task_callsite_stats, task_stats,
-           (void **) &task_lookup) == NULL)
-        {
-          task_lookup = &cs_buf;
-          task_lookup->count = 0;
-          task_lookup->cumulativeTime = 0;
-          task_lookup->cumulativeTimeSquared = 0;
-          task_lookup->maxDur = 0;
-          task_lookup->minDur = DBL_MAX;
-          task_lookup->cumulativeDataSent = 0;
-          task_lookup->cumulativeIO = 0;
-          task_lookup->cumulativeRMA = 0;
-          task_lookup->maxDataSent = 0;
-          task_lookup->minDataSent = DBL_MAX;
-          task_lookup->maxIO = 0;
-          task_lookup->minIO = DBL_MAX;
-          task_lookup->arbitraryMessageCount = 0;
-          task_lookup->rank = mpiPi.rank;
-        }
+      mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                               task_stats, &task_lookup, &cs_buf,
+                               MPIPI_CALLSITE_MIN2MAX);
+
       tot_tasks = 0;
       task_flag = task_lookup->cumulativeRMA > 0 ? 1 : 0;
 
@@ -2638,26 +2531,9 @@ mpiPi_coll_print_all_callsite_sent_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-
-              if (h_search
-                  (mpiPi.task_callsite_stats, task_stats,
-                   (void **) &task_lookup) == NULL)
-                {
-                  task_lookup = &cs_buf;
-                  task_lookup->count = 0;
-                  task_lookup->cumulativeTime = 0;
-                  task_lookup->cumulativeTimeSquared = 0;
-                  task_lookup->maxDur = 0;
-                  task_lookup->minDur = 0;
-                  task_lookup->cumulativeDataSent = 0;
-                  task_lookup->cumulativeIO = 0;
-                  task_lookup->maxDataSent = 0;
-                  task_lookup->minDataSent = 0;
-                  task_lookup->maxIO = 0;
-                  task_lookup->minIO = 0;
-                  task_lookup->arbitraryMessageCount = 0;
-                  task_lookup->op = 0;
-                }
+              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                                       task_stats, &task_lookup, &cs_buf,
+                                       MPIPI_CALLSITE_MIN2ZERO);
 
               PMPI_Gather (task_lookup, sizeof (callsite_stats_t),
                            MPI_CHAR, task_data,
@@ -2794,25 +2670,9 @@ mpiPi_coll_print_all_callsite_io_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-
-              if (h_search
-                  (mpiPi.task_callsite_stats, task_stats,
-                   (void **) &task_lookup) == NULL)
-                {
-                  task_lookup = &cs_buf;
-                  task_lookup->count = 0;
-                  task_lookup->cumulativeTime = 0;
-                  task_lookup->cumulativeTimeSquared = 0;
-                  task_lookup->maxDur = 0;
-                  task_lookup->minDur = 0;
-                  task_lookup->cumulativeDataSent = 0;
-                  task_lookup->cumulativeIO = 0;
-                  task_lookup->maxDataSent = 0;
-                  task_lookup->minDataSent = 0;
-                  task_lookup->maxIO = 0;
-                  task_lookup->minIO = 0;
-                  task_lookup->arbitraryMessageCount = 0;
-                }
+              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                                       task_stats, &task_lookup, &cs_buf,
+                                       MPIPI_CALLSITE_MIN2ZERO);
 
               PMPI_Gather (task_lookup, sizeof (callsite_stats_t),
                            MPI_CHAR, task_data,
@@ -2945,26 +2805,9 @@ mpiPi_coll_print_all_callsite_rma_info (FILE * fp)
                           MPI_CHAR, mpiPi.collectorRank, mpiPi.comm);
 
               task_stats->rank = mpiPi.rank;
-
-              if (h_search
-                  (mpiPi.task_callsite_stats, task_stats,
-                   (void **) &task_lookup) == NULL)
-                {
-                  task_lookup = &cs_buf;
-                  task_lookup->count = 0;
-                  task_lookup->cumulativeTime = 0;
-                  task_lookup->cumulativeTimeSquared = 0;
-                  task_lookup->maxDur = 0;
-                  task_lookup->minDur = 0;
-                  task_lookup->cumulativeDataSent = 0;
-                  task_lookup->cumulativeIO = 0;
-                  task_lookup->cumulativeRMA = 0;
-                  task_lookup->maxDataSent = 0;
-                  task_lookup->minDataSent = 0;
-                  task_lookup->maxIO = 0;
-                  task_lookup->minIO = 0;
-                  task_lookup->arbitraryMessageCount = 0;
-                }
+              mpiPi_stats_thr_cs_lookup(&mpiPi.task_stats,
+                                       task_stats, &task_lookup, &cs_buf,
+                                       MPIPI_CALLSITE_MIN2ZERO);
 
               PMPI_Gather (task_lookup, sizeof (callsite_stats_t),
                            MPI_CHAR, task_data,
