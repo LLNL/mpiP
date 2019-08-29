@@ -642,9 +642,17 @@ F77_SYMBOLS
 ac_ct_F77
 USE_RTC
 USE_RTS_GET_TIMEBASE
+EGREP
+GREP
+CPP
+OBJEXT
+EXEEXT
+ac_ct_CC
+CPPFLAGS
 LAUNCH
 F77
 CXX
+CC
 RANLIB
 INSTALL_DATA
 INSTALL_SCRIPT
@@ -662,16 +670,8 @@ BIN_TYPE_FLAG
 LIBUNWIND_LOC
 BINUTILS_DIR
 FFLAGS
-EGREP
-GREP
-CPP
-OBJEXT
-EXEEXT
-ac_ct_CC
-CPPFLAGS
-LDFLAGS
 CFLAGS
-CC
+LDFLAGS
 target_os
 target_vendor
 target_cpu
@@ -703,7 +703,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -812,7 +811,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1065,15 +1063,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1211,7 +1200,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1364,7 +1353,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1577,6 +1565,52 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_try_compile
+
+# ac_fn_c_try_link LINENO
+# -----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded.
+ac_fn_c_try_link ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  rm -f conftest.$ac_objext conftest$ac_exeext
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    grep -v '^ *+' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+    mv -f conftest.er1 conftest.err
+  fi
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 test -x conftest$ac_exeext
+       }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_retval=1
+fi
+  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
+  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
+  # interfere with the next link command; also delete a directory that is
+  # left behind by Apple's compiler.  We do this before executing the actions.
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_link
 
 # ac_fn_c_try_run LINENO
 # ----------------------
@@ -1870,52 +1904,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_compile
-
-# ac_fn_c_try_link LINENO
-# -----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded.
-ac_fn_c_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_link
 
 # ac_fn_c_check_decl LINENO SYMBOL VAR INCLUDES
 # ---------------------------------------------
@@ -2746,6 +2734,965 @@ echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in
 echo "        the case where test executables would need to be run as a parallel job."
 echo
 
+
+#
+#  With specifications
+#
+
+
+# Check whether --with-cc was given.
+if test "${with_cc+set}" = set; then :
+  withval=$with_cc; CC=$withval
+
+fi
+
+
+
+# Check whether --with-cxx was given.
+if test "${with_cxx+set}" = set; then :
+  withval=$with_cxx; CXX=$withval
+
+fi
+
+
+
+# Check whether --with-f77 was given.
+if test "${with_f77+set}" = set; then :
+  withval=$with_f77; F77=$withval
+
+fi
+
+
+
+# Check whether --with-include was given.
+if test "${with_include+set}" = set; then :
+  withval=$with_include; CPPFLAGS=$withval
+	echo Using extra include directories: $withval
+
+fi
+
+
+
+# Check whether --with-ldflags was given.
+if test "${with_ldflags+set}" = set; then :
+  withval=$with_ldflags; LDFLAGS=$withval
+	echo Using ld flags: $withval
+
+fi
+
+
+
+
+if test -z "${FFLAGS}" ; then
+  FFLAGS=${CFLAGS}
+fi
+
+
+
+# Check whether --with-libs was given.
+if test "${with_libs+set}" = set; then :
+  withval=$with_libs; LIBS=$withval
+	echo Using extra libraries: $withval
+
+fi
+
+
+
+# Check whether --with-binutils-dir was given.
+if test "${with_binutils_dir+set}" = set; then :
+  withval=$with_binutils_dir; BINUTILS_DIR=$withval
+	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
+	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
+	echo Using binutils-dir: $withval
+
+else
+  BINUTILS_DIR=/usr
+
+fi
+
+
+
+
+# Check whether --with-libunwind was given.
+if test "${with_libunwind+set}" = set; then :
+  withval=$with_libunwind; LIBUNWIND_LOC=$withval
+	echo Using libunwind: $withval
+
+else
+  LIBUNWIND_LOC=/usr/lib/libunwind.a
+
+fi
+
+
+
+
+# Check whether --with-bin-type-flag was given.
+if test "${with_bin_type_flag+set}" = set; then :
+  withval=$with_bin_type_flag; BIN_TYPE_FLAG=$withval
+	echo Using bin-type-flag: $withval
+
+else
+  BIN_TYPE_FLAG=
+
+fi
+
+
+
+#
+# Timer options
+#
+TIMER_OPTION=no
+
+# Check whether --with-gettimeofday was given.
+if test "${with_gettimeofday+set}" = set; then :
+  withval=$with_gettimeofday;
+$as_echo "#define USE_GETTIMEOFDAY /**/" >>confdefs.h
+
+        USE_GETTIMEOFDAY=true
+	TIMER_OPTION=yes
+
+fi
+
+
+
+# Check whether --with-wtime was given.
+if test "${with_wtime+set}" = set; then :
+  withval=$with_wtime;
+$as_echo "#define USE_WTIME /**/" >>confdefs.h
+
+	TIMER_OPTION=yes
+
+fi
+
+
+
+# Check whether --with-clock_gettime was given.
+if test "${with_clock_gettime+set}" = set; then :
+  withval=$with_clock_gettime;
+$as_echo "#define USE_CLOCK_GETTIME /**/" >>confdefs.h
+
+	USE_CLOCK_GETTIME=yes
+	TIMER_OPTION=yes
+
+fi
+
+
+
+# Check whether --with-rts_get_timebase was given.
+if test "${with_rts_get_timebase+set}" = set; then :
+  withval=$with_rts_get_timebase;
+$as_echo "#define USE_RTS_GET_TIMEBASE /**/" >>confdefs.h
+
+	USE_RTS_GET_TIMEBASE=yes
+	TIMER_OPTION=yes
+
+else
+  USE_RTS_TIMEBASE=no
+
+fi
+
+
+
+# Check whether --with-read_real_time was given.
+if test "${with_read_real_time+set}" = set; then :
+  withval=$with_read_real_time;
+$as_echo "#define USE_READ_REAL_TIME /**/" >>confdefs.h
+
+	USE_READ_REAL_TIME=yes
+	TIMER_OPTION=yes
+
+else
+  USE_READ_REAL_TIME=no
+
+fi
+
+
+
+# Check whether --with-rtc was given.
+if test "${with_rtc+set}" = set; then :
+  withval=$with_rtc;
+$as_echo "#define USE_RTC /**/" >>confdefs.h
+
+	USE_RTC=yes
+	TIMER_OPTION=yes
+
+else
+  USE_RTC=no
+
+fi
+
+
+
+# Check whether --with-dclock was given.
+if test "${with_dclock+set}" = set; then :
+  withval=$with_dclock;
+$as_echo "#define USE_DCLOCK /**/" >>confdefs.h
+
+	USE_DCLOCK=yes
+	TIMER_OPTION=yes
+
+else
+  USE_DCLOCK=no
+
+fi
+
+
+
+#
+#  Enable / Disable specifications
+#
+
+DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
+ENABLE_API_ONLY=no
+# Check whether --enable-api-only was given.
+if test "${enable_api_only+set}" = set; then :
+  enableval=$enable_api_only; if test x"$enableval" = xyes ; then
+		ENABLE_API_ONLY=yes
+		echo Configuring for API library only.
+
+$as_echo "#define ENABLE_API_ONLY /**/" >>confdefs.h
+
+		DEFAULT_TARGS="API test"
+	fi
+
+fi
+
+
+
+if test "$ENABLE_API_ONLY" = no ; then
+
+ENABLE_MPI_IO=yes
+# Check whether --enable-mpi-io was given.
+if test "${enable_mpi_io+set}" = set; then :
+  enableval=$enable_mpi_io; if test x"$enableval" = xno ; then
+		ENABLE_MPI_IO=no
+		echo Profiling of MPI I/O has been disabled.
+	fi
+
+fi
+
+
+fi
+
+if test x"$ENABLE_API_ONLY" = xno ; then
+
+ENABLE_MPI_RMA=yes
+# Check whether --enable-mpi-rma was given.
+if test "${enable_mpi_rma+set}" = set; then :
+  enableval=$enable_mpi_rma; if test x"$enableval" = xno ; then
+		ENABLE_MPI_RMA=no
+		echo Profiling of MPI RMA has been disabled.
+	fi
+
+fi
+
+
+
+ENABLE_MPI_NONBLOCKINGCOLLECTIVES=yes
+# Check whether --enable-mpi-nbc was given.
+if test "${enable_mpi_nbc+set}" = set; then :
+  enableval=$enable_mpi_nbc; if test x"$enableval" = xno ; then
+		ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
+		echo Profiling of MPI NONBLOCKINGCOLLECTIVES has been disabled.
+	fi
+
+fi
+
+
+fi
+
+ENABLE_BFD=yes
+# Check whether --enable-bfd was given.
+if test "${enable_bfd+set}" = set; then :
+  enableval=$enable_bfd; if test x"$enableval" = xno ; then
+		echo Use of libbfd has been disabled.
+		ENABLE_BFD=no SO_LOOKUP=no
+	fi
+
+fi
+
+
+DISABLE_LIBUNWIND=no
+# Check whether --enable-libunwind was given.
+if test "${enable_libunwind+set}" = set; then :
+  enableval=$enable_libunwind; if test x"$enableval" = xno ; then
+		DISABLE_LIBUNWIND=yes
+		echo Use of libunwind has been disabled.
+	fi
+
+fi
+
+
+DISABLE_SO_LOOKUP=no
+# Check whether --enable-so-lookup was given.
+if test "${enable_so_lookup+set}" = set; then :
+  enableval=$enable_so_lookup; if test x"$enableval" = xno ; then
+		DISABLE_SO_LOOKUP=yes
+		echo Use of shared object source lookup has been disabled.
+	fi
+
+fi
+
+
+USE_SETJMP=no
+# Check whether --enable-setjmp was given.
+if test "${enable_setjmp+set}" = set; then :
+  enableval=$enable_setjmp; if test x"$enableval" = xyes ; then
+		USE_SETJMP=yes
+
+$as_echo "#define USE_SETJMP /**/" >>confdefs.h
+
+		echo Setjmp will be used to generate stack traces.
+	fi
+
+fi
+
+
+# Check whether --enable-fortranxlate was given.
+if test "${enable_fortranxlate+set}" = set; then :
+  enableval=$enable_fortranxlate; if test "$enable_fortranxlate" = "no" ; then
+		ENABLE_FORTRAN_XLATE=no
+		  echo Translation of FORTRAN opaque objects has been disabled.
+	else
+		ENABLE_FORTRAN_XLATE=yes
+		echo Translation of FORTRAN opaque objects has been enabled.
+	fi
+
+else
+  ENABLE_FORTRAN_XLATE=yes
+
+fi
+
+
+
+ENABLE_FORTRAN_WEAK_SYMS=no
+# Check whether --enable-fortranweak was given.
+if test "${enable_fortranweak+set}" = set; then :
+  enableval=$enable_fortranweak; if test "$enable_fortranweak" = "no" ; then
+                ENABLE_FORTRAN_WEAK_SYMS=no
+                  echo Generation of additional weak FORTRAN symbol names has been disabled.
+        else
+                ENABLE_FORTRAN_WEAK_SYMS=yes
+
+$as_echo "#define ENABLE_FORTRAN_WEAK_SYMS /**/" >>confdefs.h
+
+                echo Generation of additional weak FORTRAN symbol names has been enabled.
+        fi
+
+else
+  ENABLE_FORTRAN_WEAK_SYMS=no
+
+fi
+
+
+
+
+
+# Check whether --enable-stackdepth was given.
+if test "${enable_stackdepth+set}" = set; then :
+  enableval=$enable_stackdepth; STACKDEPTH=$enableval;
+    echo "Maximum stacktrace depth is $STACKDEPTH"
+else
+  STACKDEPTH=8
+fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define MPIP_CALLSITE_STACK_DEPTH_MAX $STACKDEPTH
+_ACEOF
+
+#AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
+
+PC_LOOKUP_FILE=pc_lookup.c
+# Check whether --enable-dwarf was given.
+if test "${enable_dwarf+set}" = set; then :
+  enableval=$enable_dwarf; if test x"$enableval" = xyes ; then
+		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
+		ENABLE_BFD=no
+		PC_LOOKUP_FILE=pc_lookup_dwarf.c
+	fi ;
+	USE_LIBDWARF=yes
+
+else
+  USE_LIBDWARF=no
+
+fi
+
+
+
+
+USE_GETARG=false
+# Check whether --enable-getarg was given.
+if test "${enable_getarg+set}" = set; then :
+  enableval=$enable_getarg; if test x"$enableval" = xyes ; then
+
+$as_echo "#define USE_GETARG /**/" >>confdefs.h
+
+		echo Use of getarg has been enabled
+		USE_GETARG=true
+	fi
+
+fi
+
+
+
+# Check whether --enable-demangling was given.
+if test "${enable_demangling+set}" = set; then :
+  enableval=$enable_demangling; DO_DEMANGLE=$enableval
+	echo $DO_DEMANGLE demangling enabled
+
+else
+  DO_DEMANGLE=false
+
+fi
+
+
+
+# Check whether --enable-check-time was given.
+if test "${enable_check_time+set}" = set; then :
+  enableval=$enable_check_time; if test x"$enableval" = xyes ; then
+
+$as_echo "#define MPIP_CHECK_TIME /**/" >>confdefs.h
+
+		echo AIX negative time value checking has been enabled
+	fi
+
+fi
+
+
+# Check whether --enable-collective-report-default was given.
+if test "${enable_collective_report_default+set}" = set; then :
+  enableval=$enable_collective_report_default; if test "x$enableval" = xyes ; then
+
+$as_echo "#define COLLECTIVE_REPORT_DEFAULT /**/" >>confdefs.h
+
+		echo "Using collective report as default."
+	fi
+
+fi
+
+
+
+$as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_verbose" >>confdefs.h
+
+# Check whether --enable-concise-report-default was given.
+if test "${enable_concise_report_default+set}" = set; then :
+  enableval=$enable_concise_report_default; if test "x$enableval" = xyes ; then
+
+$as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_concise" >>confdefs.h
+
+		echo "Using concise report as default."
+	fi
+
+fi
+
+
+# Find a good install program.  We prefer a C program (faster),
+# so one script is as good as another.  But avoid the broken or
+# incompatible versions:
+# SysV /etc/install, /usr/sbin/install
+# SunOS /usr/etc/install
+# IRIX /sbin/install
+# AIX /bin/install
+# AmigaOS /C/install, which installs bootblocks on floppy discs
+# AIX 4 /usr/bin/installbsd, which doesn't work without a -g flag
+# AFS /usr/afsws/bin/install, which mishandles nonexistent args
+# SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
+# OS/2's system install, which has a completely different semantic
+# ./install, which can be erroneously created by make from ./install.sh.
+# Reject install programs that cannot install multiple files.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a BSD-compatible install" >&5
+$as_echo_n "checking for a BSD-compatible install... " >&6; }
+if test -z "$INSTALL"; then
+if ${ac_cv_path_install+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    # Account for people who put trailing slashes in PATH elements.
+case $as_dir/ in #((
+  ./ | .// | /[cC]/* | \
+  /etc/* | /usr/sbin/* | /usr/etc/* | /sbin/* | /usr/afsws/bin/* | \
+  ?:[\\/]os2[\\/]install[\\/]* | ?:[\\/]OS2[\\/]INSTALL[\\/]* | \
+  /usr/ucb/* ) ;;
+  *)
+    # OSF1 and SCO ODT 3.0 have their own names for install.
+    # Don't use installbsd from OSF since it installs stuff as root
+    # by default.
+    for ac_prog in ginstall scoinst install; do
+      for ac_exec_ext in '' $ac_executable_extensions; do
+	if as_fn_executable_p "$as_dir/$ac_prog$ac_exec_ext"; then
+	  if test $ac_prog = install &&
+	    grep dspmsg "$as_dir/$ac_prog$ac_exec_ext" >/dev/null 2>&1; then
+	    # AIX install.  It has an incompatible calling convention.
+	    :
+	  elif test $ac_prog = install &&
+	    grep pwplus "$as_dir/$ac_prog$ac_exec_ext" >/dev/null 2>&1; then
+	    # program-specific install script used by HP pwplus--don't use.
+	    :
+	  else
+	    rm -rf conftest.one conftest.two conftest.dir
+	    echo one > conftest.one
+	    echo two > conftest.two
+	    mkdir conftest.dir
+	    if "$as_dir/$ac_prog$ac_exec_ext" -c conftest.one conftest.two "`pwd`/conftest.dir" &&
+	      test -s conftest.one && test -s conftest.two &&
+	      test -s conftest.dir/conftest.one &&
+	      test -s conftest.dir/conftest.two
+	    then
+	      ac_cv_path_install="$as_dir/$ac_prog$ac_exec_ext -c"
+	      break 3
+	    fi
+	  fi
+	fi
+      done
+    done
+    ;;
+esac
+
+  done
+IFS=$as_save_IFS
+
+rm -rf conftest.one conftest.two conftest.dir
+
+fi
+  if test "${ac_cv_path_install+set}" = set; then
+    INSTALL=$ac_cv_path_install
+  else
+    # As a last resort, use the slow shell script.  Don't cache a
+    # value for INSTALL within a source directory, because that will
+    # break other packages using the cache if that directory is
+    # removed, or if the value is a relative name.
+    INSTALL=$ac_install_sh
+  fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $INSTALL" >&5
+$as_echo "$INSTALL" >&6; }
+
+# Use test -z because SunOS4 sh mishandles braces in ${var-val}.
+# It thinks the first close brace ends the variable substitution.
+test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
+
+test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
+
+test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
+
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
+set dummy ${ac_tool_prefix}ranlib; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_RANLIB+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$RANLIB"; then
+  ac_cv_prog_RANLIB="$RANLIB" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_RANLIB="${ac_tool_prefix}ranlib"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+RANLIB=$ac_cv_prog_RANLIB
+if test -n "$RANLIB"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RANLIB" >&5
+$as_echo "$RANLIB" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_RANLIB"; then
+  ac_ct_RANLIB=$RANLIB
+  # Extract the first word of "ranlib", so it can be a program name with args.
+set dummy ranlib; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_ac_ct_RANLIB+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_RANLIB"; then
+  ac_cv_prog_ac_ct_RANLIB="$ac_ct_RANLIB" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_RANLIB="ranlib"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_RANLIB=$ac_cv_prog_ac_ct_RANLIB
+if test -n "$ac_ct_RANLIB"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_RANLIB" >&5
+$as_echo "$ac_ct_RANLIB" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_ct_RANLIB" = x; then
+    RANLIB=":"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    RANLIB=$ac_ct_RANLIB
+  fi
+else
+  RANLIB="$ac_cv_prog_RANLIB"
+fi
+
+if test "x$AR" = "x"; then
+   AR=ar
+fi
+
+TEST_LIST=
+
+#  Test for available compilers
+C_IBM_MPI_WRAPPERS="mpixlc"
+C_INTEL_MPI_WRAPPERS="mpiicc"
+CXX_IBM_MPI_WRAPPERS="mpixlC"
+CXX_INTEL_MPI_WRAPPERS="mpiicpc"
+F77_IBM_MPI_WRAPPERS="mpixlf"
+F77_INTEL_MPI_WRAPPERS="mpiifort"
+
+if test "$ENABLE_API_ONLY" = no ; then
+  for ac_prog in $C_IBM_MPI_WRAPPERS $C_INTEL_MPI_WRAPPERS cmpicc mpcc mpicc gcc cc icc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
+$as_echo "$CC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$CC" && break
+done
+test -n "$CC" || CC="mpicc"
+
+  for ac_prog in $CXX_IBM_MPI_WRAPPERS $CXX_INTEL_MPI_WRAPPERS mpiCC mpicxx cmpic++ c++ g++ CC cxx icc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CXX+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CXX="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CXX=$ac_cv_prog_CXX
+if test -n "$CXX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
+$as_echo "$CXX" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$CXX" && break
+done
+test -n "$CXX" || CXX="mpicxx"
+
+  for ac_prog in $F77_IBM_MPI_WRAPPERS $F77_INTEL_MPI_WRAPPERS mpifort mpif77 cmpifc xlf f77 g77 pgf77 fort ifc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_F77+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$F77"; then
+  ac_cv_prog_F77="$F77" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_F77="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+F77=$ac_cv_prog_F77
+if test -n "$F77"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $F77" >&5
+$as_echo "$F77" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$F77" && break
+done
+test -n "$F77" || F77="mpifort"
+
+  for ac_prog in poe srun prun mpirun mpiexec
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_LAUNCH+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$LAUNCH"; then
+  ac_cv_prog_LAUNCH="$LAUNCH" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_LAUNCH="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+LAUNCH=$ac_cv_prog_LAUNCH
+if test -n "$LAUNCH"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LAUNCH" >&5
+$as_echo "$LAUNCH" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$LAUNCH" && break
+done
+test -n "$LAUNCH" || LAUNCH="mpirun"
+
+else
+  for ac_prog in xlc gcc cc icc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CC+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
+$as_echo "$CC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$CC" && break
+done
+test -n "$CC" || CC="mpicc"
+
+  for ac_prog in xlC c++ g++ CC cxx icc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CXX+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CXX="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+CXX=$ac_cv_prog_CXX
+if test -n "$CXX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
+$as_echo "$CXX" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$CXX" && break
+done
+test -n "$CXX" || CXX="mpiCC"
+
+  for ac_prog in xlf f77 g77 pgf77 fort ifc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_F77+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$F77"; then
+  ac_cv_prog_F77="$F77" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_F77="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+F77=$ac_cv_prog_F77
+if test -n "$F77"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $F77" >&5
+$as_echo "$F77" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$F77" && break
+done
+test -n "$F77" || F77="mpif77"
+
+  LAUNCH="\\\"\\\""
+  TEST_LIST="api-test.exp"
+fi
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3536,6 +4483,52 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqrt in -lm" >&5
+$as_echo_n "checking for sqrt in -lm... " >&6; }
+if ${ac_cv_lib_m_sqrt+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sqrt ();
+int
+main ()
+{
+return sqrt ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_m_sqrt=yes
+else
+  ac_cv_lib_m_sqrt=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_sqrt" >&5
+$as_echo "$ac_cv_lib_m_sqrt" >&6; }
+if test "x$ac_cv_lib_m_sqrt" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBM 1
+_ACEOF
+
+  LIBS="-lm $LIBS"
+
+fi
+
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3965,1001 +4958,6 @@ cat >>confdefs.h <<_ACEOF
 #define SIZEOF_VOIDP $ac_cv_sizeof_voidp
 _ACEOF
 
-
-
-
-#
-#  With specifications
-#
-
-
-# Check whether --with-cc was given.
-if test "${with_cc+set}" = set; then :
-  withval=$with_cc; CC=$withval
-
-fi
-
-
-
-# Check whether --with-cxx was given.
-if test "${with_cxx+set}" = set; then :
-  withval=$with_cxx; CXX=$withval
-
-fi
-
-
-
-# Check whether --with-f77 was given.
-if test "${with_f77+set}" = set; then :
-  withval=$with_f77; F77=$withval
-
-fi
-
-
-
-# Check whether --with-include was given.
-if test "${with_include+set}" = set; then :
-  withval=$with_include; CPPFLAGS=$withval
-	echo Using extra include directories: $withval
-
-fi
-
-
-
-# Check whether --with-ldflags was given.
-if test "${with_ldflags+set}" = set; then :
-  withval=$with_ldflags; LDFLAGS=$withval
-	echo Using ld flags: $withval
-
-fi
-
-
-
-
-if test -z "${FFLAGS}" ; then
-  FFLAGS=${CFLAGS}
-fi
-
-
-
-# Check whether --with-libs was given.
-if test "${with_libs+set}" = set; then :
-  withval=$with_libs; LIBS=$withval
-	echo Using extra libraries: $withval
-
-fi
-
-
-
-# Check whether --with-binutils-dir was given.
-if test "${with_binutils_dir+set}" = set; then :
-  withval=$with_binutils_dir; BINUTILS_DIR=$withval
-	CPPFLAGS="${CPPFLAGS} -I${BINUTILS_DIR}/include"
-	LIBS="-L${BINUTILS_DIR}/lib ${LIBS}"
-	echo Using binutils-dir: $withval
-
-else
-  BINUTILS_DIR=/usr
-
-fi
-
-
-
-
-# Check whether --with-libunwind was given.
-if test "${with_libunwind+set}" = set; then :
-  withval=$with_libunwind; LIBUNWIND_LOC=$withval
-	echo Using libunwind: $withval
-
-else
-  LIBUNWIND_LOC=/usr/lib/libunwind.a
-
-fi
-
-
-
-
-# Check whether --with-bin-type-flag was given.
-if test "${with_bin_type_flag+set}" = set; then :
-  withval=$with_bin_type_flag; BIN_TYPE_FLAG=$withval
-	echo Using bin-type-flag: $withval
-
-else
-  BIN_TYPE_FLAG=
-
-fi
-
-
-
-#
-# Timer options
-#
-TIMER_OPTION=no
-
-# Check whether --with-gettimeofday was given.
-if test "${with_gettimeofday+set}" = set; then :
-  withval=$with_gettimeofday;
-$as_echo "#define USE_GETTIMEOFDAY /**/" >>confdefs.h
-
-        USE_GETTIMEOFDAY=true
-	TIMER_OPTION=yes
-
-fi
-
-
-
-# Check whether --with-wtime was given.
-if test "${with_wtime+set}" = set; then :
-  withval=$with_wtime;
-$as_echo "#define USE_WTIME /**/" >>confdefs.h
-
-	TIMER_OPTION=yes
-
-fi
-
-
-
-# Check whether --with-clock_gettime was given.
-if test "${with_clock_gettime+set}" = set; then :
-  withval=$with_clock_gettime;
-$as_echo "#define USE_CLOCK_GETTIME /**/" >>confdefs.h
-
-	USE_CLOCK_GETTIME=yes
-	TIMER_OPTION=yes
-
-fi
-
-
-
-# Check whether --with-rts_get_timebase was given.
-if test "${with_rts_get_timebase+set}" = set; then :
-  withval=$with_rts_get_timebase;
-$as_echo "#define USE_RTS_GET_TIMEBASE /**/" >>confdefs.h
-
-	USE_RTS_GET_TIMEBASE=yes
-	TIMER_OPTION=yes
-
-else
-  USE_RTS_TIMEBASE=no
-
-fi
-
-
-
-# Check whether --with-read_real_time was given.
-if test "${with_read_real_time+set}" = set; then :
-  withval=$with_read_real_time;
-$as_echo "#define USE_READ_REAL_TIME /**/" >>confdefs.h
-
-	USE_READ_REAL_TIME=yes
-	TIMER_OPTION=yes
-
-else
-  USE_READ_REAL_TIME=no
-
-fi
-
-
-
-# Check whether --with-rtc was given.
-if test "${with_rtc+set}" = set; then :
-  withval=$with_rtc;
-$as_echo "#define USE_RTC /**/" >>confdefs.h
-
-	USE_RTC=yes
-	TIMER_OPTION=yes
-
-else
-  USE_RTC=no
-
-fi
-
-
-
-# Check whether --with-dclock was given.
-if test "${with_dclock+set}" = set; then :
-  withval=$with_dclock;
-$as_echo "#define USE_DCLOCK /**/" >>confdefs.h
-
-	USE_DCLOCK=yes
-	TIMER_OPTION=yes
-
-else
-  USE_DCLOCK=no
-
-fi
-
-
-
-#
-#  Enable / Disable specifications
-#
-
-DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
-ENABLE_API_ONLY=no
-# Check whether --enable-api-only was given.
-if test "${enable_api_only+set}" = set; then :
-  enableval=$enable_api_only; if test x"$enableval" = xyes ; then
-		ENABLE_API_ONLY=yes
-		echo Configuring for API library only.
-
-$as_echo "#define ENABLE_API_ONLY /**/" >>confdefs.h
-
-		DEFAULT_TARGS="API test"
-	fi
-
-fi
-
-
-
-if test "$ENABLE_API_ONLY" = no ; then
-
-ENABLE_MPI_IO=yes
-# Check whether --enable-mpi-io was given.
-if test "${enable_mpi_io+set}" = set; then :
-  enableval=$enable_mpi_io; if test x"$enableval" = xno ; then
-		ENABLE_MPI_IO=no
-		echo Profiling of MPI I/O has been disabled.
-	fi
-
-fi
-
-
-fi
-
-if test x"$ENABLE_API_ONLY" = xno ; then
-
-ENABLE_MPI_RMA=yes
-# Check whether --enable-mpi-rma was given.
-if test "${enable_mpi_rma+set}" = set; then :
-  enableval=$enable_mpi_rma; if test x"$enableval" = xno ; then
-		ENABLE_MPI_RMA=no
-		echo Profiling of MPI RMA has been disabled.
-	fi
-
-fi
-
-
-
-ENABLE_MPI_NONBLOCKINGCOLLECTIVES=yes
-# Check whether --enable-mpi-nbc was given.
-if test "${enable_mpi_nbc+set}" = set; then :
-  enableval=$enable_mpi_nbc; if test x"$enableval" = xno ; then
-		ENABLE_MPI_NONBLOCKINGCOLLECTIVES=no
-		echo Profiling of MPI NONBLOCKINGCOLLECTIVES has been disabled.
-	fi
-
-fi
-
-
-fi
-
-ENABLE_BFD=yes
-# Check whether --enable-bfd was given.
-if test "${enable_bfd+set}" = set; then :
-  enableval=$enable_bfd; if test x"$enableval" = xno ; then
-		echo Use of libbfd has been disabled.
-		ENABLE_BFD=no SO_LOOKUP=no
-	fi
-
-fi
-
-
-DISABLE_LIBUNWIND=no
-# Check whether --enable-libunwind was given.
-if test "${enable_libunwind+set}" = set; then :
-  enableval=$enable_libunwind; if test x"$enableval" = xno ; then
-		DISABLE_LIBUNWIND=yes
-		echo Use of libunwind has been disabled.
-	fi
-
-fi
-
-
-DISABLE_SO_LOOKUP=no
-# Check whether --enable-so-lookup was given.
-if test "${enable_so_lookup+set}" = set; then :
-  enableval=$enable_so_lookup; if test x"$enableval" = xno ; then
-		DISABLE_SO_LOOKUP=yes
-		echo Use of shared object source lookup has been disabled.
-	fi
-
-fi
-
-
-USE_SETJMP=no
-# Check whether --enable-setjmp was given.
-if test "${enable_setjmp+set}" = set; then :
-  enableval=$enable_setjmp; if test x"$enableval" = xyes ; then
-		USE_SETJMP=yes
-
-$as_echo "#define USE_SETJMP /**/" >>confdefs.h
-
-		echo Setjmp will be used to generate stack traces.
-	fi
-
-fi
-
-
-# Check whether --enable-fortranxlate was given.
-if test "${enable_fortranxlate+set}" = set; then :
-  enableval=$enable_fortranxlate; if test "$enable_fortranxlate" = "no" ; then
-		ENABLE_FORTRAN_XLATE=no
-		  echo Translation of FORTRAN opaque objects has been disabled.
-	else
-		ENABLE_FORTRAN_XLATE=yes
-		echo Translation of FORTRAN opaque objects has been enabled.
-	fi
-
-else
-  ENABLE_FORTRAN_XLATE=yes
-
-fi
-
-
-
-ENABLE_FORTRAN_WEAK_SYMS=no
-# Check whether --enable-fortranweak was given.
-if test "${enable_fortranweak+set}" = set; then :
-  enableval=$enable_fortranweak; if test "$enable_fortranweak" = "no" ; then
-                ENABLE_FORTRAN_WEAK_SYMS=no
-                  echo Generation of additional weak FORTRAN symbol names has been disabled.
-        else
-                ENABLE_FORTRAN_WEAK_SYMS=yes
-
-$as_echo "#define ENABLE_FORTRAN_WEAK_SYMS /**/" >>confdefs.h
-
-                echo Generation of additional weak FORTRAN symbol names has been enabled.
-        fi
-
-else
-  ENABLE_FORTRAN_WEAK_SYMS=no
-
-fi
-
-
-
-
-
-# Check whether --enable-stackdepth was given.
-if test "${enable_stackdepth+set}" = set; then :
-  enableval=$enable_stackdepth; STACKDEPTH=$enableval;
-    echo "Maximum stacktrace depth is $STACKDEPTH"
-else
-  STACKDEPTH=8
-fi
-
-
-cat >>confdefs.h <<_ACEOF
-#define MPIP_CALLSITE_STACK_DEPTH_MAX $STACKDEPTH
-_ACEOF
-
-#AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
-
-PC_LOOKUP_FILE=pc_lookup.c
-# Check whether --enable-dwarf was given.
-if test "${enable_dwarf+set}" = set; then :
-  enableval=$enable_dwarf; if test x"$enableval" = xyes ; then
-		echo "Using DWARF library for symbol lookup; forcing --disable-bfd"
-		ENABLE_BFD=no
-		PC_LOOKUP_FILE=pc_lookup_dwarf.c
-	fi ;
-	USE_LIBDWARF=yes
-
-else
-  USE_LIBDWARF=no
-
-fi
-
-
-
-
-USE_GETARG=false
-# Check whether --enable-getarg was given.
-if test "${enable_getarg+set}" = set; then :
-  enableval=$enable_getarg; if test x"$enableval" = xyes ; then
-
-$as_echo "#define USE_GETARG /**/" >>confdefs.h
-
-		echo Use of getarg has been enabled
-		USE_GETARG=true
-	fi
-
-fi
-
-
-
-# Check whether --enable-demangling was given.
-if test "${enable_demangling+set}" = set; then :
-  enableval=$enable_demangling; DO_DEMANGLE=$enableval
-	echo $DO_DEMANGLE demangling enabled
-
-else
-  DO_DEMANGLE=false
-
-fi
-
-
-
-# Check whether --enable-check-time was given.
-if test "${enable_check_time+set}" = set; then :
-  enableval=$enable_check_time; if test x"$enableval" = xyes ; then
-
-$as_echo "#define MPIP_CHECK_TIME /**/" >>confdefs.h
-
-		echo AIX negative time value checking has been enabled
-	fi
-
-fi
-
-
-# Check whether --enable-collective-report-default was given.
-if test "${enable_collective_report_default+set}" = set; then :
-  enableval=$enable_collective_report_default; if test "x$enableval" = xyes ; then
-
-$as_echo "#define COLLECTIVE_REPORT_DEFAULT /**/" >>confdefs.h
-
-		echo "Using collective report as default."
-	fi
-
-fi
-
-
-
-$as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_verbose" >>confdefs.h
-
-# Check whether --enable-concise-report-default was given.
-if test "${enable_concise_report_default+set}" = set; then :
-  enableval=$enable_concise_report_default; if test "x$enableval" = xyes ; then
-
-$as_echo "#define DEFAULT_REPORT_FORMAT mpiPi_style_concise" >>confdefs.h
-
-		echo "Using concise report as default."
-	fi
-
-fi
-
-
-# Find a good install program.  We prefer a C program (faster),
-# so one script is as good as another.  But avoid the broken or
-# incompatible versions:
-# SysV /etc/install, /usr/sbin/install
-# SunOS /usr/etc/install
-# IRIX /sbin/install
-# AIX /bin/install
-# AmigaOS /C/install, which installs bootblocks on floppy discs
-# AIX 4 /usr/bin/installbsd, which doesn't work without a -g flag
-# AFS /usr/afsws/bin/install, which mishandles nonexistent args
-# SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
-# OS/2's system install, which has a completely different semantic
-# ./install, which can be erroneously created by make from ./install.sh.
-# Reject install programs that cannot install multiple files.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a BSD-compatible install" >&5
-$as_echo_n "checking for a BSD-compatible install... " >&6; }
-if test -z "$INSTALL"; then
-if ${ac_cv_path_install+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    # Account for people who put trailing slashes in PATH elements.
-case $as_dir/ in #((
-  ./ | .// | /[cC]/* | \
-  /etc/* | /usr/sbin/* | /usr/etc/* | /sbin/* | /usr/afsws/bin/* | \
-  ?:[\\/]os2[\\/]install[\\/]* | ?:[\\/]OS2[\\/]INSTALL[\\/]* | \
-  /usr/ucb/* ) ;;
-  *)
-    # OSF1 and SCO ODT 3.0 have their own names for install.
-    # Don't use installbsd from OSF since it installs stuff as root
-    # by default.
-    for ac_prog in ginstall scoinst install; do
-      for ac_exec_ext in '' $ac_executable_extensions; do
-	if as_fn_executable_p "$as_dir/$ac_prog$ac_exec_ext"; then
-	  if test $ac_prog = install &&
-	    grep dspmsg "$as_dir/$ac_prog$ac_exec_ext" >/dev/null 2>&1; then
-	    # AIX install.  It has an incompatible calling convention.
-	    :
-	  elif test $ac_prog = install &&
-	    grep pwplus "$as_dir/$ac_prog$ac_exec_ext" >/dev/null 2>&1; then
-	    # program-specific install script used by HP pwplus--don't use.
-	    :
-	  else
-	    rm -rf conftest.one conftest.two conftest.dir
-	    echo one > conftest.one
-	    echo two > conftest.two
-	    mkdir conftest.dir
-	    if "$as_dir/$ac_prog$ac_exec_ext" -c conftest.one conftest.two "`pwd`/conftest.dir" &&
-	      test -s conftest.one && test -s conftest.two &&
-	      test -s conftest.dir/conftest.one &&
-	      test -s conftest.dir/conftest.two
-	    then
-	      ac_cv_path_install="$as_dir/$ac_prog$ac_exec_ext -c"
-	      break 3
-	    fi
-	  fi
-	fi
-      done
-    done
-    ;;
-esac
-
-  done
-IFS=$as_save_IFS
-
-rm -rf conftest.one conftest.two conftest.dir
-
-fi
-  if test "${ac_cv_path_install+set}" = set; then
-    INSTALL=$ac_cv_path_install
-  else
-    # As a last resort, use the slow shell script.  Don't cache a
-    # value for INSTALL within a source directory, because that will
-    # break other packages using the cache if that directory is
-    # removed, or if the value is a relative name.
-    INSTALL=$ac_install_sh
-  fi
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $INSTALL" >&5
-$as_echo "$INSTALL" >&6; }
-
-# Use test -z because SunOS4 sh mishandles braces in ${var-val}.
-# It thinks the first close brace ends the variable substitution.
-test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
-
-test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
-
-test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
-
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
-set dummy ${ac_tool_prefix}ranlib; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_RANLIB+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$RANLIB"; then
-  ac_cv_prog_RANLIB="$RANLIB" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_RANLIB="${ac_tool_prefix}ranlib"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-RANLIB=$ac_cv_prog_RANLIB
-if test -n "$RANLIB"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RANLIB" >&5
-$as_echo "$RANLIB" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_prog_RANLIB"; then
-  ac_ct_RANLIB=$RANLIB
-  # Extract the first word of "ranlib", so it can be a program name with args.
-set dummy ranlib; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_ac_ct_RANLIB+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$ac_ct_RANLIB"; then
-  ac_cv_prog_ac_ct_RANLIB="$ac_ct_RANLIB" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_RANLIB="ranlib"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_RANLIB=$ac_cv_prog_ac_ct_RANLIB
-if test -n "$ac_ct_RANLIB"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_RANLIB" >&5
-$as_echo "$ac_ct_RANLIB" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_ct_RANLIB" = x; then
-    RANLIB=":"
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    RANLIB=$ac_ct_RANLIB
-  fi
-else
-  RANLIB="$ac_cv_prog_RANLIB"
-fi
-
-if test "x$AR" = "x"; then
-   AR=ar
-fi
-TEST_LIST=
-if test "$ENABLE_API_ONLY" = no ; then
-  for ac_prog in mpxlc mpixlc mpcc_r mpicc cmpicc gcc cc icc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CC="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$CC" && break
-done
-test -n "$CC" || CC="mpicc"
-
-  for ac_prog in mpCC_r mpixlcxx mpiCC mpicxx cmpic++ c++ g++ CC xlC_r cxx icc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CXX+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CXX"; then
-  ac_cv_prog_CXX="$CXX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CXX="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CXX=$ac_cv_prog_CXX
-if test -n "$CXX"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
-$as_echo "$CXX" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$CXX" && break
-done
-test -n "$CXX" || CXX="mpiCC"
-
-  for ac_prog in mpxlf_r mpixlf77 mpxlf mpif77 cmpifc xlf f77 g77 pgf77 fort ifc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_F77+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$F77"; then
-  ac_cv_prog_F77="$F77" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_F77="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-F77=$ac_cv_prog_F77
-if test -n "$F77"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $F77" >&5
-$as_echo "$F77" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$F77" && break
-done
-test -n "$F77" || F77="mpif77"
-
-  for ac_prog in poe srun prun mpirun
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_LAUNCH+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$LAUNCH"; then
-  ac_cv_prog_LAUNCH="$LAUNCH" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_LAUNCH="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-LAUNCH=$ac_cv_prog_LAUNCH
-if test -n "$LAUNCH"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LAUNCH" >&5
-$as_echo "$LAUNCH" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$LAUNCH" && break
-done
-test -n "$LAUNCH" || LAUNCH="mpirun"
-
-else
-  for ac_prog in xlc gcc cc icc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CC"; then
-  ac_cv_prog_CC="$CC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CC="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CC=$ac_cv_prog_CC
-if test -n "$CC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
-$as_echo "$CC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$CC" && break
-done
-test -n "$CC" || CC="mpicc"
-
-  for ac_prog in xlC c++ g++ CC cxx icc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CXX+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CXX"; then
-  ac_cv_prog_CXX="$CXX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CXX="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CXX=$ac_cv_prog_CXX
-if test -n "$CXX"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
-$as_echo "$CXX" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$CXX" && break
-done
-test -n "$CXX" || CXX="mpiCC"
-
-  for ac_prog in xlf f77 g77 pgf77 fort ifc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_F77+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$F77"; then
-  ac_cv_prog_F77="$F77" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_F77="$ac_prog"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-F77=$ac_cv_prog_F77
-if test -n "$F77"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $F77" >&5
-$as_echo "$F77" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  test -n "$F77" && break
-done
-test -n "$F77" || F77="mpif77"
-
-  LAUNCH="\\\"\\\""
-  TEST_LIST="api-test.exp"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqrt in -lm" >&5
-$as_echo_n "checking for sqrt in -lm... " >&6; }
-if ${ac_cv_lib_m_sqrt+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char sqrt ();
-int
-main ()
-{
-return sqrt ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_m_sqrt=yes
-else
-  ac_cv_lib_m_sqrt=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_sqrt" >&5
-$as_echo "$ac_cv_lib_m_sqrt" >&6; }
-if test "x$ac_cv_lib_m_sqrt" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBM 1
-_ACEOF
-
-  LIBS="-lm $LIBS"
-
-fi
 
 
 #  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
@@ -7460,6 +7458,7 @@ echo "**************************************************************************
 echo "  mpiP Configuration Summary"
 echo
 echo "  C compiler               : ${CC}"
+echo "  C++ compiler             : ${CXX}"
 echo "  Fortran compiler         : ${F77}"
 echo
 echo "  Timer                    : ${TIMER_NAME}"

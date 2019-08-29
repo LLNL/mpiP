@@ -20,8 +20,6 @@ echo "  Note: mpiP sets cross_compiling to yes to keep configure from failing in
 echo "        the case where test executables would need to be run as a parallel job."
 echo
 
-AC_CHECK_SIZEOF(void*)
-
 
 #
 #  With specifications
@@ -368,12 +366,22 @@ AC_PROG_RANLIB
 if test "x$AR" = "x"; then
    AR=ar
 fi
+
 TEST_LIST=
+
+#  Test for available compilers
+C_IBM_MPI_WRAPPERS="mpixlc"
+C_INTEL_MPI_WRAPPERS="mpiicc"
+CXX_IBM_MPI_WRAPPERS="mpixlC"
+CXX_INTEL_MPI_WRAPPERS="mpiicpc"
+F77_IBM_MPI_WRAPPERS="mpixlf"
+F77_INTEL_MPI_WRAPPERS="mpiifort"
+
 if test "$ENABLE_API_ONLY" = no ; then
-  AC_CHECK_PROGS(CC, mpxlc mpixlc mpcc_r mpicc cmpicc gcc cc icc, mpicc)
-  AC_CHECK_PROGS(CXX, mpCC_r mpixlcxx mpiCC mpicxx cmpic++ c++ g++ CC xlC_r cxx icc, mpiCC)
-  AC_CHECK_PROGS(F77, mpxlf_r mpixlf77 mpxlf mpif77 cmpifc xlf f77 g77 pgf77 fort ifc, mpif77)
-  AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun, mpirun)
+  AC_CHECK_PROGS(CC,  $C_IBM_MPI_WRAPPERS $C_INTEL_MPI_WRAPPERS cmpicc mpcc mpicc gcc cc icc, mpicc)
+  AC_CHECK_PROGS(CXX, $CXX_IBM_MPI_WRAPPERS $CXX_INTEL_MPI_WRAPPERS mpiCC mpicxx cmpic++ c++ g++ CC cxx icc, mpicxx)
+  AC_CHECK_PROGS(F77, $F77_IBM_MPI_WRAPPERS $F77_INTEL_MPI_WRAPPERS mpifort mpif77 cmpifc xlf f77 g77 pgf77 fort ifc, mpifort)
+  AC_CHECK_PROGS(LAUNCH, poe srun prun mpirun mpiexec, mpirun)
 else
   AC_CHECK_PROGS(CC, xlc gcc cc icc, mpicc)
   AC_CHECK_PROGS(CXX, xlC c++ g++ CC cxx icc, mpiCC)
@@ -383,6 +391,8 @@ else
 fi
 
 AC_CHECK_LIB(m,sqrt)
+
+AC_CHECK_SIZEOF(void*)
 
 #  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
 #  would be within the bfd tests, making AC_CHECK_DECL undefined if not
@@ -768,6 +778,7 @@ echo "**************************************************************************
 echo "  mpiP Configuration Summary"
 echo
 echo "  C compiler               : ${CC}"
+echo "  C++ compiler             : ${CXX}"
 echo "  Fortran compiler         : ${F77}"
 echo
 echo "  Timer                    : ${TIMER_NAME}"
