@@ -20,6 +20,14 @@
 #define RMB() __asm__ __volatile__ ("lwsync" : : : "memory")
 #define WMB() __asm__ __volatile__ ("lwsync" : : : "memory")
 #define ISYNC() __asm__ __volatile__ ("isync" : : : "memory")
+#if defined(__PGI)
+/* work-around for bug in PGI 16.5-16.7 where the compiler fails to
+ *  * correctly emit load instructions for 64-bit operands. without this
+ *   * it will emit lwz instead of ld to load the 64-bit operand. */
+#define OPAL_ASM_VALUE64(x) (void *)(intptr_t) (x)
+#else
+#define OPAL_ASM_VALUE64(x) x
+#endif
 
 static inline
 void mpiP_atomic_wmb(void)
@@ -59,7 +67,7 @@ static inline int mpiP_atomic_cas(void **_addr, void **_oldval, void *_newval)
   int64_t *oldval = (int64_t*)_oldval;
   int64_t newval = (int64_t)_newval;
   int64_t prev;
-  bool ret;
+  _Bool ret;
 
   __asm__ __volatile__ (
         "1: ldarx   %0, 0, %2  \n\t"
