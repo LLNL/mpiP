@@ -1,4 +1,4 @@
-#!/usr/local/bin/python 
+#!/usr/local/bin/python
 # -*- python -*-
 #
 #   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
@@ -13,8 +13,8 @@
 #   $Id$
 #
 
+from __future__ import print_function
 import sys
-import string
 import os
 import copy
 import re
@@ -157,7 +157,7 @@ noDefineList = [
     "MPI_Pcontrol"
     ]
 
-opaqueInArgDict = { 
+opaqueInArgDict = {
   ("MPI_Abort", "comm"):"MPI_Comm",
   ("MPI_Accumulate", "origin_datatype"):"MPI_Datatype",
   ("MPI_Accumulate", "target_datatype"):"MPI_Datatype",
@@ -469,7 +469,7 @@ opaqueInArgDict = {
   ("MPI_Win_wait", "win"):"MPI_Win"
 }
 
-opaqueOutArgDict = { 
+opaqueOutArgDict = {
   ("MPI_Bsend_init", "request"):"MPI_Request",
   ("MPI_Cart_create", "comm_cart"):"MPI_Comm",
   ("MPI_Cart_sub", "comm_new"):"MPI_Comm",
@@ -542,35 +542,35 @@ opaqueOutArgDict = {
 }
 
 incrementFortranIndexDict = {
-  ("MPI_Testany"): ("*index", 1), 
+  ("MPI_Testany"): ("*index", 1),
   ("MPI_Testsome"): ("array_of_indices", "*count"),
-  ("MPI_Waitany"): ("*index", 1), 
-  ("MPI_Waitsome"): ("array_of_indices", "*count") 
+  ("MPI_Waitany"): ("*index", 1),
+  ("MPI_Waitsome"): ("array_of_indices", "*count")
   }
 
 xlateFortranArrayExceptions = {
-  ("MPI_Testany", "array_of_requests"): ("index"), 
-  ("MPI_Waitany", "array_of_requests"): ("index") 
+  ("MPI_Testany", "array_of_requests"): ("index"),
+  ("MPI_Waitany", "array_of_requests"): ("index")
 }
 
-collectiveList = [ 
-  "MPI_Allgather", 
-  "MPI_Allgatherv", 
-  "MPI_Allreduce", 
-  "MPI_Alltoall", 
-  "MPI_Alltoallv", 
-  "MPI_Barrier", 
-  "MPI_Bcast", 
-  "MPI_Gather", 
-  "MPI_Gatherv", 
-  "MPI_Iallgather", 
-  "MPI_Iallgatherv", 
-  "MPI_Iallreduce", 
-  "MPI_Ialltoall", 
-  "MPI_Ialltoallv", 
-  "MPI_Ialltoallw", 
-  "MPI_Ibcast", 
-  "MPI_Ibarrier", 
+collectiveList = [
+  "MPI_Allgather",
+  "MPI_Allgatherv",
+  "MPI_Allreduce",
+  "MPI_Alltoall",
+  "MPI_Alltoallv",
+  "MPI_Barrier",
+  "MPI_Bcast",
+  "MPI_Gather",
+  "MPI_Gatherv",
+  "MPI_Iallgather",
+  "MPI_Iallgatherv",
+  "MPI_Iallreduce",
+  "MPI_Ialltoall",
+  "MPI_Ialltoallv",
+  "MPI_Ialltoallw",
+  "MPI_Ibcast",
+  "MPI_Ibarrier",
   "MPI_Iexscan",
   "MPI_Igather",
   "MPI_Igatherv",
@@ -580,13 +580,13 @@ collectiveList = [
   "MPI_Iscan",
   "MPI_Iscatter",
   "MPI_Iscatterv",
-  "MPI_Reduce", 
-  "MPI_Reduce_scatter", 
-  "MPI_Scatter", 
+  "MPI_Reduce",
+  "MPI_Reduce_scatter",
+  "MPI_Scatter",
   "MPI_Scatterv"
   ]
 
-pt2ptList = [ 
+pt2ptList = [
     "MPI_Bsend",
     "MPI_Ibsend",
     "MPI_Irsend",
@@ -602,28 +602,28 @@ pt2ptList = [
 
 class VarDesc:
     def __init__ (self,name, basetype, pointerLevel, arrayLevel):
-	"initialize a new variable description structure"
-	self.name = name
-	self.basetype = basetype
-	self.pointerLevel = pointerLevel
-	self.arrayLevel = arrayLevel
-	self.recordIt = 0
+        "initialize a new variable description structure"
+        self.name = name
+        self.basetype = basetype
+        self.pointerLevel = pointerLevel
+        self.arrayLevel = arrayLevel
+        self.recordIt = 0
 
 class fdecl:
     def __init__ (self,name, id, returntype, paramList, protoline):
-	"initialize a new function declaration structure"
-	self.name = name
-	self.id = id
-	self.returntype = returntype
-	self.paramList = paramList
-	self.paramDict = {}
-	self.protoline = protoline
-	self.wrapperPreList = []
-	self.wrapperPostList = []
-	self.nowrapper = 0
-	self.paramConciseList = []
-	self.extrafields = {}
-	self.extrafieldsList = []
+        "initialize a new function declaration structure"
+        self.name = name
+        self.id = id
+        self.returntype = returntype
+        self.paramList = paramList
+        self.paramDict = {}
+        self.protoline = protoline
+        self.wrapperPreList = []
+        self.wrapperPostList = []
+        self.nowrapper = 0
+        self.paramConciseList = []
+        self.extrafields = {}
+        self.extrafieldsList = []
         self.sendCountPname = ""
         self.sendTypePname = ""
         self.vectorCountPname = ""
@@ -640,38 +640,38 @@ class xlateEntry:
         "initialize a new Fortran translation structure"
         self.mpiType = mpiType
         self.varName = varName
-        
+
 
 def ProcessDirectiveLine(lastFunction, line):
-    tokens = string.split(line)
+    tokens = line.split()
     if tokens[0] == "nowrapper":
-	fdict[lastFunction].nowrapper = 1
+        fdict[lastFunction].nowrapper = 1
     elif tokens[0] == "extrafield":
-	fdict[lastFunction].extrafieldsList.append(tokens[2])
-	fdict[lastFunction].extrafields[tokens[2]] = tokens[1]
+        fdict[lastFunction].extrafieldsList.append(tokens[2])
+        fdict[lastFunction].extrafields[tokens[2]] = tokens[1]
     else:
-	print "Warning: ",lastFunction," unknown directive [",string.strip(line),"]"
+        print("Warning: ",lastFunction," unknown directive [",line.strip(),"]")
 
 
 def ProcessWrapperPreLine(lastFunction, line):
-    #print "Processing wrapper pre [",string.strip(line),"] for ",lastFunction
+    #print "Processing wrapper pre [",line.strip(),"] for ",lastFunction
     fdict[lastFunction].wrapperPreList.append(line)
 
 
 def ProcessWrapperPostLine(lastFunction, line):
-    #print "Processing wrapper post [",string.strip(line),"] for ",lastFunction
+    #print "Processing wrapper post [",line.strip(),"] for ",lastFunction
     fdict[lastFunction].wrapperPostList.append(line)
 
 
 def DumpDict():
     for i in flist:
-	print i
-	if verbose:
-	    print "\tParams\t",fdict[i].paramList
-	    if fdict[i].wrapperPreList:
-		print "\tpre\t", fdict[i].wrapperPreList
-	    if fdict[i].wrapperPostList:
-		print "\tpost\t", fdict[i].wrapperPostList
+        print(i)
+        if verbose:
+            print("\tParams\t",fdict[i].paramList)
+            if fdict[i].wrapperPreList:
+                print("\tpre\t", fdict[i].wrapperPreList)
+            if fdict[i].wrapperPostList:
+                print("\tpost\t", fdict[i].wrapperPostList)
 
 
 #####
@@ -688,19 +688,19 @@ def SpecialParamRecord(funct,param):
     simplePointer = (pointerLevel == 1) and (arrayLevel == 0)
 
     if basetype == "MPI_Request" and simplePointer:
-	return 1
+        return 1
     elif basetype == "MPI_Comm" and simplePointer:
-	return 1
+        return 1
     elif basetype == "MPI_Datatype" and simplePointer:
-	return 1
+        return 1
     elif basetype == "MPI_Group" and simplePointer:
-	return 1
+        return 1
     elif basetype == "MPI_Info" and simplePointer:
-	return 1
+        return 1
     elif basetype == "int" and simplePointer:
-	return 1
+        return 1
     else:
-	return 0
+        return 0
 
 
 
@@ -715,41 +715,41 @@ def ParamDictUpdate(fname):
     global ioParamDict
     global rmaParamDict
     for p in fdict[fname].paramList:
-	## check for pointers, arrays
-	pname = "NULL"
-	basetype = "NULL"
-        pointerLevel = string.count(p,"*")
-        arrayLevel = string.count(p,"[")
-	if (pointerLevel > 0) and (arrayLevel > 0):
-	    ## handle pointers and arrays
-	    pname = p[string.rfind(p,"*")+1:string.find(p,"[")]
-	    basetype = p[0:string.find(p,"*")]
-	elif pointerLevel > 0:
-	    ## handle pointers
-	    pname = p[string.rfind(p,"*")+1:len(p)]
-	    basetype = p[0:string.find(p,"*")]
-	elif arrayLevel > 0:
-	    ## handle arrays
-	    pname = p[string.find(p," "):string.find(p,"[")]
-	    basetype = p[0:string.find(p," ")]
-	else:
-	    ## normal hopefully :)
-	    tokens = string.split(p)
-	    if len(tokens) == 1:
-		## must be void
-		pname = ""
-		basetype = "void"
-	    else:
-		pname = string.strip(tokens[1])
-		basetype = string.strip(tokens[0])
+        ## check for pointers, arrays
+        pname = "NULL"
+        basetype = "NULL"
+        pointerLevel = p.count("*")
+        arrayLevel = p.count("[")
+        if (pointerLevel > 0) and (arrayLevel > 0):
+            ## handle pointers and arrays
+            pname = p[p.rfind("*")+1:p.find("[")]
+            basetype = p[0:p.find("*")]
+        elif pointerLevel > 0:
+            ## handle pointers
+            pname = p[p.rfind("*")+1:len(p)]
+            basetype = p[0:p.find("*")]
+        elif arrayLevel > 0:
+            ## handle arrays
+            pname = p[p.find(" "):p.find("[")]
+            basetype = p[0:p.find(" ")]
+        else:
+            ## normal hopefully :)
+            tokens = p.split()
+            if len(tokens) == 1:
+                ## must be void
+                pname = ""
+                basetype = "void"
+            else:
+                pname = tokens[1].strip()
+                basetype = tokens[0].strip()
 
-	pname = string.strip(pname)
-	basetype = string.strip(basetype)
-	fdict[fname].paramDict[pname] = VarDesc(pname,basetype,pointerLevel,arrayLevel)
-	fdict[fname].paramConciseList.append(pname)
+        pname = pname.strip()
+        basetype = basetype.strip()
+        fdict[fname].paramDict[pname] = VarDesc(pname,basetype,pointerLevel,arrayLevel)
+        fdict[fname].paramConciseList.append(pname)
 
         #  Identify and assign message size parameters
-        if messParamDict.has_key((fname,pname)):
+        if (fname,pname) in messParamDict:
             paramMessType = messParamDict[(fname,pname)]
             if paramMessType == 1:
                 fdict[fname].sendCountPname = pname
@@ -758,48 +758,48 @@ def ParamDictUpdate(fname):
             elif paramMessType == 3:
                 fdict[fname].recvCountPname = pname
             elif paramMessType == 4:
-                fdict[fname].recvTypePname = pname                
-            
+                fdict[fname].recvTypePname = pname
+
         #  Identify and assign vector message size parameters
-        if vectorsendParamDict.has_key((fname,pname)):
+        if (fname,pname) in vectorsendParamDict:
             paramMessType = vectorsendParamDict[(fname,pname)]
             if paramMessType == 1:
                 fdict[fname].vectorCountPname = pname
-            
+
         #  Identify and assign vector message datatype parameters
-        if vectortypeParamDict.has_key((fname,pname)):
+        if (fname,pname) in vectortypeParamDict:
             paramMessType = vectortypeParamDict[(fname,pname)]
             if paramMessType == 2:
                 fdict[fname].vectorTypePname = pname
-            
+
         #  Identify and assign io size parameters
-        if ioParamDict.has_key((fname,pname)):
+        if (fname,pname) in ioParamDict:
             paramMessType = ioParamDict[(fname,pname)]
             if paramMessType == 1:
                 fdict[fname].ioCountPname = pname
             elif paramMessType == 2:
                 fdict[fname].ioTypePname = pname
-            
+
         #  Identify and assign rma size parameters
-        if rmaParamDict.has_key((fname,pname)):
+        if (fname,pname) in rmaParamDict:
             paramMessType = rmaParamDict[(fname,pname)]
             if paramMessType == 1:
                 fdict[fname].rmaCountPname = pname
             elif paramMessType == 2:
                 fdict[fname].rmaTypePname = pname
-            
-	if (fdict[fname].paramDict[pname].pointerLevel == 0) \
-	   and (fdict[fname].paramDict[pname].arrayLevel == 0) \
-	   and (fdict[fname].paramDict[pname].basetype != "void"):
-	    fdict[fname].paramDict[pname].recordIt = 1
-	elif SpecialParamRecord(fname,pname):
-	    fdict[fname].paramDict[pname].recordIt = 1
-	else:
-	    pass
 
-	if verbose:
-	    #print "\t->",p
-	    print "\t",pname, basetype, pointerLevel, arrayLevel
+        if (fdict[fname].paramDict[pname].pointerLevel == 0) \
+           and (fdict[fname].paramDict[pname].arrayLevel == 0) \
+           and (fdict[fname].paramDict[pname].basetype != "void"):
+            fdict[fname].paramDict[pname].recordIt = 1
+        elif SpecialParamRecord(fname,pname):
+            fdict[fname].paramDict[pname].recordIt = 1
+        else:
+            pass
+
+        if verbose:
+            #print "\t->",p
+            print("\t",pname, basetype, pointerLevel, arrayLevel)
 
 
 #####
@@ -818,84 +818,84 @@ def ReadInputFile(f):
 
     fcounter = baseID
 
-    print "-----*----- Parsing input file"
+    print("-----*----- Parsing input file")
     while 1:
-	##### read a line from input
-	rawline = f.readline()
-	if not rawline:
-	    break
-	cnt = cnt + 1
-	line = re.sub("\@.*$","",rawline)
+        ##### read a line from input
+        rawline = f.readline()
+        if not rawline:
+            break
+        cnt = cnt + 1
+        line = re.sub("\@.*$","",rawline)
 
-	##### break it into tokens
-	tokens = string.split(line)
-	if not tokens:
-	    continue
+        ##### break it into tokens
+        tokens = line.split()
+        if not tokens:
+            continue
 
-	##### determine what type of line this is and then parse it as required
-	if (string.find(line,"(") != -1) \
-	   and (string.find(line,")") != -1) \
-	   and (string.find(line,"MPI_") != -1) \
-	   and parserState == p_start:
-	    ##### we have a prototype start line
-	    name = tokens[1]
-	    retype = tokens[0]
-	    lparen = string.index(line,"(")
-	    rparen = string.index(line,")")
-	    paramstr = line[lparen+1:rparen]
-	    paramList = map(string.strip,string.split(paramstr,","))
-	    #    print cnt, "-->", name,  paramList
-	    fdict[name] = fdecl(name, fcounter, retype, paramList,line)
-	    ParamDictUpdate(name)
-	    lastFunction = name
-	    if verbose:
-		print name
-	else:
-	    ##### DIRECTIVES
-	    if tokens[0] == "directives" and parserState != p_directives:
-		##### beginning of directives
-		parserState = p_directives
-	    elif tokens[0] == "directives" and parserState == p_directives:
-		##### end of directives
-		parserState = p_start
-	    elif parserState == p_directives:
-		##### must be a directive, process it
-		ProcessDirectiveLine(lastFunction, line)
+        ##### determine what type of line this is and then parse it as required
+        if (line.find("(") != -1) \
+           and (line.find(")") != -1) \
+           and (line.find("MPI_") != -1) \
+           and parserState == p_start:
+            ##### we have a prototype start line
+            name = tokens[1]
+            retype = tokens[0]
+            lparen = line.index("(")
+            rparen = line.index(")")
+            paramstr = line[lparen+1:rparen]
+            paramList = list(map(str.strip,paramstr.split(",")))
+            #    print cnt, "-->", name,  paramList
+            fdict[name] = fdecl(name, fcounter, retype, paramList,line)
+            ParamDictUpdate(name)
+            lastFunction = name
+            if verbose:
+                print(name)
+        else:
+            ##### DIRECTIVES
+            if tokens[0] == "directives" and parserState != p_directives:
+                ##### beginning of directives
+                parserState = p_directives
+            elif tokens[0] == "directives" and parserState == p_directives:
+                ##### end of directives
+                parserState = p_start
+            elif parserState == p_directives:
+                ##### must be a directive, process it
+                ProcessDirectiveLine(lastFunction, line)
 
-	    ##### CODE WRAPPER PRE
-	    elif tokens[0] == "wrapper_pre" and parserState != p_wrapper_pre:
-		##### beginning of wrapper_pre
-		parserState = p_wrapper_pre
-	    elif tokens[0] == "wrapper_pre" and parserState == p_wrapper_pre:
-		##### end of wrapper_pre
-		parserState = p_start
-	    elif parserState == p_wrapper_pre:
-		##### must be a directive, process it
-		ProcessWrapperPreLine(lastFunction, line)
+            ##### CODE WRAPPER PRE
+            elif tokens[0] == "wrapper_pre" and parserState != p_wrapper_pre:
+                ##### beginning of wrapper_pre
+                parserState = p_wrapper_pre
+            elif tokens[0] == "wrapper_pre" and parserState == p_wrapper_pre:
+                ##### end of wrapper_pre
+                parserState = p_start
+            elif parserState == p_wrapper_pre:
+                ##### must be a directive, process it
+                ProcessWrapperPreLine(lastFunction, line)
 
-	    ##### CODE WRAPPER POST
-	    elif tokens[0] == "wrapper_post" and parserState != p_wrapper_post:
-		##### beginning of wrapper_post
-		parserState = p_wrapper_post
-	    elif tokens[0] == "wrapper_post" and parserState == p_wrapper_post:
-		##### end of wrapper_post
-		parserState = p_start
-	    elif parserState == p_wrapper_post:
-		##### must be a directive, process it
-		ProcessWrapperPostLine(lastFunction, line)
+            ##### CODE WRAPPER POST
+            elif tokens[0] == "wrapper_post" and parserState != p_wrapper_post:
+                ##### beginning of wrapper_post
+                parserState = p_wrapper_post
+            elif tokens[0] == "wrapper_post" and parserState == p_wrapper_post:
+                ##### end of wrapper_post
+                parserState = p_start
+            elif parserState == p_wrapper_post:
+                ##### must be a directive, process it
+                ProcessWrapperPostLine(lastFunction, line)
 
-	    ##### UNKNOWN
-	    else:
-		print "Unknown input line ",cnt, ":", line,
+            ##### UNKNOWN
+            else:
+                print("Unknown input line ",cnt, ":", line, end=' ')
 
-    flist = fdict.keys()
+    flist = list(fdict.keys())
     flist.sort()
     fcounter = baseID
     for f in flist :
       fdict[f].id = fcounter
       if f not in noDefineList:
         fcounter = fcounter + 1
-    print "-----*----- Parsing completed: ", len(fdict), " functions found."
+    print("-----*----- Parsing completed: ", len(fdict), " functions found.")
 
 
 ###
@@ -914,7 +914,7 @@ def StandardFileHeader(fname):
 
 
 ###
-### Scan the lists of all functions and look for optimization 
+### Scan the lists of all functions and look for optimization
 ### opportunities (in space/speed).
 ###
 ### NOT USED
@@ -924,9 +924,9 @@ def ParameterOptimization():
     global fdict
     ##### visit each function and update each functions parameter dictionary
     for funct in flist:
-	if verbose:
-	    print funct
-	ParamDictUpdate(funct)
+        if verbose:
+            print(funct)
+        ParamDictUpdate(funct)
 
 
 ###
@@ -935,13 +935,13 @@ def ParameterOptimization():
 def GenerateStructureFile():
     global flist
     global fdict
-    print "-----*----- Generating structure files"
+    print("-----*----- Generating structure files")
     cwd = os.getcwd()
     os.chdir(cwd)
     sname = cwd + "/mpiPi_def.h"
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
-    
+
     olist.append("\n")
     olist.append("#define mpiPi_BASE " + str(baseID) + "\n")
     olist.append("\n")
@@ -949,7 +949,7 @@ def GenerateStructureFile():
     defCount = 0
     for funct in flist:
       if funct not in noDefineList:
-	olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
+        olist.append("#define mpiPi_" + funct + " " + str(fdict[funct].id) + "\n")
         defCount = defCount + 1
 
     olist.append("#define mpiPi_DEF_END " + str(baseID + defCount) + "\n")
@@ -965,7 +965,7 @@ def GenerateLookup():
     global flist
     global fdict
 
-    print "-----*----- Generating the lookup table"
+    print("-----*----- Generating the lookup table")
     cwd = os.getcwd()
     os.chdir(cwd)
     sname = cwd + "/lookup.c"
@@ -982,13 +982,13 @@ def GenerateLookup():
     counter = 0
     for funct in flist:
         if funct not in noDefineList:
-	  if counter < len(flist) \
-	    and counter > 0 :
-	    olist.append(",\n")
-	  olist.append("\t{ mpiPi_" + funct)
-	  olist.append(", \"" + funct + "\"")
-	  olist.append("}")
-	  counter = counter + 1
+          if counter < len(flist) \
+            and counter > 0 :
+            olist.append(",\n")
+          olist.append("\t{ mpiPi_" + funct)
+          olist.append(", \"" + funct + "\"")
+          olist.append("}")
+          counter = counter + 1
 
     olist.append(",\n\t{0,NULL}};\n")
 
@@ -1007,10 +1007,10 @@ def CreateWrapper(funct, olist):
     global arch
 
     if fdict[funct].nowrapper:
-	return
+        return
 
     if verbose:
-	print "Wrapping ",funct
+        print("Wrapping ",funct)
 
     olist.append("\n\n\n/* --------------- " + funct + " --------------- */\n" )
 
@@ -1026,28 +1026,28 @@ def CreateWrapper(funct, olist):
     # add parameters
     for i in fdict[funct].paramConciseList:
 
-	olist.append(fdict[funct].paramDict[i].basetype + ' ')
+        olist.append(fdict[funct].paramDict[i].basetype + ' ')
 
-	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append(" * ")
+        if (fdict[funct].paramDict[i].pointerLevel == 0) \
+           and (fdict[funct].paramDict[i].arrayLevel == 0) \
+           and (fdict[funct].paramDict[i].basetype != "void"):
+            olist.append(" * ")
 
-	if (fdict[funct].paramDict[i].pointerLevel > 0):
-	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
-		olist.append(" *")
+        if (fdict[funct].paramDict[i].pointerLevel > 0):
+            for j in range(1,fdict[funct].paramDict[i].pointerLevel+1):
+                olist.append(" *")
 
-	olist.append(i)
+        olist.append(i)
 
-	if (fdict[funct].paramDict[i].arrayLevel > 0):
-	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
-	      olist.append('[')
-	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
-	      olist.append(']')
-	else:
-	    pass
-	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-	    olist.append(", ")
+        if (fdict[funct].paramDict[i].arrayLevel > 0):
+            for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+              olist.append('[')
+            for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+              olist.append(']')
+        else:
+            pass
+        if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+            olist.append(", ")
     olist.append(")")
     # start wrapper code
     olist.append("\n{\n")
@@ -1058,7 +1058,7 @@ def CreateWrapper(funct, olist):
 
     olist.append("\nif (mpiPi_stats_mt_is_on(hndl)) {\n")
     if fdict[funct].wrapperPreList:
-	olist.extend(fdict[funct].wrapperPreList)
+        olist.extend(fdict[funct].wrapperPreList)
 
     # capture timer
     olist.append("mpiPi_GETTIME (&start);\n" )
@@ -1072,53 +1072,53 @@ def CreateWrapper(funct, olist):
     # Mark that we have already entered Profiler to avoid nested invocations
     olist.append("mpiPi_stats_mt_enter(hndl);\n")
 
-    # call PMPI 
+    # call PMPI
     olist.append("\nrc = P" + funct + "( " )
 
     for i in fdict[funct].paramConciseList:
-	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append(" * " + i)
-	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-	    olist.append(i)
-	elif (fdict[funct].paramDict[i].arrayLevel > 0):
-	    olist.append(i)
-	else:
-	    print "Warning: passing on arg",i,"in",funct
-	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-	    olist.append(", ")
+        if (fdict[funct].paramDict[i].pointerLevel == 0) \
+           and (fdict[funct].paramDict[i].arrayLevel == 0) \
+           and (fdict[funct].paramDict[i].basetype != "void"):
+            olist.append(" * " + i)
+        elif (fdict[funct].paramDict[i].pointerLevel > 0):
+            olist.append(i)
+        elif (fdict[funct].paramDict[i].arrayLevel > 0):
+            olist.append(i)
+        else:
+            print("Warning: passing on arg",i,"in",funct)
+        if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+            olist.append(", ")
     olist.append(");\n\n")
 
     # Mark that we exited Profiler
     olist.append("mpiPi_stats_mt_exit(hndl);\n")
     olist.append("if (mpiPi_stats_mt_is_on(hndl)) {\n")
-    olist.append("\n" 
-		 + "mpiPi_GETTIME (&end);\n" 
-		 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
+    olist.append("\n"
+                 + "mpiPi_GETTIME (&end);\n"
+                 + "dur = mpiPi_GETTIMEDIFF (&end, &start);\n")
 
     #  Calculate message size based on count and datatype arguments
     if fdict[funct].sendCountPname != "":
-        olist.append( "\n" 
-                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { " 
-                      + "PMPI_Type_size(*" + fdict[funct].sendTypePname + ", " 
-                      + "&tsize);\n" 
+        olist.append( "\n"
+                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { "
+                      + "PMPI_Type_size(*" + fdict[funct].sendTypePname + ", "
+                      + "&tsize);\n"
                       + "messSize = (double)(tsize * *"
                       +  fdict[funct].sendCountPname + ");}\n"
                       + "else { mpiPi_msg_warn(\"MPI_DATATYPE_NULL encountered.  MPI_IN_PLACE not supported.\\n\");\n"
                       + "mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n")
-                  
+
     #  Calculate message size based on array count and datatype arguments
     if fdict[funct].vectorCountPname != "":
       #  Has array of datatypes, as in Ialltoallw
       if fdict[funct].vectorTypePname != "":
-        olist.append( "\n" 
+        olist.append( "\n"
                       + "  int loc_comm_size, i;\n"
                       + "  int loc_sent = 0;\n\n"
                       + "  PMPI_Comm_size(*comm, &loc_comm_size);\n\n"
-                      + "  for ( i = 0; i<loc_comm_size; i++) { \n" 
-                      + "    if ( " + fdict[funct].vectorTypePname + "[i] != MPI_DATATYPE_NULL ) { \n" 
-                      + "      PMPI_Type_size(" + fdict[funct].vectorTypePname + "[i], &tsize);\n" 
+                      + "  for ( i = 0; i<loc_comm_size; i++) { \n"
+                      + "    if ( " + fdict[funct].vectorTypePname + "[i] != MPI_DATATYPE_NULL ) { \n"
+                      + "      PMPI_Type_size(" + fdict[funct].vectorTypePname + "[i], &tsize);\n"
                       + "      loc_sent = " + fdict[funct].vectorCountPname + "[i];\n"
                       + "      messSize += (double)(tsize * loc_sent);\n"
                       + "    }\n"
@@ -1129,13 +1129,13 @@ def CreateWrapper(funct, olist):
 
       #  Scalar datatype handling
       elif ( fdict[funct].sendTypePname != "" ) :
-        olist.append( "\n" 
-                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { \n" 
+        olist.append( "\n"
+                      + "if ( *" + fdict[funct].sendTypePname + " != MPI_DATATYPE_NULL ) { \n"
                       + "  int loc_comm_size, i;\n"
                       + "  int loc_sent = 0;\n\n"
                       + "  PMPI_Comm_size(*comm, &loc_comm_size);\n"
-                      + "  PMPI_Type_size(*" + fdict[funct].sendTypePname + ", &tsize);\n" 
-                      + "  for ( i = 0; i<loc_comm_size; i++) \n" 
+                      + "  PMPI_Type_size(*" + fdict[funct].sendTypePname + ", &tsize);\n"
+                      + "  for ( i = 0; i<loc_comm_size; i++) \n"
                       + "    loc_sent += " + fdict[funct].vectorCountPname + "[i];\n"
                       + "  messSize = (double)(tsize * loc_sent);\n"
                       +  "}\n"
@@ -1143,23 +1143,23 @@ def CreateWrapper(funct, olist):
                       + "mpiPi_msg_warn(\"Values for %s may be invalid for rank %d.\\n\", &(__func__)[7], mpiPi.rank);}\n")
 
     if fdict[funct].ioCountPname != "":
-        olist.append( "\n" 
-                      + "PMPI_Type_size(*" + fdict[funct].ioTypePname + ", " 
-                      + "&tsize);\n" 
+        olist.append( "\n"
+                      + "PMPI_Type_size(*" + fdict[funct].ioTypePname + ", "
+                      + "&tsize);\n"
                       + "ioSize = (double)(tsize * *"
                       +  fdict[funct].ioCountPname + ");\n")
 
     if fdict[funct].rmaCountPname != "":
-        olist.append( "\n" 
-                      + "PMPI_Type_size(*" + fdict[funct].rmaTypePname + ", " 
-                      + "&tsize);\n" 
+        olist.append( "\n"
+                      + "PMPI_Type_size(*" + fdict[funct].rmaTypePname + ", "
+                      + "&tsize);\n"
                       + "rmaSize = (double)(tsize * *"
                       +  fdict[funct].rmaCountPname + ");\n")
-    
+
     olist.append("\n" \
-		 + "if ( dur < 0 )\n"
-		 + "  mpiPi_msg_warn(\"Rank %5d : Negative time difference : %11.9f in %s\\n\", mpiPi.rank, dur, \"" + funct + "\");\n"
-		 + "else\n")
+                 + "if ( dur < 0 )\n"
+                 + "  mpiPi_msg_warn(\"Rank %5d : Negative time difference : %11.9f in %s\\n\", mpiPi.rank, dur, \"" + funct + "\");\n"
+                 + "else\n")
     olist.append( "  mpiPi_update_callsite_stats(hndl, " + "mpiPi_" + funct + ", " \
                   + "mpiPi.rank, "
                   + "call_stack, "
@@ -1171,13 +1171,13 @@ def CreateWrapper(funct, olist):
 
     if funct in collectiveList :
       for i in fdict[funct].paramConciseList:
-	 if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
+         if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
            olist.append("\nif (mpiPi.do_collective_stats_report) { mpiPi_update_collective_stats(hndl, " + "mpiPi_" + funct + "," \
               + " dur, " + "(double)messSize," +  " " + i + "); }\n")
 
     if funct in pt2ptList :
       for i in fdict[funct].paramConciseList:
-	 if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
+         if (fdict[funct].paramDict[i].basetype == "MPI_Comm"):
            olist.append("\nif (mpiPi.do_pt2pt_stats_report) { mpiPi_update_pt2pt_stats(hndl, " + "mpiPi_" + funct + "," \
               + " dur, " + "(double)messSize," +  " " + i + "); }\n")
 
@@ -1190,17 +1190,17 @@ def CreateWrapper(funct, olist):
 
 
     if ( 'mips' in arch ) :
-    	decl =    "\nint rc;\n"
+            decl =    "\nint rc;\n"
     else :
         decl =    "\nint rc;\njmp_buf jbuf;\n"
-    
+
 
     #####
     ##### C wrapper
     #####
     olist.append("\n\nextern " + fdict[funct].protoline + "{" )
     if fdict[funct].wrapperPreList:
-	olist.extend(fdict[funct].wrapperPreList)
+        olist.extend(fdict[funct].wrapperPreList)
     olist.append(decl)
     if ( 'mips' in arch ) :
       olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
@@ -1211,18 +1211,18 @@ def CreateWrapper(funct, olist):
       olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
 
     for i in fdict[funct].paramConciseList:
-	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-	   and (fdict[funct].paramDict[i].basetype != "void"):
-	    olist.append(" & " + i)
-	elif (fdict[funct].paramDict[i].pointerLevel > 0):
-	    olist.append(i)
-	elif (fdict[funct].paramDict[i].arrayLevel > 0):
-	    olist.append(i)
-	else:
-	    pass
-	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-	    olist.append(", ")
+        if (fdict[funct].paramDict[i].pointerLevel == 0) \
+           and (fdict[funct].paramDict[i].arrayLevel == 0) \
+           and (fdict[funct].paramDict[i].basetype != "void"):
+            olist.append(" & " + i)
+        elif (fdict[funct].paramDict[i].pointerLevel > 0):
+            olist.append(i)
+        elif (fdict[funct].paramDict[i].arrayLevel > 0):
+            olist.append(i)
+        else:
+            pass
+        if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+            olist.append(", ")
 
     olist.append(" );\n\n" + "return rc;\n" )
     olist.append("}" + " /* " + funct + " */\n")
@@ -1233,8 +1233,8 @@ def CreateWrapper(funct, olist):
     #####
 
     ##### funct decl
-    olist.append("\n\nextern void " + "F77_" + string.upper(funct) + "(" )
-    
+    olist.append("\n\nextern void " + "F77_" + funct.upper() + "(" )
+
     #================================================================================
     # In the case where MPI_Fint and and opaque objects such as MPI_Request are not the same size,
     #   we want to use MPI conversion functions.
@@ -1266,80 +1266,80 @@ def CreateWrapper(funct, olist):
     stringType = "mpip_const_char_t"
     stringVarNames = []
     freelist = []
-    
+
     #  Iterate through the arguments for this function
     opaqueFound = 0
     for i in fdict[funct].paramConciseList:
-    
+
         if ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype in xlateTargetTypes ) :
-            
+
             #  Verify that there is a Dictionary entry for translating this argument
-            if ( not ( opaqueInArgDict.has_key((funct, i)) or opaqueOutArgDict.has_key((funct, i)) ) ):
-                print "*** Failed to find translation information for " + funct + ":" + i + "\n"
-            
+            if ( not ( (funct, i) in opaqueInArgDict or (funct, i) in opaqueOutArgDict ) ):
+                print("*** Failed to find translation information for " + funct + ":" + i + "\n")
+
             opaqueFound = 1
             # All Fortran opaque object are of type MPI_Fint
             currBasetype = "MPI_Fint"
-            
+
             #  Store variable name and type
             xlateTypes.append(fdict[funct].paramDict[i].basetype)
             xlateVarNames.append(i)
-            
+
             #  Try to identify whether array or single value by whether "array" is in the variable name
             #  and add C declaration to declaration list.
             if ( xlateVarNames[xlateCount].count("array") > 0 ):
                 decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + ";\n";
             else:
                 decl += xlateTypes[xlateCount] + " c_" + xlateVarNames[xlateCount] + ";\n";
-                
+
             xlateCount += 1
-        elif ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype == stringType and 
+        elif ( doOpaqueXlate is True and fdict[funct].paramDict[i].basetype == stringType and
                 1 == fdict[funct].paramDict[i].pointerLevel ) :
             stringVarNames.append(i);
             decl += "  char *c_" + i + " = NULL;\n";
         else:
             #  Not translating this variable
-    		currBasetype = fdict[funct].paramDict[i].basetype
-            
-        #  Add argument to function declaration    
-    	olist.append(currBasetype + ' ')
+            currBasetype = fdict[funct].paramDict[i].basetype
 
-    	if (fdict[funct].paramDict[i].pointerLevel == 0) \
-    	   and (fdict[funct].paramDict[i].arrayLevel == 0) \
-    	   and (fdict[funct].paramDict[i].basetype != "void"):
-    	    olist.append(" * ")
+        #  Add argument to function declaration
+        olist.append(currBasetype + ' ')
 
-    	if (fdict[funct].paramDict[i].pointerLevel > 0):
-    	    for j in xrange(1,fdict[funct].paramDict[i].pointerLevel+1):
-    		olist.append(" *")
+        if (fdict[funct].paramDict[i].pointerLevel == 0) \
+           and (fdict[funct].paramDict[i].arrayLevel == 0) \
+           and (fdict[funct].paramDict[i].basetype != "void"):
+            olist.append(" * ")
 
-    	olist.append(i)
+        if (fdict[funct].paramDict[i].pointerLevel > 0):
+            for j in range(1,fdict[funct].paramDict[i].pointerLevel+1):
+                olist.append(" *")
 
-	if (fdict[funct].paramDict[i].arrayLevel > 0):
-	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
-	      olist.append('[')
-	    for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
-	      olist.append(']')
-    	else:
-    	    pass
-    	if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
-    	    olist.append(", ")
-    
-    #  Add ierr argument and declarations to output list        
+        olist.append(i)
+
+        if (fdict[funct].paramDict[i].arrayLevel > 0):
+            for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+              olist.append('[')
+            for x in range(0, fdict[funct].paramDict[i].arrayLevel) :
+              olist.append(']')
+        else:
+            pass
+        if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
+             olist.append(", ")
+
+    #  Add ierr argument and declarations to output list
     olist.append(" , MPI_Fint *ierr")
-    
+
     # Append all string lengths parameter
     for i in stringVarNames :
         olist.append(" , int " + i + "_len")
     olist.append(")")
 
-    
+
     olist.append(" {")
     olist.append(decl)
     olist.append("\n")
-    
+
     if fdict[funct].wrapperPreList:
-	    olist.extend(fdict[funct].wrapperPreList)
+            olist.extend(fdict[funct].wrapperPreList)
 
     if ( 'mips' in arch ) :
       olist.append("void *saved_ret_addr = __builtin_return_address(0);\n")
@@ -1351,25 +1351,25 @@ def CreateWrapper(funct, olist):
     for i in range(len(xlateVarNames)) :
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
-        
+
         #  A pretty sketchy way of identifying an array size, but as far as I can tell,
         #  only one array is passed as an argument per function.
         if ( fdict[funct].paramConciseList.count("count") > 1 ):
-            print "*** Multiple arrays in 1 function!!!!\n";
-            
+            print("*** Multiple arrays in 1 function!!!!\n");
+
         if ( "incount" in fdict[funct].paramConciseList ):
             countVar = "incount";
         elif ( "count" in fdict[funct].paramConciseList ):
             countVar = "count";
         else:
             countVar = "max_integers"
-            
+
         if ( xlateVarName.count("array") > 0 ):
             olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*" + countVar + "));\n")
             olist.append("if ( c_" + xlateVarName + " == NULL ) mpiPi_abort(\"Failed to allocate memory in " \
                 + funct + "\");\n")
             freelist.append("c_"+xlateVarName)
-    
+
 
     for i in stringVarNames :
         olist.append("  for(; " + i + "_len > 0; " + i + "_len--){\n")
@@ -1384,22 +1384,22 @@ def CreateWrapper(funct, olist):
     #  Generate pre-call translation code if necessary by iterating through arguments that
     #  were identified as opaque objects needing translation above
     for i in range(len(xlateVarNames)) :
-        
+
         #  Set current argument name and type
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
-        
+
         #  Check for valid function:argument-name entry for pre-call translation.
-        if ( opaqueInArgDict.has_key((funct, xlateVarName)) \
+        if ( (funct, xlateVarName) in opaqueInArgDict \
             and opaqueInArgDict[(funct, xlateVarName)] == xlateType ) :
-                
+
             #  Datatype translation is the only call where the translation function
             #  doesn't match the argument type.
             if ( xlateType == "MPI_Datatype" ):
                 xlateFuncType = "MPI_Type"
             else:
                 xlateFuncType = xlateType
-                
+
             if ( xlateVarName.count("array") > 0 ):
                 olist.append("{\n  int i; \n")
                 olist.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
@@ -1409,18 +1409,18 @@ def CreateWrapper(funct, olist):
                 olist.append("c_" + xlateVarName + " = " + xlateFuncType + "_f2c(*" + xlateVarName + ");\n")
 
             xlateDone = 1
-            
-    #  Start generating call to C/Fortran common mpiP wrapper function        
+
+    #  Start generating call to C/Fortran common mpiP wrapper function
     if ( 'mips' in arch ) :
-        olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )    
+        olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )
     else :
-        olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )    
+        olist.append("\nrc = mpiPif_" + funct + "( &jbuf, " )
     argname = ""
 
     #  Iterate through mpiP wrapper function arguments, replacing argument with C version where appropriate
     for i in fdict[funct].paramConciseList:
-        if ( i in xlateVarNames and 
-            ( opaqueInArgDict.has_key((funct, i)) or opaqueOutArgDict.has_key((funct, i))) ):
+        if ( i in xlateVarNames and
+            ( (funct, i) in opaqueInArgDict or (funct, i) in opaqueOutArgDict) ):
             if ( i.count("array") > 0 ):
                 argname = "c_" + i;
             else:
@@ -1429,7 +1429,7 @@ def CreateWrapper(funct, olist):
             argname = "c_" + i;
         else:
             argname = i
-            
+
         if (fdict[funct].paramDict[i].pointerLevel == 0) \
            and (fdict[funct].paramDict[i].arrayLevel == 0) \
            and (fdict[funct].paramDict[i].basetype != "void"):
@@ -1440,7 +1440,7 @@ def CreateWrapper(funct, olist):
             olist.append(argname)
         else:
             pass
-            
+
         if fdict[funct].paramConciseList.index(i) < len(fdict[funct].paramConciseList) - 1:
             olist.append(", ")
 
@@ -1450,13 +1450,13 @@ def CreateWrapper(funct, olist):
     #  Generate post-call translation code if necessary
     xlateCode = []
     xlateDone = 0
-    
+
     for i in range(len(xlateVarNames)) :
-        
+
         xlateVarName = xlateVarNames[i]
         xlateType = xlateTypes[i]
 
-        if ( opaqueOutArgDict.has_key((funct, xlateVarName)) \
+        if ( (funct, xlateVarName) in opaqueOutArgDict \
             and opaqueOutArgDict[(funct, xlateVarName)] == xlateType ):
 
             #  Datatype translation is the only call where the translation function
@@ -1467,7 +1467,7 @@ def CreateWrapper(funct, olist):
                 xlateFuncType = xlateType
 
             #  Generate array or scalar translation code
-            if ( xlateFortranArrayExceptions.has_key((funct, xlateVarName)) ) :
+            if ( (funct, xlateVarName) in xlateFortranArrayExceptions ) :
               xlateCode.append(xlateVarName + "[*" + xlateFortranArrayExceptions[(funct,xlateVarName)] + \
               "] = " + xlateFuncType + "_c2f(c_" + xlateVarName + \
               "[*" + xlateFortranArrayExceptions[(funct, xlateVarName)] + "]);\n")
@@ -1478,11 +1478,11 @@ def CreateWrapper(funct, olist):
                 xlateCode.append("  }\n}\n")
             else:
                 xlateCode.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
-                
+
             xlateDone = 1
-            
+
     #  If appropriate, increment any output indices
-    if incrementFortranIndexDict.has_key(funct) :
+    if funct in incrementFortranIndexDict :
       if  incrementFortranIndexDict[funct][1] == 1 :
         xlateCode.append("if ( " + incrementFortranIndexDict[funct][0] + " >= 0 ) (" + incrementFortranIndexDict[funct][0] + ")++;\n")
       else:
@@ -1494,17 +1494,17 @@ def CreateWrapper(funct, olist):
       #print " xlateCode is ", xlateCode
       olist.extend(xlateCode)
       olist.append("}\n")
-                
+
     #  Free allocated arrays
     for freeSym in freelist:
         olist.append("free("+freeSym+");\n")
-                
-    olist.append("return;\n" + "}" + " /* " + string.lower(funct) + " */\n")
+
+    olist.append("return;\n" + "}" + " /* " + funct.lower() + " */\n")
 
     #if ( opaqueFound == 1 and xlateDone == 0 ):
     #    print "Function " + funct + " not translated!\n"
-        
-    print "   Wrapped " + funct
+
+    print("   Wrapped " + funct)
 
 
 def GenerateWrappers():
@@ -1513,7 +1513,7 @@ def GenerateWrappers():
     global arch
     global doWeakSymbols
 
-    print "-----*----- Generating profiling wrappers"
+    print("-----*----- Generating profiling wrappers")
     cwd = os.getcwd()
     os.chdir(cwd)
     sname = cwd + "/wrappers.c"
@@ -1525,12 +1525,12 @@ def GenerateWrappers():
     olist.append("#include \"symbols.h\"\n")
     if doWeakSymbols == True :
       olist.append("#include \"weak-symbols.h\"\n")
-      
+
     olist.append("#include \"mpiPi_def.h\"\n")
     olist.append("\n")
 
     for funct in flist:
-	CreateWrapper(funct, olist)
+        CreateWrapper(funct, olist)
     olist.append("\n")
     olist.append("\n")
     olist.append("/* eof */\n")
@@ -1542,17 +1542,17 @@ def GetFortranSymbol(fsymtp, fsym) :
         ofsym = ""
 
         if fsymtp == 'symbol':
-                        ofsym = string.lower(fsym)
+                        ofsym = fsym.lower()
         elif fsymtp == 'symbol_':
-                        ofsym = string.lower(fsym) + "_"
+                        ofsym = fsym.lower() + "_"
         elif fsymtp == 'symbol__':
-                        ofsym = string.lower(fsym) + "__"
+                        ofsym = fsym.lower() + "__"
         elif fsymtp == 'SYMBOL':
-                        ofsym = string.upper(fsym)
+                        ofsym = fsym.upper()
         elif fsymtp == 'SYMBOL_':
-                        ofsym = string.upper(fsym) + "_"
+                        ofsym = fsym.upper() + "_"
         elif fsymtp == 'SYMBOL__':
-                        ofsym = string.upper(fsym) + "__"
+                        ofsym = fsym.upper() + "__"
 
         return ofsym
 
@@ -1575,19 +1575,19 @@ def GenerateWeakSymbols():
 
     sname = cwd + "/weak-symbols-pcontrol.h"
     p = open(sname, "w")
-        
+
     fmlist = ['symbol', 'symbol_', 'symbol__', 'SYMBOL', 'SYMBOL_', 'SYMBOL__' ]
     if f77symbol in fmlist :
       fmlist.remove(f77symbol)
-			
+
     symflist = copy.deepcopy(flist)
 
     for funct in symflist:
       dfunc = GetFortranSymbol(f77symbol, funct)
-    	
+
       for mt in fmlist:
         wfunc = GetFortranSymbol(mt, funct)
-        if funct in [ 'MPI_Init', 'MPI_Init_thread', 'MPI_Finalize'] :  
+        if funct in [ 'MPI_Init', 'MPI_Init_thread', 'MPI_Finalize'] :
           s.write("#pragma weak " + wfunc + " = " + dfunc + "\n")
         elif 'Pcontrol' in funct :
           p.write("#pragma weak " + wfunc + " = " + dfunc + "\n")
@@ -1614,21 +1614,21 @@ def GenerateSymbolDefs():
     g = open(sname, "w")
     for funct in symflist:
         if f77symbol == 'symbol':
-            f77funct = string.lower(funct)
+            f77funct = funct.lower()
         elif f77symbol == 'symbol_':
-            f77funct = string.lower(funct) + "_"
+            f77funct = funct.lower() + "_"
         elif f77symbol == 'symbol__':
-            f77funct = string.lower(funct) + "__"
+            f77funct = funct.lower() + "__"
         elif f77symbol == 'SYMBOL':
-            f77funct = string.upper(funct)
+            f77funct = funct.upper()
         elif f77symbol == 'SYMBOL_':
-            f77funct = string.upper(funct) + "_"
+            f77funct = funct.upper() + "_"
         elif f77symbol == 'SYMBOL__':
-            f77funct = string.upper(funct) + "__"
+            f77funct = funct.upper() + "__"
         else:
-            f77funct = string.lower(funct)
+            f77funct = funct.lower()
 
-        g.write("#define F77_" + string.upper(funct) + " " + f77funct + "\n")
+        g.write("#define F77_" + funct.upper() + " " + f77funct + "\n")
 
     g.close()
 
@@ -1643,7 +1643,7 @@ def main():
 
     opts, pargs = getopt.getopt(sys.argv[1:], '', ['f77symbol=', 'xlate', 'arch=', 'weak', 'usesetjmp'])
 
-    print "MPI Wrapper Generator ($Revision$)"
+    print("MPI Wrapper Generator ($Revision$)")
     #print "opts=",opts
     #print "pargs=",pargs
 
@@ -1652,7 +1652,7 @@ def main():
     doWeakSymbols = False
     useSetJmp = False
     arch = 'unknown'
-    
+
     for o, a in opts:
         if o == '--f77symbol':
             f77symbol = a
@@ -1664,16 +1664,16 @@ def main():
             arch = a
         if o == '--usesetjmp':
             useSetJmp = True
-            
+
 
     ##### Load the input file
     if len(pargs) < 1:
-	f = sys.__stdin__
+        f = sys.__stdin__
     else:
-	f = open(pargs[0])
+        f = open(pargs[0])
     ReadInputFile(f)
 
-    print "-----*----- Beginning parameter optimization"
+    print("-----*----- Beginning parameter optimization")
     #ParameterOptimization()
 
     GenerateStructureFile()
@@ -1689,34 +1689,34 @@ def main():
 #####
 main()
 
-#  
-#  
+#
+#
 #  <license>
-#  
-#  Copyright (c) 2006, The Regents of the University of California. 
-#  Produced at the Lawrence Livermore National Laboratory 
-#  Written by Jeffery Vetter and Christopher Chambreau. 
-#  UCRL-CODE-223450. 
-#  All rights reserved. 
-#   
-#  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
-#   
+#
+#  Copyright (c) 2006, The Regents of the University of California.
+#  Produced at the Lawrence Livermore National Laboratory
+#  Written by Jeffery Vetter and Christopher Chambreau.
+#  UCRL-CODE-223450.
+#  All rights reserved.
+#
+#  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP.
+#
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
 #  met:
-#   
+#
 #  * Redistributions of source code must retain the above copyright
 #  notice, this list of conditions and the disclaimer below.
-#  
+#
 #  * Redistributions in binary form must reproduce the above copyright
 #  notice, this list of conditions and the disclaimer (as noted below) in
 #  the documentation and/or other materials provided with the
 #  distribution.
-#  
+#
 #  * Neither the name of the UC/LLNL nor the names of its contributors
 #  may be used to endorse or promote products derived from this software
 #  without specific prior written permission.
-#  
+#
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 #  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 #  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -1729,22 +1729,22 @@ main()
 #  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#   
-#   
-#  Additional BSD Notice 
-#   
+#
+#
+#  Additional BSD Notice
+#
 #  1. This notice is required to be provided under our contract with the
 #  U.S. Department of Energy (DOE).  This work was produced at the
 #  University of California, Lawrence Livermore National Laboratory under
 #  Contract No. W-7405-ENG-48 with the DOE.
-#   
+#
 #  2. Neither the United States Government nor the University of
 #  California nor any of their employees, makes any warranty, express or
 #  implied, or assumes any liability or responsibility for the accuracy,
 #  completeness, or usefulness of any information, apparatus, product, or
 #  process disclosed, or represents that its use would not infringe
 #  privately-owned rights.
-#   
+#
 #  3.  Also, reference herein to any specific commercial products,
 #  process, or services by trade name, trademark, manufacturer or
 #  otherwise does not necessarily constitute or imply its endorsement,
@@ -1753,8 +1753,8 @@ main()
 #  herein do not necessarily state or reflect those of the United States
 #  Government or the University of California, and shall not be used for
 #  advertising or product endorsement purposes.
-#  
+#
 #  </license>
-#  
-#  
+#
+#
 # --- EOF
