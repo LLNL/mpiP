@@ -42,6 +42,7 @@
 #include "mpip_timers.h"
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
+#define MPIPI_COPIED_ARGS_MAX 32
 #define MPIP_CALLSITE_STACK_DEPTH_MAX @STACKDEPTH@
 
 #define MPIP_HELP_LIST "@PACKAGE_BUGREPORT@"
@@ -160,7 +161,7 @@ typedef struct _mpiPi_histogram
 typedef struct _mpiPi_t
 {
   int ac;
-  char *av[32];
+  char *av[MPIPI_COPIED_ARGS_MAX];
   char *toolname;
   char *appName;
   char *appFullName;

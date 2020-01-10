@@ -369,7 +369,7 @@ mpiPi_print_report_header (FILE * fp)
   int i;
   fprintf (fp, "@ %s\n", mpiPi.toolname);
   fprintf (fp, "@ Command : ");
-  for (i = 0; i < mpiPi.ac; i++)
+  for (i = 0; (i < mpiPi.ac) && (i < MPIPI_COPIED_ARGS_MAX); i++)
     {
       fprintf (fp, "%s ", mpiPi.av[i]);
     }

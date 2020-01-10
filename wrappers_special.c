@@ -69,7 +69,8 @@ MPI_Init (int *argc, char ***argv)
   rc = _MPI_Init (argc, argv);
 
   if (argc != NULL && argv != NULL)
-    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
+    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av,
+            MPIPI_COPIED_ARGS_MAX, *argc, *argv);
   else
     {
 #ifdef Linux
@@ -92,7 +93,7 @@ F77_MPI_INIT (int *ierr)
 #ifdef Linux
   getProcCmdLine (&(mpiPi.ac), mpiPi.av);
 #else
-  mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, 32);
+  mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, MPIPI_COPIED_ARGS_MAX);
 #endif
 
   tmp_argv = mpiPi.av;
@@ -148,7 +149,8 @@ MPI_Init_thread (int *argc, char ***argv, int required, int *provided)
   rc = _MPI_Init_thread (argc, argv, required, provided);
 
   if (argc != NULL && argv != NULL)
-    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av, 32, *argc, *argv);
+    mpiPi_copy_given_args (&(mpiPi.ac), mpiPi.av,
+            MPIPI_COPIED_ARGS_MAX, *argc, *argv);
   else
     {
 #ifdef Linux
@@ -171,7 +173,7 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
 #ifdef Linux
   getProcCmdLine (&(mpiPi.ac), mpiPi.av);
 #else
-  mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, 32);
+  mpiPi_copy_args (&(mpiPi.ac), mpiPi.av, MPIPI_COPIED_ARGS_MAX);
 #endif
 
   tmp_argv = mpiPi.av;
