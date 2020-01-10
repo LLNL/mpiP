@@ -283,6 +283,15 @@ AC_ARG_ENABLE(stackdepth,
 )
 AC_SUBST(STACKDEPTH)
 
+AC_ARG_ENABLE(maxargs,
+    AS_HELP_STRING(--enable-maxargs,Maximum number of command line arguments copied (default is 32).),
+    MAX_COPIED_ARGS=$enableval
+    echo Maximum number of command line arguments copied is $MAX_COPIED_ARGS
+    ,
+    MAX_COPIED_ARGS=32
+)
+AC_SUBST(MAX_COPIED_ARGS)
+
 PC_LOOKUP_FILE=pc_lookup.c
 AC_ARG_ENABLE(dwarf,
 	AS_HELP_STRING(--enable-dwarf,Use DWARF library for source lookup.),
