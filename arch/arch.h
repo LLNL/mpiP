@@ -15,7 +15,7 @@
 
 #ifdef __x86_64__
 #include "arch/arch_x86_64.h"
-#elif __ppc64__ || __ppc__
+#elif __ppc64__ || __ppc__ || __PPC64__
 #include "arch/arch_ppc.h"
 #elif __aarch64__
 #include "arch/arch_arm64.h"

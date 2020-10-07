@@ -20,12 +20,12 @@
 #define RMB() __asm__ __volatile__ ("dmb ld" : : : "memory")
 #define WMB() __asm__ __volatile__ ("dmb st" : : : "memory")
 
-static inline void opal_atomic_wmb (void)
+static inline void mpiP_atomic_wmb (void)
 {
   WMB();
 }
 
-static inline void opal_atomic_isync (void)
+static inline void mpiP_atomic_isync (void)
 {
   __asm__ __volatile__ ("isb");
 }

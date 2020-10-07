@@ -36,7 +36,7 @@ void mpiP_atomic_wmb(void)
 }
 
 static inline
-void opal_atomic_isync(void)
+void mpiP_atomic_isync(void)
 {
   ISYNC();
 }
