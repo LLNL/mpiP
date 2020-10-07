@@ -4961,6 +4961,16 @@ _ACEOF
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking PIC flags" >&5
+$as_echo_n "checking PIC flags... " >&6; }
+if `$CC -fpic 2>&1 | grep 'warning' >/dev/null 2>&1` ; then
+  PIC_FLAGS="-DPIC"
+else
+  PIC_FLAGS="-fpic -DPIC"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PIC_FLAGS" >&5
+$as_echo "$PIC_FLAGS" >&6; }
+
 #  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
 #  would be within the bfd tests, making AC_CHECK_DECL undefined if not
 #  checking for bfd.

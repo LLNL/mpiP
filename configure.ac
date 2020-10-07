@@ -394,6 +394,14 @@ AC_CHECK_LIB(m,sqrt)
 
 AC_CHECK_SIZEOF(void*)
 
+AC_MSG_CHECKING(PIC flags)
+if `$CC -fpic 2>&1 | grep 'warning' >/dev/null 2>&1` ; then
+  PIC_FLAGS="-DPIC"
+else
+  PIC_FLAGS="-fpic -DPIC"
+fi
+AC_MSG_RESULT($PIC_FLAGS)
+
 #  Check for MPI, but also define AC_CHECK_DECL macro, since the next use
 #  would be within the bfd tests, making AC_CHECK_DECL undefined if not
 #  checking for bfd.
