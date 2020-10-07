@@ -18,6 +18,7 @@ FLIBS	:= -l$(MPIPFLIB) $(LIBS)
 API_LIBS := -lmpiPapi $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 CPPFLAGS =
+ADD_OBJS = @ADD_OBJS@
 
 CSRCS =	0-simple.c \
 	0-simple-c++.C \
