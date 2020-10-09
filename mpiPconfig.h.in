@@ -24,6 +24,9 @@
 /* BFD get section size */
 #undef HAVE_BFD_GET_SECTION_SIZE
 
+/* BFD macros available before version 2.34 */
+#undef HAVE_BFD_GET_SECTION_MACROS
+
 /* Have demangling */
 #undef HAVE_DEMANGLE_H
 

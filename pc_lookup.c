@@ -146,12 +146,25 @@ find_address_in_section (abfd, section, data)
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
 
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
   if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
   {
     mpiPi_msg_debug ("failed bfd_get_section_flags\n");
     return;
   }
+#else
+  if ((bfd_section_flags (section) & SEC_ALLOC) == 0)
+  {
+    mpiPi_msg_debug ("failed bfd_section_flags\n");
+    return;
+  }
+#endif
+
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
   vma = bfd_get_section_vma (abfd, section);
+#else
+  vma = bfd_section_vma (section);
+#endif
 
   if (local_pc < vma)
   {
@@ -159,9 +172,15 @@ find_address_in_section (abfd, section, data)
       {
         sprintf_vma (addr_buf1, local_pc);
         sprintf_vma (addr_buf2, vma);
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
         mpiPi_msg_debug
             ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
              addr_buf1, addr_buf2);
+#else
+        mpiPi_msg_debug
+           ("failed bfd_section_vma: local_pc=%s  vma=%s\n",
+            addr_buf1, addr_buf2);
+#endif
       }
     return;
   }
@@ -169,13 +188,15 @@ find_address_in_section (abfd, section, data)
 /* The following define addresses binutils modifications between
  * version 2.15 and 2.15.96
 */
-#ifdef HAVE_BFD_GET_SECTION_SIZE
+#if defined(HAVE_BFD_GET_SECTION_SIZE)
   size = bfd_get_section_size (section);
-#else
+#elif defined(HAVE_BFD_GET_SECTION_MACROS)
   if (section->reloc_done)
     size = bfd_get_section_size_after_reloc (section);
   else
     size = bfd_get_section_size_before_reloc (section);
+#else
+  size = bfd_section_size(section);
 #endif
 
   if (local_pc >= vma + size)

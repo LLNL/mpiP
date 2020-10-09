@@ -419,6 +419,7 @@ if test "x$ENABLE_BFD" = "xyes" ; then
   AC_CHECK_HEADER(bfd.h,
     AC_CHECK_LIB(bfd,bfd_openr, LIBS="$LIBS -lbfd", ENABLE_BFD=no, $BFD_AUX_LIBS)
     AC_CHECK_DECL(bfd_get_section_size, AC_DEFINE([HAVE_BFD_GET_SECTION_SIZE], [], [BFD get section size]), ,[#include "bfd.h"]) 
+    AC_CHECK_DECL(bfd_get_section_vma, AC_DEFINE(HAVE_BFD_GET_SECTION_MACROS), ,[#include "bfd.h"])
     , ENABLE_BFD=no SO_LOOKUP=no
   )
   AC_CHECK_TYPE(bfd_boolean, ,AC_DEFINE([HAVE_BFD_BOOLEAN], [], [BFD booleans]), [#include "bfd.h"])
