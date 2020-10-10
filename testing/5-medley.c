@@ -1,6 +1,6 @@
 /* -*- Mode: C; -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -19,7 +19,7 @@ static char *svnid =
 #include <stdio.h>
 #include <unistd.h>
 
-#include "mpi.h"
+#include <mpi.h>
 
 int
 main (int argc, char **argv)
@@ -146,7 +146,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

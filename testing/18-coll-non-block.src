@@ -1,0 +1,29 @@
+checkOutput "Iallgatherv" "Report check:"
+checkOutput "Iallgather " "Report check:"
+checkOutput "Ialltoallv" "Report check:"
+checkOutput "Ialltoallw" "Report check:"
+checkOutput "Ialltoall" "Report check:"
+checkOutput "Iallreduce" "Report check:"
+checkOutput "Ibarrier" "Report check:"
+checkOutput "Ibcast" "Report check:"
+checkOutput "Iexscan" "Report check:"
+checkOutput "Igatherv" "Report check:"
+checkOutput "Igather " "Report check:"
+checkOutput "Ireduce_scatter_block" "Report check:"
+checkOutput "Ireduce_scatter" "Report check:"
+checkOutput "Ireduce " "Report check:"
+checkOutput "Iscan" "Report check:"
+checkOutput "Iscatter " "Report check:"
+checkOutput "Iscatterv" "Report check:"
+
+proc checkMessOutput { text type count total } {
+  checkOutput "$text +\[0-9\]+ +$count +$total" "Message size check:"
+}
+
+foreach op { Iallgatherv Iallgather Iallreduce Ialltoall Ibcast Iexscan Igather Igatherv Ireduce Ireduce_scatter_block Iscan Iscatter } {
+  checkMessOutput $op "Message size check:" 2 16
+}
+
+foreach op { Ialltoallv Ialltoallw Ireduce_scatter Iscatterv } {
+  checkMessOutput $op "Message size check:" 2 32
+}

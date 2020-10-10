@@ -52,11 +52,11 @@ done
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${EXE_RPATHS}
 
 #  Set LD_PRELOAD to preload mpiP library and other libs used by mpiP
-export LD_PRELOAD=\
+export RT_LD_PRELOAD=\
 ${LD_PRELOAD:+${LD_PRELOAD}:}${MPIP_DIR}/lib/libmpiP.so${ADDTL_RT_LIBS:+:${ADDTL_RT_LIBS}}
 
 #export LD_DEBUG=libs
 
-srun "$@"
+srun --export LD_PRELOAD=${RT_LD_PRELOAD} "$@"
 
 exit $?

@@ -1,5 +1,5 @@
 /* -*- Mode: C; -*- 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -20,14 +20,14 @@ static char *svnid =
 
 #define MSG_CNT 4
 
-main (int ac, char **av)
+int main (int ac, char **av)
 {
   int i, j;
   MPI_Request r[2];
   MPI_Status s[2];
   int cnt = MSG_CNT;
   int tag = 111;
-  int comm = MPI_COMM_WORLD;
+  MPI_Comm comm = MPI_COMM_WORLD;
   int nprocs, rank;
   float sendX[MSG_CNT] = { 1, 2, 3, 4 };
   float recvX[MSG_CNT];
@@ -58,7 +58,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

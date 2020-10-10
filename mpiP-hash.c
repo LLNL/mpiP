@@ -1,10 +1,10 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   ----- 
+   -----
 
    mpiP-hash.c -- generic hash table
 
@@ -90,15 +90,14 @@ h_insert (h_t * ht, void *ptr)
       /* search list for similar key, if not, append it to list */
       /* OPTIMIZATION: remove this and let users deal with it :) */
       for (het_index = ht->table[tableIndex];
-	   het_index != NULL; het_index = het_index->next)
-	{
-	  if (ht->hc (het_index->ptr, ptr) == 0)
-	    {
-	      printf
-		("hash: warning: tried to insert identical entry again\n");
-	      return 1;
-	    }
-	}
+           het_index != NULL; het_index = het_index->next)
+        {
+          if (ht->hc (het_index->ptr, ptr) == 0)
+            {
+              printf("hash: warning: tried to insert identical entry again\n");
+              return 1;
+            }
+        }
       het->next = ht->table[tableIndex];
       ht->table[tableIndex] = het;
     }
@@ -115,8 +114,9 @@ h_search (h_t * ht, void *key, void **ptr)
 {
   unsigned tableIndex;
   h_entry_t *het_index = NULL;
-  if (ht == NULL)
+  if (ht == NULL){
     Abort ("hash table uninitialized");
+    }
   if (key == NULL)
     Abort ("h_search: key == NULL");
   if (ptr == NULL)
@@ -128,14 +128,14 @@ h_search (h_t * ht, void *key, void **ptr)
     {
       /* search list for similar key  */
       for (het_index = ht->table[tableIndex];
-	   het_index != NULL; het_index = het_index->next)
-	{
-	  if (ht->hc (het_index->ptr, key) == 0)
-	    {
-	      *ptr = het_index->ptr;
-	      return *ptr;
-	    }
-	}
+           het_index != NULL; het_index = het_index->next)
+        {
+          if (ht->hc (het_index->ptr, key) == 0)
+            {
+              *ptr = het_index->ptr;
+              return *ptr;
+            }
+        }
     }
   return NULL;
 }
@@ -159,21 +159,21 @@ h_delete (h_t * ht, void *key, void **ptr)
     {
       /* search list for similar key  */
       for (het_index = ht->table[tableIndex],
-	   next_addr = &(ht->table[tableIndex]);
-	   het_index != NULL; het_index = het_index->next)
-	{
-	  if (ht->hc (het_index->ptr, key) == 0)
-	    {
-	      /* match */
-	      *ptr = het_index->ptr;
-	      *next_addr = het_index->next;
-	      free (het_index);
-	      ht->count--;
-	      return *ptr;
-	    }
+           next_addr = &(ht->table[tableIndex]);
+           het_index != NULL; het_index = het_index->next)
+        {
+          if (ht->hc (het_index->ptr, key) == 0)
+            {
+              /* match */
+              *ptr = het_index->ptr;
+              *next_addr = het_index->next;
+              free (het_index);
+              ht->count--;
+              return *ptr;
+            }
 
-	  next_addr = &(het_index->next);
-	}
+          next_addr = &(het_index->next);
+        }
     }
   return NULL;
 }
@@ -193,18 +193,42 @@ h_gather_data (h_t * ht, int *ac, void ***ptr)
   for (i = 0; i < ht->size; i++)
     {
       if (ht->table[i] != NULL)
-	{
-	  for (het_index = ht->table[i];
-	       het_index != NULL; het_index = het_index->next)
-	    {
-	      (*ptr)[*ac] = het_index->ptr;
-	      (*ac)++;
-	    }
-	}
+        {
+          for (het_index = ht->table[i];
+               het_index != NULL; het_index = het_index->next)
+            {
+              (*ptr)[*ac] = het_index->ptr;
+              (*ac)++;
+            }
+        }
     }
   return *ac;
 }
 
+int
+h_drain (h_t * ht, int *ac, void ***ptr)
+{
+  int i;
+  h_entry_t *het_index = NULL;
+  h_gather_data (ht, ac, ptr);
+
+  for (i = 0; i < ht->size; i++)
+    {
+      if (ht->table[i] != NULL)
+        {
+          for (het_index = ht->table[i];
+               het_index != NULL; )
+            {
+              h_entry_t *to_free = het_index;
+              het_index = het_index->next;
+              free(to_free);
+            }
+        }
+      ht->table[i] = NULL;
+    }
+  ht->count = 0;
+  return *ac;
+}
 
 #define TESTING 0
 #if TESTING
@@ -255,9 +279,9 @@ main ()
   for (i = 0; i < 20; i++)	/* insert some elements */
     {
       if (NULL != h_insert (ht, &sr[i]))
-	{
-	  printf ("%5d: inserted %d\n", i, sr[i].id);
-	}
+        {
+          printf ("%5d: inserted %d\n", i, sr[i].id);
+        }
     }
   printf ("-----\n");
   {
@@ -266,7 +290,7 @@ main ()
     h_gather_data (ht, &dc, (void ***) &dv);	/* gather elements and print */
     for (i = 0; i < dc; i++)
       {
-	printf ("%5d: %d %d %d\n", i, dv[i]->id, dv[i]->size, dv[i]->order);
+        printf ("%5d: %d %d %d\n", i, dv[i]->id, dv[i]->size, dv[i]->order);
       }
     free (dv);			/* remember to release return vector */
   }
@@ -275,9 +299,9 @@ main ()
     {
       SampleRecord_t *d;
       if (NULL != h_delete (ht, &sr[i], (void **) &d))
-	{
-	  printf ("%5d: deleted %d\n", i, sr[i].id);
-	}
+        {
+          printf ("%5d: deleted %d\n", i, sr[i].id);
+        }
     }
 
   printf ("-----\n");
@@ -287,7 +311,7 @@ main ()
     h_gather_data (ht, &dc, (void ***) &dv);	/* gather elements and print */
     for (i = 0; i < dc; i++)
       {
-	printf ("%5d: %d %d %d\n", i, dv[i]->id, dv[i]->size, dv[i]->order);
+        printf ("%5d: %d %d %d\n", i, dv[i]->id, dv[i]->size, dv[i]->order);
       }
     free (dv);			/* remember to release return vector */
   }
@@ -297,9 +321,9 @@ main ()
     {
       SampleRecord_t *d;
       if (NULL != h_delete (ht, &sr[i], (void **) &d))
-	{
-	  printf ("%5d: deleted %d\n", i, sr[i].id);
-	}
+        {
+          printf ("%5d: deleted %d\n", i, sr[i].id);
+        }
     }
 
   h_close (ht);
@@ -318,13 +342,13 @@ Produced at the Lawrence Livermore National Laboratory
 Written by Jeffery Vetter and Christopher Chambreau. 
 UCRL-CODE-223450. 
 All rights reserved. 
- 
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
- 
+
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
- 
+
 * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the disclaimer below.
 
@@ -349,22 +373,22 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- 
+
+
 Additional BSD Notice 
- 
+
 1. This notice is required to be provided under our contract with the
 U.S. Department of Energy (DOE).  This work was produced at the
 University of California, Lawrence Livermore National Laboratory under
 Contract No. W-7405-ENG-48 with the DOE.
- 
+
 2. Neither the United States Government nor the University of
 California nor any of their employees, makes any warranty, express or
 implied, or assumes any liability or responsibility for the accuracy,
 completeness, or usefulness of any information, apparatus, product, or
 process disclosed, or represents that its use would not infringe
 privately-owned rights.
- 
+
 3.  Also, reference herein to any specific commercial products,
 process, or services by trade name, trademark, manufacturer or
 otherwise does not necessarily constitute or imply its endorsement,

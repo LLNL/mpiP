@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -22,7 +22,7 @@ int mpiPi_debug = 0;
 
 int mpiPi_vmajor = 3;
 int mpiPi_vminor = 4;
-int mpiPi_vpatch = 1;
+int mpiPi_vpatch = 2;
 char *mpiPi_vdate = __DATE__;
 char *mpiPi_vtime = __TIME__;
 
@@ -37,7 +37,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

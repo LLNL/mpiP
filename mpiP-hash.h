@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -29,9 +29,9 @@ typedef struct _h_t
 {
   int size;
   int count;
-  h_HashFunct hf;		/* given an element compute the hash number */
-  h_Comparator hc;		/* given two elements, do they match? 0 for yes */
-  h_entry_t **table;		/* table[size] of pointers to lists of entries */
+  h_HashFunct hf;    /* given an element compute the hash number */
+  h_Comparator hc;   /* given two elements, do they match? 0 for yes */
+  h_entry_t **table; /* table[size] of pointers to lists of entries */
 }
 h_t;
 
@@ -49,7 +49,7 @@ h_t;
   UCRL-CODE-223450. 
   All rights reserved. 
    
-  This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are

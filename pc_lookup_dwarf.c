@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -35,6 +35,7 @@ static char *svnid =
 #include "libdwarf.h"
 #endif
 
+static Dwarf_Error dw_err;
 
 
 /*----------------------------------------------------------------------------
@@ -78,10 +79,10 @@ UniqueFileName_Get (const char *testFileName)
   while (currInfo != NULL)
     {
       if (strcmp (testFileName, currInfo->ufi.fileName) == 0)
-	{
-	  /* we found a match */
-	  break;
-	}
+        {
+          /* we found a match */
+          break;
+        }
 
       /* advance to the next file name */
       currInfo = currInfo->next;
@@ -102,17 +103,17 @@ UniqueFileName_Get (const char *testFileName)
        * Allocate a new string.
        */
       currInfo = (struct UniqueFileNameListNode *)
-	malloc (sizeof (struct UniqueFileNameListNode));
+          malloc (sizeof (struct UniqueFileNameListNode));
       if (currInfo == NULL)
-	{
-	  mpiPi_abort ("malloc failed\n");
-	}
+        {
+          mpiPi_abort ("malloc failed\n");
+        }
 
       currInfo->ufi.fileName = strdup (testFileName);
       if (currInfo->ufi.fileName == NULL)
-	{
-	  mpiPi_abort ("malloc failed\n");
-	}
+        {
+          mpiPi_abort ("malloc failed\n");
+        }
 
       /* 
        * link the new entry into our list
@@ -191,7 +192,7 @@ AddrRangeMap_Init (struct AddrRangeMap *map)
 
 static void
 AddrRangeMap_DestroyAux (struct AddrRangeMapNode *node,
-			 void (*nodeInfoFreeFunc) (void *))
+                         void (*nodeInfoFreeFunc) (void *))
 {
   assert (node != NULL);
 
@@ -218,14 +219,14 @@ AddrRangeMap_DestroyAux (struct AddrRangeMapNode *node,
 
 static void
 AddrRangeMap_Destroy (struct AddrRangeMap *map,
-		      void (*nodeInfoFreeFunc) (void *))
+                      void (*nodeInfoFreeFunc) (void *))
 {
   if (map != NULL)
     {
       if (map->root != NULL)
-	{
-	  AddrRangeMap_DestroyAux (map->root, nodeInfoFreeFunc);
-	}
+        {
+          AddrRangeMap_DestroyAux (map->root, nodeInfoFreeFunc);
+        }
       free (map);
     }
 }
@@ -233,7 +234,7 @@ AddrRangeMap_Destroy (struct AddrRangeMap *map,
 
 static void
 AddrRangeMap_LeftRotate (struct AddrRangeMap *map,
-			 struct AddrRangeMapNode *node)
+                         struct AddrRangeMapNode *node)
 {
   struct AddrRangeMapNode *oldRightChild = NULL;
 
@@ -274,7 +275,7 @@ AddrRangeMap_LeftRotate (struct AddrRangeMap *map,
 
 static void
 AddrRangeMap_RightRotate (struct AddrRangeMap *map,
-			  struct AddrRangeMapNode *node)
+                          struct AddrRangeMapNode *node)
 {
   struct AddrRangeMapNode *oldLeftChild = NULL;
 
@@ -318,14 +319,14 @@ AddrRangeMap_RightRotate (struct AddrRangeMap *map,
 
 static void
 AddrRangeMap_Add (struct AddrRangeMap *map,
-		  Dwarf_Addr lowAddr, Dwarf_Addr highAddr, void *info)
+                  Dwarf_Addr lowAddr, Dwarf_Addr highAddr, void *info)
 {
   struct AddrRangeMapNode *currNode = NULL;
   struct AddrRangeMapNode *newEntry = NULL;
 
 
   mpiPi_msg_debug ("AddrRangeMap::Add: [0x%016llx,0x%016llx]\n",
-		   lowAddr, highAddr);
+                   lowAddr, highAddr);
 
   /* build a new entry for this mapping */
   newEntry =
@@ -355,47 +356,47 @@ AddrRangeMap_Add (struct AddrRangeMap *map,
       /* new node is not the first node to be added */
       currNode = map->root;
       while (currNode != NULL)
-	{
-	  if (highAddr <= currNode->lowAddr)
-	    {
-	      /* target address is below range covered by current node */
-	      if (currNode->leftChild != NULL)
-		{
-		  /* compare with ranges smaller than ours */
-		  currNode = currNode->leftChild;
-		}
-	      else
-		{
-		  /* adopt new node as our left child */
-		  currNode->leftChild = newEntry;
-		  newEntry->parent = currNode;
-		  break;
-		}
-	    }
-	  else if (lowAddr >= currNode->highAddr)
-	    {
-	      /* target address is above range covered by current node */
-	      if (currNode->rightChild != NULL)
-		{
-		  /* compare with ranges larger than ours */
-		  currNode = currNode->rightChild;
-		}
-	      else
-		{
-		  /* adopt new node as our right child */
-		  currNode->rightChild = newEntry;
-		  newEntry->parent = currNode;
-		  break;
-		}
-	    }
-	  else
-	    {
-	      /* new range overlaps with our range! */
-	      mpiPi_abort
-		("new address node range [0x%016llx,0x%016llx] overlaps our range [0x%016llx,0x%016llx]\n",
-		 lowAddr, highAddr, currNode->lowAddr, currNode->highAddr);
-	    }
-	}
+        {
+          if (highAddr <= currNode->lowAddr)
+            {
+              /* target address is below range covered by current node */
+              if (currNode->leftChild != NULL)
+                {
+                  /* compare with ranges smaller than ours */
+                  currNode = currNode->leftChild;
+                }
+              else
+                {
+                  /* adopt new node as our left child */
+                  currNode->leftChild = newEntry;
+                  newEntry->parent = currNode;
+                  break;
+                }
+            }
+          else if (lowAddr >= currNode->highAddr)
+            {
+              /* target address is above range covered by current node */
+              if (currNode->rightChild != NULL)
+                {
+                  /* compare with ranges larger than ours */
+                  currNode = currNode->rightChild;
+                }
+              else
+                {
+                  /* adopt new node as our right child */
+                  currNode->rightChild = newEntry;
+                  newEntry->parent = currNode;
+                  break;
+                }
+            }
+          else
+            {
+              /* new range overlaps with our range! */
+              mpiPi_abort
+                  ("new address node range [0x%016llx,0x%016llx] overlaps our range [0x%016llx,0x%016llx]\n",
+                   lowAddr, highAddr, currNode->lowAddr, currNode->highAddr);
+            }
+        }
     }
 
 
@@ -408,60 +409,60 @@ AddrRangeMap_Add (struct AddrRangeMap *map,
    */
   currNode = newEntry;
   while ((currNode != map->root) &&
-	 (currNode->parent->color == AddrRangeMapNodeColor_Red))
+         (currNode->parent->color == AddrRangeMapNodeColor_Red))
     {
       struct AddrRangeMapNode *uncleNode = NULL;
 
       if (currNode->parent == currNode->parent->parent->leftChild)
-	{
-	  /* currNode's parent is its parent's left child */
-	  uncleNode = currNode->parent->parent->rightChild;
-	  if ((uncleNode != NULL) &&
-	      (uncleNode->color == AddrRangeMapNodeColor_Red))
-	    {
-	      currNode->parent->color = AddrRangeMapNodeColor_Black;
-	      uncleNode->color = AddrRangeMapNodeColor_Black;
-	      currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
-	      currNode = currNode->parent->parent;
-	    }
-	  else
-	    {
-	      /* uncleNode is NULL (NULL is assumed black) or is black */
-	      if (currNode == currNode->parent->rightChild)
-		{
-		  currNode = currNode->parent;
-		  AddrRangeMap_LeftRotate (map, currNode);
-		}
-	      currNode->parent->color = AddrRangeMapNodeColor_Black;
-	      currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
-	      AddrRangeMap_RightRotate (map, currNode->parent->parent);
-	    }
-	}
+        {
+          /* currNode's parent is its parent's left child */
+          uncleNode = currNode->parent->parent->rightChild;
+          if ((uncleNode != NULL) &&
+              (uncleNode->color == AddrRangeMapNodeColor_Red))
+            {
+              currNode->parent->color = AddrRangeMapNodeColor_Black;
+              uncleNode->color = AddrRangeMapNodeColor_Black;
+              currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
+              currNode = currNode->parent->parent;
+            }
+          else
+            {
+              /* uncleNode is NULL (NULL is assumed black) or is black */
+              if (currNode == currNode->parent->rightChild)
+                {
+                  currNode = currNode->parent;
+                  AddrRangeMap_LeftRotate (map, currNode);
+                }
+              currNode->parent->color = AddrRangeMapNodeColor_Black;
+              currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
+              AddrRangeMap_RightRotate (map, currNode->parent->parent);
+            }
+        }
       else
-	{
-	  /* currNode's parent is its parent's right child */
-	  uncleNode = currNode->parent->parent->leftChild;
-	  if ((uncleNode != NULL) &&
-	      (uncleNode->color == AddrRangeMapNodeColor_Red))
-	    {
-	      currNode->parent->color = AddrRangeMapNodeColor_Black;
-	      uncleNode->color = AddrRangeMapNodeColor_Black;
-	      currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
-	      currNode = currNode->parent->parent;
-	    }
-	  else
-	    {
-	      /* uncleNode is NULL (NULL is assumed black) or is black */
-	      if (currNode == currNode->parent->leftChild)
-		{
-		  currNode = currNode->parent;
-		  AddrRangeMap_RightRotate (map, currNode);
-		}
-	      currNode->parent->color = AddrRangeMapNodeColor_Black;
-	      currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
-	      AddrRangeMap_LeftRotate (map, currNode->parent->parent);
-	    }
-	}
+        {
+          /* currNode's parent is its parent's right child */
+          uncleNode = currNode->parent->parent->leftChild;
+          if ((uncleNode != NULL) &&
+              (uncleNode->color == AddrRangeMapNodeColor_Red))
+            {
+              currNode->parent->color = AddrRangeMapNodeColor_Black;
+              uncleNode->color = AddrRangeMapNodeColor_Black;
+              currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
+              currNode = currNode->parent->parent;
+            }
+          else
+            {
+              /* uncleNode is NULL (NULL is assumed black) or is black */
+              if (currNode == currNode->parent->leftChild)
+                {
+                  currNode = currNode->parent;
+                  AddrRangeMap_RightRotate (map, currNode);
+                }
+              currNode->parent->color = AddrRangeMapNodeColor_Black;
+              currNode->parent->parent->color = AddrRangeMapNodeColor_Red;
+              AddrRangeMap_LeftRotate (map, currNode->parent->parent);
+            }
+        }
     }
   assert (map->root != NULL);
   map->root->color = AddrRangeMapNodeColor_Black;
@@ -481,30 +482,30 @@ AddrRangeMap_Find (struct AddrRangeMap *map, void *addr)
   while (currNode != NULL)
     {
       mpiPi_msg_debug
-	("AddrRangeMap::Find: comparing with [0x%016llx,0x%016llx]\n",
-	 currNode->lowAddr, currNode->highAddr);
+          ("AddrRangeMap::Find: comparing with [0x%016llx,0x%016llx]\n",
+           currNode->lowAddr, currNode->highAddr);
 
       if (((Dwarf_Addr) addr) < currNode->lowAddr)
-	{
-	  /* target address is below range covered by current node */
-	  /* NOTE: we might not have a left child */
-	  mpiPi_msg_debug ("AddrRangeMap::Find: going left\n");
-	  currNode = currNode->leftChild;
-	}
+        {
+          /* target address is below range covered by current node */
+          /* NOTE: we might not have a left child */
+          mpiPi_msg_debug ("AddrRangeMap::Find: going left\n");
+          currNode = currNode->leftChild;
+        }
       else if (((Dwarf_Addr) addr) > currNode->highAddr)
-	{
-	  /* target address is above range covered by current node */
-	  /* NOTE: we might not have a right child */
-	  mpiPi_msg_debug ("AddrRangeMap::Find: going right\n");
-	  currNode = currNode->rightChild;
-	}
+        {
+          /* target address is above range covered by current node */
+          /* NOTE: we might not have a right child */
+          mpiPi_msg_debug ("AddrRangeMap::Find: going right\n");
+          currNode = currNode->rightChild;
+        }
       else
-	{
-	  /* target address falls within range of current node's statement */
-	  mpiPi_msg_debug ("AddrRangeMap::Find: found\n");
-	  ret = currNode->info;
-	  break;
-	}
+        {
+          /* target address falls within range of current node's statement */
+          mpiPi_msg_debug ("AddrRangeMap::Find: found\n");
+          ret = currNode->info;
+          break;
+        }
     }
 
   return ret;
@@ -568,27 +569,27 @@ AddrToSourceMap_Destroy (void)
 
 static void
 AddrToSourceMap_Add (Dwarf_Addr addr,
-		     const char *fileName, unsigned int lineNumber)
+                     const char *fileName, unsigned int lineNumber)
 {
   /* build a new entry for this mapping */
   struct AddrToSourceInfo *newEntry =
-    (struct AddrToSourceInfo *) malloc (sizeof (struct AddrToSourceInfo));
-  if (newEntry == NULL)
-    {
-      mpiPi_abort ("malloc failed\n");
-    }
-  newEntry->fileName = UniqueFileName_Get (fileName);
-  assert (newEntry->fileName != NULL);
-  newEntry->lineNumber = lineNumber;
+      (struct AddrToSourceInfo *) malloc (sizeof (struct AddrToSourceInfo));
+      if (newEntry == NULL)
+        {
+          mpiPi_abort ("malloc failed\n");
+        }
+      newEntry->fileName = UniqueFileName_Get (fileName);
+      assert (newEntry->fileName != NULL);
+      newEntry->lineNumber = lineNumber;
 
-  mpiPi_msg_debug ("AddrToSourceMap::Add: 0x%016llx => %s: %d\n",
-		   addr, newEntry->fileName, newEntry->lineNumber);
+      mpiPi_msg_debug ("AddrToSourceMap::Add: 0x%016llx => %s: %d\n",
+                       addr, newEntry->fileName, newEntry->lineNumber);
 
 
 
-  assert (addrToSourceMap != NULL);
-  AddrRangeMap_Add (addrToSourceMap, addr, addr,	/* we will patch range ends later */
-		    newEntry);
+      assert (addrToSourceMap != NULL);
+      AddrRangeMap_Add (addrToSourceMap, addr, addr,	/* we will patch range ends later */
+                        newEntry);
 }
 
 
@@ -597,7 +598,7 @@ AddrToSourceMap_Add (Dwarf_Addr addr,
 
 static Dwarf_Addr
 AddrToSourceMap_PatchRangesAux (struct AddrRangeMapNode *node,
-				Dwarf_Addr maxAddress)
+                                Dwarf_Addr maxAddress)
 {
   Dwarf_Addr ret;
 
@@ -629,7 +630,7 @@ AddrToSourceMap_PatchRangesAux (struct AddrRangeMapNode *node,
        * so there are ranges that are larger than ours
        */
       maxAddress = AddrToSourceMap_PatchRangesAux (node->rightChild,
-						   maxAddress);
+                                                   maxAddress);
     }
 
   /*
@@ -670,11 +671,11 @@ AddrToSourceMap_PatchRanges (void)
 
 
 static const struct AddrToSourceInfo *
-AddrToSourceMap_Find (void *addr)
+    AddrToSourceMap_Find (void *addr)
 {
   assert (addrToSourceMap != NULL);
   return (const struct AddrToSourceInfo *) AddrRangeMap_Find (addrToSourceMap,
-							      addr);
+                                                              addr);
 }
 
 
@@ -727,7 +728,7 @@ FunctionMap_Destroy (void)
 
 void
 FunctionMap_Add (const char *funcName,
-		 Dwarf_Addr lowAddress, Dwarf_Addr highAddress)
+                 Dwarf_Addr lowAddress, Dwarf_Addr highAddress)
 {
   /* build a new entry for this function */
   struct FunctionInfo *newEntry =
@@ -738,7 +739,7 @@ FunctionMap_Add (const char *funcName,
     }
 
   mpiPi_msg_debug ("FunctionMap::Add: %s [0x%016llx,0x%016llx]\n",
-		   funcName, lowAddress, highAddress);
+                   funcName, lowAddress, highAddress);
 
   newEntry->name = strdup (funcName);
   if (newEntry->name == NULL)
@@ -780,15 +781,26 @@ HandleFunctionDIE (Dwarf_Debug dwHandle, Dwarf_Die currChildDIE)
   Dwarf_Addr lowAddress = 0;
   Dwarf_Addr highAddress = 0;
 
-  int dwDieNameRet = dwarf_diename (currChildDIE,
-				    &funcName,
-				    NULL);
-  int dwDieLowAddrRet = dwarf_lowpc (currChildDIE,
-				     &lowAddress,
-				     NULL);
-  int dwDieHighAddrRet = dwarf_highpc (currChildDIE,
-				       &highAddress,
-				       NULL);
+  int dwDieNameRet, dwDieLowAddrRet, dwDieHighAddrRet;
+
+  dwDieNameRet = dwarf_diename (currChildDIE,
+                                &funcName,
+                                &dw_err);
+  if (dwDieNameRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get DIE name : %s\n", dwarf_errmsg(dw_err));
+
+  dwDieLowAddrRet = dwarf_lowpc (currChildDIE,
+                                 &lowAddress,
+                                 &dw_err);
+  if (dwDieLowAddrRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get low PC : %s\n", dwarf_errmsg(dw_err));
+
+  dwDieHighAddrRet = dwarf_highpc (currChildDIE,
+                                   &highAddress,
+                                   &dw_err);
+
+  if (dwDieHighAddrRet != DW_DLV_OK)
+    mpiPi_msg_debug("Failed to get high PC : %s\n", dwarf_errmsg(dw_err));
 
   if ((dwDieNameRet == DW_DLV_OK) &&
       (dwDieLowAddrRet == DW_DLV_OK) && (dwDieHighAddrRet == DW_DLV_OK))
@@ -815,7 +827,7 @@ open_dwarf_executable (char *fileName)
     {
       mpiPi_msg_warn ("Executable file name is NULL!\n");
       mpiPi_msg_warn
-	("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+          ("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
     }
 
   /* open the executable */
@@ -831,16 +843,16 @@ open_dwarf_executable (char *fileName)
   /* initialize the DWARF library */
   assert (dwHandle == NULL);
   dwStatus = dwarf_init (dwFd,	/* exe file descriptor */
-			 DW_DLC_READ,	/* desired access */
-			 NULL,	/* error handler */
-			 NULL,	/* error argument */
-			 &dwHandle,	/* session handle */
-			 NULL);	/* error object */
+                         DW_DLC_READ,	/* desired access */
+                         NULL,	/* error handler */
+                         NULL,	/* error argument */
+                         &dwHandle,	/* session handle */
+                         &dw_err);	/* error object */
   if (dwStatus == DW_DLV_ERROR)
     {
       close (dwFd);
       dwFd = -1;
-      mpiPi_abort ("could not initialize DWARF library\n");
+      mpiPi_abort ("could not initialize DWARF library : %s\n", dwarf_errmsg(dw_err));
     }
 
   if (dwStatus == DW_DLV_NO_ENTRY)
@@ -868,131 +880,142 @@ open_dwarf_executable (char *fileName)
 
       /* access next compilation unit header */
       dwStatus = dwarf_next_cu_header (dwHandle, NULL,	/* cu_header_length */
-				       NULL,	/* version_stamp */
-				       NULL,	/* abbrev_offset */
-				       NULL,	/* address_size */
-				       &nextCompilationUnitHeaderOffset, NULL);	/* error object */
+                                       NULL,	/* version_stamp */
+                                       NULL,	/* abbrev_offset */
+                                       NULL,	/* address_size */
+                                       &nextCompilationUnitHeaderOffset, &dw_err);	/* error object */
       if (dwStatus != DW_DLV_OK)
-	{
-	  if (dwStatus != DW_DLV_NO_ENTRY)
-	    {
-	      mpiPi_abort ("failed to access next DWARF cu header\n");
-	    }
-	  break;
-	}
+        {
+          if (dwStatus != DW_DLV_NO_ENTRY)
+            {
+              mpiPi_abort ("failed to access next DWARF cu header : %s\n", dwarf_errmsg(dw_err));
+            }
+          break;
+        }
 
       /* access the first debug info entry (DIE) for this computation unit */
       dwStatus = dwarf_siblingof (dwHandle, NULL,	/* current DIE */
-				  &currCompileUnitDIE,	/* sibling DIE */
-				  NULL);	/* error object */
+                                  &currCompileUnitDIE,	/* sibling DIE */
+                                  &dw_err);	/* error object */
       if (dwStatus != DW_DLV_OK)
-	{
-	  mpiPi_abort ("failed to access first DWARF DIE\n");
-	}
+        {
+          mpiPi_abort ("failed to access first DWARF DIE : %s\n", dwarf_errmsg(dw_err));
+        }
 
       /* get line number information for this compilation 
        * unit, if available 
        */
       dwStatus = dwarf_srclines (currCompileUnitDIE,
-				 &lineEntries, &nLineEntries, NULL);
+                                 &lineEntries, &nLineEntries, &dw_err);
       if (dwStatus == DW_DLV_OK)
-	{
-	  unsigned int i;
+        {
+          unsigned int i;
 
 
-	  /*
-	   * Extract and save address-to-source line mapping.
-	   * 
-	   * NOTE: At least on the Cray X1, we see line number 
-	   * information with the same address mapping to different lines.
-	   * It seems like when there are multiple entries for a given
-	   * address, the last one is the correct one.  (Needs verification.)
-	   * If we see multiple entries for a given address, we only 
-	   * save the last one.
-	   */
-	  for (i = 0; i < nLineEntries; i++)
-	    {
-	      Dwarf_Unsigned lineNumber = 0;
-	      Dwarf_Addr lineAddress = 0;
-	      char *lineSourceFile = NULL;
+          /*
+           * Extract and save address-to-source line mapping.
+           *
+           * NOTE: At least on the Cray X1, we see line number
+           * information with the same address mapping to different lines.
+           * It seems like when there are multiple entries for a given
+           * address, the last one is the correct one.  (Needs verification.)
+           * If we see multiple entries for a given address, we only
+           * save the last one.
+           */
+          for (i = 0; i < nLineEntries; i++)
+            {
+              Dwarf_Unsigned lineNumber = 0;
+              Dwarf_Addr lineAddress = 0;
+              char *lineSourceFile = NULL;
 
 
-	      int lineNoStatus = dwarf_lineno (lineEntries[i],
-					       &lineNumber,
-					       NULL);
+              int lineNoStatus, lineAddrStatus, lineSrcFileStatus;
 
-	      int lineAddrStatus = dwarf_lineaddr (lineEntries[i],
-						   &lineAddress,
-						   NULL);
+              lineNoStatus = dwarf_lineno (lineEntries[i],
+                                           &lineNumber,
+                                           &dw_err);
 
-	      int lineSrcFileStatus = dwarf_linesrc (lineEntries[i],
-						     &lineSourceFile,
-						     NULL);
+              if (lineNoStatus != DW_DLV_OK)
+                mpiPi_msg_debug("Failed to get line number : %s\n", dwarf_errmsg(dw_err));
 
-	      if ((lineNoStatus == DW_DLV_OK) &&
-		  (lineAddrStatus == DW_DLV_OK)
-		  && (lineSrcFileStatus == DW_DLV_OK))
-		{
-		  int saveCurrentEntry = 0;	/* bool */
+              lineAddrStatus = dwarf_lineaddr (lineEntries[i],
+                                               &lineAddress,
+                                               &dw_err);
 
-		  if (i < (nLineEntries - 1))
-		    {
-		      /*
-		       * We're not on the last line number entry -
-		       * check the address associated with the next
-		       * entry to see if it differs from this one.
-		       * Only save the entry if it the next address
-		       * differs.
-		       */
-		      Dwarf_Addr nextLineAddress = 0;
-		      int nextLineAddrStatus =
-			dwarf_lineaddr (lineEntries[i + 1],
-					&nextLineAddress,
-					NULL);
-		      assert (nextLineAddrStatus == DW_DLV_OK);
-		      if (nextLineAddress != lineAddress)
-			{
-			  saveCurrentEntry = 1;
-			}
-		    }
-		  else
-		    {
-		      /* we're on the last line number entry */
-		      saveCurrentEntry = 1;
-		    }
+              if (lineAddrStatus != DW_DLV_OK)
+                mpiPi_msg_debug("Failed to get line address : %s\n", dwarf_errmsg(dw_err));
 
-		  if (saveCurrentEntry)
-		    {
-		      /* save the mapping entry */
-		      AddrToSourceMap_Add (lineAddress, lineSourceFile,
-					   lineNumber);
-		    }
-		}
+              lineSrcFileStatus = dwarf_linesrc (lineEntries[i],
+                                                 &lineSourceFile,
+                                                 &dw_err);
 
-	      if (lineSourceFile != NULL)
-		{
-		  dwarf_dealloc (dwHandle, lineSourceFile, DW_DLA_STRING);
-		}
-	    }
+              if (lineSrcFileStatus != DW_DLV_OK)
+                mpiPi_msg_debug("Failed to get source file status : %s\n", dwarf_errmsg(dw_err));
 
-	  /* release the line number info */
-	  for (i = 0; i < nLineEntries; i++)
-	    {
-	      dwarf_dealloc (dwHandle, lineEntries[i], DW_DLA_LINE);
-	    }
-	  dwarf_dealloc (dwHandle, lineEntries, DW_DLA_LIST);
-	}
+              if ((lineNoStatus == DW_DLV_OK) &&
+                  (lineAddrStatus == DW_DLV_OK)
+                  && (lineSrcFileStatus == DW_DLV_OK))
+                {
+                  int saveCurrentEntry = 0;	/* bool */
+
+                  if (i < (nLineEntries - 1))
+                    {
+                      /*
+                       * We're not on the last line number entry -
+                       * check the address associated with the next
+                       * entry to see if it differs from this one.
+                       * Only save the entry if it the next address
+                       * differs.
+                       */
+                      Dwarf_Addr nextLineAddress = 0;
+                      int nextLineAddrStatus =
+                          dwarf_lineaddr (lineEntries[i + 1],
+                          &nextLineAddress,
+                          &dw_err);
+                      assert (nextLineAddrStatus == DW_DLV_OK);
+                      if (nextLineAddress != lineAddress)
+                        {
+                          saveCurrentEntry = 1;
+                        }
+                    }
+                  else
+                    {
+                      /* we're on the last line number entry */
+                      saveCurrentEntry = 1;
+                    }
+
+                  if (saveCurrentEntry)
+                    {
+                      /* save the mapping entry */
+                      AddrToSourceMap_Add (lineAddress, lineSourceFile,
+                                           lineNumber);
+                    }
+                }
+
+              if (lineSourceFile != NULL)
+                {
+                  dwarf_dealloc (dwHandle, lineSourceFile, DW_DLA_STRING);
+                }
+            }
+
+          /* release the line number info */
+          for (i = 0; i < nLineEntries; i++)
+            {
+              dwarf_dealloc (dwHandle, lineEntries[i], DW_DLA_LINE);
+            }
+          dwarf_dealloc (dwHandle, lineEntries, DW_DLA_LIST);
+        }
       else if (dwStatus != DW_DLV_ERROR)
-	{
-	  /*
-	   * no line information for the current DIE - 
-	   * not an error, just unfortunate
-	   */
-	}
+        {
+      /*
+       * no line information for the current DIE -
+       * not an error, just unfortunate
+       */
+        }
       else
-	{
-	  mpiPi_abort ("failed to obtain line info for the current DIE\n");
-	}
+        {
+          mpiPi_abort ("failed to obtain line info for the current DIE : %s\n", dwarf_errmsg(dw_err));
+        }
 
       /* discover function information for the current compilation unit */
       /* 
@@ -1000,58 +1023,60 @@ open_dwarf_executable (char *fileName)
        * a hierarchy.  However, we presume that the function entries are
        * all children of the compilation unit DIE.
        */
-      dwStatus = dwarf_tag (currCompileUnitDIE, &currDIETag, NULL);
+      dwStatus = dwarf_tag (currCompileUnitDIE, &currDIETag, &dw_err);
       assert ((dwStatus == DW_DLV_OK) && (currDIETag == DW_TAG_compile_unit));
 
       /* access the first child DIE of the compile unit DIE */
-      dwStatus = dwarf_child (currCompileUnitDIE, &currChildDIE, NULL);
+      dwStatus = dwarf_child (currCompileUnitDIE, &currChildDIE, &dw_err);
       if (dwStatus == DW_DLV_NO_ENTRY)
-	{
-	  mpiPi_abort ("no child DIEs of compile unit DIE\n");
-	}
+        {
+          // On some Cray systems, executables are linked with assembly compile units
+          // with no functions.
+          // mpiPi_abort ("no child DIEs of compile unit DIE\n");
+        }
       else if (dwStatus != DW_DLV_OK)
-	{
-	  mpiPi_abort
-	    ("failed to access first child DIE of compile unit DIE\n");
-	}
+        {
+          mpiPi_abort
+              ("failed to access first child DIE of compile unit DIE\n");
+        }
 
       while (dwStatus == DW_DLV_OK)
-	{
-	  /* determine the type of the child DIE */
-	  dwStatus = dwarf_tag (currChildDIE, &currDIETag, NULL);
-	  if (dwStatus == DW_DLV_OK)
-	    {
-	      if ((currDIETag == DW_TAG_subprogram) ||
-		  (currDIETag == DW_TAG_entry_point))
-		{
-		  HandleFunctionDIE (dwHandle, currChildDIE);
-		}
-	    }
-	  else
-	    {
-	      mpiPi_abort ("unable to determine tag of current child DIE\n");
-	    }
+        {
+          /* determine the type of the child DIE */
+          dwStatus = dwarf_tag (currChildDIE, &currDIETag, &dw_err);
+          if (dwStatus == DW_DLV_OK)
+            {
+              if ((currDIETag == DW_TAG_subprogram) ||
+                  (currDIETag == DW_TAG_entry_point))
+                {
+                  HandleFunctionDIE (dwHandle, currChildDIE);
+                }
+            }
+          else
+            {
+              mpiPi_abort ("unable to determine tag of current child DIE : %s \n", dwarf_errmsg(dw_err));
+            }
 
-	  /* advance to the next child DIE */
-	  oldChildDIE = currChildDIE;
-	  dwStatus = dwarf_siblingof (dwHandle,
-				      currChildDIE, &nextChildDIE, NULL);
-	  if (dwStatus == DW_DLV_OK)
-	    {
-	      currChildDIE = nextChildDIE;
-	      nextChildDIE = NULL;
-	    }
-	  else if (dwStatus != DW_DLV_NO_ENTRY)
-	    {
-	      mpiPi_abort
-		("unable to access next child DIE of current compilation unit\n");
-	    }
+          /* advance to the next child DIE */
+          oldChildDIE = currChildDIE;
+          dwStatus = dwarf_siblingof (dwHandle,
+                                      currChildDIE, &nextChildDIE, &dw_err);
+          if (dwStatus == DW_DLV_OK)
+            {
+              currChildDIE = nextChildDIE;
+              nextChildDIE = NULL;
+            }
+          else if (dwStatus != DW_DLV_NO_ENTRY)
+            {
+              mpiPi_abort
+                  ("unable to access next child DIE of current compilation unit : %s\n", dwarf_errmsg(dw_err));
+            }
 
-	  if (oldChildDIE != NULL)
-	    {
-	      dwarf_dealloc (dwHandle, oldChildDIE, NULL);
-	    }
-	}
+          if (oldChildDIE != NULL)
+            {
+              dwarf_dealloc (dwHandle, oldChildDIE, DW_DLA_DIE);
+            }
+        }
 
       /* release the current compilation unit DIE */
       dwarf_dealloc (dwHandle, currCompileUnitDIE, DW_DLA_DIE);
@@ -1078,20 +1103,16 @@ close_dwarf_executable (void)
 
   assert (dwHandle != NULL);
   assert (dwFd != -1);
-  dwStatus = dwarf_get_elf (dwHandle, &elfHandle, NULL);
-  if (dwStatus == DW_DLV_OK)
-    {
-      elf_end (elfHandle);
-    }
-  else
-    {
-      mpiPi_msg_debug ("dwarf_get_elf failed; ignoring\n");
-    }
-
-  dwStatus = dwarf_finish (dwHandle, NULL);
+  dwStatus = dwarf_get_elf (dwHandle, &elfHandle, &dw_err);
   if (dwStatus != DW_DLV_OK)
     {
-      mpiPi_msg_debug ("dwarf_finish failed; ignoring\n");
+      mpiPi_msg_debug ("dwarf_get_elf failed; ignoring : %s\n", dwarf_errmsg(dw_err));
+    }
+
+  dwStatus = dwarf_finish (dwHandle, &dw_err);
+  if (dwStatus != DW_DLV_OK)
+    {
+      mpiPi_msg_debug ("dwarf_finish failed; ignoring : %s\n", dwarf_errmsg(dw_err));
     }
   dwHandle = NULL;
 
@@ -1118,7 +1139,7 @@ mpiP_find_src_loc (void *i_addr_hex,
   assert (o_funct_str != NULL);
 
   *o_file_str = NULL;
-  *o_lineno = NULL;
+  *o_lineno = 0;
   *o_funct_str = NULL;
 
   /* determine if we have source line info for this address */
@@ -1130,17 +1151,17 @@ mpiP_find_src_loc (void *i_addr_hex,
       *o_lineno = addrToSrcMapping->lineNumber;
 
       if (mpiPi.baseNames == 0 && *o_file_str != NULL)
-	{
-	  char *h;
-	  h = strrchr (*o_file_str, '/');
-	  if (h != NULL)
-	    *o_file_str = h + 1;
-	}
+        {
+          char *h;
+          h = strrchr (*o_file_str, '/');
+          if (h != NULL)
+            *o_file_str = h + 1;
+        }
     }
   else
     {
       mpiPi_msg_warn ("unable to find source line info for address 0x%p\n",
-		      i_addr_hex);
+                      i_addr_hex);
       /*
        * the rest of the mpiP code seems to expect that the filename
        * will be set to "??" if we are unable to associate it with a file
@@ -1157,7 +1178,7 @@ mpiP_find_src_loc (void *i_addr_hex,
   else
     {
       mpiPi_msg_warn ("unable to find function info for address %s\n",
-		      mpiP_format_address (i_addr_hex, addr_buf));
+                      mpiP_format_address (i_addr_hex, addr_buf));
     }
 
   return (((addrToSrcMapping != NULL) || (functionInfo != NULL)) ? 0 : 1);
@@ -1179,7 +1200,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

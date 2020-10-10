@@ -1,6 +1,6 @@
 /*
   
-     mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+     mpiP MPI Profiler ( http://llnl.github.io/mpiP )
   
      Please see COPYRIGHT AND LICENSE information at the end of this file.
   
@@ -21,6 +21,7 @@ extern int h_insert (h_t * ht, void *ptr);
 extern void *h_search (h_t * ht, void *key, void **ptr);
 extern void *h_delete (h_t * ht, void *key, void **ptr);
 extern int h_gather_data (h_t * ht, int *ac, void ***ptr);
+extern int h_drain (h_t * ht, int *ac, void ***ptr);
 
 #else /* __STDC__ */
 
@@ -31,6 +32,7 @@ extern int h_insert ( /* h_t * ht, void *ptr */ );
 extern void *h_search ( /* h_t * ht, void *key, void **ptr */ );
 extern void *h_delete ( /* h_t * ht, void *key, void **ptr */ );
 extern int h_gather_data ( /* h_t * ht, int *ac, void ***ptr */ );
+extern int h_drain ( /* h_t * ht, int *ac, void ***ptr */ );
 
 #endif /* __STDC__ */
 #endif /* __CEXTRACT__ */
@@ -45,7 +47,7 @@ extern int h_gather_data ( /* h_t * ht, int *ac, void ***ptr */ );
   UCRL-CODE-223450. 
   All rights reserved. 
    
-  This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are

@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -139,82 +139,103 @@ find_address_in_section (abfd, section, data)
     local_pc &= 0x00000000FFFFFFFF;
   local_pc += mpiPi.text_start;
   mpiPi_msg_debug ("pc is %s, text_start is %s, local_pc is %s\n",
-		   mpiP_format_address ((void *) pc, addr_buf1),
-		   mpiP_format_address ((void *) mpiPi.text_start, addr_buf2),
-		   mpiP_format_address ((void *) local_pc, addr_buf3));
+                   mpiP_format_address ((void *) pc, addr_buf1),
+                   mpiP_format_address ((void *) mpiPi.text_start, addr_buf2),
+                   mpiP_format_address ((void *) local_pc, addr_buf3));
 #else
   local_pc = pc /*& (~0x10000000) */ ;
 #endif
 
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
   if ((bfd_get_section_flags (abfd, section) & SEC_ALLOC) == 0)
-    {
-      mpiPi_msg_debug ("failed bfd_get_section_flags\n");
-      return;
-    }
+  {
+    mpiPi_msg_debug ("failed bfd_get_section_flags\n");
+    return;
+  }
+#else
+  if ((bfd_section_flags (section) & SEC_ALLOC) == 0)
+  {
+    mpiPi_msg_debug ("failed bfd_section_flags\n");
+    return;
+  }
+#endif
+
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
   vma = bfd_get_section_vma (abfd, section);
+#else
+  vma = bfd_section_vma (section);
+#endif
 
   if (local_pc < vma)
-    {
-      if (mpiPi_debug == 1)
-	{
-	  sprintf_vma (addr_buf1, local_pc);
-	  sprintf_vma (addr_buf2, vma);
-	  mpiPi_msg_debug
-	    ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
-	     addr_buf1, addr_buf2);
-	}
-      return;
-    }
+  {
+    if (mpiPi_debug == 1)
+      {
+        sprintf_vma (addr_buf1, local_pc);
+        sprintf_vma (addr_buf2, vma);
+#if defined(HAVE_BFD_GET_SECTION_MACROS)
+        mpiPi_msg_debug
+            ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
+             addr_buf1, addr_buf2);
+#else
+        mpiPi_msg_debug
+           ("failed bfd_section_vma: local_pc=%s  vma=%s\n",
+            addr_buf1, addr_buf2);
+#endif
+      }
+    return;
+  }
 
 /* The following define addresses binutils modifications between
  * version 2.15 and 2.15.96
- */
-#ifdef HAVE_BFD_GET_SECTION_SIZE
+*/
+#if defined(HAVE_BFD_GET_SECTION_SIZE)
   size = bfd_get_section_size (section);
-#else
+#elif defined(HAVE_BFD_GET_SECTION_MACROS)
   if (section->reloc_done)
     size = bfd_get_section_size_after_reloc (section);
   else
     size = bfd_get_section_size_before_reloc (section);
+#else
+  size = bfd_section_size(section);
 #endif
 
   if (local_pc >= vma + size)
-    {
-      if (mpiPi_debug == 1)
-	{
-	  sprintf_vma (addr_buf1, local_pc);
-	  sprintf_vma (addr_buf2, vma);
-	  sprintf_vma (addr_buf3, (vma + size));
-	  mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
-			   addr_buf1, addr_buf2, addr_buf3);
-	}
-      return;
-    }
+  {
+    if (mpiPi_debug == 1)
+      {
+        sprintf_vma (addr_buf1, local_pc);
+        sprintf_vma (addr_buf2, vma);
+        sprintf_vma (addr_buf3, (vma + size));
+        mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
+                         addr_buf1, addr_buf2, addr_buf3);
+      }
+    return;
+  }
 
 
   found = bfd_find_nearest_line (abfd, section, syms, local_pc - vma,
-				 &filename, &functionname, &line);
+                                 &filename, &functionname, &line);
 
   if (!found && mpiPi_debug == 1)
-    {
-      sprintf_vma (addr_buf1, local_pc);
-      sprintf_vma (addr_buf2, vma);
-      sprintf_vma (addr_buf3, (vma + size));
-      mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
-		       addr_buf1, addr_buf2, addr_buf3);
-    }
+  {
+    sprintf_vma (addr_buf1, local_pc);
+    sprintf_vma (addr_buf2, vma);
+    sprintf_vma (addr_buf3, (vma + size));
+    mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
+                     addr_buf1, addr_buf2, addr_buf3);
+  }
 
   if (mpiPi_debug == 1)
-    {
-      sprintf_vma (addr_buf1, local_pc);
-      sprintf_vma (addr_buf2, vma);
-      sprintf_vma (addr_buf3, (vma + size));
-      mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
-		       addr_buf1, addr_buf2, addr_buf3);
+  {
+    sprintf_vma (addr_buf1, local_pc);
+    sprintf_vma (addr_buf2, vma);
+    sprintf_vma (addr_buf3, (vma + size));
+    mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
+                     addr_buf1, addr_buf2, addr_buf3);
 
-      mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
-		       filename, functionname, line);
-    }
+    mpiPi_msg_debug ("                 returned : %s:%s:%u\n",
+                     filename, functionname, line);
+  }
 }
 
 
@@ -323,13 +344,13 @@ mpiPi_parse_maps ()
     {
       /* sanity check input buffer */
       if (inbuf == NULL)
-	return 0;
+        return 0;
 
       mpiPi_msg_debug ("maps getline is %s\n", inbuf);
 
       /* scan address range */
       if (sscanf (inbuf, scan_str, &lvma, &uvma) < 2)
-	return 0;
+        return 0;
 
       mpiPi_msg_debug ("Parsed range as %lx - %lx\n", lvma, uvma);
 
@@ -341,7 +362,7 @@ mpiPi_parse_maps ()
 
       /* Check for text segment */
       if (tokptr == NULL || tokptr[0] != 'r' || tokptr[2] != 'x')
-	continue;
+        continue;
 
       /* get pointer to offset */
       tokptr = strtok_r (NULL, delim, &sp);
@@ -357,20 +378,20 @@ mpiPi_parse_maps ()
 
       /* Process file info */
       if (fpath == NULL || fpath[0] != '/')
-	continue;
+        continue;
       mpiPi_msg_debug ("maps fpath is %s\n", fpath);
 
       /* copy info into structure */
       cso = (so_info_t *) malloc (sizeof (so_info_t));
       if (cso == NULL)
-	return 0;
+        return 0;
       cso->lvma = lvma;
       cso->uvma = uvma;
       cso->fpath = strdup (fpath);
       cso->bfd = NULL;
       if (tsearch (cso, (void **) &(mpiPi.so_info), mpiPi_so_info_compare) !=
-	  NULL)
-	mpiPi.so_count++;
+          NULL)
+        mpiPi.so_count++;
     }
 
   fclose (fh);
@@ -387,7 +408,7 @@ mpiPi_parse_maps ()
 
 int
 mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
-		   char **o_funct_str)
+                   char **o_funct_str)
 {
   char buf[128];
   char addr_buf[24];
@@ -395,7 +416,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   if (i_addr_hex == NULL)
     {
       mpiPi_msg_debug
-	("mpiP_find_src_loc returning failure as i_addr_hex == NULL\n");
+          ("mpiP_find_src_loc returning failure as i_addr_hex == NULL\n");
       return 1;
     }
 
@@ -405,7 +426,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
   if (abfd == NULL)
     {
       mpiPi_msg_debug
-	("mpiP_find_src_loc returning failure as abfd == NULL\n");
+          ("mpiP_find_src_loc returning failure as abfd == NULL\n");
       return 1;
     }
 
@@ -422,42 +443,42 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       so_info_t cso, *fso, **pfso;
 
       if (mpiPi.so_info == NULL)
-	if (mpiPi_parse_maps () == 0)
-	  {
-	    mpiPi_msg_debug ("Failed to parse SO maps.\n");
-	    return 1;
-	  }
+        if (mpiPi_parse_maps () == 0)
+          {
+            mpiPi_msg_debug ("Failed to parse SO maps.\n");
+            return 1;
+          }
 
       cso.lvma = (void *) i_addr_hex;
 
       mpiPi_msg_debug
-	("At SO tfind, &cso is %p, &so_info is %p, &mpiPi_so_info_compare is %p\n",
-	 &cso, &(mpiPi.so_info), mpiPi_so_info_compare);
+          ("At SO tfind, &cso is %p, &so_info is %p, &mpiPi_so_info_compare is %p\n",
+           &cso, &(mpiPi.so_info), mpiPi_so_info_compare);
       pfso =
-	(so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
-			      mpiPi_so_info_compare);
+          (so_info_t **) tfind ((void *) &cso, (void **) &(mpiPi.so_info),
+                                mpiPi_so_info_compare);
       mpiPi_msg_debug ("After SO tfind\n");
 
       if (pfso != NULL)
-	{
-	  fso = *pfso;
-	  if (fso->bfd == NULL)
-	    {
-	      mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
-	      fso->bfd = (bfd *) open_bfd_object (fso->fpath);
-	    }
+        {
+          fso = *pfso;
+          if (fso->bfd == NULL)
+            {
+              mpiPi_msg_debug ("opening SO filename %s\n", fso->fpath);
+              fso->bfd = (bfd *) open_bfd_object (fso->fpath);
+            }
 
-	  pc = (char *) i_addr_hex - (char *) fso->lvma;
-	  mpiPi_msg_debug
-	    ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
+          pc = (char *) i_addr_hex - (char *) fso->lvma;
+          mpiPi_msg_debug
+              ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
 
-	  found = FALSE;
+          found = FALSE;
 
-	  mpiPi_msg_debug ("fso->bfd->sections is %p\n",
-			   ((bfd *) (fso->bfd))->sections);
-	  bfd_map_over_sections (fso->bfd, find_address_in_section,
-				 (PTR) NULL);
-	}
+          mpiPi_msg_debug ("fso->bfd->sections is %p\n",
+                           ((bfd *) (fso->bfd))->sections);
+          bfd_map_over_sections (fso->bfd, find_address_in_section,
+                                 (PTR) NULL);
+        }
 
     }
 #endif /* #ifdef SO_LOOKUP */
@@ -475,22 +496,22 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       char *res = NULL;
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-      res = mpiPdemangle (functionname);
+	  res = mpiPdemangle (functionname);
 #endif
-      if (res == NULL)
-	{
-	  *o_funct_str = strdup (functionname);
-	}
-      else
-	{
-	  *o_funct_str = res;
-	}
+	  if (res == NULL)
+		{
+		  *o_funct_str = strdup (functionname);
+		}
+	  else
+		{
+		  *o_funct_str = res;
+		}
 
 #if defined(DEMANGLE_IBM) || defined(DEMANGLE_Compaq) || defined(DEMANGLE_GNU)
-      mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
-		       *o_funct_str);
+	  mpiPi_msg_debug ("attempted demangle %s->%s\n", functionname,
+	                   *o_funct_str);
 #endif
-    }
+	}
 
   /* set the filename and line no */
   if (mpiPi.baseNames == 0 && filename != NULL)
@@ -498,14 +519,14 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
       char *h;
       h = strrchr (filename, '/');
       if (h != NULL)
-	filename = h + 1;
+        filename = h + 1;
     }
 
   *o_lineno = line;
   *o_file_str = strdup (filename ? filename : "[unknown]");
 
   mpiPi_msg_debug ("BFD: %s -> %s:%u:%s\n", buf, *o_file_str, *o_lineno,
-		   *o_funct_str);
+                   *o_funct_str);
 
   return 0;
 }
@@ -526,7 +547,7 @@ open_bfd_object (char *filename)
     {
       mpiPi_msg_warn ("BFD Object filename is NULL!\n");
       mpiPi_msg_warn
-	("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
+          ("If this is a Fortran application, you may be using the incorrect mpiP library.\n");
       return NULL;
     }
 
@@ -563,11 +584,11 @@ open_bfd_object (char *filename)
     {
       char *curr_match;
       if (matching != NULL)
-	{
-	  for (curr_match = matching[0]; curr_match != NULL; curr_match++)
-	    mpiPi_msg_debug ("found matching type %s\n", curr_match);
-	  free (matching);
-	}
+        {
+          for (curr_match = matching[0]; curr_match != NULL; curr_match++)
+            mpiPi_msg_debug ("found matching type %s\n", curr_match);
+          free (matching);
+        }
       mpiPi_msg_warn ("BFD format matching failed");
       bfd_close (new_bfd);
       return NULL;
@@ -593,8 +614,8 @@ open_bfd_object (char *filename)
   symcount = bfd_read_minisymbols (new_bfd, FALSE, (void *) &syms, &size);
   if (symcount == 0)
     symcount =
-      bfd_read_minisymbols (new_bfd, TRUE /* dynamic */ , (void *) &syms,
-			    &size);
+        bfd_read_minisymbols (new_bfd, TRUE /* dynamic */ , (void *) &syms,
+                              &size);
 
   if (symcount < 0)
     {
@@ -689,15 +710,15 @@ mpiPi_get_text_start (char *filename)
       mpiPi_msg_debug ("text start is 0x%0x\n", AoutHeader32.o_text_start);
 
       while (count++ < FileHeader32.f_nscns)
-	{
-	  read (fh, &SectHeader32, sizeof (SCNHDR));
-	  mpiPi_msg_debug ("found header name %s\n", SectHeader32.s_name);
-	  mpiPi_msg_debug ("found header raw ptr 0x%0x\n",
-			   SectHeader32.s_scnptr);
+        {
+          read (fh, &SectHeader32, sizeof (SCNHDR));
+          mpiPi_msg_debug ("found header name %s\n", SectHeader32.s_name);
+          mpiPi_msg_debug ("found header raw ptr 0x%0x\n",
+                           SectHeader32.s_scnptr);
 
-	  if (SectHeader32.s_flags & STYP_TEXT)
-	    text_start = AoutHeader32.o_text_start - SectHeader32.s_scnptr;
-	}
+          if (SectHeader32.s_flags & STYP_TEXT)
+            text_start = AoutHeader32.o_text_start - SectHeader32.s_scnptr;
+        }
     }
   else if (magic == 0x01EF || magic == 0x01F7)	/*  64-bit  */
     {
@@ -708,15 +729,15 @@ mpiPi_get_text_start (char *filename)
       mpiPi_msg_debug ("text start is 0x%0llx\n", AoutHeader64.o_text_start);
 
       while (count++ < FileHeader64.f_nscns)
-	{
-	  read (fh, &SectHeader64, sizeof (SCNHDR_64));
-	  mpiPi_msg_debug ("found header name %s\n", SectHeader64.s_name);
-	  mpiPi_msg_debug ("found header raw ptr 0x%0llx\n",
-			   SectHeader64.s_scnptr);
+        {
+          read (fh, &SectHeader64, sizeof (SCNHDR_64));
+          mpiPi_msg_debug ("found header name %s\n", SectHeader64.s_name);
+          mpiPi_msg_debug ("found header raw ptr 0x%0llx\n",
+                           SectHeader64.s_scnptr);
 
-	  if (SectHeader64.s_flags & STYP_TEXT)
-	    text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
-	}
+          if (SectHeader64.s_flags & STYP_TEXT)
+            text_start = AoutHeader64.o_text_start - SectHeader64.s_scnptr;
+        }
     }
   else
     {
@@ -744,7 +765,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

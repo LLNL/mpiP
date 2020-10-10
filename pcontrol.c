@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -24,31 +24,20 @@ static char *svnid = "$Id$";
 void
 mpiPi_reset_callsite_data ()
 {
-  int ac, ndx;
-  callsite_stats_t **av;
-  callsite_stats_t *csp = NULL;
+  mpiPi_stats_mt_cs_reset(&mpiPi.task_stats);
+  /* Drop the content of the src ID cache so the old callsites won't appear in
+   * the callsites unless they are invoked again
+   */
+  if (NULL != callsite_src_id_cache) {
+      int ac, ndx;
+      callsite_stats_t **av;
 
-  /* gather local task data */
-  h_gather_data (mpiPi.task_callsite_stats, &ac, (void ***) &av);
-
-  for (ndx = 0; ndx < ac; ndx++)
-    {
-      csp = av[ndx];
-
-      csp->maxDur = 0;
-      csp->minDur = DBL_MAX;
-      csp->maxIO = 0;
-      csp->minIO = DBL_MAX;
-      csp->maxDataSent = 0;
-      csp->minDataSent = DBL_MAX;
-
-      csp->count = 0;
-      csp->cumulativeTime = 0;
-      csp->cumulativeTimeSquared = 0;
-      csp->cumulativeDataSent = 0;
-      csp->cumulativeIO = 0;
-
-      csp->arbitraryMessageCount = 0;
+      h_drain(callsite_src_id_cache, &ac, (void ***)&av);
+      for (ndx = 0; ndx < ac; ndx++)
+        {
+          free(av[ndx]);
+        }
+      free(av);
     }
 
   if (time (&mpiPi.start_timeofday) == (time_t) - 1)
@@ -56,7 +45,7 @@ mpiPi_reset_callsite_data ()
       mpiPi_msg_warn ("Could not get time of day from time()\n");
     }
 
-  mpiPi_GETTIME (&mpiPi.startTime);
+  mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
   mpiPi.cumulativeTime = 0;
 
   mpiPi.global_app_time = 0;
@@ -67,8 +56,6 @@ mpiPi_reset_callsite_data ()
   mpiPi.global_mpi_msize_threshold_count = 0;
   mpiPi.global_mpi_sent_count = 0;
   mpiPi.global_time_callsite_count = 0;
-
-  free (av);
 }
 
 
@@ -81,14 +68,10 @@ mpiPi_MPI_Pcontrol (const int flag)
   if (flag == 0)
     {
       if (!mpiPi.enabled)
-	mpiPi_msg_warn
-	  ("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
+        mpiPi_msg_warn
+            ("MPI_Pcontrol trying to disable MPIP while it is already disabled.\n");
 
-      mpiPi_GETTIME (&mpiPi.endTime);
-      dur =
-	(mpiPi_GETTIMEDIFF (&mpiPi.endTime, &mpiPi.startTime) / 1000000.0);
-      mpiPi.cumulativeTime += dur;
-      assert (mpiPi.cumulativeTime >= 0);
+      mpiPi_stats_mt_timer_stop(&mpiPi.task_stats);
       mpiPi.enabled = 0;
     }
   else if (flag == 2)
@@ -98,22 +81,22 @@ mpiPi_MPI_Pcontrol (const int flag)
   else if (flag == 3)
     {
       mpiPi_generateReport (mpiPi_style_verbose);
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
   else if (flag == 4)
     {
       mpiPi_generateReport (mpiPi_style_concise);
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
   else
     {
       if (mpiPi.enabled)
-	mpiPi_msg_warn
-	  ("MPI_Pcontrol trying to enable MPIP while it is already enabled.\n");
+        mpiPi_msg_warn
+            ("MPI_Pcontrol trying to enable MPIP while it is already enabled.\n");
 
       mpiPi.enabled = 1;
       mpiPi.enabledCount++;
-      mpiPi_GETTIME (&mpiPi.startTime);
+      mpiPi_stats_mt_timer_start(&mpiPi.task_stats);
     }
 
   return MPI_SUCCESS;
@@ -143,7 +126,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

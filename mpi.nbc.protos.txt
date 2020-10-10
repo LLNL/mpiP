@@ -1,0 +1,35 @@
+@@@  MPI Non-blocking collective functions
+
+int MPI_Iallgather ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm, MPI_Request *request ) 
+
+int MPI_Iallgatherv ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, mpip_const_int_t recvcounts[], mpip_const_int_t displs[], MPI_Datatype recvtype, MPI_Comm comm, MPI_Request* request )
+
+int MPI_Iallreduce ( const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Ialltoall ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Ialltoallv ( const void* sendbuf, mpip_const_int_t sendcounts[], mpip_const_int_t sdispls[], MPI_Datatype sendtype, void* recvbuf, mpip_const_int_t recvcounts[], mpip_const_int_t rdispls[], MPI_Datatype recvtype, MPI_Comm comm, MPI_Request *request )
+
+int MPI_Ialltoallw ( const void* sendbuf, mpip_const_int_t sendcounts[], mpip_const_int_t sdispls[], mpip_const_datatype_t sendtypes[], void* recvbuf, mpip_const_int_t recvcounts[], mpip_const_int_t rdispls[], mpip_const_datatype_t recvtypes[], MPI_Comm comm, MPI_Request *request )
+
+int MPI_Ibarrier ( MPI_Comm comm, MPI_Request *request )
+
+int MPI_Ibcast ( void* buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm, MPI_Request *request ) 
+
+int MPI_Iexscan ( const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Igather ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm, MPI_Request *request) 
+
+int MPI_Igatherv ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, mpip_const_int_t recvcounts[], mpip_const_int_t displs[], MPI_Datatype recvtype, int root, MPI_Comm comm, MPI_Request *request )
+
+int MPI_Ireduce ( const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Ireduce_scatter_block ( const void* sendbuf, void* recvbuf, int recvcount, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Ireduce_scatter ( const void* sendbuf, void* recvbuf, mpip_const_int_t recvcounts[], MPI_Datatype datatype, MPI_Op op, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Iscan ( const void* sendbuf, void* recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Iscatter ( const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm, MPI_Request *request )  
+
+int MPI_Iscatterv ( const void* sendbuf, mpip_const_int_t sendcounts[], mpip_const_int_t displs[], MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm, MPI_Request *request )

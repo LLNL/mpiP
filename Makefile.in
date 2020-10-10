@@ -35,6 +35,10 @@ PC_LOOKUP_OBJ = $(PC_LOOKUP_FILE:.c=.o)
 
 SRCS =	diag_msgs.c \
 	mpiP-hash.c \
+	mpiP-callsites.c \
+	mpiP-stats.c \
+	mpiP-mt-stats.c \
+	mpiP-tslist.c \
 	glob.c \
 	wrappers.c \
 	wrappers_special.c \
@@ -49,6 +53,9 @@ SRCS =	diag_msgs.c \
 
 API_SRCS =	diag_msgs_api.c \
 	mpiP-hash.c \
+	mpiP-callsites.c \
+	mpiP-stats.c \
+	mpiP-mt-stats.c \
 	glob.c \
 	mpiPi.c \
 	util.c \
@@ -142,7 +149,7 @@ install::
 clean::
 	rm -f ${SHARED_C_TARGET}
 
-${SHARED_C_TARGET}: CFLAGS += -fpic -DPIC
+${SHARED_C_TARGET}: CFLAGS += @PIC_FLAGS@
 ${SHARED_C_TARGET}: cleanobjs ${OBJS}
 	${CC} -shared -o $@ ${OBJS} ${LDFLAGS} ${LIBS}
 
@@ -231,6 +238,10 @@ ifeq ($(USE_SETJMP), yes)
   MAKE_WRAPPERS_ARGS += --usesetjmp
 endif
 
+#  Since mpiP needs to build wrappers and other files before building,
+#  parallel builds tend to fail.
+.NOTPARALLEL:
+
 wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
@@ -294,7 +305,7 @@ lint: ${SRCS}
 
 distclean: clean
 	make -C testing clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt mpiPi.h get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
 
 include Check.mak
 

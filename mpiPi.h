@@ -1,6 +1,6 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -38,14 +38,16 @@
 #endif
 
 #include "mpiP-hash.h"
+#include "mpiP-callsites.h"
+#include "mpiP-mt-stats.h"
 
 #include "mpip_timers.h"
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
-#define MPIPI_COPIED_ARGS_MAX @MAX_COPIED_ARGS@
-#define MPIP_CALLSITE_STACK_DEPTH_MAX @STACKDEPTH@
 
-#define MPIP_HELP_LIST "@PACKAGE_BUGREPORT@"
+#define MPIPI_COPIED_ARGS_MAX @MAX_COPIED_ARGS@
+
+#define MPIP_HELP_LIST PACKAGE_BUGREPORT
 
 #define MPIP_CALLSITE_STACK_DEPTH (mpiPi.stackDepth)
 #define MPIP_CALLSITE_STATS_COOKIE 518641
@@ -55,6 +57,7 @@
 typedef const void mpip_const_void_t;
 typedef const int mpip_const_int_t;
 typedef const char mpip_const_char_t;
+typedef const MPI_Datatype mpip_const_datatype_t;
 #else
 typedef void mpip_const_void_t;
 typedef int mpip_const_int_t;
@@ -62,36 +65,6 @@ typedef char mpip_const_char_t;
 #endif
 
 typedef char mpiPi_hostname_t[MPIPI_HOSTNAME_LEN_MAX];
-
-typedef struct _callsite_stats
-{
-  unsigned op;
-  unsigned rank;
-  int csid;
-  long long count;
-  double cumulativeTime;
-  double cumulativeTimeSquared;
-  double maxDur;
-  double minDur;
-  double maxDataSent;
-  double minDataSent;
-  double maxIO;
-  double minIO;
-  double maxRMA;
-  double minRMA;
-  double cumulativeDataSent;
-  double cumulativeIO;
-  double cumulativeRMA;
-  long long arbitraryMessageCount;
-  double *siteData;
-  int siteDataIdx;
-  void *pc[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  char *filename[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  char *functname[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  int lineno[MPIP_CALLSITE_STACK_DEPTH_MAX];
-  long cookie;
-}
-callsite_stats_t;
 
 typedef struct callsite_src_id_cache_entry_t
 {
@@ -150,14 +123,6 @@ typedef struct SO_INFO
 } so_info_t;
 #endif
 
-typedef struct _mpiPi_histogram
-{
-  int first_bin_max;
-  int hist_size;
-  int *bin_intervals;
-} mpiPi_histogram_t;
-
-
 typedef struct _mpiPi_t
 {
   int ac;
@@ -180,8 +145,6 @@ typedef struct _mpiPi_t
   char *envStr;
   FILE *stdout_;
   FILE *stderr_;
-  mpiPi_TIME startTime;
-  mpiPi_TIME endTime;
 
   double cumulativeTime;	/* necessary for pcontrol */
   time_t start_timeofday;
@@ -205,11 +168,11 @@ typedef struct _mpiPi_t
   long long global_time_callsite_count;
 
   int tableSize;
-  h_t *task_callsite_stats;
-  callsite_stats_t *rawCallsiteData;
   h_t *global_callsite_stats;
   h_t *global_callsite_stats_agg;
   h_t *global_MPI_stats_agg;
+
+  mpiPi_mt_stat_t task_stats;
 
   mpiPi_lookup_t *lookup;
 
@@ -235,15 +198,9 @@ typedef struct _mpiPi_t
   int disable_finalize_report;
 
   int do_collective_stats_report;
-  mpiPi_histogram_t coll_comm_histogram;
-  mpiPi_histogram_t coll_size_histogram;
-  double coll_time_stats[(mpiPi_DEF_END - mpiPi_BASE)][32][32];
-
+  double coll_time_stats[MPIP_NFUNC][MPIP_COMM_HISTCNT][MPIP_SIZE_HISTCNT];
   int do_pt2pt_stats_report;
-  mpiPi_histogram_t pt2pt_comm_histogram;
-  mpiPi_histogram_t pt2pt_size_histogram;
-  double pt2pt_send_stats[(mpiPi_DEF_END - mpiPi_BASE)][32][32];
-
+  double pt2pt_send_stats[MPIP_NFUNC][MPIP_COMM_HISTCNT][MPIP_SIZE_HISTCNT];
 }
 mpiPi_t;
 
@@ -317,7 +274,8 @@ extern void *saved_ret_addr;
 
 /*  undefined  */
 #else
-#if ! defined(HAVE_LIBUNWIND)
+#if ! (defined(HAVE_LIBUNWIND) || defined(USE_BACKTRACE))
+
 #warning "No stack trace mechanism defined for this platform."
 #endif
 #define ParentFP(jb) (0)
@@ -381,7 +339,7 @@ extern void *saved_ret_addr;
   UCRL-CODE-223450. 
   All rights reserved. 
    
-  This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+  This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are

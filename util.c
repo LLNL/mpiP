@@ -1,10 +1,10 @@
 /* -*- C -*- 
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
-   ----- 
+   -----
 
    util.c -- misc util functions
 
@@ -51,7 +51,7 @@ GetBaseAppName (char *rawName)
 
 void
 mpiPi_getenv ()
-{				/* NEED TO ADD SANITY CHECKS HERE */
+{  /* NEED TO ADD SANITY CHECKS HERE */
   char *cp = NULL;
   char *ep = NULL;
 
@@ -69,213 +69,213 @@ mpiPi_getenv ()
       char *sep = " \t,";
 
       if (mpiPi.rank == 0)
-	mpiPi_msg ("Found MPIP environment variable [%s]\n", ep);
+        mpiPi_msg ("Found MPIP environment variable [%s]\n", ep);
       av[0] = "JUNK";
       for (cp = strtok (ep, sep), ac = 1; (ac < 64) && (NULL != cp); ac++)
-	{
-	  av[ac] = cp;
-	  /*mpiPi_msg("av[%d] = %s\n", ac, av[ac]); */
-	  cp = strtok (NULL, sep);
-	}
+        {
+          av[ac] = cp;
+          /*mpiPi_msg("av[%d] = %s\n", ac, av[ac]); */
+          cp = strtok (NULL, sep);
+        }
 
       av[ac] = NULL;
 
       for (; ((c = getopt (ac, av, "cdef:gk:lm:noprs:t:vx:yz")) != EOF);)
-	{
-	  switch (c)
-	    {
-	    case 'f':
-	      mpiPi.outputDir = optarg;
-	      if (mpiPi.rank == 0)
-		mpiPi_msg ("Set the output directory to [%s].\n",
-			   mpiPi.outputDir);
-	      break;
+        {
+          switch (c)
+            {
+            case 'f':
+              mpiPi.outputDir = optarg;
+              if (mpiPi.rank == 0)
+                mpiPi_msg ("Set the output directory to [%s].\n",
+                           mpiPi.outputDir);
+              break;
 
-	    case 'g':
-	      mpiPi_debug = 1;
-	      if (mpiPi.rank == 0)
-		mpiPi_msg ("Enabled mpiPi debug mode.\n");
-	      break;
+            case 'g':
+              mpiPi_debug = 1;
+              if (mpiPi.rank == 0)
+                mpiPi_msg ("Enabled mpiPi debug mode.\n");
+              break;
 
-	    case 's':
-	      {
-		int defaultSize = mpiPi.tableSize;
-		mpiPi.tableSize = atoi (optarg);
-		if (mpiPi.tableSize < 2)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("-s tablesize invalid %d. Using default.\n",
-			 mpiPi.tableSize);
-		    mpiPi.tableSize = defaultSize;
-		  }
-		if (mpiPi.tableSize < 128)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("tablesize small %d. Consider making it larger w/ -s.\n",
-			 mpiPi.tableSize);
-		  }
-		if (mpiPi.rank == 0)
-		  mpiPi_msg
-		    ("Set the callsite table size to [%d].\n",
-		     mpiPi.tableSize);
-	      }
-	      break;
+            case 's':
+              {
+                int defaultSize = mpiPi.tableSize;
+                mpiPi.tableSize = atoi (optarg);
+                if (mpiPi.tableSize < 2)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("-s tablesize invalid %d. Using default.\n",
+                           mpiPi.tableSize);
+                    mpiPi.tableSize = defaultSize;
+                  }
+                if (mpiPi.tableSize < 128)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("tablesize small %d. Consider making it larger w/ -s.\n",
+                           mpiPi.tableSize);
+                  }
+                if (mpiPi.rank == 0)
+                  mpiPi_msg
+                      ("Set the callsite table size to [%d].\n",
+                       mpiPi.tableSize);
+              }
+              break;
 
-	    case 'k':
-	      {
-		mpiPi.stackDepth = atoi (optarg);
-		if (mpiPi.stackDepth < 0)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("-k stackdepth invalid %d. Using 0.\n",
-			 mpiPi.stackDepth);
-		    mpiPi.stackDepth = 0;
-		    mpiPi.print_callsite_detail = 0;
-		  }
-		if (mpiPi.stackDepth > MPIP_CALLSITE_STACK_DEPTH_MAX)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("stackdepth of %d too large. Using %d.\n",
-			 mpiPi.stackDepth, MPIP_CALLSITE_STACK_DEPTH_MAX);
-		    mpiPi.stackDepth = MPIP_CALLSITE_STACK_DEPTH_MAX;
-		  }
-		else if (mpiPi.stackDepth > 4)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("stackdepth of %d is large. Consider making it smaller.\n",
-			 mpiPi.stackDepth);
-		  }
+            case 'k':
+              {
+                mpiPi.stackDepth = atoi (optarg);
+                if (mpiPi.stackDepth < 0)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("-k stackdepth invalid %d. Using 0.\n",
+                           mpiPi.stackDepth);
+                    mpiPi.stackDepth = 0;
+                    mpiPi.print_callsite_detail = 0;
+                  }
+                if (mpiPi.stackDepth > MPIP_CALLSITE_STACK_DEPTH_MAX)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("stackdepth of %d too large. Using %d.\n",
+                           mpiPi.stackDepth, MPIP_CALLSITE_STACK_DEPTH_MAX);
+                    mpiPi.stackDepth = MPIP_CALLSITE_STACK_DEPTH_MAX;
+                  }
+                else if (mpiPi.stackDepth > 4)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("stackdepth of %d is large. Consider making it smaller.\n",
+                           mpiPi.stackDepth);
+                  }
 
-		//  If the stack depth is 0, we are accumulating data
-		//  for each MPI op (i.e. potentially multiple callsites),
-		//  resulting in data that would not be useful for calculating COV.
-		if (mpiPi.stackDepth == 0)
-		  mpiPi.calcCOV = 0;
+                //  If the stack depth is 0, we are accumulating data
+                //  for each MPI op (i.e. potentially multiple callsites),
+                //  resulting in data that would not be useful for calculating COV.
+                if (mpiPi.stackDepth == 0)
+                  mpiPi.calcCOV = 0;
 
-		if (mpiPi.rank == 0)
-		  mpiPi_msg
-		    ("Set the callsite stack traceback depth to [%d].\n",
-		     mpiPi.stackDepth);
-	      }
-	      break;
+                if (mpiPi.rank == 0)
+                  mpiPi_msg
+                      ("Set the callsite stack traceback depth to [%d].\n",
+                       mpiPi.stackDepth);
+              }
+              break;
 
-	    case 't':
-	      {
-		int defaultThreshold = mpiPi.reportPrintThreshold;
-		mpiPi.reportPrintThreshold = atof (optarg);
-		if (mpiPi.reportPrintThreshold < 0)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("-t report print threshold invalid %g. Using default.\n",
-			 mpiPi.reportPrintThreshold);
-		    mpiPi.reportPrintThreshold = defaultThreshold;
-		  }
-		if (mpiPi.reportPrintThreshold >= 100)
-		  {
-		    if (mpiPi.rank == 0)
-		      mpiPi_msg_warn
-			("report print threshold large %g. Making it default.\n",
-			 mpiPi.reportPrintThreshold);
-		    mpiPi.reportPrintThreshold = defaultThreshold;
-		  }
-		if (mpiPi.rank == 0)
-		  mpiPi_msg
-		    ("Set the report print threshold to [%3.2lf%%].\n",
-		     mpiPi.reportPrintThreshold);
-	      }
-	      break;
+            case 't':
+              {
+                int defaultThreshold = mpiPi.reportPrintThreshold;
+                mpiPi.reportPrintThreshold = atof (optarg);
+                if (mpiPi.reportPrintThreshold < 0)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("-t report print threshold invalid %g. Using default.\n",
+                           mpiPi.reportPrintThreshold);
+                    mpiPi.reportPrintThreshold = defaultThreshold;
+                  }
+                if (mpiPi.reportPrintThreshold >= 100)
+                  {
+                    if (mpiPi.rank == 0)
+                      mpiPi_msg_warn
+                          ("report print threshold large %g. Making it default.\n",
+                           mpiPi.reportPrintThreshold);
+                    mpiPi.reportPrintThreshold = defaultThreshold;
+                  }
+                if (mpiPi.rank == 0)
+                  mpiPi_msg
+                      ("Set the report print threshold to [%3.2lf%%].\n",
+                       mpiPi.reportPrintThreshold);
+              }
+              break;
 
-	    case 'o':
-	      {
-		if (mpiPi.rank == 0)
-		  mpiPi_msg_warn
-		    ("Disabling MPIP at Init. Code must use Pcontrol to enable.\n");
-		mpiPi.enabled = 0;
-		mpiPi.enabledCount = 0;
-	      }
-	      break;
+            case 'o':
+              {
+                if (mpiPi.rank == 0)
+                  mpiPi_msg_warn
+                      ("Disabling MPIP at Init. Code must use Pcontrol to enable.\n");
+                mpiPi.enabled = 0;
+                mpiPi.enabledCount = 0;
+              }
+              break;
 
-	    case 'n':
-	      mpiPi.baseNames = 1;
-	      break;
+            case 'n':
+              mpiPi.baseNames = 1;
+              break;
 
-	    case 'e':
-	      mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
-	      break;
+            case 'e':
+              mpiPi.reportFormat = MPIP_REPORT_FLT_FORMAT;
+              break;
 
-	    case 'c':
-	      mpiPi.report_style = mpiPi_style_concise;
-	      break;
+            case 'c':
+              mpiPi.report_style = mpiPi_style_concise;
+              break;
 
-	    case 'v':
-	      mpiPi.report_style = mpiPi_style_both;
-	      break;
+            case 'v':
+              mpiPi.report_style = mpiPi_style_both;
+              break;
 
-	    case 'm':
-	      mpiPi.messageCountThreshold = atoi (optarg);
-	      mpiPi_msg_debug ("Set messageCountThreshold to %d\n",
-			       mpiPi.messageCountThreshold);
-	      break;
-	    case 'x':
-	      if (optarg != NULL)
-		{
-		  mpiPi.appFullName = strdup (optarg);
-		  mpiPi.av[0] = strdup (optarg);
-		  mpiPi.appName = strdup (GetBaseAppName (mpiPi.appFullName));
-		  mpiPi_msg_debug ("Set mpiPi.appFullName to %s\n",
-				   mpiPi.appFullName);
-		}
-	      break;
-	    case 'd':
-	      /*  Suppress/Activate printing of call site detail based on default.  */
-	      mpiPi.print_callsite_detail ^= 1;
-	      break;
+            case 'm':
+              mpiPi.messageCountThreshold = atoi (optarg);
+              mpiPi_msg_debug ("Set messageCountThreshold to %d\n",
+                               mpiPi.messageCountThreshold);
+              break;
+            case 'x':
+              if (optarg != NULL)
+                {
+                  mpiPi.appFullName = strdup (optarg);
+                  mpiPi.av[0] = strdup (optarg);
+                  mpiPi.appName = strdup (GetBaseAppName (mpiPi.appFullName));
+                  mpiPi_msg_debug ("Set mpiPi.appFullName to %s\n",
+                                   mpiPi.appFullName);
+                }
+              break;
+            case 'd':
+              /*  Suppress/Activate printing of call site detail based on default.  */
+              mpiPi.print_callsite_detail ^= 1;
+              break;
 
-	    case 'l':
-	      /*  Use low-memory use approach using MPI collectives 
-	         for report generation   */
-	      mpiPi.collective_report = 1;
-	      break;
+            case 'l':
+              /*  Use low-memory use approach using MPI collectives
+             for report generation   */
+              mpiPi.collective_report = 1;
+              break;
 
-	    case 'r':
-	      /*  Use collector task to aggregate all task data and
-	         generate report   */
-	      mpiPi.collective_report = 0;
-	      break;
+            case 'r':
+              /*  Use collector task to aggregate all task data and
+             generate report   */
+              mpiPi.collective_report = 0;
+              break;
 
-	    case 'z':
-	      mpiPi.disable_finalize_report = 1;
-	      break;
+            case 'z':
+              mpiPi.disable_finalize_report = 1;
+              break;
 
-	    case 'y':
-	      mpiPi.do_collective_stats_report = 1;
-	      break;
+            case 'y':
+              mpiPi.do_collective_stats_report = 1;
+              break;
 
-	    case 'p':
-	      mpiPi.do_pt2pt_stats_report = 1;
-	      break;
+            case 'p':
+              mpiPi.do_pt2pt_stats_report = 1;
+              break;
 
-	    case 'a':
-	    case 'b':
-	    case 'h':
-	    case 'i':
-	    case 'j':
-	    case 'q':
-	    case 'u':
-	    case 'w':
-	    default:
-	      if (mpiPi.rank == 0)
-		mpiPi_msg_warn
-		  ("Option flag (-%c) not recognized. Ignored.\n", c);
-	      break;
-	    }
-	}
+            case 'a':
+            case 'b':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'q':
+            case 'u':
+            case 'w':
+            default:
+              if (mpiPi.rank == 0)
+                mpiPi_msg_warn
+                    ("Option flag (-%c) not recognized. Ignored.\n", c);
+              break;
+            }
+        }
     }
   if (mpiPi.rank == 0)
     mpiPi_msg ("\n");
@@ -302,18 +302,18 @@ getProcExeLink ()
   if (exelen == -1)
     {
       if (errno != ENOENT)
-	{
-	  while (exelen == -1 && errno == ENAMETOOLONG)
-	    {
-	      insize += 256;
-	      inbuf = realloc (inbuf, insize);
-	      exelen = readlink (file, inbuf, insize);
-	    }
-	  inbuf[exelen] = '\0';
-	  return inbuf;
-	}
+        {
+          while (exelen == -1 && errno == ENAMETOOLONG)
+            {
+              insize += 256;
+              inbuf = realloc (inbuf, insize);
+              exelen = readlink (file, inbuf, insize);
+            }
+          inbuf[exelen] = '\0';
+          return inbuf;
+        }
       else
-	free (inbuf);
+        free (inbuf);
     }
   else
     {
@@ -342,19 +342,19 @@ getProcCmdLine (int *ac, char **av)
   if (infile != NULL)
     {
       while (!feof (infile))
-	{
-	  inbuf = malloc (MPIP_MAX_ARG_STRING_SIZE);
-	  if (fread (inbuf, 1, MPIP_MAX_ARG_STRING_SIZE, infile) > 0)
-	    {
-	      arg_ptr = inbuf;
-	      while (*arg_ptr != '\0')
-		{
-		  av[i] = strdup (arg_ptr);
-		  arg_ptr += strlen (av[i]) + 1;
-		  i++;
-		}
-	    }
-	}
+        {
+          inbuf = malloc (MPIP_MAX_ARG_STRING_SIZE);
+          if (fread (inbuf, 1, MPIP_MAX_ARG_STRING_SIZE, infile) > 0)
+            {
+              arg_ptr = inbuf;
+              while (*arg_ptr != '\0')
+                {
+                  av[i] = strdup (arg_ptr);
+                  arg_ptr += strlen (av[i]) + 1;
+                  i++;
+                }
+            }
+        }
       *ac = i;
 
       free (inbuf);
@@ -430,14 +430,14 @@ mpiPi_copy_given_args (int *ac, char **av, int av_len, int argc, char **argv)
 
     for (i = 0; i < mpiPi_argc; i++)
       {
-	int buf_len = EXECUTABLE_LEN;
+        int buf_len = EXECUTABLE_LEN;
 
-	extern void F77_MPIPI_GET_FORTRAN_ARG (int *, int *, char *, int *,
-					       int);
-	F77_MPIPI_GET_FORTRAN_ARG (&i, &buf_len, buf, &len, EXECUTABLE_LEN);
+        extern void F77_MPIPI_GET_FORTRAN_ARG (int *, int *, char *, int *,
+                                               int);
+        F77_MPIPI_GET_FORTRAN_ARG (&i, &buf_len, buf, &len, EXECUTABLE_LEN);
 
-	buf[len < EXECUTABLE_LEN ? len : EXECUTABLE_LEN - 1] = 0;
-	av[i] = strdup (buf);
+        buf[len < EXECUTABLE_LEN ? len : EXECUTABLE_LEN - 1] = 0;
+        av[i] = strdup (buf);
       }
   }
 
@@ -468,7 +468,7 @@ mpiP_format_address (void *pval, char *addr_buf)
 #endif
 
       if (strcmp (test_buf, "0x1") != 0)
-	strcpy (hex_prefix, "0x");
+        strcpy (hex_prefix, "0x");
 
       get_sys_info = 1;
     }
@@ -493,13 +493,13 @@ Produced at the Lawrence Livermore National Laboratory
 Written by Jeffery Vetter and Christopher Chambreau. 
 UCRL-CODE-223450. 
 All rights reserved. 
- 
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
- 
+
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
- 
+
 * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the disclaimer below.
 
@@ -524,22 +524,22 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- 
+
+
 Additional BSD Notice 
- 
+
 1. This notice is required to be provided under our contract with the
 U.S. Department of Energy (DOE).  This work was produced at the
 University of California, Lawrence Livermore National Laboratory under
 Contract No. W-7405-ENG-48 with the DOE.
- 
+
 2. Neither the United States Government nor the University of
 California nor any of their employees, makes any warranty, express or
 implied, or assumes any liability or responsibility for the accuracy,
 completeness, or usefulness of any information, apparatus, product, or
 process disclosed, or represents that its use would not infringe
 privately-owned rights.
- 
+
 3.  Also, reference herein to any specific commercial products,
 process, or services by trade name, trademark, manufacturer or
 otherwise does not necessarily constitute or imply its endorsement,

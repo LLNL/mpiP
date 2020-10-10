@@ -1,6 +1,6 @@
 /*
 
-   mpiP MPI Profiler ( http://mpip.sourceforge.net/ )
+   mpiP MPI Profiler ( http://llnl.github.io/mpiP )
 
    Please see COPYRIGHT AND LICENSE information at the end of this file.
 
@@ -41,7 +41,7 @@ int comm::doBarriers(MPI_Comm com, const int x)
   return 1;
 }
 
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   const int x = 10;
 
@@ -64,7 +64,7 @@ Written by Jeffery Vetter and Christopher Chambreau.
 UCRL-CODE-223450. 
 All rights reserved. 
  
-This file is part of mpiP.  For details, see http://mpip.sourceforge.net/. 
+This file is part of mpiP.  For details, see http://llnl.github.io/mpiP. 
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
