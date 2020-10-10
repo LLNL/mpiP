@@ -2852,7 +2852,7 @@ TIMER_OPTION=no
 # Check whether --with-gettimeofday was given.
 if test "${with_gettimeofday+set}" = set; then :
   withval=$with_gettimeofday;
-$as_echo "#define USE_GETTIMEOFDAY /**/" >>confdefs.h
+$as_echo "#define USE_GETTIMEOFDAY 1" >>confdefs.h
 
         USE_GETTIMEOFDAY=true
 	TIMER_OPTION=yes
@@ -2864,7 +2864,7 @@ fi
 # Check whether --with-wtime was given.
 if test "${with_wtime+set}" = set; then :
   withval=$with_wtime;
-$as_echo "#define USE_WTIME /**/" >>confdefs.h
+$as_echo "#define USE_WTIME 1" >>confdefs.h
 
 	TIMER_OPTION=yes
 
@@ -2875,7 +2875,7 @@ fi
 # Check whether --with-clock_gettime was given.
 if test "${with_clock_gettime+set}" = set; then :
   withval=$with_clock_gettime;
-$as_echo "#define USE_CLOCK_GETTIME /**/" >>confdefs.h
+$as_echo "#define USE_CLOCK_GETTIME 1" >>confdefs.h
 
 	USE_CLOCK_GETTIME=yes
 	TIMER_OPTION=yes
@@ -2887,7 +2887,7 @@ fi
 # Check whether --with-rts_get_timebase was given.
 if test "${with_rts_get_timebase+set}" = set; then :
   withval=$with_rts_get_timebase;
-$as_echo "#define USE_RTS_GET_TIMEBASE /**/" >>confdefs.h
+$as_echo "#define USE_RTS_GET_TIMEBASE 1" >>confdefs.h
 
 	USE_RTS_GET_TIMEBASE=yes
 	TIMER_OPTION=yes
@@ -2902,7 +2902,7 @@ fi
 # Check whether --with-read_real_time was given.
 if test "${with_read_real_time+set}" = set; then :
   withval=$with_read_real_time;
-$as_echo "#define USE_READ_REAL_TIME /**/" >>confdefs.h
+$as_echo "#define USE_READ_REAL_TIME 1" >>confdefs.h
 
 	USE_READ_REAL_TIME=yes
 	TIMER_OPTION=yes
@@ -2917,7 +2917,7 @@ fi
 # Check whether --with-rtc was given.
 if test "${with_rtc+set}" = set; then :
   withval=$with_rtc;
-$as_echo "#define USE_RTC /**/" >>confdefs.h
+$as_echo "#define USE_RTC 1" >>confdefs.h
 
 	USE_RTC=yes
 	TIMER_OPTION=yes
@@ -2932,7 +2932,7 @@ fi
 # Check whether --with-dclock was given.
 if test "${with_dclock+set}" = set; then :
   withval=$with_dclock;
-$as_echo "#define USE_DCLOCK /**/" >>confdefs.h
+$as_echo "#define USE_DCLOCK 1" >>confdefs.h
 
 	USE_DCLOCK=yes
 	TIMER_OPTION=yes
@@ -2956,7 +2956,7 @@ if test "${enable_api_only+set}" = set; then :
 		ENABLE_API_ONLY=yes
 		echo Configuring for API library only.
 
-$as_echo "#define ENABLE_API_ONLY /**/" >>confdefs.h
+$as_echo "#define ENABLE_API_ONLY 1" >>confdefs.h
 
 		DEFAULT_TARGS="API test"
 	fi
@@ -3046,7 +3046,7 @@ if test "${enable_setjmp+set}" = set; then :
   enableval=$enable_setjmp; if test x"$enableval" = xyes ; then
 		USE_SETJMP=yes
 
-$as_echo "#define USE_SETJMP /**/" >>confdefs.h
+$as_echo "#define USE_SETJMP 1" >>confdefs.h
 
 		echo Setjmp will be used to generate stack traces.
 	fi
@@ -3080,7 +3080,7 @@ if test "${enable_fortranweak+set}" = set; then :
         else
                 ENABLE_FORTRAN_WEAK_SYMS=yes
 
-$as_echo "#define ENABLE_FORTRAN_WEAK_SYMS /**/" >>confdefs.h
+$as_echo "#define ENABLE_FORTRAN_WEAK_SYMS 1" >>confdefs.h
 
                 echo Generation of additional weak FORTRAN symbol names has been enabled.
         fi
@@ -3148,7 +3148,7 @@ USE_GETARG=false
 if test "${enable_getarg+set}" = set; then :
   enableval=$enable_getarg; if test x"$enableval" = xyes ; then
 
-$as_echo "#define USE_GETARG /**/" >>confdefs.h
+$as_echo "#define USE_GETARG 1" >>confdefs.h
 
 		echo Use of getarg has been enabled
 		USE_GETARG=true
@@ -3174,7 +3174,7 @@ fi
 if test "${enable_check_time+set}" = set; then :
   enableval=$enable_check_time; if test x"$enableval" = xyes ; then
 
-$as_echo "#define MPIP_CHECK_TIME /**/" >>confdefs.h
+$as_echo "#define MPIP_CHECK_TIME 1" >>confdefs.h
 
 		echo AIX negative time value checking has been enabled
 	fi
@@ -3186,7 +3186,7 @@ fi
 if test "${enable_collective_report_default+set}" = set; then :
   enableval=$enable_collective_report_default; if test "x$enableval" = xyes ; then
 
-$as_echo "#define COLLECTIVE_REPORT_DEFAULT /**/" >>confdefs.h
+$as_echo "#define COLLECTIVE_REPORT_DEFAULT 1" >>confdefs.h
 
 		echo "Using collective report as default."
 	fi
@@ -5233,14 +5233,15 @@ fi
 "
 if test "x$ac_cv_have_decl_bfd_get_section_size" = xyes; then :
 
-$as_echo "#define HAVE_BFD_GET_SECTION_SIZE /**/" >>confdefs.h
+$as_echo "#define HAVE_BFD_GET_SECTION_SIZE 1" >>confdefs.h
 
 fi
 
     ac_fn_c_check_decl "$LINENO" "bfd_get_section_vma" "ac_cv_have_decl_bfd_get_section_vma" "#include \"bfd.h\"
 "
 if test "x$ac_cv_have_decl_bfd_get_section_vma" = xyes; then :
-  $as_echo "#define HAVE_BFD_GET_SECTION_MACROS 1" >>confdefs.h
+
+$as_echo "#define HAVE_BFD_GET_SECTION_MACROS 1" >>confdefs.h
 
 fi
 
@@ -5257,7 +5258,7 @@ if test "x$ac_cv_type_bfd_boolean" = xyes; then :
 
 else
 
-$as_echo "#define HAVE_BFD_BOOLEAN /**/" >>confdefs.h
+$as_echo "#define HAVE_BFD_BOOLEAN 1" >>confdefs.h
 
 fi
 
@@ -5265,14 +5266,14 @@ fi
     ac_fn_c_check_header_mongrel "$LINENO" "demangle.h" "ac_cv_header_demangle_h" "$ac_includes_default"
 if test "x$ac_cv_header_demangle_h" = xyes; then :
 
-$as_echo "#define HAVE_DEMANGLE_H /**/" >>confdefs.h
+$as_echo "#define HAVE_DEMANGLE_H 1" >>confdefs.h
  if test "x$DO_DEMANGLE" = xfalse ; then DO_DEMANGLE=GNU ; fi
 fi
 
 
     LIBS="$LIBS $BFD_AUX_LIBS"
 
-$as_echo "#define ENABLE_BFD /**/" >>confdefs.h
+$as_echo "#define ENABLE_BFD 1" >>confdefs.h
 
     SOURCE_LOOKUP=bfd
   fi
@@ -5369,7 +5370,7 @@ fi
     if test x$LIBELF_FOUND = xyes -a x$LIBDWARF_FOUND = xyes ; then
       LIBS="${LIBS} -ldwarf -lelf"
 
-$as_echo "#define USE_LIBDWARF /**/" >>confdefs.h
+$as_echo "#define USE_LIBDWARF 1" >>confdefs.h
 
       echo " found libelf/libdwarf"
       SOURCE_LOOKUP=libelf/libdwarf
@@ -5419,7 +5420,7 @@ fi
 $as_echo "$ac_cv_lib_mpi_MPIR_ToPointer" >&6; }
 if test "x$ac_cv_lib_mpi_MPIR_ToPointer" = xyes; then :
 
-$as_echo "#define HAVE_MPIR_TOPOINTER /**/" >>confdefs.h
+$as_echo "#define HAVE_MPIR_TOPOINTER 1" >>confdefs.h
 
 fi
 
@@ -5461,7 +5462,7 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPIR_ToPointer" >&6; }
 if test "x$ac_cv_lib_mpich_MPIR_ToPointer" = xyes; then :
 
-$as_echo "#define HAVE_MPIR_TOPOINTER /**/" >>confdefs.h
+$as_echo "#define HAVE_MPIR_TOPOINTER 1" >>confdefs.h
 
 fi
 
@@ -5485,7 +5486,7 @@ main ()
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-$as_echo "#define USE_MPI3_CONSTS /**/" >>confdefs.h
+$as_echo "#define USE_MPI3_CONSTS 1" >>confdefs.h
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -5504,7 +5505,7 @@ if test x$TIMER_FOUND = xno && \
 ac_fn_c_check_func "$LINENO" "rts_get_timebase" "ac_cv_func_rts_get_timebase"
 if test "x$ac_cv_func_rts_get_timebase" = xyes; then :
 
-$as_echo "#define USE_RTS_GET_TIMEBASE /**/" >>confdefs.h
+$as_echo "#define USE_RTS_GET_TIMEBASE 1" >>confdefs.h
 
         USE_RTS_GET_TIMEBASE=yes ; TIMER_FOUND=yes ; TIMER_NAME="rts_get_timebase (assuming 700MHz)" ;
 
@@ -5519,7 +5520,7 @@ ac_fn_c_check_decl "$LINENO" "_rtc" "ac_cv_have_decl__rtc" "#include <intrinsics
 "
 if test "x$ac_cv_have_decl__rtc" = xyes; then :
 
-$as_echo "#define USE_RTC /**/" >>confdefs.h
+$as_echo "#define USE_RTC 1" >>confdefs.h
 
         USE_RTC=yes ; TIMER_FOUND=yes ; TIMER_NAME=_rtc ;
 
@@ -5543,7 +5544,7 @@ if test "x$ac_cv_have_decl_mread_real_time" = xyes; then :
 
 else
 
-$as_echo "#define NEED_MREAD_REAL_TIME_DECL /**/" >>confdefs.h
+$as_echo "#define NEED_MREAD_REAL_TIME_DECL 1" >>confdefs.h
 
 fi
 
@@ -5598,7 +5599,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_rt_clock_gettime" >&5
 $as_echo "$ac_cv_lib_rt_clock_gettime" >&6; }
 if test "x$ac_cv_lib_rt_clock_gettime" = xyes; then :
-  $as_echo "#define USE_CLOCK_GETTIME  Use clock_gettime for timing" >>confdefs.h
+  $as_echo "#define USE_CLOCK_GETTIME 1 Use clock_gettime for timing" >>confdefs.h
  USE_CLOCK_GETTIME=true TIMER_FOUND=yes TIMER_NAME=clock_gettime LIBS="$LIBS -lrt"
 
 fi
@@ -5608,7 +5609,7 @@ fi
 # If specified, use dclock
 if test x$TIMER_FOUND = xno && test "x$USE_DCLOCK" = "xyes" ; then
 
-$as_echo "#define USE_DCLOCK /**/" >>confdefs.h
+$as_echo "#define USE_DCLOCK 1" >>confdefs.h
  TIMER_FOUND=yes TIMER_NAME=dclock
 fi
 
@@ -5617,12 +5618,12 @@ if test x$TIMER_FOUND = xno ; then
         ac_fn_c_check_func "$LINENO" "MPI_Wtime" "ac_cv_func_MPI_Wtime"
 if test "x$ac_cv_func_MPI_Wtime" = xyes; then :
 
-$as_echo "#define USE_WTIME /**/" >>confdefs.h
+$as_echo "#define USE_WTIME 1" >>confdefs.h
  TIMER_NAME=MPI_Wtime
 
 else
   echo Failed to find MPI_Wtime.  Trying to use gettimeofday.;
-$as_echo "#define USE_GETTIMEOFDAY /**/" >>confdefs.h
+$as_echo "#define USE_GETTIMEOFDAY 1" >>confdefs.h
  USE_GETTIMEOFDAY=true
 fi
 
@@ -5638,7 +5639,7 @@ if test "x$DISABLE_LIBUNWIND" = "xno" ; then
 	ac_fn_c_check_header_mongrel "$LINENO" "libunwind.h" "ac_cv_header_libunwind_h" "$ac_includes_default"
 if test "x$ac_cv_header_libunwind_h" = xyes; then :
 
-$as_echo "#define HAVE_LIBUNWIND /**/" >>confdefs.h
+$as_echo "#define HAVE_LIBUNWIND 1" >>confdefs.h
  LIBS="$LIBS -lunwind" HAVE_LIBUNWIND=yes UNWIND_WITH=libunwind
 else
    if test x$build_cpu = xx86_64 ; then
@@ -5659,7 +5660,7 @@ if test x"$HAVE_LIBUNWIND" = xno && test x"$USE_SETJMP" = xno ; then
   ac_fn_c_check_func "$LINENO" "backtrace" "ac_cv_func_backtrace"
 if test "x$ac_cv_func_backtrace" = xyes; then :
 
-$as_echo "#define USE_BACKTRACE /**/" >>confdefs.h
+$as_echo "#define USE_BACKTRACE 1" >>confdefs.h
  UNWIND_WITH=glibc-backtrace
 else
   USE_SETJMP=yes
@@ -5671,7 +5672,7 @@ if test "$ENABLE_API_ONLY" = no && test "$ENABLE_MPI_IO" = yes ; then
 ac_fn_c_check_func "$LINENO" "MPI_File_open" "ac_cv_func_MPI_File_open"
 if test "x$ac_cv_func_MPI_File_open" = xyes; then :
 
-$as_echo "#define HAVE_MPI_IO /**/" >>confdefs.h
+$as_echo "#define HAVE_MPI_IO 1" >>confdefs.h
  HAVE_MPI_IO=mpi.io.protos.txt
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_File_open in -lmpio" >&5
@@ -5712,7 +5713,7 @@ fi
 $as_echo "$ac_cv_lib_mpio_MPI_File_open" >&6; }
 if test "x$ac_cv_lib_mpio_MPI_File_open" = xyes; then :
 
-$as_echo "#define HAVE_MPI_IO /**/" >>confdefs.h
+$as_echo "#define HAVE_MPI_IO 1" >>confdefs.h
  HAVE_MPI_IO=mpi.io.protos.txt LIBS="${LIBS} -lmpio"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI I/O symbols not found.  MPI I/O reporting deactivated." >&5
@@ -5732,7 +5733,7 @@ if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_RMA" = xyes ; then
 ac_fn_c_check_func "$LINENO" "MPI_Win_allocate" "ac_cv_func_MPI_Win_allocate"
 if test "x$ac_cv_func_MPI_Win_allocate" = xyes; then :
 
-$as_echo "#define HAVE_MPI_RMA /**/" >>confdefs.h
+$as_echo "#define HAVE_MPI_RMA 1" >>confdefs.h
  HAVE_MPI_RMA=mpi.rma.protos.txt
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI RMA symbols not found.  MPI RMA reporting deactivated." >&5
@@ -5750,7 +5751,7 @@ if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_NONBLOCKINGCOLLECTIVES" 
 ac_fn_c_check_func "$LINENO" "MPI_Ibarrier" "ac_cv_func_MPI_Ibarrier"
 if test "x$ac_cv_func_MPI_Ibarrier" = xyes; then :
 
-$as_echo "#define HAVE_MPI_NONBLOCKINGCOLLECTIVES /**/" >>confdefs.h
+$as_echo "#define HAVE_MPI_NONBLOCKINGCOLLECTIVES 1" >>confdefs.h
  HAVE_MPI_NONBLOCKINGCOLLECTIVES=mpi.nbc.protos.txt
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI NONBLOCKINGCOLLECTIVES symbols not found.  MPI NONBLOCKINGCOLLECTIVES reporting deactivated." >&5
@@ -5783,7 +5784,7 @@ $as_echo "no" >&6; }
     ac_fn_c_check_func "$LINENO" "getline" "ac_cv_func_getline"
 if test "x$ac_cv_func_getline" = xyes; then :
 
-$as_echo "#define SO_LOOKUP /**/" >>confdefs.h
+$as_echo "#define SO_LOOKUP 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: getline not found so SO lookup is disabled." >&5
