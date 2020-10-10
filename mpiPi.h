@@ -124,7 +124,7 @@ typedef struct SO_INFO
 typedef struct _mpiPi_t
 {
   int ac;
-  char *av[32];
+  char *av[MPIP_COPIED_ARGS_MAX];
   char *toolname;
   char *appName;
   char *appFullName;

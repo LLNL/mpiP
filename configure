@@ -625,6 +625,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 slibdir
+MPIP_COPIED_ARGS_MAX
 PIC_FLAGS
 ADD_OBJS
 USE_SETJMP
@@ -757,6 +758,7 @@ enable_setjmp
 enable_fortranxlate
 enable_fortranweak
 enable_stackdepth
+enable_maxargs
 enable_dwarf
 enable_getarg
 enable_demangling
@@ -1403,6 +1405,8 @@ Optional Features:
   --enable-fortranweak    Generate weak symbols for additional Fortran symbol
                           name styles.
   --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
+  --enable-maxargs        Maximum number of command line arguments copied
+                          (default is 32).
   --enable-dwarf          Use DWARF library for source lookup.
   --enable-getarg         Use getarg to get fortran command line args.
   --enable-demangling     Specify GNU, IBM, or Compaq demangling support.
@@ -3104,6 +3108,22 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 #AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
+
+# Check whether --enable-maxargs was given.
+if test "${enable_maxargs+set}" = set; then :
+  enableval=$enable_maxargs; MPIP_COPIED_ARGS_MAX=$enableval
+    echo Maximum number of command line arguments copied is $MPIP_COPIED_ARGS_MAX
+
+else
+  MPIP_COPIED_ARGS_MAX=32
+
+fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define MPIP_COPIED_ARGS_MAX $MPIP_COPIED_ARGS_MAX
+_ACEOF
+
 
 PC_LOOKUP_FILE=pc_lookup.c
 # Check whether --enable-dwarf was given.
@@ -5224,6 +5244,7 @@ if test "x$ac_cv_have_decl_bfd_get_section_vma" = xyes; then :
 
 fi
 
+
 else
   ENABLE_BFD=no SO_LOOKUP=no
 
@@ -6207,6 +6228,7 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 ENABLE_BFD=$ENABLE_BFD
+
 
 
 
