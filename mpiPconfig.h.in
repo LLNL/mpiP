@@ -81,6 +81,9 @@
 /* MPI check time */
 #undef MPIP_CHECK_TIME
 
+/* Maximum number of command line arguments copied */
+#undef MPIP_COPIED_ARGS_MAX
+
 /* Need Real-time declaration */
 #undef NEED_MREAD_REAL_TIME_DECL
 

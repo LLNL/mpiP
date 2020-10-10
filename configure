@@ -625,6 +625,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 slibdir
+MPIP_COPIED_ARGS_MAX
 PIC_FLAGS
 ADD_OBJS
 USE_SETJMP
@@ -663,7 +664,6 @@ DO_DEMANGLE
 USE_GETARG
 PC_LOOKUP_FILE
 USE_LIBDWARF
-MAX_COPIED_ARGS
 ENABLE_FORTRAN_WEAK_SYMS
 ENABLE_FORTRAN_XLATE
 ENABLE_MPI_NONBLOCKINGCOLLECTIVES
@@ -3111,14 +3111,18 @@ _ACEOF
 
 # Check whether --enable-maxargs was given.
 if test "${enable_maxargs+set}" = set; then :
-  enableval=$enable_maxargs; MAX_COPIED_ARGS=$enableval
-    echo Maximum number of command line arguments copied is $MAX_COPIED_ARGS
+  enableval=$enable_maxargs; MPIP_COPIED_ARGS_MAX=$enableval
+    echo Maximum number of command line arguments copied is $MPIP_COPIED_ARGS_MAX
 
 else
-  MAX_COPIED_ARGS=32
+  MPIP_COPIED_ARGS_MAX=32
 
 fi
 
+
+cat >>confdefs.h <<_ACEOF
+#define MPIP_COPIED_ARGS_MAX $MPIP_COPIED_ARGS_MAX
+_ACEOF
 
 
 PC_LOOKUP_FILE=pc_lookup.c
@@ -6224,6 +6228,7 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 ENABLE_BFD=$ENABLE_BFD
+
 
 
 

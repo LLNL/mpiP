@@ -45,8 +45,6 @@
 
 #define MPIPI_HOSTNAME_LEN_MAX 128
 
-#define MPIPI_COPIED_ARGS_MAX @MAX_COPIED_ARGS@
-
 #define MPIP_HELP_LIST PACKAGE_BUGREPORT
 
 #define MPIP_CALLSITE_STACK_DEPTH (mpiPi.stackDepth)
@@ -126,7 +124,7 @@ typedef struct SO_INFO
 typedef struct _mpiPi_t
 {
   int ac;
-  char *av[MPIPI_COPIED_ARGS_MAX];
+  char *av[MPIP_COPIED_ARGS_MAX];
   char *toolname;
   char *appName;
   char *appFullName;

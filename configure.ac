@@ -299,12 +299,12 @@ AC_DEFINE_UNQUOTED([MPIP_CALLSITE_STACK_DEPTH_MAX], [$STACKDEPTH], [Depth of the
 
 AC_ARG_ENABLE(maxargs,
     AS_HELP_STRING(--enable-maxargs,Maximum number of command line arguments copied (default is 32).),
-    MAX_COPIED_ARGS=$enableval
-    echo Maximum number of command line arguments copied is $MAX_COPIED_ARGS
+    MPIP_COPIED_ARGS_MAX=$enableval
+    echo Maximum number of command line arguments copied is $MPIP_COPIED_ARGS_MAX
     ,
-    MAX_COPIED_ARGS=32
+    MPIP_COPIED_ARGS_MAX=32
 )
-AC_SUBST(MAX_COPIED_ARGS)
+AC_DEFINE_UNQUOTED(MPIP_COPIED_ARGS_MAX, [$MPIP_COPIED_ARGS_MAX], [Maximum number of command line arguments copied])
 
 PC_LOOKUP_FILE=pc_lookup.c
 AC_ARG_ENABLE(dwarf,
@@ -776,6 +776,7 @@ AC_SUBST(USE_BACKTRACE)
 AC_SUBST(USE_SETJMP)
 AC_SUBST(ADD_OBJS)
 AC_SUBST(PIC_FLAGS)
+AC_SUBST(MPIP_COPIED_ARGS_MAX)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(HAVE_MPI_RMA)
 AC_SUBST_FILE(HAVE_MPI_NONBLOCKINGCOLLECTIVES)
