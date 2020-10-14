@@ -664,6 +664,9 @@ DO_DEMANGLE
 USE_GETARG
 PC_LOOKUP_FILE
 USE_LIBDWARF
+MPIP_CALLSITE_STACK_DEPTH_MAX
+MPIP_INTERNAL_STACK_DEPTH
+MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX
 ENABLE_FORTRAN_WEAK_SYMS
 ENABLE_FORTRAN_XLATE
 ENABLE_MPI_NONBLOCKINGCOLLECTIVES
@@ -758,6 +761,7 @@ enable_setjmp
 enable_fortranxlate
 enable_fortranweak
 enable_stackdepth
+enable_internal_stackdepth
 enable_maxargs
 enable_dwarf
 enable_getarg
@@ -1404,7 +1408,11 @@ Optional Features:
   --disable-fortranxlate  Disable translation of Fortran opaque objects.
   --enable-fortranweak    Generate weak symbols for additional Fortran symbol
                           name styles.
-  --enable-stackdepth     Specify maximum stacktrace depth (default is 8).
+  --enable-stackdepth     Specify maximum report stacktrace depth (default is
+                          8).
+  --enable-internal-stackdepth
+                          Specify number of internal stack frames (default is
+                          3).
   --enable-maxargs        Maximum number of command line arguments copied
                           (default is 32).
   --enable-dwarf          Use DWARF library for source lookup.
@@ -3104,10 +3112,30 @@ fi
 
 
 cat >>confdefs.h <<_ACEOF
-#define MPIP_CALLSITE_STACK_DEPTH_MAX $STACKDEPTH
+#define MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX $STACKDEPTH
 _ACEOF
 
-#AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
+
+
+# Check whether --enable-internal-stackdepth was given.
+if test "${enable_internal_stackdepth+set}" = set; then :
+  enableval=$enable_internal_stackdepth; MPIP_INTERNAL_STACK_DEPTH=$enableval;
+    echo "Internal stacktrace depth is $MPIP_INTERNAL_STACK_DEPTH"
+else
+  MPIP_INTERNAL_STACK_DEPTH=3
+fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define MPIP_INTERNAL_STACK_DEPTH $MPIP_INTERNAL_STACK_DEPTH
+_ACEOF
+
+
+
+
+$as_echo "#define MPIP_CALLSITE_STACK_DEPTH_MAX (MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX + MPIP_INTERNAL_STACK_DEPTH)" >>confdefs.h
+
+
 
 # Check whether --enable-maxargs was given.
 if test "${enable_maxargs+set}" = set; then :

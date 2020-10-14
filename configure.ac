@@ -289,13 +289,25 @@ AC_SUBST(ENABLE_FORTRAN_WEAK_SYMS)
 
 
 AC_ARG_ENABLE(stackdepth,
-	AS_HELP_STRING([--enable-stackdepth], [Specify maximum stacktrace depth (default is 8).]),
+	AS_HELP_STRING([--enable-stackdepth], [Specify maximum report stacktrace depth (default is 8).]),
 	STACKDEPTH=$enableval; 
     echo "Maximum stacktrace depth is $STACKDEPTH",
 	STACKDEPTH=8,
 )
-AC_DEFINE_UNQUOTED([MPIP_CALLSITE_STACK_DEPTH_MAX], [$STACKDEPTH], [Depth of the callsite])
-#AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
+AC_DEFINE_UNQUOTED([MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX], [$STACKDEPTH], [Stack depth of callsites in report])
+AC_SUBST(MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX)
+
+AC_ARG_ENABLE(internal-stackdepth,
+	AS_HELP_STRING([--enable-internal-stackdepth], [Specify number of internal stack frames (default is 3).]),
+	MPIP_INTERNAL_STACK_DEPTH=$enableval; 
+    echo "Internal stacktrace depth is $MPIP_INTERNAL_STACK_DEPTH",
+	MPIP_INTERNAL_STACK_DEPTH=3,
+)
+AC_DEFINE_UNQUOTED([MPIP_INTERNAL_STACK_DEPTH], [$MPIP_INTERNAL_STACK_DEPTH], [Number of internal stack frames])
+AC_SUBST(MPIP_INTERNAL_STACK_DEPTH)
+
+AC_DEFINE([MPIP_CALLSITE_STACK_DEPTH_MAX], [(MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX + MPIP_INTERNAL_STACK_DEPTH)], [Recorded stack depth of callsites])
+AC_SUBST(MPIP_CALLSITE_STACK_DEPTH_MAX)
 
 AC_ARG_ENABLE(maxargs,
     AS_HELP_STRING(--enable-maxargs,Maximum number of command line arguments copied (default is 32).),

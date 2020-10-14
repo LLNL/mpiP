@@ -554,7 +554,7 @@ mpiPi_print_callsites (FILE * fp)
   char addr_buf[24];
 
   /*  If stack depth is 0, call sites are really just MPI calls */
-  if (mpiPi.stackDepth == 0)
+  if (mpiPi.reportStackDepth == 0)
     return;
 
   h_gather_data (callsite_src_id_cache, &ac, (void ***) &av);
@@ -567,7 +567,7 @@ mpiPi_print_callsites (FILE * fp)
     {
       int j, currlen;
       for (j = 0;
-           (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL);
+           (j < mpiPi.fullStackDepth) && (av[i]->filename[j] != NULL);
            j++)
         {
           currlen = strlen (av[i]->filename[j]);
@@ -584,43 +584,53 @@ mpiPi_print_callsites (FILE * fp)
   for (i = 0; i < ac; i++)
     {
       int j;
+      char * display_op = NULL;
+      int frames_printed = 0;
+
       for (j = 0, stack_continue_flag = 1;
-           (j < MPIP_CALLSITE_STACK_DEPTH) && (av[i]->filename[j] != NULL) &&
+           (frames_printed < mpiPi.reportStackDepth) && (av[i]->filename[j] != NULL) &&
            stack_continue_flag == 1; j++)
         {
+            //  May encounter multiple "mpiP-wrappers.c" filename frames
+            if ( strcmp(av[i]->filename[j], "mpiP-wrappers.c") == 0 )
+                continue;
+
+            if ( NULL == display_op)
+                display_op = &(mpiPi.lookup[av[i]->op - mpiPi_BASE].name[4]);
+
+
           if (av[i]->line[j] == 0 &&
               (strcmp (av[i]->filename[j], "[unknown]") == 0 ||
                strcmp (av[i]->functname[j], "[unknown]") == 0))
             {
               fprintf (fp, "%3d %3d %-*s %-*s %s\n",
                        av[i]->id,
-                       j,
+                       frames_printed,
                        fileLenMax + 6,
                        mpiP_format_address (av[i]->pc[j], addr_buf),
                        funcLenMax,
                        av[i]->functname[j],
-                       (j ==
-                        0) ? &(mpiPi.lookup[av[i]->op -
-                             mpiPi_BASE].name[4]) : "");
+                       display_op);
             }
           else
             {
               fprintf (fp, "%3d %3d %-*s %5d %-*s %s\n",
                        av[i]->id,
-                       j,
+                       frames_printed,
                        fileLenMax,
                        av[i]->filename[j], av[i]->line[j],
                        funcLenMax,
                        av[i]->functname[j],
-                       (j ==
-                        0) ? &(mpiPi.lookup[av[i]->op -
-                             mpiPi_BASE].name[4]) : "");
+                       display_op);
             }
           /*  Do not bother printing stack frames above main   */
           if (strcmp (av[i]->functname[j], "main") == 0
               || strcmp (av[i]->functname[j], ".main") == 0
               || strcmp (av[i]->functname[j], "MAIN__") == 0)
             stack_continue_flag = 0;
+
+          display_op = "";
+          ++frames_printed;
         }
     }
   free (av);
@@ -633,7 +643,7 @@ mpiPi_print_top_time_sites (FILE * fp)
   callsite_stats_t **av;
   double timeCOV;
 
-  if (mpiPi.stackDepth > 0)
+  if (mpiPi.reportStackDepth > 0)
     h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
   else
     h_gather_data (mpiPi.global_MPI_stats_agg, &ac, (void ***) &av);
@@ -707,7 +717,7 @@ mpiPi_print_top_sent_sites (FILE * fp)
 
   if (mpiPi.global_mpi_size > 0)
     {
-      if (mpiPi.stackDepth > 0)
+      if (mpiPi.reportStackDepth > 0)
         h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
       else
         h_gather_data (mpiPi.global_MPI_stats_agg, &ac, (void ***) &av);
@@ -929,7 +939,7 @@ mpiPi_print_top_io_sites (FILE * fp)
    *  */
   if (mpiPi.global_mpi_io > 0)
     {
-      if (mpiPi.stackDepth > 0)
+      if (mpiPi.reportStackDepth > 0)
         h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
       else
         h_gather_data (mpiPi.global_MPI_stats_agg, &ac, (void ***) &av);
@@ -973,7 +983,7 @@ mpiPi_print_top_rma_sites (FILE * fp)
    *  */
   if (mpiPi.global_mpi_rma > 0)
     {
-      if (mpiPi.stackDepth > 0)
+      if (mpiPi.reportStackDepth > 0)
         h_gather_data (mpiPi.global_callsite_stats_agg, &ac, (void ***) &av);
       else
         h_gather_data (mpiPi.global_MPI_stats_agg, &ac, (void ***) &av);

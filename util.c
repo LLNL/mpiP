@@ -125,43 +125,45 @@ mpiPi_getenv ()
 
             case 'k':
               {
-                mpiPi.stackDepth = atoi (optarg);
-                if (mpiPi.stackDepth < 0)
+                mpiPi.reportStackDepth = atoi (optarg);
+                if (mpiPi.reportStackDepth < 0)
                   {
                     if (mpiPi.rank == 0)
                       mpiPi_msg_warn
                           ("-k stackdepth invalid %d. Using 0.\n",
-                           mpiPi.stackDepth);
-                    mpiPi.stackDepth = 0;
+                           mpiPi.reportStackDepth);
+                    mpiPi.reportStackDepth = 0;
                     mpiPi.print_callsite_detail = 0;
                   }
-                if (mpiPi.stackDepth > MPIP_CALLSITE_STACK_DEPTH_MAX)
+                if (mpiPi.reportStackDepth > MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX)
                   {
                     if (mpiPi.rank == 0)
                       mpiPi_msg_warn
                           ("stackdepth of %d too large. Using %d.\n",
-                           mpiPi.stackDepth, MPIP_CALLSITE_STACK_DEPTH_MAX);
-                    mpiPi.stackDepth = MPIP_CALLSITE_STACK_DEPTH_MAX;
+                           mpiPi.reportStackDepth, MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX);
+                    mpiPi.reportStackDepth = MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX;
                   }
-                else if (mpiPi.stackDepth > 4)
+                else if (mpiPi.reportStackDepth > 4)
                   {
                     if (mpiPi.rank == 0)
                       mpiPi_msg_warn
                           ("stackdepth of %d is large. Consider making it smaller.\n",
-                           mpiPi.stackDepth);
+                           mpiPi.reportStackDepth);
                   }
 
                 //  If the stack depth is 0, we are accumulating data
                 //  for each MPI op (i.e. potentially multiple callsites),
                 //  resulting in data that would not be useful for calculating COV.
-                if (mpiPi.stackDepth == 0)
+                if (mpiPi.reportStackDepth == 0)
                   mpiPi.calcCOV = 0;
 
                 if (mpiPi.rank == 0)
                   mpiPi_msg
                       ("Set the callsite stack traceback depth to [%d].\n",
-                       mpiPi.stackDepth);
+                       mpiPi.reportStackDepth);
               }
+              mpiPi.fullStackDepth = mpiPi.reportStackDepth + mpiPi.internalStackDepth;
+
               break;
 
             case 't':

@@ -75,7 +75,13 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Depth of the callsite */
+/* Stack depth of callsites in report */
+#undef MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX
+
+/* Internal stack frames */
+#undef MPIP_INTERNAL_STACK_DEPTH
+
+/* Recorded stack depth of callsites */
 #undef MPIP_CALLSITE_STACK_DEPTH_MAX
 
 /* MPI check time */

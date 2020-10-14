@@ -47,7 +47,6 @@
 
 #define MPIP_HELP_LIST PACKAGE_BUGREPORT
 
-#define MPIP_CALLSITE_STACK_DEPTH (mpiPi.stackDepth)
 #define MPIP_CALLSITE_STATS_COOKIE 518641
 #define MPIP_CALLSITE_STATS_COOKIE_ASSERT(f) {assert(MPIP_CALLSITE_STATS_COOKIE==((f)->cookie));}
 
@@ -174,7 +173,9 @@ typedef struct _mpiPi_t
 
   mpiPi_lookup_t *lookup;
 
-  int stackDepth;
+  int reportStackDepth;
+  int internalStackDepth;
+  int fullStackDepth;
   double reportPrintThreshold;
   int baseNames;
   MPIP_REPORT_FORMAT_TYPE reportFormat;

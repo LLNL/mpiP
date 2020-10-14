@@ -16,6 +16,7 @@
 #include "mpiP-callsites.h"
 #include "mpiPi.h"
 
+
 void mpiPi_cs_reset_stat(callsite_stats_t *csp)
 {
   csp->maxDur = 0;
@@ -40,7 +41,7 @@ void mpiPi_cs_init(callsite_stats_t *csp, void *pc[],
   int i;
   csp->op = op;
   csp->rank = rank;
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  for (i = 0; i < mpiPi.fullStackDepth; i++)
     {
       csp->pc[i] = pc[i];
     }
@@ -150,14 +151,14 @@ callsite_src_id_cache_comparator (const void *p1, const void *p2)
   callsite_src_id_cache_entry_t *csp_2 = (callsite_src_id_cache_entry_t *) p2;
 
 #define express(f) {if ((csp_1->f) > (csp_2->f)) {return 1;} if ((csp_1->f) < (csp_2->f)) {return -1;}}
-  if (mpiPi.stackDepth == 0)
+  if (mpiPi.reportStackDepth == 0)
     {
       express (id);		/* In cases where the call stack depth is 0, the only unique info may be the id */
       return 0;
     }
   else
     {
-      for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+      for (i = 0; i < mpiPi.fullStackDepth; i++)
         {
           if (csp_1->filename[i] != NULL && csp_2->filename[i] != NULL)
             {
@@ -193,7 +194,7 @@ callsite_src_id_cache_hashkey (const void *p1)
   int i, j;
   int res = 0;
   callsite_src_id_cache_entry_t *cs1 = (callsite_src_id_cache_entry_t *) p1;
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  for (i = 0; i < mpiPi.fullStackDepth; i++)
     {
       if (cs1->filename[i] != NULL)
         {
@@ -304,7 +305,7 @@ mpiPi_query_src (callsite_stats_t * p)
      different ids */
   bzero (&key, sizeof (callsite_src_id_cache_entry_t));
 
-  for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
+  for (i = 0; (i < mpiPi.fullStackDepth) && (p->pc[i] != NULL); i++)
     {
       if (mpiPi.do_lookup == 1)
         mpiPi_query_pc (p->pc[i], &(p->filename[i]), &(p->functname[i]),
@@ -334,7 +335,7 @@ mpiPi_query_src (callsite_stats_t * p)
           malloc (sizeof (callsite_src_id_cache_entry_t));
       bzero (csp, sizeof (callsite_src_id_cache_entry_t));
 
-      for (i = 0; (i < MPIP_CALLSITE_STACK_DEPTH) && (p->pc[i] != NULL); i++)
+      for (i = 0; (i < mpiPi.fullStackDepth) && (p->pc[i] != NULL); i++)
         {
           csp->filename[i] = strdup (key.filename[i]);
           csp->functname[i] = strdup (key.functname[i]);
@@ -342,7 +343,7 @@ mpiPi_query_src (callsite_stats_t * p)
           csp->pc[i] = p->pc[i];
         }
       csp->op = p->op;
-      if (mpiPi.stackDepth == 0)
+      if (mpiPi.reportStackDepth == 0)
         csp->id = csp->op - mpiPi_BASE;
       else
         csp->id = callsite_src_id_counter++;

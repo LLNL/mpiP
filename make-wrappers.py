@@ -1064,7 +1064,7 @@ def CreateWrapper(funct, olist):
     olist.append("mpiPi_GETTIME (&start);\n" )
 
     # capture call stack
-    olist.append("if ( mpiPi.stackDepth > 0 ) mpiPi_RecordTraceBack((*base_jbuf), call_stack, MPIP_CALLSITE_STACK_DEPTH);\n"  )
+    olist.append("if ( mpiPi.reportStackDepth > 0 ) mpiPi_RecordTraceBack((*base_jbuf), call_stack, mpiPi.fullStackDepth);\n"  )
 
     # end of enabled check
     olist.append("}\n\n")
@@ -1516,7 +1516,7 @@ def GenerateWrappers():
     print("-----*----- Generating profiling wrappers")
     cwd = os.getcwd()
     os.chdir(cwd)
-    sname = cwd + "/wrappers.c"
+    sname = cwd + "/mpiP-wrappers.c"
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
 
