@@ -591,8 +591,8 @@ mpiPi_print_callsites (FILE * fp)
            (frames_printed < mpiPi.reportStackDepth) && (av[i]->filename[j] != NULL) &&
            stack_continue_flag == 1; j++)
         {
-            //  May encounter multiple "wrappers.c" filename frames
-            if ( strcmp(av[i]->filename[j], "wrappers.c") == 0 )
+            //  May encounter multiple "mpiP-wrappers.c" filename frames
+            if ( strcmp(av[i]->filename[j], "mpiP-wrappers.c") == 0 )
                 continue;
 
             if ( NULL == display_op)

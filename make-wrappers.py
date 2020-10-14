@@ -1516,7 +1516,7 @@ def GenerateWrappers():
     print("-----*----- Generating profiling wrappers")
     cwd = os.getcwd()
     os.chdir(cwd)
-    sname = cwd + "/wrappers.c"
+    sname = cwd + "/mpiP-wrappers.c"
     g = open(sname, "w")
     olist = StandardFileHeader(sname)
 
