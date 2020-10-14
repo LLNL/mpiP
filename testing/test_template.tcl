@@ -43,6 +43,13 @@ proc runTest { } {
 
   set timeout 20
   case "$launch" in {
+      { "jsrun" } { 
+        set pre_args ""
+        set pre_procs "-p$procs"
+        set command "$launch $pre_args $pre_procs $test_targ"
+        send_user "${command} \n"
+        spawn -noecho {*}${command}
+      }
       { "prun" | "srun" } { 
         set pre_args "-p$pool"
         set pre_procs "-n$procs"

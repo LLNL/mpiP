@@ -7,7 +7,12 @@ exec sleep $pause_time
 
 
 case "$launch" in {
-    { "prun" | "srun" } { 
+    { "jsrun" } { 
+        set pre_args ""
+        set post_args ""
+        set pre_procs "-p2"
+        set post_procs ""
+    } { "prun" | "srun" } { 
         set pre_args "-p$pool"
         set post_args ""
         set pre_procs "-n2"
@@ -32,9 +37,9 @@ case "$launch" in {
 
 set timeout 30
 
-send_user "$launch $pre_args $pre_procs $test_targ $post_args $post_procs\n"
-
-spawn -noecho $launch $pre_args $pre_procs $test_targ $post_args $post_procs
+set command "$launch $pre_args $pre_procs $test_targ $post_args $post_procs"
+send_user "${command} \n"
+spawn -noecho {*}${command}
 
 expect { 
    "Collector found no records to merge."   { 
