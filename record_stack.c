@@ -32,7 +32,6 @@ static char *svnid = "$Id$";
 #endif
 
 
-
 #ifdef HAVE_LIBUNWIND
 
 int
@@ -50,7 +49,7 @@ mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 
   // Inlining / noinlining may affect frames in report
   //   - Tools frames may appear in report
-  parent_frame_start = 1;
+  parent_frame_start = 0;
 
   if (unw_getcontext (&uc) != 0)
     {
@@ -158,52 +157,35 @@ mpiPi_RecordTraceBack (void *pc, void *pc_array[], int max_back)
 #include <execinfo.h>
 
 int
-mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int report_back)
+mpiPi_RecordTraceBack (jmp_buf jb, void *pc_array[], int max_back)
 {
-#define MPIP_INTERNAL_FRAMES 3
-#define MPIP_MAX_TEMP_FRAMES (MPIP_CALLSITE_STACK_DEPTH_MAX + MPIP_INTERNAL_FRAMES)
-  int max_temp_back = MPIP_MAX_TEMP_FRAMES;
-  static void *temp_stack_trace[MPIP_MAX_TEMP_FRAMES];
+  static void *temp_stack_trace[MPIP_CALLSITE_STACK_DEPTH_MAX];
   int all_frame_count, user_frame_count;
   void **cp;
 
-  /*  backtrace() will provide us with the 3 internal mpiP stack frames,
-     as well as the user stack frames.  We need to make sure that the
-     report_back maximum number of stack frames reflects only the user
-     frames and not the internal mpiP frames.
+  /*  backtrace() will provide internal mpiP stack frames,
+     including for this function.  
 
-     So, let's:
-     o max_temp_back = MPIP_CALLSITE_STACK_DEPTH_MAX + 3
-     o use a temporary array of frame pointers size of max_temp_back
-     o call backtrace() for max_temp_back frames.
-     o memcpy backtrace results - 3 frames
+     libunwind functionality provides a stack trace beginning with the
+     parent function, so we remove the current function from the
+     stack trace for consistent behavior.
+
    */
 
-  if ((report_back + MPIP_INTERNAL_FRAMES) < max_temp_back)
-    max_temp_back = report_back + MPIP_INTERNAL_FRAMES;
+  all_frame_count = backtrace (temp_stack_trace, max_back);
 
-  all_frame_count = backtrace (temp_stack_trace, max_temp_back);
-
-  if (all_frame_count <= MPIP_INTERNAL_FRAMES)
+  if (all_frame_count <= MPIP_INTERNAL_STACK_DEPTH)
     return 0;
 
-  user_frame_count = all_frame_count - MPIP_INTERNAL_FRAMES;
+  memcpy(pc_array, temp_stack_trace+1, sizeof(void*)*(all_frame_count-1));
+  pc_array[all_frame_count] = NULL;
 
-  if (user_frame_count > report_back)
-    user_frame_count = report_back;
-
-  memmove (pc_array, &(temp_stack_trace[MPIP_INTERNAL_FRAMES]),
-           (user_frame_count * sizeof (void *)));
-  pc_array[user_frame_count] = NULL;
-
-#if defined(DO_PC_SUBTRACTION)
   /* Subtract 1 pointer size from results to point to the address 
-     of the calling instruction */
+     of the calling instruction rather than the return address */
   for (cp = pc_array; cp != NULL && *cp != NULL; cp++)
     *cp = *cp - sizeof (cp);
-#endif
 
-  return user_frame_count;
+  return all_frame_count;
 }
 
 #elif defined(USE_SETJMP)

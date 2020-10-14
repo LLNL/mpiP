@@ -126,15 +126,20 @@ mpiPi_init (char *appName, mpiPi_thr_mode_t thr_mode)
   if (DEFAULT_REPORT_FORMAT == mpiPi_style_concise)
     {
       mpiPi.report_style = mpiPi_style_concise;
-      mpiPi.stackDepth = 0;
+      mpiPi.reportStackDepth = 0;
       mpiPi.print_callsite_detail = 0;
     }
   else // verbose default
     {
       mpiPi.report_style = mpiPi_style_verbose;
-      mpiPi.stackDepth = 1;
+      mpiPi.reportStackDepth = 1;
       mpiPi.print_callsite_detail = 1;
     }
+
+  mpiPi.internalStackDepth = MPIP_INTERNAL_STACK_DEPTH;
+  mpiPi.fullStackDepth = mpiPi.reportStackDepth + mpiPi.internalStackDepth;
+  if ( mpiPi.fullStackDepth > MPIP_CALLSITE_STACK_DEPTH_MAX )
+      mpiPi.fullStackDepth = MPIP_CALLSITE_STACK_DEPTH_MAX;
 
 #ifdef COLLECTIVE_REPORT_DEFAULT
   mpiPi.collective_report = 1;
@@ -747,7 +752,7 @@ mpiPi_generateReport (int report_style)
 
   mpiPi_GETTIME (&timer_start);
   mergeResult = mpiPi_mergeResults ();
-  if (mergeResult == 1 && mpiPi.stackDepth == 0)
+  if (mergeResult == 1 && mpiPi.reportStackDepth == 0)
     mergeResult = mpiPi_insert_MPI_records ();
   if (mergeResult == 1)
     mergeResult = mpiPi_mergeCollectiveStats ();

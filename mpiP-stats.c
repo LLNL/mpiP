@@ -80,7 +80,7 @@ _thrd_pc_hashkey (const void *p)
   int i;
   callsite_stats_t *csp = (callsite_stats_t *) p;
   MPIP_CALLSITE_STATS_COOKIE_ASSERT (csp);
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  for (i = 0; i < mpiPi.fullStackDepth; i++)
     {
       res ^= (unsigned) (long) csp->pc[i];
     }
@@ -100,7 +100,7 @@ trd_pc_comparator (const void *p1, const void *p2)
   express (op);
   express (rank);
 
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  for (i = 0; i < mpiPi.fullStackDepth; i++)
     {
       express (pc[i]);
     }
@@ -208,7 +208,7 @@ mpiPi_stats_thr_cs_upd (mpiPi_thread_stat_t *stat,
   key.op = op;
   key.rank = rank;
   key.cookie = MPIP_CALLSITE_STATS_COOKIE;
-  for (i = 0; i < MPIP_CALLSITE_STACK_DEPTH; i++)
+  for (i = 0; i < mpiPi.fullStackDepth; i++)
     {
       key.pc[i] = pc[i];
     }
@@ -289,12 +289,6 @@ void mpiPi_stats_thr_cs_merge(mpiPi_thread_stat_t *dst,
   for(i=0; i<ac; i++)
     {
       callsite_stats_t *csp_src = av[i], *csp_dst;
-
-      /* update file/line in p if need */
-      if( NULL == csp_src->filename || NULL == csp_src->functname )
-        {
-          mpiPi_query_src (csp_src);
-        }
 
       /* Search for the callsite and create a new record if needed */
       if (NULL == h_search (dst->cs_stats, csp_src, (void **) &csp_dst))
