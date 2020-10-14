@@ -40,7 +40,7 @@ SRCS =	diag_msgs.c \
 	mpiP-mt-stats.c \
 	mpiP-tslist.c \
 	glob.c \
-	wrappers.c \
+	mpiP-wrappers.c \
 	wrappers_special.c \
 	mpiPi.c \
 	util.c \
@@ -242,7 +242,7 @@ endif
 #  parallel builds tend to fail.
 .NOTPARALLEL:
 
-wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
+mpiP-wrappers.c symbols.h lookup.c mpiPi_def.h: mpi.protos.txt make-wrappers.py
 	$(PYTHON) $(srcdir)/make-wrappers.py $(MAKE_WRAPPERS_ARGS) --arch=$(ARCH) --f77symbol $(F77_SYMBOLS) $^
 
 ifeq ($(ENABLE_API_ONLY), no)
@@ -290,7 +290,7 @@ proto:
 	cextract -DCEXTRACT $(CPPFLAGS) *.c | sed -e '/find_address/d' -e '/Dwarf/d' > mpiPi_proto.h
 
 clean::
-	rm -f wrappers.c symbols.h lookup.c mpiPi_def.h
+	rm -f mpiP-wrappers.c symbols.h lookup.c mpiPi_def.h
 
 clean::
 	rm -f ${FORTRAN_TARGET} ${DEMANGLE_TARGET} ${API_TARGET}
@@ -305,7 +305,7 @@ lint: ${SRCS}
 
 distclean: clean
 	make -C testing clean
-	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h wrappers.c testing/Makefile libmpiP* mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
+	rm -f Makefile Defs.mak Check.mak config.log config.status lookup.c mpiPconfig.h mpiPi_def.h symbols.h mpiP-wrappers.c testing/Makefile libmpiP* mpi.protos.txt get_fortran_arg.f mpip_timers/aix_local.h site.exp site.bak testing.sum
 
 include Check.mak
 
