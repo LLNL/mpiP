@@ -1,0 +1,3 @@
+
+checkOutput "Barrier .* 10848 " "Count check:"
+checkOutput "Gather .* 12 " "Count check:"

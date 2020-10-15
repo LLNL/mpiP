@@ -1,0 +1,16 @@
+
+##  Test-specific information
+#
+
+set test_title "02_mt_send-recv_nb: multi-threaded isend/irecv test"
+set test "mt/02_mt_send-recv_nb.exe"
+set procs 2
+set test_args "-m -t 6 -n 700"
+set source_check_file "testing/mt/02_mt_send-recv_nb.src"
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+

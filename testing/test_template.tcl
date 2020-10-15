@@ -39,36 +39,41 @@ proc checkAbsent { text type } {
 
 
 proc runTest { } {
-  global launch pool rmpool procs test_targ test expect_out env
+  global launch pool rmpool procs test_targ test expect_out env test_args
 
   set timeout 20
+
+  if { ! [info exists test_args] } {
+      set test_args ""
+  }
+
   case "$launch" in {
       { "jsrun" } { 
         set pre_args ""
         set pre_procs "-p$procs"
-        set command "$launch $pre_args $pre_procs $test_targ"
+        set command "$launch $pre_args $pre_procs $test_targ $test_args"
         send_user "${command} \n"
         spawn -noecho {*}${command}
       }
       { "prun" | "srun" } { 
         set pre_args "-p$pool"
         set pre_procs "-n$procs"
-        send_user "$launch $pre_args $pre_procs $test_targ \n"
-        spawn -noecho $launch $pre_args $pre_procs $test_targ 
+        send_user "$launch $pre_args $pre_procs $test_targ $test_args\n"
+        spawn -noecho $launch $pre_args $pre_procs $test_targ {*}$test_args    
       }
       { "mpirun" } { 
         set pre_args "-np"
         set pre_procs $procs
-        send_user "$launch $pre_args $pre_procs $test_targ \n"
-        spawn -noecho $launch $pre_args $pre_procs $test_targ 
+        send_user "$launch $pre_args $pre_procs $test_targ $test_args\n"
+        spawn -noecho $launch $pre_args $pre_procs $test_targ {*}$test_args
       }
       { "poe" } { 
         set env(MP_PROCS) "$procs"
 #       send_user "set MP_PROCS to $procs=$env(MP_PROCS)"
         set env(MP_NODES) 1
         set env(MP_RMPOOL) $rmpool
-        send_user "$launch $test_targ \n"
-        spawn -noecho $launch $test_targ 
+        send_user "$launch $test_targ $test_args\n"
+        spawn -noecho $launch $test_targ {*}$test_args
       }
   }
   

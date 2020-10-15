@@ -1,0 +1,5 @@
+
+checkOutput "Irecv .* 4200 " "Count check:"
+checkOutput "Isend .* 4200 " "Count check:"
+checkOutput "Waitall .* 84 " "Count check:"
+checkOutput "Gather .* 12 " "Count check:"

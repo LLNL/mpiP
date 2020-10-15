@@ -1,0 +1,18 @@
+
+##  Test-specific information
+#
+
+set test_title "03_mt_barrier: multi-threaded barrier test"
+set test "mt/03_mt_barrier.exe"
+set procs 2
+set test_args "-m -t 8 -n 678"
+set source_check_file "testing/mt/03_mt_barrier.src"
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
+# Do not pass args to other tests
+set test_args ""

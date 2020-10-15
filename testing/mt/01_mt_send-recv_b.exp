@@ -1,0 +1,17 @@
+
+##  Test-specific information
+#
+
+set test_title "01_mt_send-recv_b: multi-threaded send/recv test"
+set test "mt/01_mt_send-recv_b.exe"
+set procs 2
+set test_args "-m -t 4"
+set source_check_file "testing/mt/01_mt_send-recv_b.src"
+
+
+source "testing/test_template.tcl"
+
+checkSource
+
+send_user "\n\n"
+
