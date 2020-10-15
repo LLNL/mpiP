@@ -56,7 +56,9 @@ EXES += $(FSRCS:.f=.exe)
 #EXES += $(API_SRCS:.c=.exe)
 
 all: ${EXES}
+	make -C mt
 	@echo All done.
+
 
 .SUFFIXES: .exe
 .c.exe::
@@ -72,6 +74,7 @@ api-test.exe :: LIBS=$(API_LIBS)
 
 clean::
 	rm -f ${EXES} *.mpiP *.o
+	make -C mt clean
 
 include $(srcdir)/../Rules.mak
 

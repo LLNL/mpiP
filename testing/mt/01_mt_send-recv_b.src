@@ -1,0 +1,4 @@
+
+checkOutput "Recv .* 4000 " "Count check:"
+checkOutput "Send .* 4000 " "Count check:"
+checkOutput "Gather .* 12 " "Count check:"

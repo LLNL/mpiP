@@ -239,7 +239,7 @@ void mt_common_fini()
                  stats_glob[i].total_time);
       }
       printf("%s: count=%d, <service calls>\n",
-             "MPI_Gather", TEST_MPI_COUNT);
+             "MPI_Gather (Rank 0)", TEST_MPI_COUNT);
   }
 
   free(thread_ids);

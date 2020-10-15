@@ -1,5 +1,5 @@
 
-MPICC ?= mpicc
+include ../../Defs.mak
 
 HEADERS = mt_common.h
 
@@ -9,15 +9,13 @@ SRCS =  01_mt_send-recv_b.c     \
         04_mt_dynamic_threads.c \
         mt_common.c             \
 
-CFLAGS = -g -O3
-
-
+LIBS += -lpthread -L../.. -lmpiP
 all: $(SRCS) $(HEADERS)
-	$(MPICC) $(CFLAGS) -o 01_mt_send-recv_b 01_mt_send-recv_b.c mt_common.c
-	$(MPICC) $(CFLAGS) -o 02_mt_send-recv_nb 02_mt_send-recv_nb.c mt_common.c
-	$(MPICC) $(CFLAGS) -o 03_mt_barrier 03_mt_barrier.c mt_common.c
+	$(CC) $(CFLAGS) -o 01_mt_send-recv_b.exe 01_mt_send-recv_b.c mt_common.c $(LIBS)
+	$(CC) $(CFLAGS) -o 02_mt_send-recv_nb.exe 02_mt_send-recv_nb.c mt_common.c ${LIBS}
+	$(CC) $(CFLAGS) -o 03_mt_barrier.exe 03_mt_barrier.c mt_common.c ${LIBS}
 
 clean:
-	rm -f SRCS =  01_mt_send-recv_b 02_mt_send-recv_nb 03_mt_barrier 
+	rm -f SRCS =  01_mt_send-recv_b.exe 02_mt_send-recv_nb.exe 03_mt_barrier.exe *.mpiP *.o
 #04_mt_dynamic_threads
 

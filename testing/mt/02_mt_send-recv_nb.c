@@ -30,7 +30,7 @@ void send_nb(int tid)
 
       start = GET_TS();
       MPI_Waitall(j, req, MPI_STATUSES_IGNORE);
-      mt_common_stat_append(tid, TEST_MPI_WAITALL, j, GET_TS() - start);
+      mt_common_stat_append(tid, TEST_MPI_WAITALL, 1, GET_TS() - start);
     }
 
   MT_COMMON_DBG(tid,"End");
@@ -60,7 +60,7 @@ void recv_nb(int tid)
 
       start = GET_TS();
       MPI_Waitall(j, req, MPI_STATUSES_IGNORE);
-      mt_common_stat_append(tid, TEST_MPI_WAITALL, j, GET_TS() - start);
+      mt_common_stat_append(tid, TEST_MPI_WAITALL, 1, GET_TS() - start);
     }
 
   MT_COMMON_DBG(tid,"End");

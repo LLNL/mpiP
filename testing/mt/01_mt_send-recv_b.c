@@ -43,7 +43,7 @@ void recv_b(int tid)
       MPI_Recv(&buf, 1, MPI_INT, mt_common_nbr(), tid,
                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
-  mt_common_stat_append(tid, TEST_MPI_SEND, mt_common_iter(), GET_TS() - start);
+  mt_common_stat_append(tid, TEST_MPI_RECV, mt_common_iter(), GET_TS() - start);
 
   MT_COMMON_DBG(tid,"End");
   mt_common_thr_exit(tid);
