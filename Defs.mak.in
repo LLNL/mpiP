@@ -86,6 +86,7 @@ endif
 endif
 
 C_TARGET = libmpiP.a
+SHARED_C_TARGET = libmpiP.so
 API_TARGET = libmpiPapi.a
 MPIPLIB  = mpiP
 MPIPFLIB = mpiP

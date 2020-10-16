@@ -2956,7 +2956,7 @@ fi
 #  Enable / Disable specifications
 #
 
-DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
+DEFAULT_TARGS='${SHARED_C_TARGET}'
 ENABLE_API_ONLY=no
 # Check whether --enable-api-only was given.
 if test "${enable_api_only+set}" = set; then :

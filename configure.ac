@@ -162,7 +162,7 @@ AC_ARG_WITH(dclock,
 #  Enable / Disable specifications
 #
 
-DEFAULT_TARGS='${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET}'
+DEFAULT_TARGS='${SHARED_C_TARGET}'
 ENABLE_API_ONLY=no
 AC_ARG_ENABLE(api-only,
 	AS_HELP_STRING(--enable-api-only,Only build the API library.),

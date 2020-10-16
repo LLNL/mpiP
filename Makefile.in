@@ -27,7 +27,7 @@ include Defs.mak
 
 default: @DEFAULT_TARGS@
 
-all: ${C_TARGET} ${FORTRAN_TARGET} ${DEMANGLE_TARGET} API test
+all: ${SHARED_C_TARGET} test
 	@echo All done.
 
 PC_LOOKUP_FILE=@PC_LOOKUP_FILE@
@@ -136,7 +136,6 @@ ${API_TARGET}:: ${API_OBJS}
 
 
 ifeq ($(OS), Linux)
-SHARED_C_TARGET = $(C_TARGET:.a=.so)
 SHARED_FORTRAN_TARGET = $(FORTRAN_TARGET:.a=.so)
 SHARED_DEMANGLE_TARGET = $(DEMANGLE_TARGET:.a=.so)
 
