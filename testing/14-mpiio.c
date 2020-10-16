@@ -16,10 +16,18 @@ static char *svnid =
 
 #include <mpi.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define TEST_OPS 20
-#define BUF_SIZE 256
 #define BLOCK_SIZE 16
+
+//#define DEBUG
+#ifdef DEBUG
+#define fprintf(...) fprintf(__VA_ARGS__)
+#else
+#define fprintf(...)
+#endif
 
 int
 main (int argc, char **argv)
@@ -27,59 +35,100 @@ main (int argc, char **argv)
   MPI_Request request;
   MPI_File fh;
   MPI_Datatype ftype;
-  MPI_Offset offset;
   MPI_Status status;
-  int rank, wsize, fsize, i;
+  MPI_Offset offset;
+
+  int rank, wsize, i;
   char file_name[128];
-  int buf[BUF_SIZE * TEST_OPS];
+  size_t data_size;
+  int *buf;
   int count;
+  int ret;
+  char *pfs_path;
 
   MPI_Init (&argc, &argv);
 
   MPI_Comm_size (MPI_COMM_WORLD, &wsize);
   MPI_Comm_rank (MPI_COMM_WORLD, &rank);
 
-  strcpy (file_name, argv[0]);
-  strcat (file_name, ".tmp");
+  data_size = BLOCK_SIZE * TEST_OPS * wsize * sizeof(int);
+  fprintf(stderr, "data_size is %ld\n", data_size);
 
-  MPI_File_open (MPI_COMM_WORLD, file_name, MPI_MODE_RDWR | MPI_MODE_CREATE,
+  pfs_path = getenv("MPIP_TEST_PFS_DIR");
+  if ( NULL == pfs_path)
+      strcpy (file_name, "./testing/");
+  else
+      strcpy (file_name, pfs_path);
+  strcat (file_name, "14-mpiio.tmp");
+  fprintf(stderr, "file_name is %s\n", file_name);
+
+  ret = MPI_File_open (MPI_COMM_WORLD, file_name, MPI_MODE_RDWR | MPI_MODE_CREATE | MPI_MODE_DELETE_ON_CLOSE,
 		 MPI_INFO_NULL, &fh);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_open\n", rank);
+  fprintf(stderr, "After MPI_File_open\n");
 
-  fsize = wsize * BUF_SIZE * TEST_OPS;
-  MPI_File_preallocate (fh, fsize);
+  buf = (int*)malloc(data_size);
+  if ( NULL == buf ) fprintf(stderr, " Rank %d failed to allocate %zd bytes\n", rank, data_size);
 
-  memset (buf, 0, BUF_SIZE * TEST_OPS);
+  ret = MPI_File_preallocate (fh, data_size);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_preallocate\n", rank);
+  fprintf(stderr, "After MPI_File_preallocate\n");
+
+  memset (buf, 0, data_size);
   offset = 0;
   count = BLOCK_SIZE;
 
   for (i = 0; i < TEST_OPS; i++)
     {
-      offset = i * BLOCK_SIZE + (rank * BLOCK_SIZE * TEST_OPS);
+      offset = (i * BLOCK_SIZE * sizeof(int)) + (rank * BLOCK_SIZE * TEST_OPS * sizeof(int));
+      fprintf(stderr, "Rank %d offset 1:%d is %lld, count %d\n", rank, i, offset, count);
 
-      MPI_File_seek (fh, offset, MPI_SEEK_SET);
-      MPI_File_write (fh, buf, count, MPI_INT, &status);
+      ret = MPI_File_seek (fh, offset, MPI_SEEK_SET);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_seek\n", rank);
+      fprintf(stderr, "After MPI_File_seek\n");
 
-      MPI_File_seek (fh, offset, MPI_SEEK_SET);
-      MPI_File_read (fh, buf, count, MPI_INT, &status);
+      ret = MPI_File_write (fh, buf, count, MPI_INT, &status);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_write\n", rank);
+
+      ret = MPI_File_seek (fh, offset, MPI_SEEK_SET);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_seek 2\n", rank);
+
+      ret = MPI_File_read (fh, buf, count, MPI_INT, &status);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_read\n", rank);
     }
 
   for (i = 0; i < TEST_OPS; i++)
     {
-      offset = i * BLOCK_SIZE + (rank * BLOCK_SIZE * TEST_OPS);
-      MPI_File_write_at (fh, offset, buf, count, MPI_INT, &status);
-      MPI_File_read_at (fh, offset, buf, count, MPI_INT, &status);
+      offset = (i * BLOCK_SIZE * sizeof(int)) + (rank * BLOCK_SIZE * TEST_OPS * sizeof(int));
+      fprintf(stderr, "Rank %d offset 2:%d is %lld, count %d\n", rank, i, offset, count);
+
+      ret = MPI_File_write_at (fh, offset, buf, count, MPI_INT, &status);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_write_at\n", rank);
+
+      ret = MPI_File_read_at (fh, offset, buf, count, MPI_INT, &status);
+      if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_read_at\n", rank);
     }
 
-  MPI_Type_vector (fsize / BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE * wsize,
+  ret = MPI_Type_vector (data_size / BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE * wsize,
 		   MPI_INT, &ftype);
-  MPI_Type_commit (&ftype);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_Type_vector\n", rank);
+
+  ret = MPI_Type_commit (&ftype);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_Type_commit\n", rank);
 
   offset = rank * BLOCK_SIZE * TEST_OPS;
   count = BLOCK_SIZE * TEST_OPS;
 
-  MPI_File_set_view (fh, offset, MPI_INT, ftype, "native", MPI_INFO_NULL);
-  MPI_File_write_all (fh, buf, count, MPI_INT, &status);
-  MPI_File_read_all (fh, buf, count, MPI_INT, &status);
+  ret = MPI_File_set_view (fh, offset, MPI_INT, ftype, "native", MPI_INFO_NULL);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_set_view\n", rank);
+
+  ret = MPI_File_write_all (fh, buf, count, MPI_INT, &status);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_write_all\n", rank);
+
+  ret = MPI_File_read_all (fh, buf, count, MPI_INT, &status);
+  if ( MPI_SUCCESS != ret ) fprintf(stderr, " Rank %d failed MPI_File_read_all\n", rank);
+
+  free(buf);
 
   MPI_File_close (&fh);
 

@@ -15,7 +15,6 @@ FFLAGS  = -g
 LDFLAGS	+= -L..
 CXXLIBS	:= -l$(MPIPCXXLIB) $(LIBS) $(CXXLIBS)
 FLIBS	:= -l$(MPIPFLIB) $(LIBS)
-API_LIBS := -lmpiPapi $(LIBS)
 LIBS	:= -lmpiP $(LIBS)
 CPPFLAGS =
 ADD_OBJS = @ADD_OBJS@
@@ -48,12 +47,10 @@ CSRCS += 17-rma.c
 endif
 
 FSRCS =	0-simplef.f sweep-ops.f sweep-ops-stack.f 16-waitallf.f 
-API_SRCS = api-test.c
 
 TEXES = $(CSRCS:.c=.exe)
 EXES = $(TEXES:.C=.exe)
 EXES += $(FSRCS:.f=.exe)
-#EXES += $(API_SRCS:.c=.exe)
 
 all: ${EXES}
 	make -C mt
@@ -69,8 +66,6 @@ all: ${EXES}
 
 .f.exe:
 	${FC} ${FFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} -o $@ ${LDFLAGS} ${FLIBS}
-
-api-test.exe :: LIBS=$(API_LIBS)
 
 clean::
 	rm -f ${EXES} *.mpiP *.o

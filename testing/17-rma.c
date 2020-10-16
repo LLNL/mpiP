@@ -15,9 +15,8 @@ main (int argc, char **argv)
   MPI_Request req;
   MPI_Info info;
   char *base, *result;
-  int disp_unit = 1;
   int rank, size, target_rank, target_disp = 0;
-  int r, i, flag, errlen, *ranks;
+  int r, errlen;
   char errmsg[MPI_MAX_ERROR_STRING];
 
   /*************************************************************/
@@ -28,7 +27,6 @@ main (int argc, char **argv)
   MPI_Comm_rank (MPI_COMM_WORLD, &rank);
   MPI_Comm_size (MPI_COMM_WORLD, &size);
   target_rank = (rank + 1) % size;
-  ranks = (int *) malloc (sizeof (int) * size);
 
   MPI_Alloc_mem (WIN_SIZE, MPI_INFO_NULL, &base);
   if (NULL == base)
@@ -54,6 +52,7 @@ main (int argc, char **argv)
   /* Win_create */
   /*************************************************************/
 
+  fprintf(stderr, "First epoch : rank %d\n", rank);
   r = MPI_Win_create (base, win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD, &win);
   if (MPI_SUCCESS TEST_OP r)
     {
@@ -96,7 +95,7 @@ main (int argc, char **argv)
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Win_free\n", rank);
 
-  //printf ("End of first epoch.\n");
+  fprintf (stderr, "End of first epoch - rank %d.\n", rank);
 
 
   /*************************************************************/
@@ -104,44 +103,36 @@ main (int argc, char **argv)
   /*              Complete, Wait                               */
   /*************************************************************/
 
-  /* Create rank-specific windows */
-  if (rank == 0)
-    {
-      r =
-	MPI_Win_create (base, win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD,
-			&win);
-      if (MPI_SUCCESS TEST_OP r)
-	printf ("Rank %d failed MPI_Win_create\n", rank);
-    }
-  else
-    {
-      r =
-	MPI_Win_create (NULL, 0, sizeof(MPI_INT), MPI_INFO_NULL, MPI_COMM_WORLD,
-			&win);
-      if (MPI_SUCCESS TEST_OP r)
-	printf ("Rank %d failed MPI_Win_create\n", rank);
-    }
+  fprintf(stderr, "Second epoch : rank %d\n", rank);
+
+  /* Create window */
+  r =
+      MPI_Win_create (base, win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD,
+              &win);
+  if (MPI_SUCCESS TEST_OP r)
+      printf ("Rank %d failed MPI_Win_create\n", rank);
 
   /* Create distinct groups */
   r = MPI_Comm_group (MPI_COMM_WORLD, &comm_group);
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Comm_group\n", rank);
 
-  for (i = 0; i < size; i++)
-    ranks[i] = i;
+  int target = 0, origin = 1;
 
   if (rank == 0)
     {
-      r = MPI_Group_incl (comm_group, 1, ranks, &group);
-      if (MPI_SUCCESS TEST_OP r)
-	printf ("Rank %d failed MPI_Group_incl\n", rank);
+        //r = MPI_Group_incl (comm_group, 1, &target, &group);
+        r = MPI_Group_incl (comm_group, 1, &origin, &group);
+        if (MPI_SUCCESS TEST_OP r)
+            printf ("Rank %d failed MPI_Group_incl\n", rank);
     }
   else
     {
-      r = MPI_Group_incl (comm_group, size - 1, ranks + 1, &group);
-      if (MPI_SUCCESS TEST_OP r)
-	printf ("Rank %d failed MPI_Group_incl\n", rank);
+        r = MPI_Group_incl (comm_group, 1, &target, &group);
+        if (MPI_SUCCESS TEST_OP r)
+            printf ("Rank %d failed MPI_Group_incl\n", rank);
     }
+
 
   /*  Communication  */
   if (rank == 0)
@@ -169,19 +160,22 @@ main (int argc, char **argv)
 	printf ("Rank %d failed MPI_Win_complete\n", rank);
 
     }
+
   r = MPI_Win_free (&win);
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Win_free\n", rank);
 
   MPI_Group_free (&comm_group);
   MPI_Group_free (&group);
-  free (base);
+  //free (base);
 
-  //printf ("End of second epoch.\n");
+  fprintf (stderr, "End of second epoch - rank %d.\n", rank);
 
   /*************************************************************/
   /* Third epoch: Win_allocate, Win_get_info, Win_set_info, Lock, Unlock, Rput */
   /*************************************************************/
+  fprintf(stderr, "Third epoch : rank %d\n", rank);
+
   r =
     MPI_Win_allocate (win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD, base, &win);
   if (MPI_SUCCESS TEST_OP r)
@@ -195,33 +189,56 @@ main (int argc, char **argv)
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Win_set_info\n", rank);
 
-  r = MPI_Win_lock (MPI_LOCK_SHARED, target_rank, 0, win);
-  if (MPI_SUCCESS TEST_OP r)
-    printf ("Rank %d failed MPI_Win_lock\n", rank);
-
-  if (rank == 0)
-    {
-      r = MPI_Rput (base, WIN_SIZE, MPI_BYTE, target_rank, target_disp,
-		   WIN_SIZE, MPI_BYTE, win, &req);
-      if (MPI_SUCCESS TEST_OP r)
-	printf ("Rank %d failed MPI_Put\n", rank);
-    }
-
-  r = MPI_Win_unlock (target_rank, win);
-  if (MPI_SUCCESS TEST_OP r)
-    printf ("Rank %d failed MPI_Win_unlock\n", rank);
-
-  r = MPI_Win_fence (0, win);
-  if (MPI_SUCCESS TEST_OP r)
-    printf ("Rank %d failed MPI_Win_fence\n", rank);
-
   r = MPI_Win_free (&win);
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Win_free\n", rank);
 
+  if ( 0 == rank )
+  {
+      r =
+          MPI_Win_create(NULL,0,1, MPI_INFO_NULL,MPI_COMM_WORLD,&win);
+      if (MPI_SUCCESS TEST_OP r)
+          printf ("Rank %d failed MPI_Win_create\n", rank);
+  }
+  else
+  {
+      r =
+          MPI_Win_create (base, win_size, 1, MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+      if (MPI_SUCCESS TEST_OP r)
+          printf ("Rank %d failed MPI_Win_create\n", rank);
+  }
+
+
+  if ( 0 == rank )
+  {
+      r = MPI_Win_lock (MPI_LOCK_SHARED, target_rank, 0, win);
+      if (MPI_SUCCESS TEST_OP r)
+          printf ("Rank %d failed MPI_Win_lock\n", rank);
+
+      r = MPI_Rput (base, WIN_SIZE, MPI_BYTE, target_rank, target_disp,
+              WIN_SIZE, MPI_BYTE, win, &req);
+      if (MPI_SUCCESS TEST_OP r)
+          printf ("Rank %d failed MPI_Put\n", rank);
+
+      r = MPI_Win_unlock (target_rank, win);
+      if (MPI_SUCCESS TEST_OP r)
+          printf ("Rank %d failed MPI_Win_unlock\n", rank);
+  }
+
+  r = MPI_Win_fence (0, win);
+  if (MPI_SUCCESS TEST_OP r)
+      printf ("Rank %d failed MPI_Win_fence\n", rank);
+
+  r = MPI_Win_free (&win);
+  if (MPI_SUCCESS TEST_OP r)
+      printf ("Rank %d failed MPI_Win_free\n", rank);
+
+  fprintf (stderr, "End of third epoch - rank %d.\n", rank);
+
   /*************************************************************/
   /* Fourth epoch: Win_create_dynamic, attach, detach */
   /*************************************************************/
+  fprintf (stderr, "Start of fourth epoch - rank %d.\n", rank);
   MPI_Alloc_mem (WIN_SIZE, MPI_INFO_NULL, &base);
   if (NULL == base)
     {
@@ -253,10 +270,10 @@ main (int argc, char **argv)
   if (MPI_SUCCESS TEST_OP r)
     printf ("Rank %d failed MPI_Win_free\n", rank);
 
+  fprintf (stderr, "End of fourth epoch - rank %d.\n", rank);
   /*************************************************************/
   /* Finalize */
   /*************************************************************/
-  free (ranks);
 
   MPI_Finalize ();
 }
