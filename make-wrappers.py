@@ -254,6 +254,7 @@ opaqueInArgDict = {
   ("MPI_File_write_at_all", "datatype"):"MPI_Datatype",
   ("MPI_File_get_position", "fh"):"MPI_File",
   ("MPI_File_get_byte_offset", "fh"):"MPI_File",
+  ("MPI_File_get_size", "fh"):"MPI_File",
   ("MPI_File_sync", "fh"):"MPI_File",
   ("MPI_Gather", "comm"):"MPI_Comm",
   ("MPI_Gather", "recvtype"):"MPI_Datatype",
