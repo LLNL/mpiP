@@ -1297,6 +1297,7 @@ def CreateWrapper(funct, olist):
                 1 == fdict[funct].paramDict[i].pointerLevel ) :
             stringVarNames.append(i);
             decl += "  char *c_" + i + " = NULL;\n";
+            currBasetype = fdict[funct].paramDict[i].basetype
         else:
             #  Not translating this variable
             currBasetype = fdict[funct].paramDict[i].basetype
