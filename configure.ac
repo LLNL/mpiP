@@ -388,6 +388,11 @@ if test "x$AR" = "x"; then
    AR=ar
 fi
 
+AC_CHECK_PROG(HAVE_PYTHON,[python],[python],[no])
+if test "x$HAVE_PYTHON" == "xno" ; then
+  AC_MSG_ERROR([Python is required to build mpiP.])
+fi
+
 TEST_LIST=
 
 #  Test for available compilers
