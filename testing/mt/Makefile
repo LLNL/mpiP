@@ -19,8 +19,8 @@ mt_common.o : mt_common.c $(HEADERS)
 	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
 
 %.exe : %.c mt_common.o $(HEADERS) 
-	${CC} ${CFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} mt_common.o -o $@ ${LDFLAGS} ${LIBS}
+	${CC} ${CFLAGS} ${CPPFLAGS} $< ${ADD_OBJS} mt_common.o ${ADD_OBJS} -o $@ ${LDFLAGS} ${LIBS}
 
 clean::
-	rm -f ${EXES} mt_common.o
+	rm -f ${EXES} *.o *.mpiP
 
