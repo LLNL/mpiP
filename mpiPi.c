@@ -554,7 +554,7 @@ mpiPi_mergept2ptStats ()
   size_t size;
 
 
-  if (mpiPi.do_pt2pt_stats_report)
+  if (!mpiPi.do_pt2pt_stats_report)
     {
       return 1;
     }
