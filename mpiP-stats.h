@@ -59,7 +59,7 @@ typedef struct {
   mpiPi_msg_stat_t coll, pt2pt;
 } mpiPi_thread_stat_t;
 
-int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_fini(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_reset_all(mpiPi_thread_stat_t *stat);
 void mpiPi_stats_thr_merge_all(mpiPi_thread_stat_t *dst,
@@ -108,8 +108,8 @@ void mpiPi_stats_thr_pt2pt_binstrings(mpiPi_thread_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
 
-int mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat);
-int mpiPi_stats_thr_enter(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat);
+void mpiPi_stats_thr_enter(mpiPi_thread_stat_t *stat);
 int mpiPi_stats_thr_is_on(mpiPi_thread_stat_t *stat);
 
 #endif

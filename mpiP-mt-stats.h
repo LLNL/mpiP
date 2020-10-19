@@ -69,8 +69,8 @@ void mpiPi_stats_mt_pt2pt_binstrings(mpiPi_mt_stat_t *stat,
                                      int comm_idx, char *comm_buf,
                                      int size_idx, char *size_buf);
 
-int mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl);
-int mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl);
+void mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl);
+void mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl);
 int mpiPi_stats_mt_is_on(mpiPi_mt_stat_tls_t *hndl);
 
 #endif // MPIPMTSTATS_H

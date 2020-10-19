@@ -300,17 +300,17 @@ void mpiPi_stats_mt_pt2pt_binstrings(mpiPi_mt_stat_t *stat,
                                    size_idx, size_buf);
 }
 
-int mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl)
+void mpiPi_stats_mt_exit(mpiPi_mt_stat_tls_t *hndl)
 {
   mpiPi_stats_thr_exit(hndl->tls_ptr);
 }
 
-int mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl)
+void mpiPi_stats_mt_enter(mpiPi_mt_stat_tls_t *hndl)
 {
   mpiPi_stats_thr_enter(hndl->tls_ptr);
 }
 
 int mpiPi_stats_mt_is_on(mpiPi_mt_stat_tls_t *hndl)
 {
-  mpiPi_stats_thr_is_on(hndl->tls_ptr);
+  return mpiPi_stats_thr_is_on(hndl->tls_ptr);
 }

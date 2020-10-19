@@ -109,7 +109,7 @@ trd_pc_comparator (const void *p1, const void *p2)
   return 0;
 }
 
-int mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat)
+void mpiPi_stats_thr_init(mpiPi_thread_stat_t *stat)
 {
   stat->cs_stats = h_open (mpiPi.tableSize, _thrd_pc_hashkey,
                                       trd_pc_comparator);
@@ -174,12 +174,12 @@ double mpiPi_stats_thr_cum_time(mpiPi_thread_stat_t *s)
   return s->cum_time;
 }
 
-int mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat)
+void mpiPi_stats_thr_exit(mpiPi_thread_stat_t *stat)
 {
   stat->disabled++;
 }
 
-int mpiPi_stats_thr_enter(mpiPi_thread_stat_t *stat)
+void mpiPi_stats_thr_enter(mpiPi_thread_stat_t *stat)
 {
   stat->disabled--;
 }
