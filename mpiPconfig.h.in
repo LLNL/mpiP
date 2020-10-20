@@ -18,6 +18,9 @@
 /* F77 symbols */
 #undef F77_SYMBOLS
 
+/* ARM LSE */
+#undef HAVE_ARM_LSE
+
 /* BFD booleans */
 #undef HAVE_BFD_BOOLEAN
 

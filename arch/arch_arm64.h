@@ -14,7 +14,7 @@
 #define ARCH_ARM64_H
 
 #include <stdint.h>
-#include "mpiPconfig.h"b
+#include "mpiPconfig.h"
 
 #define MB()  __asm__ __volatile__ ("dmb sy" : : : "memory")
 #define RMB() __asm__ __volatile__ ("dmb ld" : : : "memory")
@@ -62,12 +62,15 @@ static inline int64_t _mpiP_atomic_swap_lse(int64_t *addr, int64_t newval)
   return ret;
 }
 
-/* TODO: Detect the support for LSE extentions */
 static inline void *mpiP_atomic_swap(void **_addr, void *_newval)
 {
   int64_t *addr  = (int64_t *)_addr;
   int64_t newval = (int64_t)_newval;
+#if HAVE_ARM_LSE == 1
   return (void*)_mpiP_atomic_swap_lse(addr, newval);
+#else
+  return (void*)_mpiP_atomic_swap_ldst(addr, newval);
+#endif
 }
 
 static inline int mpiP_atomic_cas(void **_addr, void **_oldval, void *_newval)

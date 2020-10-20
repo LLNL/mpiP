@@ -5885,6 +5885,43 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 fi
+
+#  Check for ARM LSE
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking ARM LSE" >&5
+$as_echo_n "checking ARM LSE... " >&6; }
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+ #include <stdint.h>
+int
+main ()
+{
+ #if __aarch64__
+                          int64_t *addr, newval; int64_t ret;
+
+__asm__ __volatile__ ("swpl %2, %0, [%1]\n"
+                      : "=&r" (ret)
+                      : "r" (addr), "r" (newval)
+                      : );
+#else
+fail
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+$as_echo "#define HAVE_ARM_LSE 1" >>confdefs.h
+
+else
+  ({ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; })
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+#AC_SUBST(HAVE_ARM_LSE)
 fi
 
 #  If using Fortran routines to access command line,

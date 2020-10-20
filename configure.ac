@@ -636,6 +636,25 @@ if test "$ENABLE_FORTRAN_XLATE" = yes ; then
               (AC_MSG_RESULT(  functions not found  translation deactivated)
                 ENABLE_FORTRAN_XLATE=no) )
 fi
+
+#  Check for ARM LSE
+     AC_MSG_CHECKING(ARM LSE)
+     AC_LINK_IFELSE(
+       [ AC_LANG_PROGRAM([[#include <stdint.h>]], 
+                         [[ #if __aarch64__   
+                          int64_t *addr, newval; int64_t ret;
+
+__asm__ __volatile__ ("swpl %2, %0, [%1]\n"
+                      : "=&r" (ret)
+                      : "r" (addr), "r" (newval)
+                      : );
+#else
+fail
+#endif
+]] ) ],
+	      [AC_MSG_RESULT([yes])] AC_DEFINE(HAVE_ARM_LSE, [1], [Using a processor with LSE]),
+              (AC_MSG_RESULT( no)) )
+#AC_SUBST(HAVE_ARM_LSE)
 fi
 
 #  If using Fortran routines to access command line,
