@@ -11,7 +11,7 @@ directives
 	nowrapper
 directives
 
-int MPI_Address ( void *location, MPI_Aint *address )
+int MPI_Get_address ( mpip_const_void_t *location, MPI_Aint *address )
 directives
 	nowrapper
 directives
@@ -25,13 +25,6 @@ int MPI_Allreduce ( mpip_const_void_t *sendbuf, void *recvbuf, int count, MPI_Da
 int MPI_Alltoall ( mpip_const_void_t *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcnt, MPI_Datatype recvtype, MPI_Comm comm )
 
 int MPI_Alltoallv ( mpip_const_void_t *sendbuf, mpip_const_int_t *sendcnts, mpip_const_int_t *sdispls, MPI_Datatype sendtype, void *recvbuf, mpip_const_int_t *recvcnts, mpip_const_int_t *rdispls, MPI_Datatype recvtype, MPI_Comm comm )
-
-@ Deprecated since MPI-2.0
-@int MPI_Attr_delete ( MPI_Comm comm, int keyval )
-
-@int MPI_Attr_get ( MPI_Comm comm, int keyval, void *attr_value, int *flag )
-
-@int MPI_Attr_put ( MPI_Comm comm, int keyval, void *attr_value )
 
 int MPI_Barrier ( MPI_Comm comm )
 
@@ -63,6 +56,12 @@ int MPI_Cart_sub ( MPI_Comm comm, mpip_const_int_t *remain_dims, MPI_Comm *comm_
 
 int MPI_Cartdim_get ( MPI_Comm comm, int *ndims )
 
+int MPI_Comm_delete_attr ( MPI_Comm comm, int comm_keyval )
+
+int MPI_Comm_get_attr ( MPI_Comm comm, int comm_keyval, void *attribute_value, int *flag )
+
+int MPI_Comm_set_attr ( MPI_Comm comm, int comm_keyval, void *attribute_value )
+
 int MPI_Comm_compare ( MPI_Comm comm1, MPI_Comm comm2, int *result )
 directives
 	nowrapper
@@ -70,9 +69,24 @@ directives
 
 int MPI_Comm_create ( MPI_Comm comm, MPI_Group group, MPI_Comm *comm_out )
 
+int MPI_Comm_create_errhandler ( MPI_Comm_errhandler_function *function, MPI_Errhandler *errhandler )
+directives
+	nowrapper
+directives
+
+int MPI_Comm_create_keyval ( MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, int *comm_keyval, void *extra_state )
+
+
 int MPI_Comm_dup ( MPI_Comm comm, MPI_Comm *comm_out )
 
 int MPI_Comm_free ( MPI_Comm *commp )
+
+int MPI_Comm_free_keyval ( int *keyval )
+
+int MPI_Comm_get_errhandler ( MPI_Comm comm, MPI_Errhandler *errhandler )
+directives
+	nowrapper
+directives
 
 @int MPI_Comm_get_name ( MPI_Comm comm, char *namep, int *reslen )
 
@@ -87,6 +101,11 @@ int MPI_Comm_remote_group ( MPI_Comm comm, MPI_Group *group )
 
 int MPI_Comm_remote_size ( MPI_Comm comm, int *size )
 
+int MPI_Comm_set_errhandler ( MPI_Comm comm, MPI_Errhandler errhandler )
+directives
+	nowrapper
+directives
+
 @int MPI_Comm_set_name ( MPI_Comm com, char * name )
 
 int MPI_Comm_size ( MPI_Comm comm, int *size )
@@ -100,22 +119,7 @@ int MPI_Comm_test_inter ( MPI_Comm comm, int *flag )
 
 int MPI_Dims_create ( int nnodes, int ndims, int *dims )
 
-int MPI_Errhandler_create ( MPI_Handler_function *function, MPI_Errhandler *errhandler )
-directives
-	nowrapper
-directives
-
 int MPI_Errhandler_free ( MPI_Errhandler *errhandler )
-directives
-	nowrapper
-directives
-
-int MPI_Errhandler_get ( MPI_Comm comm, MPI_Errhandler *errhandler )
-directives
-	nowrapper
-directives
-
-int MPI_Errhandler_set ( MPI_Comm comm, MPI_Errhandler errhandler )
 directives
 	nowrapper
 directives
@@ -245,11 +249,6 @@ int MPI_Isend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int de
 
 int MPI_Issend ( mpip_const_void_t *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request )
 
-@int MPI_Keyval_create ( MPI_Copy_function *copy_fn, MPI_Delete_function *delete_fn, int *keyval, void *extra_state )
-
-@ Deprecated since MPI-2.0
-@int MPI_Keyval_free ( int *keyval )
-
 int MPI_Op_create ( MPI_User_function *function, int commute, MPI_Op *op )
 directives
 	nowrapper
@@ -348,17 +347,27 @@ directives
 	nowrapper
 directives
 
+int MPI_Type_create_hindexed ( int count, int *blocklens, MPI_Aint *array_of_displacements, MPI_Datatype old_type, MPI_Datatype *newtype )
+directives
+	nowrapper
+directives
+
+int MPI_Type_create_hvector ( int count, int blocklen, MPI_Aint stride, MPI_Datatype old_type, MPI_Datatype *newtype )
+directives
+	nowrapper
+directives
+
 int MPI_Type_create_indexed_block ( int count, int blocklength, int array_of_displacements[], MPI_Datatype old_type, MPI_Datatype *newtype )
 directives
 	nowrapper
 directives
 
-int MPI_Type_create_subarray ( int ndims, int *array_of_sizes, int *array_of_subsizes, int *array_of_starts, int order, MPI_Datatype oldtype, MPI_Datatype *newtype )
+int MPI_Type_create_struct ( int count, mpip_const_void_t *array_of_blocklengths, MPI_Aint *array_of_displacements, MPI_Datatype *array_of_types, MPI_Datatype *newtype )
 directives
 	nowrapper
 directives
 
-int MPI_Type_extent ( MPI_Datatype datatype, MPI_Aint *extent )
+int MPI_Type_create_subarray ( int ndims, int *array_of_sizes, int *array_of_subsizes, int *array_of_starts, int order, MPI_Datatype oldtype, MPI_Datatype *newtype )
 directives
 	nowrapper
 directives
@@ -369,12 +378,7 @@ int MPI_Type_get_contents ( MPI_Datatype datatype, int max_integers, int max_add
 
 int MPI_Type_get_envelope ( MPI_Datatype datatype, int *num_integers, int *num_addresses, int *num_datatypes, int *combiner )
 
-int MPI_Type_hindexed ( int count, int *blocklens, MPI_Aint *indices, MPI_Datatype old_type, MPI_Datatype *newtype )
-directives
-	nowrapper
-directives
-
-int MPI_Type_hvector ( int count, int blocklen, MPI_Aint stride, MPI_Datatype old_type, MPI_Datatype *newtype )
+int MPI_Type_get_extent ( MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent )
 directives
 	nowrapper
 directives
@@ -384,22 +388,7 @@ directives
 	nowrapper
 directives
 
-int MPI_Type_lb ( MPI_Datatype datatype, MPI_Aint *displacement )
-directives
-	nowrapper
-directives
-
 int MPI_Type_size ( MPI_Datatype datatype, int *size )
-directives
-	nowrapper
-directives
-
-int MPI_Type_struct ( int count, int *blocklens, MPI_Aint *indices, MPI_Datatype *old_types, MPI_Datatype *newtype )
-directives
-	nowrapper
-directives
-
-int MPI_Type_ub ( MPI_Datatype datatype, MPI_Aint *displacement )
 directives
 	nowrapper
 directives
