@@ -250,12 +250,12 @@ else
 ${API_OBJS} : mpiPconfig.h mpiPi.h mpiPi_proto.h mpip_timers.h
 endif
 
-install:: ${C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} 
+install:: ${SHARED_C_TARGET} ${DEMANGLE_TARGET} ${FORTRAN_TARGET} 
 	mkdir -p ${DESTDIR}${libdir} ${DESTDIR}${docdir}
-	${INSTALL} ${C_TARGET} ${DESTDIR}${libdir}/${C_TARGET}
+	${INSTALL} ${SHARED_C_TARGET} ${DESTDIR}${libdir}/${SHARED_C_TARGET}
 	if test "x${DEMANGLE_TARGET}" != "x" ; then ${INSTALL} ${DEMANGLE_TARGET} ${DESTDIR}${libdir}/${DEMANGLE_TARGET} ; fi
 	if test "x${FORTRAN_TARGET}" != "x" ; then ${INSTALL} ${FORTRAN_TARGET} ${DESTDIR}${libdir}/${FORTRAN_TARGET} ; fi
-	${INSTALL} doc/*txt doc/*html doc/README ${DESTDIR}${docdir} ; \
+	${INSTALL} doc/*md doc/*html doc/*pdf doc/README ${DESTDIR}${docdir} ; \
 
 install-api: API
 	mkdir -p ${DESTDIR}${libdir} ${DESTDIR}${includedir}/mpip_timers 
