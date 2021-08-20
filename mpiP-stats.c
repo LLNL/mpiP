@@ -306,6 +306,30 @@ void mpiPi_stats_thr_cs_merge(mpiPi_thread_stat_t *dst,
   free (av);
 }
 
+/* Collective histogram stats track call timing */
+static void _update_dur_stat (mpiPi_msg_stat_t *stat,
+                                int op, double dur, double size,
+                                MPI_Comm * comm,
+                                char *dbg_prefix)
+{
+  int op_idx, comm_size, comm_bin, size_bin;
+
+  PMPI_Comm_size (*comm, &comm_size);
+
+  op_idx = op - mpiPi_BASE;
+
+  comm_bin = get_histogram_bin (&stat->comm_hist, comm_size);
+  size_bin = get_histogram_bin (&stat->size_hist, size);
+
+  mpiPi_msg_debug
+      ("Adding %.0f time to entry %s[%d][%d][%d] value of %.0f\n",
+       dur, dbg_prefix,
+       op_idx, comm_bin, size_bin,
+       stat->time_stats[op_idx][comm_bin][size_bin]);
+
+  stat->time_stats[op_idx][comm_bin][size_bin] += dur;
+}
+
 /* Message size statistics */
 static void _gather_msize_stat(mpiPi_msg_stat_t *stat,
                                double **_outbuf)
@@ -365,7 +389,7 @@ void mpiPi_stats_thr_coll_upd (mpiPi_thread_stat_t *stat,
   if (!mpiPi_stats_thr_is_on(stat))
     return;
 
-  _update_msize_stat(&stat->coll, op, dur, size, comm, "collectives");
+  _update_dur_stat(&stat->coll, op, dur, size, comm, "collectives");
 }
 
 void mpiPi_stats_thr_coll_gather(mpiPi_thread_stat_t *stat, double **_outbuf)
