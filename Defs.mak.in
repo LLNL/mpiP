@@ -9,7 +9,7 @@ CXX	= @CXX@
 FC	= @F77@
 AR	= ar
 RANLIB	= @RANLIB@
-PYTHON  = python
+PYTHON  = @HAVE_PYTHON@
 
 CFLAGS = @CFLAGS@
 FFLAGS = @FFLAGS@

@@ -388,10 +388,11 @@ if test "x$AR" = "x"; then
    AR=ar
 fi
 
-AC_CHECK_PROG(HAVE_PYTHON,[python],[python],[no])
+AC_CHECK_PROGS(HAVE_PYTHON,[python python3 python2],[no])
 if test "x$HAVE_PYTHON" == "xno" ; then
   AC_MSG_ERROR([Python is required to build mpiP.])
 fi
+AC_SUBST(HAVE_PYTHON)
 
 TEST_LIST=
 
@@ -837,6 +838,7 @@ echo
 echo "  C compiler               : ${CC}"
 echo "  C++ compiler             : ${CXX}"
 echo "  Fortran compiler         : ${F77}"
+echo "  Python                   : ${HAVE_PYTHON}"
 echo
 echo "  Timer                    : ${TIMER_NAME}"
 echo "  Stack Unwinding          : ${UNWIND_WITH}"
