@@ -3420,8 +3420,10 @@ if test "x$AR" = "x"; then
    AR=ar
 fi
 
-# Extract the first word of "python", so it can be a program name with args.
-set dummy python; ac_word=$2
+for ac_prog in python python3 python2
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_prog_HAVE_PYTHON+:} false; then :
@@ -3437,7 +3439,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_HAVE_PYTHON="python"
+    ac_cv_prog_HAVE_PYTHON="$ac_prog"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -3445,7 +3447,6 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_prog_HAVE_PYTHON" && ac_cv_prog_HAVE_PYTHON="no"
 fi
 fi
 HAVE_PYTHON=$ac_cv_prog_HAVE_PYTHON
@@ -3458,9 +3459,14 @@ $as_echo "no" >&6; }
 fi
 
 
+  test -n "$HAVE_PYTHON" && break
+done
+test -n "$HAVE_PYTHON" || HAVE_PYTHON="no"
+
 if test "x$HAVE_PYTHON" == "xno" ; then
   as_fn_error $? "Python is required to build mpiP." "$LINENO" 5
 fi
+
 
 TEST_LIST=
 
@@ -7604,6 +7610,7 @@ echo
 echo "  C compiler               : ${CC}"
 echo "  C++ compiler             : ${CXX}"
 echo "  Fortran compiler         : ${F77}"
+echo "  Python                   : ${HAVE_PYTHON}"
 echo
 echo "  Timer                    : ${TIMER_NAME}"
 echo "  Stack Unwinding          : ${UNWIND_WITH}"
