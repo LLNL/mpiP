@@ -1,0 +1,13 @@
+@@@  MPI Partitioned Communication functions
+
+int MPI_Psend_init ( const void* buf, int partitions, MPI_Count count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Info info, MPI_Request *request )
+
+int MPI_Precv_init ( void* buf, int partitions, MPI_Count count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Info info, MPI_Request *request )
+
+int MPI_Pready ( int partitions, MPI_Request request )
+
+int MPI_Pready_range ( int partition_low, int partition_high, MPI_Request request )
+
+int MPI_Pready_list ( int length, int partition_list[], MPI_Request request )
+
+int MPI_Parrived ( MPI_Request request, int partition, int *flag )
