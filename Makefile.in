@@ -118,6 +118,7 @@ endif
 ${C_TARGET}:: ${OBJS} 
 	${AR} ruv $@ ${OBJS}
 	${RANLIB} $@
+	rm -f pc_lookup.o
 
 ${FORTRAN_TARGET}:: ${FOBJS} 
 	${AR} ruv $@ ${FOBJS}

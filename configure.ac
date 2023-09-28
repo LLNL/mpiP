@@ -213,6 +213,42 @@ AC_ARG_ENABLE(mpi-nbc,
 	,
 )
 AC_SUBST(ENABLE_MPI_NONBLOCKINGCOLLECTIVES)
+
+ENABLE_MPI_PERSISTENTCOLLECTIVES=yes
+AC_ARG_ENABLE(mpi-pcoll,
+	AS_HELP_STRING(--disable-mpi-pcoll,[Disable MPI PERSISTENTCOLLECTIVES reporting.]),
+	if test x"$enableval" = xno ; then
+		ENABLE_MPI_PERSISTENTCOLLECTIVES=no
+		echo Profiling of MPI PERSISTENTCOLLECTIVES has been disabled.
+	fi
+	,
+)
+AC_SUBST(ENABLE_MPI_PERSISTENTCOLLECTIVES)
+
+
+ENABLE_MPI_ISENDRECV=yes
+AC_ARG_ENABLE(mpi-isendrecv,
+	AS_HELP_STRING(--disable-mpi-isendrecv,[Disable MPI ISENDRECV reporting.]),
+	if test x"$enableval" = xno ; then
+		ENABLE_MPI_ISENDRECV=no
+		echo Profiling of MPI ISENDRECV has been disabled.
+	fi
+	,
+)
+AC_SUBST(ENABLE_MPI_ISENDRECV)
+
+ENABLE_MPI_PARTITIONED=yes
+AC_ARG_ENABLE(mpi-partitioned,
+	AS_HELP_STRING(--disable-mpi-partitioned,[Disable MPI PARTITIONED reporting.]),
+	if test x"$enableval" = xno ; then
+		ENABLE_MPI_PARTITIONED=no
+		echo Profiling of MPI PARTITIONED has been disabled.
+	fi
+	,
+)
+AC_SUBST(ENABLE_MPI_PARTITIONED)
+
+dnl end of API conditional
 fi
 
 ENABLE_BFD=yes
@@ -609,6 +645,39 @@ else
   HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
 fi
 
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_PERSISTENTCOLLECTIVES" = xyes ; then
+AC_CHECK_FUNC(MPI_Barrier_init,
+              AC_DEFINE([HAVE_MPI_PERSISTENTCOLLECTIVES],[1],[Have MPI persistent collectives]) HAVE_MPI_PERSISTENTCOLLECTIVES=mpi.pcoll.protos.txt,
+                AC_MSG_RESULT([MPI PERSISTENTCOLLECTIVES symbols not found.  MPI PERSISTENTCOLLECTIVES reporting deactivated.])
+                HAVE_MPI_PERSISTENTCOLLECTIVES=/dev/null
+                ENABLE_MPI_PERSISTENTCOLLECTIVES=no
+)
+else
+  HAVE_MPI_PERSISTENTCOLLECTIVES=/dev/null
+fi
+
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_ISENDRECV" = xyes ; then
+AC_CHECK_FUNC(MPI_Isendrecv,
+              AC_DEFINE([HAVE_MPI_ISENDRECV],[1],[Have MPI Isendrecv]) HAVE_MPI_ISENDRECV=mpi.isendrecv.protos.txt,
+                AC_MSG_RESULT([MPI ISENDRECV symbols not found.  MPI ISENDRECV reporting deactivated.])
+                HAVE_MPI_ISENDRECV=/dev/null
+                ENABLE_MPI_ISENDRECV=no
+)
+else
+  HAVE_MPI_ISENDRECV=/dev/null
+fi
+
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_PARTITIONED" = xyes ; then
+AC_CHECK_FUNC(MPI_Psend_init,
+              AC_DEFINE([HAVE_MPI_PARTITIONED],[1],[Have MPI Psend_init]) HAVE_MPI_PARTITIONED=mpi.partitioned.protos.txt,
+                AC_MSG_RESULT([MPI PARTITIONED symbols not found.  MPI PARTITIONED reporting deactivated.])
+                HAVE_MPI_PARTITIONED=/dev/null
+                ENABLE_MPI_PARTITIONED=no
+)
+else
+  HAVE_MPI_PARTITIONED=/dev/null
+fi
+
 if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
@@ -703,7 +772,7 @@ if test -n "$F77" -a "$F77" != no ; then
     AC_MSG_NOTICE($F77_OBJ_OUT)
     AC_MSG_ERROR([giving up])
   fi
-  echo "main(){ FF(); return 0; }" > flink.c
+  echo "extern void FF(); int main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     AC_MSG_RESULT(same as C)
     F77_SYMBOLS=symbol
@@ -817,6 +886,9 @@ AC_SUBST(MPIP_COPIED_ARGS_MAX)
 AC_SUBST_FILE(HAVE_MPI_IO)
 AC_SUBST_FILE(HAVE_MPI_RMA)
 AC_SUBST_FILE(HAVE_MPI_NONBLOCKINGCOLLECTIVES)
+AC_SUBST_FILE(HAVE_MPI_PERSISTENTCOLLECTIVES)
+AC_SUBST_FILE(HAVE_MPI_ISENDRECV)
+AC_SUBST_FILE(HAVE_MPI_PARTITIONED)
 AC_SUBST_FILE(FORTRAN_GETARG)
 
 if test "x${slibdir}" = x ; then
@@ -847,4 +919,7 @@ echo
 echo "  MPI-I/O support          : ${ENABLE_MPI_IO}"
 echo "  MPI-RMA support          : ${ENABLE_MPI_RMA}"
 echo "  MPI-NBC support          : ${ENABLE_MPI_NONBLOCKINGCOLLECTIVES}"
+echo "  MPI-PC  support          : ${ENABLE_MPI_PERSISTENTCOLLECTIVES}"
+echo "  MPI-Isendrecv support    : ${ENABLE_MPI_ISENDRECV}"
+echo "  MPI-Partitioned support  : ${ENABLE_MPI_PARTITIONED}"
 echo "********************************************************************************"
