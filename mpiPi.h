@@ -113,6 +113,7 @@ typedef struct SO_INFO
 {
   void *lvma;
   void *uvma;
+  size_t offset;
   char *fpath;
   bfd *bfd;
 } so_info_t;
