@@ -262,12 +262,12 @@ mpiPi_print_so_node_info (const void *so_node, VISIT which, int depth)
     case preorder:
       break;
     case postorder:
-      printf ("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+      printf ("%p - %p %lx: %s\n", cso->lvma, cso->uvma, cso->offset, cso->fpath);
       break;
     case endorder:
       break;
     case leaf:
-      printf ("%p - %p : %s\n", cso->lvma, cso->uvma, cso->fpath);
+      printf ("%p - %p %lx: %s\n", cso->lvma, cso->uvma, cso->offset, cso->fpath);
       break;
     }
 }
@@ -317,6 +317,7 @@ mpiPi_parse_maps ()
   char fbuf[64];
   FILE *fh;
   void *lvma, *uvma;
+  size_t offset;
   char *fpath, *inbuf = NULL, *tokptr;
   so_info_t *cso = NULL;
   size_t inbufsize;
@@ -334,9 +335,9 @@ mpiPi_parse_maps ()
     }
 
   if (sizeof (void *) == 4)
-    scan_str = "%x-%x";
+    scan_str = "%x-%x %*s %x";
   else
-    scan_str = "%llx-%llx";
+    scan_str = "%llx-%llx %*s %llx";
 
   mpiPi.so_info = NULL;
 
@@ -349,10 +350,10 @@ mpiPi_parse_maps ()
       mpiPi_msg_debug ("maps getline is %s\n", inbuf);
 
       /* scan address range */
-      if (sscanf (inbuf, scan_str, &lvma, &uvma) < 2)
+      if (sscanf (inbuf, scan_str, &lvma, &uvma, &offset) < 2)
         return 0;
 
-      mpiPi_msg_debug ("Parsed range as %lx - %lx\n", lvma, uvma);
+      mpiPi_msg_debug ("Parsed range as %lx - %lx offset: %lx\n", lvma, uvma, offset);
 
       /* get pointer to address range */
       tokptr = strtok_r (inbuf, delim, &sp);
@@ -387,6 +388,7 @@ mpiPi_parse_maps ()
         return 0;
       cso->lvma = lvma;
       cso->uvma = uvma;
+      cso->offset = offset;
       cso->fpath = strdup (fpath);
       cso->bfd = NULL;
       if (tsearch (cso, (void **) &(mpiPi.so_info), mpiPi_so_info_compare) !=
@@ -468,7 +470,7 @@ mpiP_find_src_loc (void *i_addr_hex, char **o_file_str, int *o_lineno,
               fso->bfd = (bfd *) open_bfd_object (fso->fpath);
             }
 
-          pc = (char *) i_addr_hex - (char *) fso->lvma;
+          pc = (((char *) i_addr_hex - (char *) fso->lvma) + fso->offset);
           mpiPi_msg_debug
               ("Calling bfd_map_over_sections with new bfd for %p\n", pc);
 
