@@ -18,17 +18,17 @@
 /* F77 symbols */
 #undef F77_SYMBOLS
 
-/* ARM LSE */
+/* Using a processor with LSE */
 #undef HAVE_ARM_LSE
 
 /* BFD booleans */
 #undef HAVE_BFD_BOOLEAN
 
+/* BFD get section macros */
+#undef HAVE_BFD_GET_SECTION_MACROS
+
 /* BFD get section size */
 #undef HAVE_BFD_GET_SECTION_SIZE
-
-/* BFD macros available before version 2.34 */
-#undef HAVE_BFD_GET_SECTION_MACROS
 
 /* Have demangling */
 #undef HAVE_DEMANGLE_H
@@ -36,14 +36,11 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `m' library (-lm). */
+/* Define to 1 if you have the 'm' library (-lm). */
 #undef HAVE_LIBM
 
 /* Have libunwind */
 #undef HAVE_LIBUNWIND
-
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
 
 /* Have MPIR to pointer */
 #undef HAVE_MPIR_TOPOINTER
@@ -59,6 +56,9 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
@@ -81,9 +81,6 @@
 /* Stack depth of callsites in report */
 #undef MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX
 
-/* Internal stack frames */
-#undef MPIP_INTERNAL_STACK_DEPTH
-
 /* Recorded stack depth of callsites */
 #undef MPIP_CALLSITE_STACK_DEPTH_MAX
 
@@ -92,6 +89,9 @@
 
 /* Maximum number of command line arguments copied */
 #undef MPIP_COPIED_ARGS_MAX
+
+/* Number of internal stack frames */
+#undef MPIP_INTERNAL_STACK_DEPTH
 
 /* Need Real-time declaration */
 #undef NEED_MREAD_REAL_TIME_DECL
@@ -114,13 +114,15 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* The size of `void*', as computed by sizeof. */
+/* The size of 'void*', as computed by sizeof. */
 #undef SIZEOF_VOIDP
 
 /* SO lookup */
 #undef SO_LOOKUP
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
 
 /* Use backtrace */
