@@ -703,7 +703,7 @@ if test -n "$F77" -a "$F77" != no ; then
     AC_MSG_NOTICE($F77_OBJ_OUT)
     AC_MSG_ERROR([giving up])
   fi
-  echo "main(){ FF(); return 0; }" > flink.c
+  echo "void FF(); int main(){ FF(); return 0; }" > flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     AC_MSG_RESULT(same as C)
     F77_SYMBOLS=symbol
