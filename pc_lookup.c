@@ -54,6 +54,10 @@ typedef boolean bfd_boolean;
 #endif
 static bfd_boolean found;
 
+#ifndef PTR
+#define PTR void *
+#endif
+
 
 #ifdef DEMANGLE_IBM
 
@@ -170,8 +174,8 @@ find_address_in_section (abfd, section, data)
   {
     if (mpiPi_debug == 1)
       {
-        sprintf_vma (addr_buf1, local_pc);
-        sprintf_vma (addr_buf2, vma);
+        bfd_sprintf_vma (abfd, addr_buf1, local_pc);
+        bfd_sprintf_vma (abfd, addr_buf2, vma);
 #if defined(HAVE_BFD_GET_SECTION_MACROS)
         mpiPi_msg_debug
             ("failed bfd_get_section_vma: local_pc=%s  vma=%s\n",
@@ -203,9 +207,9 @@ find_address_in_section (abfd, section, data)
   {
     if (mpiPi_debug == 1)
       {
-        sprintf_vma (addr_buf1, local_pc);
-        sprintf_vma (addr_buf2, vma);
-        sprintf_vma (addr_buf3, (vma + size));
+        bfd_sprintf_vma (abfd, addr_buf1, local_pc);
+        bfd_sprintf_vma (abfd, addr_buf2, vma);
+        bfd_sprintf_vma (abfd, addr_buf3, (vma + size));
         mpiPi_msg_debug ("PC not in section: pc=%s vma=%s-%s\n",
                          addr_buf1, addr_buf2, addr_buf3);
       }
@@ -218,18 +222,18 @@ find_address_in_section (abfd, section, data)
 
   if (!found && mpiPi_debug == 1)
   {
-    sprintf_vma (addr_buf1, local_pc);
-    sprintf_vma (addr_buf2, vma);
-    sprintf_vma (addr_buf3, (vma + size));
+    bfd_sprintf_vma (abfd, addr_buf1, local_pc);
+    bfd_sprintf_vma (abfd, addr_buf2, vma);
+    bfd_sprintf_vma (abfd, addr_buf3, (vma + size));
     mpiPi_msg_debug ("bfd_find_nearest_line failed for : pc=%s vma=%s-%s\n",
                      addr_buf1, addr_buf2, addr_buf3);
   }
 
   if (mpiPi_debug == 1)
   {
-    sprintf_vma (addr_buf1, local_pc);
-    sprintf_vma (addr_buf2, vma);
-    sprintf_vma (addr_buf3, (vma + size));
+    bfd_sprintf_vma (abfd, addr_buf1, local_pc);
+    bfd_sprintf_vma (abfd, addr_buf2, vma);
+    bfd_sprintf_vma (abfd, addr_buf3, (vma + size));
     mpiPi_msg_debug ("bfd_find_nearest_line for : pc=%s vma=%s-%s\n",
                      addr_buf1, addr_buf2, addr_buf3);
 
