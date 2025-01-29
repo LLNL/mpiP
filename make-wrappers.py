@@ -230,12 +230,16 @@ opaqueInArgDict = {
   ("MPI_File_get_info", "fh"):"MPI_File",
   ("MPI_File_read", "fh"):"MPI_File",
   ("MPI_File_read", "datatype"):"MPI_Datatype",
+  ("MPI_File_read", "status"):"MPI_Status",
   ("MPI_File_read_all", "fh"):"MPI_File",
   ("MPI_File_read_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_read_all", "status"):"MPI_Status",
   ("MPI_File_read_at", "fh"):"MPI_File",
   ("MPI_File_read_at", "datatype"):"MPI_Datatype",
+  ("MPI_File_read_at", "status"):"MPI_Status",
   ("MPI_File_read_at_all", "fh"):"MPI_File",
   ("MPI_File_read_at_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_read_at_all", "status"):"MPI",
   ("MPI_File_seek", "fh"):"MPI_File",
   ("MPI_File_set_view", "fh"):"MPI_File",
   ("MPI_File_set_view", "etype"):"MPI_Datatype",
@@ -244,12 +248,16 @@ opaqueInArgDict = {
   ("MPI_File_get_view", "fh"):"MPI_File",
   ("MPI_File_write", "fh"):"MPI_File",
   ("MPI_File_write", "datatype"):"MPI_Datatype",
+  ("MPI_File_write", "status"):"MPI_Status",
   ("MPI_File_write_all", "fh"):"MPI_File",
   ("MPI_File_write_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_write_all", "status"):"MPI_Status",
   ("MPI_File_write_at", "fh"):"MPI_File",
   ("MPI_File_write_at", "datatype"):"MPI_Datatype",
+  ("MPI_File_write_at", "status"):"MPI_Status",
   ("MPI_File_write_at_all", "fh"):"MPI_File",
   ("MPI_File_write_at_all", "datatype"):"MPI_Datatype",
+  ("MPI_File_write_at_all", "status"):"MPI_Status",
   ("MPI_File_get_position", "fh"):"MPI_File",
   ("MPI_File_get_byte_offset", "fh"):"MPI_File",
   ("MPI_File_get_size", "fh"):"MPI_File",
@@ -329,6 +337,7 @@ opaqueInArgDict = {
   ("MPI_Intercomm_create", "peer_comm"):"MPI_Comm",
   ("MPI_Intercomm_merge", "comm"):"MPI_Comm",
   ("MPI_Iprobe", "comm"):"MPI_Comm",
+  ("MPI_Iprobe", "status"):"MPI_Status",
   ("MPI_Irecv", "comm"):"MPI_Comm",
   ("MPI_Irecv", "datatype"):"MPI_Datatype",
   ("MPI_Ireduce", "datatype"):"MPI_Datatype",
@@ -360,6 +369,7 @@ opaqueInArgDict = {
   ("MPI_Pack_size", "comm"):"MPI_Comm",
   ("MPI_Pack_size", "datatype"):"MPI_Datatype",
   ("MPI_Probe", "comm"):"MPI_Comm",
+  ("MPI_Probe", "status"):"MPI_Status",
   ("MPI_Put", "origin_datatype"):"MPI_Datatype",
   ("MPI_Put", "target_datatype"):"MPI_Datatype",
   ("MPI_Put", "win"):"MPI_Win",
@@ -370,6 +380,7 @@ opaqueInArgDict = {
   ("MPI_Raccumulate", "request"):"MPI_Request",
   ("MPI_Recv", "comm"):"MPI_Comm",
   ("MPI_Recv", "datatype"):"MPI_Datatype",
+  ("MPI_Recv", "status"):"MPI_Status",
   ("MPI_Recv_init", "comm"):"MPI_Comm",
   ("MPI_Recv_init", "datatype"):"MPI_Datatype",
   ("MPI_Reduce", "comm"):"MPI_Comm",
@@ -414,8 +425,10 @@ opaqueInArgDict = {
   ("MPI_Sendrecv", "recvtag"):"MPI_Datatype",
   ("MPI_Sendrecv", "recvtype"):"MPI_Datatype",
   ("MPI_Sendrecv", "sendtype"):"MPI_Datatype",
+  ("MPI_Sendrecv", "status"):"MPI_Status",
   ("MPI_Sendrecv_replace", "comm"):"MPI_Comm",
   ("MPI_Sendrecv_replace", "datatype"):"MPI_Datatype",
+  ("MPI_Sendrecv_replace", "status"):"MPI_Status",
   ("MPI_Ssend", "comm"):"MPI_Comm",
   ("MPI_Ssend", "datatype"):"MPI_Datatype",
   ("MPI_Ssend_init", "comm"):"MPI_Comm",
@@ -423,8 +436,10 @@ opaqueInArgDict = {
   ("MPI_Start", "request"):"MPI_Request",
   ("MPI_Startall", "array_of_requests"):"MPI_Request",
   ("MPI_Test", "request"):"MPI_Request",
+  ("MPI_Test", "status"):"MPI_Status",
   ("MPI_Testall", "array_of_requests"):"MPI_Request",
   ("MPI_Testany", "array_of_requests"):"MPI_Request",
+  ("MPI_Testany", "status"):"MPI_Status",
   ("MPI_Testsome", "array_of_requests"):"MPI_Request",
   ("MPI_Topo_test", "comm"):"MPI_Comm",
   ("MPI_Type_commit", "datatype"):"MPI_Datatype",
@@ -444,8 +459,10 @@ opaqueInArgDict = {
   ("MPI_Unpack", "comm"):"MPI_Comm",
   ("MPI_Unpack", "datatype"):"MPI_Datatype",
   ("MPI_Wait", "request"):"MPI_Request",
+  ("MPI_Wait", "status"):"MPI_Status",
   ("MPI_Waitall", "array_of_requests"):"MPI_Request",
   ("MPI_Waitany", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitany", "status"):"MPI_Status",
   ("MPI_Waitsome", "array_of_requests"):"MPI_Request",
   ("MPI_Win_allocate", "info"):"MPI_Info",
   ("MPI_Win_allocate", "comm"):"MPI_Comm",
@@ -500,6 +517,14 @@ opaqueOutArgDict = {
   ("MPI_File_get_view", "etype"):"MPI_Datatpye",
   ("MPI_File_get_view", "filetype"):"MPI_Datatpye",
   ("MPI_File_get_view", "info"):"MPI_Info",
+  ("MPI_File_read", "status"):"MPI_Status",
+  ("MPI_File_read_all", "status"):"MPI_Status",
+  ("MPI_File_read_at", "status"):"MPI_Status",
+  ("MPI_File_read_at_all", "status"):"MPI_Status",
+  ("MPI_File_write", "status"):"MPI_Status",
+  ("MPI_File_write_all", "status"):"MPI_Status",
+  ("MPI_File_write_at", "status"):"MPI_Status",
+  ("MPI_File_write_at_all", "status"):"MPI_Status",
   ("MPI_Graph_create", "comm_graph"):"MPI_Comm",
   ("MPI_Group_difference", "group_out"):"MPI_Group",
   ("MPI_Group_excl", "newgroup"):"MPI_Group",
@@ -529,22 +554,31 @@ opaqueOutArgDict = {
   ("MPI_Ibsend", "request"):"MPI_Request",
   ("MPI_Intercomm_create", "comm_out"):"MPI_Comm",
   ("MPI_Intercomm_merge", "comm_out"):"MPI_Comm",
+  ("MPI_Iprobe", "status"):"MPI_Status",
   ("MPI_Irecv", "request"):"MPI_Request",
   ("MPI_Irsend", "request"):"MPI_Request",
   ("MPI_Isend", "request"):"MPI_Request",
   ("MPI_Issend", "request"):"MPI_Request",
   ("MPI_Op_create", "op"):"MPI_Op",
+  ("MPI_Probe", "status"):"MPI_Status",
+  ("MPI_Recv", "status"):"MPI_Status",
   ("MPI_Recv_init", "request"):"MPI_Request",
   ("MPI_Request_free", "request"):"MPI_Request",
   ("MPI_Rsend_init", "request"):"MPI_Request",
   ("MPI_Send_init", "request"):"MPI_Request",
+  ("MPI_Sendrecv", "status"):"MPI_Status",
+  ("MPI_Sendrecv_replace", "status"):"MPI_Status",
   ("MPI_Ssend_init", "request"):"MPI_Request",
   ("MPI_Start", "request"):"MPI_Request",
   ("MPI_Startall", "array_of_requests"):"MPI_Request",
   ("MPI_Test", "request"):"MPI_Request",
+  ("MPI_Test", "status"):"MPI_Status",
   ("MPI_Testall", "array_of_requests"):"MPI_Request",
+  ("MPI_Testall", "array_of_statuses"):"MPI_Status",
   ("MPI_Testany", "array_of_requests"):"MPI_Request",
+  ("MPI_Testany", "status"):"MPI_Status",
   ("MPI_Testsome", "array_of_requests"):"MPI_Request",
+  ("MPI_Testsome", "array_of_statuses"):"MPI_Status",
   ("MPI_Type_commit", "datatype"):"MPI_Datatype",
   ("MPI_Type_contiguous", "newtype"):"MPI_Datatype",
   ("MPI_Type_create_hindexed", "newtype"):"MPI_Datatype",
@@ -555,9 +589,13 @@ opaqueOutArgDict = {
   ("MPI_Type_create_struct", "newtype"):"MPI_Datatype",
   ("MPI_Type_vector", "newtype"):"MPI_Datatype",
   ("MPI_Wait", "request"):"MPI_Request",
+  ("MPI_Wait", "status"):"MPI_Status",
   ("MPI_Waitall", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitall", "array_of_statuses"):"MPI_Status",
   ("MPI_Waitany", "array_of_requests"):"MPI_Request",
-  ("MPI_Waitsome", "array_of_requests"):"MPI_Request"
+  ("MPI_Waitany", "status"):"MPI_Status",
+  ("MPI_Waitsome", "array_of_requests"):"MPI_Request",
+  ("MPI_Waitsome", "array_of_statuses"):"MPI_Status"
 }
 
 incrementFortranIndexDict = {
@@ -604,6 +642,61 @@ collectiveList = [
   "MPI_Scatter",
   "MPI_Scatterv"
   ]
+
+in_place_bottomList = [
+  "MPI_Allgather",
+  "MPI_Allgatherv",
+  "MPI_Allreduce",
+  "MPI_Alltoall",
+  "MPI_Alltoallv",
+  "MPI_Gather",
+  "MPI_Gatherv",
+  "MPI_Iallgather",
+  "MPI_Iallgatherv",
+  "MPI_Iallreduce",
+  "MPI_Ialltoall",
+  "MPI_Ialltoallv",
+  "MPI_Ialltoallw",
+  "MPI_Igather",
+  "MPI_Igatherv",
+  "MPI_Ireduce",
+  "MPI_Ireduce_scatter_block",
+  "MPI_Ireduce_scatter",
+  "MPI_Iscan",
+  "MPI_Iscatter",
+  "MPI_Iscatterv",
+  "MPI_Reduce",
+  "MPI_Reduce_scatter",
+  "MPI_Scatter",
+  "MPI_Scatterv"
+  ]
+
+status_ignoreList = [
+    "MPI_File_read",
+    "MPI_File_read_all",
+    "MPI_File_read_at",
+    "MPI_File_read_at_all",
+    "MPI_File_write",
+    "MPI_File_write_all",
+    "MPI_File_write_at",
+    "MPI_File_write_at_all",
+    "MPI_Iprobe",
+    "MPI_Probe",
+    "MPI_Recv",
+    "MPI_Sendrecv",
+    "MPI_Sendrecv_replace",
+    "MPI_Test",
+    "MPI_Testany",
+    "MPI_Wait",
+    "MPI_Waitany"
+]
+
+statuses_ignoreList = [
+    "MPI_Testall",
+    "MPI_Testsome",
+    "MPI_Waitall",
+    "MPI_Waitsome"
+]
 
 pt2ptList = [
     "MPI_Bsend",
@@ -1281,7 +1374,7 @@ def CreateWrapper(funct, olist):
     xlateTypes = []
     xlateCount = 0
     #  Input types to translate
-    xlateTargetTypes = [ "MPI_Comm", "MPI_Datatype", "MPI_File", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request" ]
+    xlateTargetTypes = [ "MPI_Comm", "MPI_Datatype", "MPI_File", "MPI_Group", "MPI_Info", "MPI_Op", "MPI_Request", "MPI_Status" ]
     stringType = "mpip_const_char_t"
     stringVarNames = []
     freelist = []
@@ -1307,7 +1400,13 @@ def CreateWrapper(funct, olist):
             #  Try to identify whether array or single value by whether "array" is in the variable name
             #  and add C declaration to declaration list.
             if ( xlateVarNames[xlateCount].count("array") > 0 ):
-                decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + ";\n";
+                if ( xlateVarNames[xlateCount].count("statuses") > 0 ):
+                    decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + " = NULL;\n";
+                else:
+                    decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + ";\n";
+            #  Do the same for status/statuses
+            elif ( xlateVarNames[xlateCount].count("status") > 0 ):
+                decl += xlateTypes[xlateCount] + " *c_" + xlateVarNames[xlateCount] + " = NULL;\n";
             else:
                 decl += xlateTypes[xlateCount] + " c_" + xlateVarNames[xlateCount] + ";\n";
 
@@ -1384,7 +1483,7 @@ def CreateWrapper(funct, olist):
         else:
             countVar = "max_integers"
 
-        if ( xlateVarName.count("array") > 0 ):
+        if ( xlateVarName.count("array") > 0 and xlateVarName.count("statuses") == 0) :
             olist.append("c_" + xlateVarName + " = (" + xlateType + "*)malloc(sizeof(" + xlateType + ")*(*" + countVar + "));\n")
             olist.append("if ( c_" + xlateVarName + " == NULL ) mpiPi_abort(\"Failed to allocate memory in " \
                 + funct + "\");\n")
@@ -1426,11 +1525,42 @@ def CreateWrapper(funct, olist):
                 olist.append("    c_" + xlateVarName + "[i] = " + xlateFuncType + "_f2c(" + xlateVarName + "[i]);\n")
                 olist.append("  }\n}\n")
             else:
-                olist.append("c_" + xlateVarName + " = " + xlateFuncType + "_f2c(*" + xlateVarName + ");\n")
+                if ( xlateVarName.count("status") == 0 ):
+                    olist.append("c_" + xlateVarName + " = " + xlateFuncType + "_f2c(*" + xlateVarName + ");\n")
 
             xlateDone = 1
 
-    #  Start generating call to C/Fortran common mpiP wrapper function
+    #  Add logic for IN_PlACE/MPI_BOTTOM
+    if funct in in_place_bottomList:
+        olist.append("\nif ((size_t)sendbuf == mpiPi_fortran.in_place)\n")
+        olist.append("  sendbuf = MPI_IN_PLACE;\n\n")
+        olist.append("if ((size_t)sendbuf == mpiPi_fortran.bottom)\n")
+        olist.append("  sendbuf = MPI_BOTTOM;\n\n")
+        olist.append("if ((size_t)recvbuf == mpiPi_fortran.bottom)\n")
+        olist.append("  recvbuf = MPI_BOTTOM;\n")
+
+    # Add logic for MPI_STATUS_IGNORE
+    if funct in status_ignoreList:
+        olist.append("\nif ((size_t)status == mpiPi_fortran.status_ignore)\n")
+        olist.append("  c_status = MPI_STATUS_IGNORE;\n")
+        olist.append("else {\n")
+        olist.append("  c_status = (MPI_Status *) malloc(sizeof(MPI_Status));\n")
+        olist.append("  if (c_status == NULL)\n")
+        olist.append("    mpiPi_abort(\"Failed to allocate memory in " + funct + "\");\n")
+        olist.append("}\n")
+
+
+    # Add logic for MPI_STATUSES_IGNORE
+    if funct in statuses_ignoreList:
+        olist.append("\nif ((size_t)array_of_statuses == mpiPi_fortran.statuses_ignore)\n")
+        olist.append("  c_array_of_statuses = MPI_STATUSES_IGNORE;\n")
+        olist.append("else {\n")
+        olist.append("  c_array_of_statuses = (MPI_Status *) malloc(sizeof(MPI_Status) * (*count));\n")
+        olist.append("  if (c_array_of_statuses == NULL)\n")
+        olist.append("    mpiPi_abort(\"Failed to allocate memory in " + funct + "\");\n")
+        olist.append("}\n")
+
+     #  Start generating call to C/Fortran common mpiP wrapper function
     if ( 'mips' in arch ) :
         olist.append("\nrc = mpiPif_" + funct + "( &saved_ret_addr, " )
     else :
@@ -1441,7 +1571,7 @@ def CreateWrapper(funct, olist):
     for i in fdict[funct].paramConciseList:
         if ( i in xlateVarNames and
             ( (funct, i) in opaqueInArgDict or (funct, i) in opaqueOutArgDict) ):
-            if ( i.count("array") > 0 ):
+            if ( i.count("array") > 0 ) or (i.count("status") > 0):
                 argname = "c_" + i;
             else:
                 argname = "&c_" + i;
@@ -1492,12 +1622,25 @@ def CreateWrapper(funct, olist):
               "] = " + xlateFuncType + "_c2f(c_" + xlateVarName + \
               "[*" + xlateFortranArrayExceptions[(funct, xlateVarName)] + "]);\n")
             elif ( xlateVarName.count("array") > 0 ):
-                xlateCode.append("{\n  int i; \n")
-                xlateCode.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
-                xlateCode.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
-                xlateCode.append("  }\n}\n")
+                if ( xlateVarName.count("array_of_statuses") > 0 ):
+                    xlateCode.append("{\n  int j; \n")
+                    xlateCode.append("\n  if ( (size_t)" + xlateVarName + " != mpiPi_fortran.statuses_ignore ) {\n")
+                    xlateCode.append("  rc = " + xlateFuncType + "_c2f(&c_" + xlateVarName + "[j], &" + xlateVarName + "[j]);\n")
+                    xlateCode.append("  free(c_" + xlateVarName + ");\n")
+                    xlateCode.append("  }\n}\n\n")
+                else:
+                    xlateCode.append("{\n  int i; \n")
+                    xlateCode.append("  for (i = 0; i < *" + countVar + "; i++) { \n")
+                    xlateCode.append("    " + xlateVarName + "[i] = " + xlateFuncType + "_c2f(c_" + xlateVarName + "[i]);\n")
+                    xlateCode.append("  }\n}\n")
             else:
-                xlateCode.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
+                if ( xlateVarName.count("status") > 0 ):
+                    xlateCode.append("\nif ( (size_t)" + xlateVarName + " != mpiPi_fortran.status_ignore ) {\n")
+                    xlateCode.append("  rc = " + xlateFuncType + "_c2f(c_" + xlateVarName + ", " + xlateVarName + ");\n")
+                    xlateCode.append("  free(c_" + xlateVarName + ");\n")
+                    xlateCode.append("}\n")
+                else:
+                    xlateCode.append("*" + xlateVarName + " = " + xlateFuncType + "_c2f(c_" + xlateVarName + ");\n")
 
             xlateDone = 1
 

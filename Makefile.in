@@ -33,6 +33,9 @@ all: ${SHARED_C_TARGET} test
 PC_LOOKUP_FILE=@PC_LOOKUP_FILE@
 PC_LOOKUP_OBJ = $(PC_LOOKUP_FILE:.c=.o)
 
+FORTRAN_VARS_FILE=fortran_vars.f
+FORTRAN_VARS_OBJ=fortran_vars.o
+
 SRCS =	diag_msgs.c \
 	mpiP-hash.c \
 	mpiP-callsites.c \
@@ -49,6 +52,7 @@ SRCS =	diag_msgs.c \
 	pcontrol.c \
 	mpiP-API.c \
 	record_stack.c \
+	$(FORTRAN_VARS_OBJ) \
 	${PC_LOOKUP_FILE}
 
 API_SRCS =	diag_msgs_api.c \
@@ -61,6 +65,7 @@ API_SRCS =	diag_msgs_api.c \
 	util.c \
 	record_stack.c \
 	mpiP-API.c \
+	$(FORTRAN_VARS_OBJ) \
 	${PC_LOOKUP_FILE}
 
 OBJS  = $(SRCS:.c=.o)
