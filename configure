@@ -6216,7 +6216,8 @@ $as_echo "Failed to compile fortran test object. Example error follows:" >&6; }
 $as_echo "$as_me: $F77_OBJ_OUT" >&6;}
     as_fn_error $? "giving up" "$LINENO" 5
   fi
-  echo "main(){ FF(); return 0; }" > flink.c
+  echo "extern void f_fun_(void);" > flink.c
+  echo "int main(){ FF(); return 0; }" >> flink.c
   if $CC -o flink -DFF=f_fun flink.c ffunc.o $LDFLAGS $LIBS 1>/dev/null 2>/dev/null; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: same as C" >&5
 $as_echo "same as C" >&6; }
