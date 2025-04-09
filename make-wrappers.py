@@ -924,9 +924,10 @@ def StandardFileHeader(fname):
     olist = []
     olist.append("/* " + fname + " */\n")
     olist.append("/* DO NOT EDIT -- AUTOMATICALLY GENERATED! */\n")
-    olist.append("/* Timestamp: " + time.strftime("%d %B %Y %H:%M", time.localtime(time.time())) + "  */\n")
-    olist.append("/* Location: " + socket.gethostname () + " " + os.name + " */\n")
-    olist.append("/* Creator: " + os.environ["LOGNAME"] + "  */\n")
+    if not os.getenv("SOURCE_DATE_EPOCH"):
+        olist.append("/* Timestamp: " + time.strftime("%d %B %Y %H:%M", time.localtime(time.time())) + "  */\n")
+        olist.append("/* Location: " + socket.gethostname () + " " + os.name + " */\n")
+        olist.append("/* Creator: " + os.environ["LOGNAME"] + "  */\n")
     olist.append("\n")
     olist.append("\n")
     return olist
