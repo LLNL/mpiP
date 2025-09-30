@@ -110,6 +110,10 @@ mpiPdemangle (const char *mangledSym)
 
 #endif
 
+/* To provide compatibility to modern versions of bfd (>2.37) */
+#ifndef PTR
+#define PTR void *
+#endif
 
 static void
 find_address_in_section (abfd, section, data)
