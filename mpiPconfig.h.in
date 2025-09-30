@@ -18,17 +18,17 @@
 /* F77 symbols */
 #undef F77_SYMBOLS
 
-/* ARM LSE */
+/* Using a processor with LSE */
 #undef HAVE_ARM_LSE
 
 /* BFD booleans */
 #undef HAVE_BFD_BOOLEAN
 
+/* BFD get section macros */
+#undef HAVE_BFD_GET_SECTION_MACROS
+
 /* BFD get section size */
 #undef HAVE_BFD_GET_SECTION_SIZE
-
-/* BFD macros available before version 2.34 */
-#undef HAVE_BFD_GET_SECTION_MACROS
 
 /* Have demangling */
 #undef HAVE_DEMANGLE_H
@@ -51,8 +51,17 @@
 /* Have MPI-IO */
 #undef HAVE_MPI_IO
 
+/* Have MPI Isendrecv */
+#undef HAVE_MPI_ISENDRECV
+
 /* Have MPI non-blocking collectives */
 #undef HAVE_MPI_NONBLOCKINGCOLLECTIVES
+
+/* Have MPI Psend_init */
+#undef HAVE_MPI_PARTITIONED
+
+/* Have MPI persistent collectives */
+#undef HAVE_MPI_PERSISTENTCOLLECTIVES
 
 /* Have MPI RMA */
 #undef HAVE_MPI_RMA
@@ -81,9 +90,6 @@
 /* Stack depth of callsites in report */
 #undef MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX
 
-/* Internal stack frames */
-#undef MPIP_INTERNAL_STACK_DEPTH
-
 /* Recorded stack depth of callsites */
 #undef MPIP_CALLSITE_STACK_DEPTH_MAX
 
@@ -92,6 +98,9 @@
 
 /* Maximum number of command line arguments copied */
 #undef MPIP_COPIED_ARGS_MAX
+
+/* Number of internal stack frames */
+#undef MPIP_INTERNAL_STACK_DEPTH
 
 /* Need Real-time declaration */
 #undef NEED_MREAD_REAL_TIME_DECL
