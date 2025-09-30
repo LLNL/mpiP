@@ -667,6 +667,9 @@ MPIP_INTERNAL_STACK_DEPTH
 MPIP_CALLSITE_REPORT_STACK_DEPTH_MAX
 ENABLE_FORTRAN_WEAK_SYMS
 ENABLE_FORTRAN_XLATE
+ENABLE_MPI_PARTITIONED
+ENABLE_MPI_ISENDRECV
+ENABLE_MPI_PERSISTENTCOLLECTIVES
 ENABLE_MPI_NONBLOCKINGCOLLECTIVES
 ENABLE_MPI_RMA
 ENABLE_MPI_IO
@@ -729,7 +732,10 @@ SHELL'
 ac_subst_files='FORTRAN_GETARG
 HAVE_MPI_IO
 HAVE_MPI_RMA
-HAVE_MPI_NONBLOCKINGCOLLECTIVES'
+HAVE_MPI_NONBLOCKINGCOLLECTIVES
+HAVE_MPI_PERSISTENTCOLLECTIVES
+HAVE_MPI_ISENDRECV
+HAVE_MPI_PARTITIONED'
 ac_user_opts='
 enable_option_checking
 with_cc
@@ -752,6 +758,9 @@ enable_api_only
 enable_mpi_io
 enable_mpi_rma
 enable_mpi_nbc
+enable_mpi_pcoll
+enable_mpi_isendrecv
+enable_mpi_partitioned
 enable_bfd
 enable_libunwind
 enable_so_lookup
@@ -1397,6 +1406,10 @@ Optional Features:
   --disable-mpi-io        Disable MPI-I/O reporting.
   --disable-mpi-rma       Disable MPI RMA reporting.
   --disable-mpi-nbc       Disable MPI NONBLOCKINGCOLLECTIVES reporting.
+  --disable-mpi-pcoll     Disable MPI PERSISTENTCOLLECTIVES reporting.
+  --disable-mpi-isendrecv Disable MPI ISENDRECV reporting.
+  --disable-mpi-partitioned
+                          Disable MPI PARTITIONED reporting.
   --disable-bfd           Do not use GNU binutils libbfd for source lookup.
   --disable-libunwind     Do not use libunwind to generate stack traces.
   --disable-so-lookup     Disable functionality to attempt to find source info
@@ -3005,6 +3018,44 @@ if test "${enable_mpi_nbc+set}" = set; then :
 	fi
 
 fi
+
+
+
+ENABLE_MPI_PERSISTENTCOLLECTIVES=yes
+# Check whether --enable-mpi-pcoll was given.
+if test "${enable_mpi_pcoll+set}" = set; then :
+  enableval=$enable_mpi_pcoll; if test x"$enableval" = xno ; then
+		ENABLE_MPI_PERSISTENTCOLLECTIVES=no
+		echo Profiling of MPI PERSISTENTCOLLECTIVES has been disabled.
+	fi
+
+fi
+
+
+
+
+ENABLE_MPI_ISENDRECV=yes
+# Check whether --enable-mpi-isendrecv was given.
+if test "${enable_mpi_isendrecv+set}" = set; then :
+  enableval=$enable_mpi_isendrecv; if test x"$enableval" = xno ; then
+		ENABLE_MPI_ISENDRECV=no
+		echo Profiling of MPI ISENDRECV has been disabled.
+	fi
+
+fi
+
+
+
+ENABLE_MPI_PARTITIONED=yes
+# Check whether --enable-mpi-partitioned was given.
+if test "${enable_mpi_partitioned+set}" = set; then :
+  enableval=$enable_mpi_partitioned; if test x"$enableval" = xno ; then
+		ENABLE_MPI_PARTITIONED=no
+		echo Profiling of MPI PARTITIONED has been disabled.
+	fi
+
+fi
+
 
 
 fi
@@ -5835,6 +5886,60 @@ else
   HAVE_MPI_NONBLOCKINGCOLLECTIVES=/dev/null
 fi
 
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_PERSISTENTCOLLECTIVES" = xyes ; then
+ac_fn_c_check_func "$LINENO" "MPI_Barrier_init" "ac_cv_func_MPI_Barrier_init"
+if test "x$ac_cv_func_MPI_Barrier_init" = xyes; then :
+
+$as_echo "#define HAVE_MPI_PERSISTENTCOLLECTIVES 1" >>confdefs.h
+ HAVE_MPI_PERSISTENTCOLLECTIVES=mpi.pcoll.protos.txt
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI PERSISTENTCOLLECTIVES symbols not found.  MPI PERSISTENTCOLLECTIVES reporting deactivated." >&5
+$as_echo "MPI PERSISTENTCOLLECTIVES symbols not found.  MPI PERSISTENTCOLLECTIVES reporting deactivated." >&6; }
+                HAVE_MPI_PERSISTENTCOLLECTIVES=/dev/null
+                ENABLE_MPI_PERSISTENTCOLLECTIVES=no
+
+fi
+
+else
+  HAVE_MPI_PERSISTENTCOLLECTIVES=/dev/null
+fi
+
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_ISENDRECV" = xyes ; then
+ac_fn_c_check_func "$LINENO" "MPI_Isendrecv" "ac_cv_func_MPI_Isendrecv"
+if test "x$ac_cv_func_MPI_Isendrecv" = xyes; then :
+
+$as_echo "#define HAVE_MPI_ISENDRECV 1" >>confdefs.h
+ HAVE_MPI_ISENDRECV=mpi.isendrecv.protos.txt
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI ISENDRECV symbols not found.  MPI ISENDRECV reporting deactivated." >&5
+$as_echo "MPI ISENDRECV symbols not found.  MPI ISENDRECV reporting deactivated." >&6; }
+                HAVE_MPI_ISENDRECV=/dev/null
+                ENABLE_MPI_ISENDRECV=no
+
+fi
+
+else
+  HAVE_MPI_ISENDRECV=/dev/null
+fi
+
+if test "x$ENABLE_API_ONLY" = xno && test "x$ENABLE_MPI_PARTITIONED" = xyes ; then
+ac_fn_c_check_func "$LINENO" "MPI_Psend_init" "ac_cv_func_MPI_Psend_init"
+if test "x$ac_cv_func_MPI_Psend_init" = xyes; then :
+
+$as_echo "#define HAVE_MPI_PARTITIONED 1" >>confdefs.h
+ HAVE_MPI_PARTITIONED=mpi.partitioned.protos.txt
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: MPI PARTITIONED symbols not found.  MPI PARTITIONED reporting deactivated." >&5
+$as_echo "MPI PARTITIONED symbols not found.  MPI PARTITIONED reporting deactivated." >&6; }
+                HAVE_MPI_PARTITIONED=/dev/null
+                ENABLE_MPI_PARTITIONED=no
+
+fi
+
+else
+  HAVE_MPI_PARTITIONED=/dev/null
+fi
+
 if test "x$DISABLE_SO_LOOKUP" = "xno" && test "x$ENABLE_BFD" = xyes; then
   SO_LOOKUP=no
   #  Check for /proc/self/maps, can't use AC_CHECK_FILES since cross compiling
@@ -6337,6 +6442,9 @@ FORTRAN_TARGET=$FORTRAN_TARGET
 FORTRAN_STR_DECL=$FORTRAN_STR_DECL
 
 ENABLE_BFD=$ENABLE_BFD
+
+
+
 
 
 
@@ -7620,4 +7728,7 @@ echo
 echo "  MPI-I/O support          : ${ENABLE_MPI_IO}"
 echo "  MPI-RMA support          : ${ENABLE_MPI_RMA}"
 echo "  MPI-NBC support          : ${ENABLE_MPI_NONBLOCKINGCOLLECTIVES}"
+echo "  MPI-PC  support          : ${ENABLE_MPI_PERSISTENTCOLLECTIVES}"
+echo "  MPI-Isendrecv support    : ${ENABLE_MPI_ISENDRECV}"
+echo "  MPI-Partitioned support  : ${ENABLE_MPI_PARTITIONED}"
 echo "********************************************************************************"
