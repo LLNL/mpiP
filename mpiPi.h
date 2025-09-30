@@ -91,7 +91,15 @@ typedef struct _histogram_entry_t
 }
 mpiPi_histogram_entry_t;
 
+typedef struct _mpiPi_fortran_t {
+  size_t in_place;
+  size_t bottom;
+  size_t status_ignore;
+  size_t statuses_ignore;
+} mpiPi_fortran_t;
+
 extern mpiPi_lookup_t mpiPi_lookup[];
+extern mpiPi_fortran_t mpiPi_fortran;
 
 enum
 { MPIP_MPI_TIME_FMT, MPIP_MPI_TIME_SUMMARY_FMT,

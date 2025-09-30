@@ -19,6 +19,7 @@ static char *svnid = "$Id$";
 #include <unistd.h>
 #include "mpiPi.h"
 
+mpiPi_fortran_t mpiPi_fortran;
 
 
 static int
@@ -155,6 +156,12 @@ mpiPi_init (char *appName, mpiPi_thr_mode_t thr_mode)
   mpiPi_getenv ();
 
   mpiPi_stats_mt_init(&mpiPi.task_stats, thr_mode);
+
+  /* -- get addresses of MPI_IN_PLACE, MPI_BOTTOM, MPI_STATUS_IGNORE
+   *    and MPI_STATUSES_IGNORE when profiling Fortran code
+   */
+  fortran_vars(&mpiPi_fortran.in_place, &mpiPi_fortran.bottom, 
+               &mpiPi_fortran.status_ignore, &mpiPi_fortran.statuses_ignore);
 
   /* -- welcome msg only collector  */
   if (mpiPi.collectorRank == mpiPi.rank)
